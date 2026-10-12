@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-12 Traveler creation sequence studied (top level)
+
+**Changed:** wrote `docs/traveler-creation.md`; updated the `FILL` entry in `docs/days-csv-format.md` and the seed note in `docs/rand.md`.
+**Why:** to know the order of events when a traveler arrives, before studying the large functions each step calls.
+**Tested how:** decompiled and read in full 10 functions (`BoothEnv.makeNewTraveler`, the `BoothEnv` constructor, `applyError`, four `Day` methods, `ErrorContext`); recovered two dropped arguments from the raw instructions; checked the `FILL` column of `Days.csv`.
+**Result:** the 12-step creation sequence and the 10-step booth setup are written down, including which random generator each uses and exactly when the additional-error roll consumes a draw. `FILL` is confirmed as the template for travelers after the scripted list (the last list entry repeats). `BoothEnv`'s generator is seeded with the day seed minus `0x7FFFF000`.
+**Still broken / not tested:** the `Traveler` constructor, the error system (`Errors.txt`, `ErrorLib`, `ErrorMaker`), `addPaper`, `makeFactValue` and `applyOp` are not studied. Nothing is checked against the running game.
+**Next:** the error system, starting with `Errors.txt`.
+
 ## 2026-10-12 Traveler script meaning studied (creation side)
 
 **Changed:** rewrote `docs/travelers-txt-format.md` with confirmed meanings; added `scripts/ghidra/DumpAssembly.java`; added `__pycache__/` to `.gitignore`; updated `docs/data-files.md` and `docs/ghidra-workflow.md`.

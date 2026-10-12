@@ -58,8 +58,10 @@ exist.
 - `minTravelers` = the number of `TRAVELERS` entries, or 100 if there are
   none.
 - `FILL`: if not blank, appended to the end of the traveler list (after
-  `minTravelers` is counted). Its use as the template for the remaining
-  random travelers is inferred.
+  `minTravelers` is counted). When the list runs out, the last entry is used
+  for every further traveler (`Day.makeTravelerSpec`, see
+  `traveler-creation.md`), so `FILL` is the template for the rest of the
+  day. Every day in the table has one.
 - If the saved story has a fact named `Game/Visitor<number>`, its value is
   inserted at the front of the list. The number is probably the day; not
   confirmed.
