@@ -78,6 +78,16 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
 - `Days.csv` carry-over lists are built left to right through the day
   columns.
 
+## Faces
+
+- A traveler's height comes from the assembled face picture, so the face
+  must be built exactly even when it is not shown: the four pieces, the
+  marker dots in reading order, the stretch factors (head at most 1.05), the
+  truncating draw with no blending, and the height scan **before** the
+  palette is applied (`faces.md`, `scripts/reference/faces.py`).
+- The first shoulder dot is not always the left one. Piece numbers 25 to 27
+  (male) have no artwork.
+
 ## Text and parsing
 
 - `Facts.xml` is not valid XML (a raw `&&`); read it leniently. Attribute

@@ -27,6 +27,7 @@ Run from the project root with `python -I`. Paths below assume
 | `map_order_check.py` | `scripts\reference D\Facts.xml D\Text.xml D\NamesM.txt D\NamesF.txt` | `haxe-maps.md` |
 | `responses_check.py` | `scripts\reference D\Travelers.txt dumps\il2cppdumper\stringliteral.json` | `responses-and-events.md` |
 | `actions_check.py` | `scripts\reference D\Travelers.txt D\Errors.txt D\Papers.xml D\Facts.xml D\Text.xml D\Speeches.txt` | `player-actions.md` (also models the stamp-result rules and the penalty formula) |
+| `faces_check.py` | `scripts\reference <assets>\faces D\Faces.xml <assets>\FacePalette.png` (`<assets>` = `extracted\art\assets`; needs Pillow) | `faces.md` |
 | `speech_check.py` | `scripts\reference D\Speeches.txt D\Travelers.txt D\Errors.txt D\Facts.xml` | `speech.md` (also reads `dumps\il2cppdumper\stringliteral.json` if present) |
 | `traveler_build_check.py` | `scripts\reference D\Travelers.txt D\Errors.txt D\NamesM.txt D\NamesF.txt D\Bodies.xml D\Faces.xml` | `traveler-build.md` |
 

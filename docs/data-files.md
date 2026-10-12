@@ -18,7 +18,7 @@ cross-checked, with a write-up in `docs/`.
 | `Nights.txt` | `data.NightLib` | Not studied |
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Not studied |
 | `Endlesses.xml` | `data.EndlessLib` | Not studied |
-| `Faces.xml` | `data.FaceLib` | Partly: how face metadata is combined and counted in `traveler-build.md`; the loader (`FaceLib` constructor) not read |
+| `Faces.xml` | `data.FaceLib` | Studied: `faces.md` (the loader and how a face picture is built); how the metadata of four pieces is combined in `traveler-build.md` |
 | `Bodies.xml` | `data.BodyLib` | Partly: the contraband types in `traveler-build.md`; the rest not studied |
 | `Emblems.xml` | `data.EmblemLib` | Not studied |
 | `Fonts.xml` | `data.FontLib` | Not studied |

@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Faces: the loader, how a face is built, and the pixel height
+
+**Changed:** wrote `docs/faces.md`; added `scripts/reference/faces.py` (builds a face from the local sheet images, needs Pillow) and `scripts/checks/faces_check.py`; updated `docs/traveler-build.md`, `data-files.md`, `port-requirements.md` and the checks README.
+**Why:** step 2 in `PROGRESS.md`: the traveler's height comes from the face picture, so the face-building procedure was the last unknown in creating a traveler.
+**Tested how:** read the decompiled functions in full (`decompiled/faces.clean.c`, `image.clean.c`, `affine.clean.c`); settled one ambiguous branch and one dropped value from the raw instructions; read four constants from the DLL; ran `faces_check.py`; built five faces with `faces.py` and looked at them; ran the height survey over every head and shoulders pairing.
+**Result:** the faces come out correctly assembled (palettes, mirroring and the document version included). Data findings: sheet `M6` has artwork only for piece 24; one female face has its shoulder dots in the opposite order (harmless). Face heights by the reference script: men with random faces 1.645 m to 1.964 m, women 1.618 m to 1.909 m; no pairing gives a zero height.
+**Still broken / not tested:** not compared pixel-for-pixel with the running game. `Image.paste`, the PNG decoder, `getDocImage` and `getPhotoHeadImage` not read. `docs/PROGRESS.md` not updated (only on request).
+**Next:** the Python reference of traveler creation from a master seed (the second half of step 2), then step 3 (remaining data files).
+
 ## 2026-10-13 The player's actions and judging mistakes (booth part 2)
 
 **Changed:** wrote `docs/player-actions.md`; added `scripts/checks/actions_check.py`; updated `docs/responses-and-events.md`, `operations-and-fact-validity.md`, `facts-xml-format.md`, `port-requirements.md`, `data-files.md` and the checks README to point at it.

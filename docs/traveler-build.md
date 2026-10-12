@@ -100,7 +100,8 @@ Then weight is computed; no draw.
   gender.
 
 Two faces are built from that face specification: the live face and the
-document face (`forDoc`). How a face is drawn is not studied.
+document face (`forDoc`). How a face is built from its four pieces is in
+`faces.md`.
 
 ### Face specification and `FaceSpec.fromString`
 
@@ -181,7 +182,7 @@ as `M<sheet>:<position>` or `F<sheet>:<position>`. The combined metadata is:
 - description words ("has" and "has not") taken from the matching piece
   (shoulders, head, eyes, mouth).
 
-How `FaceLib` reads `Faces.xml` into those keys is not studied.
+How `FaceLib` reads `Faces.xml` into those keys is in `faces.md`.
 
 ## The name
 
@@ -230,9 +231,9 @@ order. Then: while finger 2 equals finger 3 (counting from 1), redraw finger
 
 ## Height and weight
 
-- The face has a height from its image: `1.0 + pixels / 110` metres. How
-  many pixels is not studied (it is worked out when the face image is
-  built).
+- The face has a height from its image: `1.0 + pixels / 110` metres. The
+  pixel count is `120 − hair height − the first row of the assembled face
+  picture that contains the dark face colour` (`faces.md`).
 - **Height** = face height − `r × 0.1` metres (one draw, up to 10 cm
   shorter). In centimetres it is rounded.
 - **Weight**: start with `w = floor(bmi × height²)`. Then multiply by a
@@ -301,8 +302,8 @@ Script: `scripts/checks/traveler_build_check.py`.
 
 ## Not studied
 
-- How a face image is built (`Face` constructor, `heightInPixels`) and the
-  `Faces.xml` and `Bodies.xml` formats in general.
+- (How a face image is built, `heightInPixels` and the `Faces.xml` format
+  are now in `faces.md`.) The `Bodies.xml` format in general.
 - `GregorianDate.afterYears`, `TravelerName.getFormatted` and the other
   name methods, `FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`.
 - What `canDetain`, `forceDeny`, `slow`, `leaveDir` and `special` do in
