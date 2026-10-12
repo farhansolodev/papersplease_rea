@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Reference script for the wrong-value helpers (answer key, layer 5a)
+
+**Changed:** added `scripts/reference/values.py` (name layouts, wrong names, aliases, the alias swap sets, typos, the upper-case table, wrong faces, wrong fingerprints, altered id numbers); noted it in `docs/value-helpers.md`.
+**Why:** first half of the fifth layer of the Python reference of traveler creation; the document values need these helpers.
+**Tested how:** re-read `TravelerName` (`getFormatted`, `getRandomInvalidated`, `getRandomInvalidatedImp`, `getRandomAlias`), `Lang.buildAliasSwapSets` and its sort, `makeAlias`, `makeTypo`, `FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`; read four constants from the DLL; ran `values.py`, which prints examples and checks itself over 1,500 name parts and 300 seeds.
+**Result:** `problems: none`. The swap-set order built from `Text.xml` and `UpperCase.txt` through `haxemap.py` equals the order recorded earlier in `haxe-maps.md` (`CK, IUY, JL, aeiou, jl, bh, GPQ, BH, gpq, AEIOU, iuy, ck`). Aliases use 3 to 11 draws.
+**Still broken / not tested:** not compared with the running game. The two "draw of exactly 1.0" cases in the pickers follow Haxe's documented behaviour. Only the English text was used for the swap sets.
+**Next:** layer 5b: the booth itself (fact definitions, `addPaper` in hash order, `makeFactValue`, applying an error's lines), then the script that chains all layers.
+
 ## 2026-10-13 Reference script for choosing errors (answer key, layer 4)
 
 **Changed:** added `scripts/reference/errormaker.py` (error library, requirements, error context, `makeError` with the recent-groups rule, the additional-error roll, the always errors) and `scripts/checks/errormaker_check.py`; updated `docs/errors-txt-format.md` (reference section; corrected the number of hidden-paper errors from ten to nine), `port-requirements.md` and the checks README.

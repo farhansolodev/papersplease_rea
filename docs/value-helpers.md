@@ -166,6 +166,30 @@ map instead, replaces `$key` with each value, in the map's hash order. Given
 another list, replaces numbered placeholders in turn (the numbering was
 dropped by the decompiler and not checked).
 
+## Reference implementation
+
+`scripts/reference/values.py` (written 2026-10-13 after re-reading
+`TravelerName`, `buildAliasSwapSets`, `makeAlias`, `makeTypo`,
+`FaceSpec.getInvalid`, `FingerprintCode.makeInvalid` and
+`invalidateIdNumber`; the constants 0.75, 0.333, 0.666 and 0.0001 were read
+from the DLL) implements everything in this document except the date type,
+which is in `gdate.py`. It builds the swap sets from `Text.xml` and
+`UpperCase.txt` through the lookup-table model (`haxemap.py`) and gets the
+same order as listed above.
+
+Its self-checks, over 1,500 name parts and 300 seeds: an alias changes
+exactly one letter and uses at least three draws (3 for about 70% of names,
+up to 11 seen); every name part has at least one swappable letter, so the
+typo fallback never fired; a typo removes one character and never the first;
+a wrong face has four different pieces within 0 to 19 and uses four draws;
+wrong fingerprints differ on all five fingers; an altered id number differs
+in exactly one place; a wrong name is never the real one.
+
+Two details the code makes explicit: a typo only checks the removed
+character and the one **before** it against `-`, `.` and space (the one
+after may be a space); and reading a position outside a word gives nothing
+rather than an error, which matters for one- and two-letter words.
+
 ## Notes for the port
 
 - Count the draws exactly: wrong names loop; an alias makes at least three
