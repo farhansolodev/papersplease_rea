@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Reference script for traveler scripts and the day's traveler list (answer key, layer 3)
+
+**Changed:** added `scripts/reference/travspec.py` (script evaluation into a specification, weighted picks, conditions, the `WorldDef` pickers, the `Days.csv` traveler list and day facts, the criminal faces made at day set-up) and `scripts/checks/travspec_check.py`; updated `docs/travelers-txt-format.md`, `days-csv-format.md` (criminals are made every day; exact text of the day facts), `port-requirements.md` and the checks README.
+**Why:** third layer of the Python reference of traveler creation from a master seed.
+**Tested how:** re-read `applyToSpec`, `assignVar`, `makeTravelerSpec`, the condition closure, `ExpressionTester`, `Probability.select`, the `WorldDef` pickers, `PurposeDef`/`AutoPaperDef.getMatches`, `splitAndTrim`, `getAccumulatedRow` and the end of the `Day` constructor; read the criminal gender comparison from the raw instructions; ran the demonstration for days 1 and 8 and `travspec_check.py` over all 31 days and 12 master seeds.
+**Result:** 4,932 specifications built with no failure and no empty detail; day 1 and day 8 lists and rules read sensibly (day 8 has Jorji's scripted face, name and id). New findings: every day makes three criminal faces at set-up, using the face cycler and the traveler generator; `Day/Rules` and `Day/Features` end in `;`; `HIRING_ENGINEERS` tests `Game/Rules`, which nothing sets, so that condition never holds.
+**Still broken / not tested:** not compared with the running game. Story facts and facts set during the day are inputs (empty by default). Whether a `Day` object is constructed more than once per day (which would use the cycler again) is not known. The number in `Game/Visitor<n>` is still unconfirmed.
+**Next:** layer 4: errors (`ErrorLib`, `ErrorMaker.makeError`, the additional-error roll); then document values and papers; then one script that chains the layers for a whole traveler.
+
 ## 2026-10-13 Reference script for building the person (traveler answer key, layer 2)
 
 **Changed:** added `scripts/reference/person.py` (the `Traveler` constructor: draw order, scripted-face parser, face metadata, id number, fingerprints, height, weight, birth date) and `scripts/checks/person_check.py`; noted both in `docs/traveler-build.md`; settled one open item in `docs/player-actions.md` (`Want` and `Reject` patterns are case-insensitive); added the check to the checks README.

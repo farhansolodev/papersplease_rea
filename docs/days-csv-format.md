@@ -159,9 +159,17 @@ Where the templates live (probably `Text.xml`) is inferred.
 ### CRIMFACE
 
 `NAME:face spec`, matched with the pattern `\s*(.*):(.*)\s*`. If it matches,
-one criminal is created from `FaceSpec.fromString`. The list is then filled
-up to three criminals with faces from the run's face cycler, drawing from the
-traveler random generator each time.
+one criminal is created from `FaceSpec.fromString`, which draws from the
+traveler random generator once per missing part of the face. The list is
+then filled up to three criminals: for each, one draw `r` from the traveler
+random generator, and a face from the run's face cycler, male if `r > 0.5`
+(the comparison was read from the raw instructions, 2026-10-13).
+
+**This happens on every day**, whether or not the day has the `CRIMINALS`
+feature. So each day's set-up takes three faces from the face cycler (two on
+days 24, 29 and 30, which have a `CRIMFACE`) and uses up to three traveler
+draws before the first traveler is made. The port must do the same or every
+later face is off. Modelled in `scripts/reference/travspec.py`.
 
 ### PAPERS
 
@@ -182,9 +190,10 @@ data.
   endless run's own seed. Four independent random generators are created from
   it: news (`seed + 0x1000`), border (`+ 0x2000`), night (`+ 0x3000`) and
   travelers (`+ 0x4000`).
-- **Day facts.** Three facts are recorded for the day: `Day/Rules` (rule
-  names joined with `;`), `Day/Id` and `Day/Features` (feature names joined
-  with `;`).
+- **Day facts.** Three facts are recorded for the day: `Day/Rules` (each
+  rule name followed by `;`, so the text ends in `;`), `Day/Id` and
+  `Day/Features` (feature names joined with `;`, plus a final `;`; a day
+  with no features has just `;`).
 
 ## Not studied
 

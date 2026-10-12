@@ -175,6 +175,39 @@ inside responses (5 times each), where that is valid.
   level. All block-level uses are inside `DEFAULT`, which is handled
   separately.
 
+- **A condition that can never hold.** `HIRING_ENGINEERS` tests
+  `? Game/Rules has RuleNoImpor` to leave Impor out of its nations.
+  `Game/Rules` appears nowhere else in the data files and is not a string in
+  the game's code (the day's rules are in `Day/Rules`), so the saved story
+  never has it and the line under it never runs. Found 2026-10-13.
+
+## Reference implementation
+
+`scripts/reference/travspec.py` (written 2026-10-13 after re-reading
+`applyToSpec`, `assignVar`, `makeTravelerSpec`, the condition tester, the
+`WorldDef` pickers, `Probability.select`, `CsvTable.getAccumulatedRow` and
+the end of the `Day` constructor) evaluates an entry into a specification:
+block lines, weighted `=` picks, conditions, `INCLUDE`, `BREAK`, `fallback`,
+then the gap filling in order. It also models the day: the traveler list
+from `Days.csv`, the day facts and the three criminal faces made at the
+start of every day (`days-csv-format.md`).
+
+`scripts/checks/travspec_check.py` builds the first travelers of all 31
+story days for 12 master seeds (4,932 specifications): nothing is rejected,
+no detail is left empty, and an unset gender comes out male 2,120 times and
+female 2,104 times. A specification takes 7 to 16 draws; only two entries
+(`GENERIC_BOMBER`, with its `RANDOM100`, and `SEARCH_DAY`) take a varying
+number. With an empty saved story, three entries fall back to `GENERIC`
+(`EZIC_HANDLER_PRE1`, `WATCH_BUYER0`, `WATCH_BUYER1`).
+
+Limits: the saved story's facts and the facts scripts set during the day
+(`Day/Confiscated`, `Day/KidKiller` and others, 23 in all) are inputs,
+empty by default; the error-pattern filter on random purposes is left out
+because it excludes nothing with the game's data (`facts-xml-format.md`);
+responses and custom errors are recorded by name only. A weighted pick
+whose draw is exactly 1.0 returns nothing, as in the game. Nothing has been
+compared with the running game.
+
 ## DEFAULT
 
 `TravelerLib` keeps a pointer to the entry `DEFAULT`. The designer's note
@@ -195,4 +228,4 @@ is created. It is read by `BoothEnv.findDefaultRunOpNode`
 - The custom error and custom fact group classes beyond how they are built.
 - What reads each variable (`want`, `special`, `slow`, `face` and so on).
 - How the language packs alter the tree.
-- No reader has been written for the port beyond the tree parser.
+- (A reference reader now exists: `scripts/reference/travspec.py`, above.)

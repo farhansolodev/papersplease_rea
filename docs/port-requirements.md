@@ -22,6 +22,10 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   not from the day. The face cycler's sequences have overlapping seeds; the
   name cycler's position is saved with the game and advances even for
   scripted names (`traveler-build.md`).
+- **Every day's set-up makes three criminal faces**, on days without the
+  wanted-criminals feature too: up to three draws from the day's traveler
+  generator and three faces from the face cycler before the first traveler
+  (`days-csv-format.md`, `scripts/reference/travspec.py`).
 - Draw **exactly** when the original does:
   - a `=` line in a traveler script draws even with a single value
     (`travelers-txt-format.md`);
