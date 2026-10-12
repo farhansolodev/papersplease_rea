@@ -153,7 +153,8 @@ never missing, when the day has no bulletin text.
 5. In story mode only (not endless), if the day's news has articles: add page
    `news`, and for each article whose bulletin text (its title, or its
    subtitle when there is no title) is present, set `Bulletin/<the article's
-   fact id>` to it. News itself is not studied.
+   fact id>` to it. The articles and their fact ids are in
+   `news-txt-format.md`.
 6. For each page `i`, set `Bulletin/PageNumber<Page>` to `"<i+1>/<count>"`.
    `<Page>` is the page id with its first letter, and every letter after a
    space, in upper case (`notice0` becomes `Notice0`).
@@ -203,8 +204,8 @@ Script: `scripts/checks/papers_on_desk_check.py` (see its README entry).
 
 ## Not studied
 
-- What the token list and `Bulletin/PageMask` are used for; news articles
-  (`DayNews`, `NewsArticle`).
+- What the token list and `Bulletin/PageMask` are used for. (News articles
+  are now in `news-txt-format.md`.)
 - `AlltimeStats.awardAchievement` (out of scope).
 - `TravelerName.getFormatted` (the filer label) and the localization lookup.
 - Every caller of `addPaper` outside `BoothEnv` (calls by slot number are

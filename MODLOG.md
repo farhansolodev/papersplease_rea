@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 News.txt and the day's headlines (step 3, first data file)
+
+**Changed:** added `docs/news-txt-format.md`, `scripts/reference/news.py` (articles, scores, the game's quicksort, the day's headline list, fillers, the `News<i>` names, traveler news) and `scripts/checks/news_check.py`; updated `docs/data-files.md`, `days-csv-format.md`, `papers-on-desk.md`, `port-requirements.md` (sorting is not stable) and the checks README.
+**Why:** step 3 of `PROGRESS.md`: the remaining data files, starting with news.
+**Tested how:** read `News.txt` with its comments; decompiled and read the `NewsArticleLib`, `NewsArticle` and `DayNews` functions, `addTravelerNews`, `getNewsIds`, `getValueStringArray`, `compareStrings`, `Array.sort`/`quicksort`, both `getRemappedFactId`; read four dropped numbers from the raw instructions; searched the other data files and the code's strings for news ids; ran `news.py 12345` and `news_check.py` (31 days, 200 master seeds).
+**Result:** `problems: none`. 57 entries, 64 articles. Findings: a day's paper takes traveler-triggered news from the **previous** day's saved fact; the sort is a quicksort that swaps equal items, so on days 2, 3, 13 and 16 the two articles end up in the opposite order to the file; fillers are counted from the number of ids (so up to four items); each `RANDOM_` list has one live article, the rest are commented out; the entry `DIPLOMAT_FIRST` is named by nothing found.
+**Still broken / not tested:** not compared with the running game. Drawing the newspaper (`DayNewsImage.make`, `LayoutImage`, the `NewsLayout` images) is not studied, so whether the first article is the main headline is not known. `whenAddNews` and endless-mode news not studied. Other callers of `Array.sort` not listed.
+**Next:** either the newspaper picture (`DayNewsImage.make`), or the next data file (`Nights.txt`).
+
 ## 2026-10-13 Reference script for the booth: a whole traveler from a master seed (answer key, layer 5b part 2 and the chaining layer)
 
 **Changed:** added `scripts/reference/booth.py` (fact stores, `addPaper`, every branch of `makeFactValue`, `setFactInvalid`/`setFactValid`, the lines of an error, criminal selection, and `makeNewTraveler` chaining all earlier layers) and `scripts/checks/booth_check.py`; `person.py` now takes the criminal pick as a function and records the criminal's number and the name's gender; `travspec.py` keeps a specification's custom error lines; updated `docs/traveler-creation.md` (reference section), `fact-values.md` (access nations, description words, date text, check results) and the checks README.

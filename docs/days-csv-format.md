@@ -153,7 +153,7 @@ Where the templates live (probably `Text.xml`) is inferred.
 
 - `NEWS` is not read by the `Day` constructor. `DayLib.getNewsIds` reads it,
   and a `DayNews` object is built with the day's news random generator.
-  `DayNews` itself is not studied.
+  What it does with the ids is in `news-txt-format.md`.
 - `NIGHTEVENTS`: night event ids, one per line.
 
 ### CRIMFACE

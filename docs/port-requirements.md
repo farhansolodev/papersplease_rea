@@ -81,6 +81,12 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   `scripts/reference/haxemap.py` (text hash checked in the emulator).
 - `Days.csv` carry-over lists are built left to right through the day
   columns.
+- **Sorting is not stable.** The original's `Array.sort` is a quicksort
+  around the middle item, and equal items change places (two equal items
+  are always swapped). The day's news articles are sorted with it
+  (`news-txt-format.md`, modelled in `scripts/reference/news.py`). Other
+  callers of `Array.sort` have not been listed yet; wherever the port
+  sorts something the original sorts, use the same procedure.
 
 ## Faces
 

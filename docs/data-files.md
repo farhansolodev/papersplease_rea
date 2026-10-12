@@ -14,7 +14,7 @@ cross-checked, with a write-up in `docs/`.
 | `Travelers.txt` | `data.TravelerLib` | Studied: `travelers-txt-format.md`; responses at the booth in `responses-and-events.md` and `player-actions.md` |
 | `Errors.txt` | `data.ErrorLib` | Studied: `errors-txt-format.md`; applying an error in `operations-and-fact-validity.md` |
 | `Speeches.txt` | `data.SpeechLib` | Studied: `speech.md` |
-| `News.txt` | `data.NewsArticleLib` | Not studied |
+| `News.txt` | `data.NewsArticleLib` | Studied: `news-txt-format.md` (the file and which headlines a day gets; drawing the newspaper not studied) |
 | `Nights.txt` | `data.NightLib` | Not studied |
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Not studied |
 | `Endlesses.xml` | `data.EndlessLib` | Not studied |
