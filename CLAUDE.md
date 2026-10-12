@@ -59,7 +59,9 @@ Port my own copy of Papers, Please to run in the browser:
   `docs/il2cpp-name-recovery.md`.
 - REA's Ghidra requests time out on `GameAssembly.dll` (see `STATUS.md`), so
   that DLL is analysed by running Ghidra's `analyzeHeadless` directly.
-- Rust, Bevy and the wasm toolchain have not been checked or set up yet.
+- Rust 1.99 and the `wasm32-unknown-unknown` target are installed (checked
+  2026-10-12). `trunk`, `wasm-pack` and `wasm-bindgen` are not installed, and
+  Bevy has not been set up or tried.
 - Setup references, only if a problem comes up:
   - https://github.com/morluto/rea/blob/main/docs/installation.md
   - https://github.com/morluto/rea/blob/main/docs/windows-ghidra-p0.md

@@ -15,6 +15,33 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-12 Papers.xml format studied in full
+
+**Changed:** wrote `docs/papers-xml-format.md`; added `scripts/ghidra/clean_decompile.py`; added a study method and two tool notes to `docs/ghidra-workflow.md`.
+**Why:** `Papers.xml` defines every document, its pages and what is drawn on them.
+**Tested how:** inventoried all tags and attributes; decompiled and read in full 17 loader and helper functions; compared the strings each loader uses with the file's attribute names; checked every attribute value in the file against what the code accepts.
+**Result:** 68 papers, 120 pages, 509 marks, all accounted for. Marks inherit defaults paper -> page -> mark. Text or image values starting with `$` are fact ids filled in per traveler. Three attributes are never read (`fontlinespacing`, mark `format`, mark `section`). Papers are stored in reverse file order, which decides which `Passport` a nation-less lookup returns. Side finding: `Facts.xml` is not well-formed XML (strict parser fails at line 96).
+**Still broken / not tested:** no reader written for the port. Mark layout and drawing, the phone/tablet rewrites, the carousel's role and language overrides not studied. The Rust toolchain was checked in passing: `rustc` 1.99 and the `wasm32-unknown-unknown` target are installed; `trunk`, `wasm-pack` and `wasm-bindgen` are not.
+**Next:** `Facts.xml`, since papers, days and travelers all depend on facts.
+
+## 2026-10-12 Days.csv: rest of the Day setup read, guesses corrected
+
+**Changed:** rewrote `docs/days-csv-format.md`; added `scripts/ghidra/ListStringUses.java`.
+**Why:** the first pass only skimmed two-thirds of the `Day` constructor and matched rows to fields by name.
+**Tested how:** read the remaining ~900 decompiled lines; listed the string constants in machine-code order to identify lookups where the decompiler dropped the row name; searched for users of the `RPAGE`, `NEWS` and `DESC` strings; read the enum orders from `dump.cs`; printed the short rows from the file.
+**Result:** every row is now confirmed. Three earlier guesses were wrong or incomplete: `RPAGE` is not used at all (no such string in the code); `NEWS` is read by `DayLib.getNewsIds`, not the constructor; `GUARDS` is a string of flag characters (`0`-`4`, `J`, `F`), not a number. `DURATION_SLOW` confirmed as phone-only.
+**Still broken / not tested:** no reader written for the port. `app.Rand`, `DayNews`, face generation and text templates not studied.
+**Next:** `Papers.xml`.
+
+## 2026-10-12 Days.csv format studied
+
+**Changed:** wrote `docs/days-csv-format.md`. No code changed.
+**Why:** `Days.csv` defines what happens on each day; the port has to read it the same way the game does.
+**Tested how:** parsed the file with a standard CSV reader (20 rows, 34 columns, all rows the same width); decompiled `data.CsvTable`, `data.DayLib` and the `play.day.Day` constructor and read the table parser, the carry-over logic and the first third of the constructor.
+**Result:** table is sideways (rows are properties, columns are days). `+Name` / `-Name` carry over between days. 11 of 20 rows confirmed in code, plus the date and random-seed formulas; the rest are inferred from names and marked so.
+**Still broken / not tested:** second half of the `Day` constructor only skimmed. No parser written for the port, so nothing is tested end to end. `app.Rand` not studied.
+**Next:** `Papers.xml`.
+
 ## 2026-10-12 Art.dat decrypted and unpacked
 
 **Changed:** added `scripts/ghidra/FindReferences.java`, `scripts/extract/decrypt_art.py`, `scripts/extract/unpack_art.py`; wrote `docs/art-dat-format.md`; added a pitfall note to `docs/ghidra-workflow.md`; added `/.claude/settings.local.json` to `.gitignore`.
