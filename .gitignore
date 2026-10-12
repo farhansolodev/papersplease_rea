@@ -1,0 +1,8 @@
+# Copyrighted game material: never commit
+/game/
+/extracted/
+/dumps/
+/decompiled/
+
+# Rust
+/target/
