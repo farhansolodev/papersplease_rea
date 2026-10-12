@@ -30,6 +30,7 @@ Run from the project root with `python -I`. Paths below assume
 | `faces_check.py` | `scripts\reference <assets>\faces D\Faces.xml <assets>\FacePalette.png` (`<assets>` = `extracted\art\assets`; needs Pillow) | `faces.md` |
 | `person_check.py` | `scripts\reference <assets> D\Travelers.txt` (`<assets>` = `extracted\art\assets`; needs Pillow) | `traveler-build.md` (the reference script `person.py`) |
 | `travspec_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `travelers-txt-format.md` and `days-csv-format.md` (the reference script `travspec.py`) |
+| `errormaker_check.py` | `scripts\reference D` | `errors-txt-format.md` (the reference script `errormaker.py`) |
 | `speech_check.py` | `scripts\reference D\Speeches.txt D\Travelers.txt D\Errors.txt D\Facts.xml` | `speech.md` (also reads `dumps\il2cppdumper\stringliteral.json` if present) |
 | `traveler_build_check.py` | `scripts\reference D\Travelers.txt D\Errors.txt D\NamesM.txt D\NamesF.txt D\Bodies.xml D\Faces.xml` | `traveler-build.md` |
 

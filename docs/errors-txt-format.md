@@ -160,8 +160,12 @@ been checked.
 ## Small helpers
 
 - `getHiddenPaperId`: if the id contains `-Hidden`, the paper is the part of
-  the id before its **first** `-` (for example `Passport`). Ten errors:
-  one per document type.
+  the id before its **first** `-` (for example `Passport`). **Nine** errors
+  (corrected 2026-10-13; an earlier count of ten was wrong): `Passport`,
+  `EntryTicket`, `IdCard`, `IdSupplement`, `EntryPermit`, `WorkPermit`,
+  `AccessPermit`, `AsylumGrant`, `VaccineCert`. The test is on the id, not
+  the group: `Passport-Missing...` is in group `Passport-MissingHidden` but
+  hides nothing.
 - `isSpeechError`: the id contains `<speech>`.
 
 ## Checks against the real file
@@ -177,6 +181,39 @@ expansion:
 - Every paper requirement names a document in `Facts.xml`.
 - One error has no `!` line (`Traveler-Criminal<generic>`); eight have no
   requirement, so they are always possible when selected by name.
+
+## Reference implementation
+
+`scripts/reference/errormaker.py` (written 2026-10-13 after re-reading the
+`ErrorLib` constructor, `getErrorsForContext`, `Error.getMatchesContext`,
+`getHiddenPaperId`, `isSpeechError`, `ErrorMaker.makeError`,
+`Day.makeErrorContext`, `ErrorContext` and the error steps of
+`makeNewTraveler`) loads the errors, tests requirements, picks the first
+error, rolls for an additional one and lists the "always" errors.
+
+`scripts/checks/errormaker_check.py` runs it over the first travelers of all
+31 days for 12 master seeds (7,908 travelers, 4,532 errors chosen):
+
+- a pick uses no draw when there are no candidates and exactly two
+  otherwise;
+- every chosen group is one the recent-groups rule allows;
+- 97 of the 107 random errors get chosen at least once;
+- after a first error that hides a paper or is a speech error, the roll
+  produced a second error 31% and 32% of the time (the data's chance is
+  0.33 for both); other first errors never roll;
+- 1,996 travelers have an `error` variable that matches nothing (mostly
+  `--`).
+
+**Patterns are real regular expressions.** Three of the 35 distinct
+`= error` values in `Travelers.txt` use pattern syntax: `<.*>`,
+`Diplomat.*<deny>` and `^(?!Passport).*<missing>`, which uses a negative
+look-ahead ("any missing-document error except the passport's"). The port's
+pattern matcher must support that.
+
+The functions are separate (`first_error`, `additional_error`,
+`always_errors_for_context`) because in the game the person and the
+documents draw from the same generator between them; chaining them is the
+job of a later layer. Nothing has been compared with the running game.
 
 ## Not studied
 

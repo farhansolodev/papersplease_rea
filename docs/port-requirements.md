@@ -110,6 +110,10 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   (`facts-xml-format.md`).
 - Error ids are matched as case-insensitive regular expressions; a fact
   group path or response name containing `*` is also a regular expression.
+  One error pattern in `Travelers.txt` uses a negative look-ahead
+  (`^(?!Passport).*<missing>`), which Rust's standard `regex` crate does not
+  support: use a matcher that does, or handle that pattern specially
+  (`errors-txt-format.md`).
 - Out-of-range reads of a Haxe array give nothing rather than failing, and
   `Std.parseInt` of non-numeric text gives nothing (usually treated as 0).
 

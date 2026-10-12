@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Reference script for choosing errors (answer key, layer 4)
+
+**Changed:** added `scripts/reference/errormaker.py` (error library, requirements, error context, `makeError` with the recent-groups rule, the additional-error roll, the always errors) and `scripts/checks/errormaker_check.py`; updated `docs/errors-txt-format.md` (reference section; corrected the number of hidden-paper errors from ten to nine), `port-requirements.md` and the checks README.
+**Why:** fourth layer of the Python reference of traveler creation from a master seed.
+**Tested how:** re-read the `ErrorLib` constructor, `getErrorsForContext`, `getMatchingErrors`, `Error.getMatchesContext`, `getHiddenPaperId`, `isSpeechError`, `makeError`, `makeErrorContext`, `ErrorContext` and the error steps of `makeNewTraveler`; ran the demonstration for days 1 and 8 and `errormaker_check.py` over 31 days and 12 master seeds.
+**Result:** 4,532 errors chosen with no rule broken: 0 or 2 draws per pick, every chosen group allowed by the recent-groups rule, second-error rate 31-32% against the data's 0.33. Day 1 foreigners get `ALWAYS:Rules-ArstotzkaOnly`; day 8's Jorji gets `EntryPermit-Missing`. New findings: one error pattern uses a negative look-ahead, which the port's matcher must support; the earlier doc's "ten hidden-paper errors" was wrong (nine).
+**Still broken / not tested:** not compared with the running game. The demonstration's errors are not what the game would produce for that seed (the person's and documents' draws come between). The `Traveler-Criminal` replacement and custom errors are handled in the person layer and the chaining layer, not here.
+**Next:** layer 5: document values and papers (`makeFactValue`, `addPaper`, applying an error's invalidate lines); then one script chaining all layers.
+
 ## 2026-10-13 Reference script for traveler scripts and the day's traveler list (answer key, layer 3)
 
 **Changed:** added `scripts/reference/travspec.py` (script evaluation into a specification, weighted picks, conditions, the `WorldDef` pickers, the `Days.csv` traveler list and day facts, the criminal faces made at day set-up) and `scripts/checks/travspec_check.py`; updated `docs/travelers-txt-format.md`, `days-csv-format.md` (criminals are made every day; exact text of the day facts), `port-requirements.md` and the checks README.
