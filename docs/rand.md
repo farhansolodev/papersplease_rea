@@ -79,8 +79,11 @@ see `docs/days-csv-format.md`), `play.Bootstrap`, `BoothEnv`,
 `CriminalPoster`, `TakeBursts`, `BorderCam`, `ScreenShake`, `PullChain`,
 `LoadScreen.loadButton_onClick`, `ShuffledSequence`, `SoundDefLib` and
 `FaceCycler`. `BoothEnv` uses the day seed minus `0x7FFFF000` and shares that
-generator with its error maker (`traveler-creation.md`). **What seed each of
-the others uses is not studied.** In
+generator with its error maker (`traveler-creation.md`). `FaceCycler` and
+`ShuffledSequence` derive several generators from one seed, some of them
+overlapping; the name cycler's position is saved with the game
+(`traveler-build.md`). **What seed each of the others uses is not
+studied**, nor which seed the face and name cyclers are given. In
 particular, where a new game's story seed comes from is unknown; if it is
 taken from the clock, two new games differ, which is expected behaviour.
 

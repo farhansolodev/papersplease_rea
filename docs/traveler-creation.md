@@ -92,7 +92,8 @@ The `BoothEnv` constructor, in order:
 5. **Make the scripted error**, if the specification has an `error`
    variable: `errorMaker.makeError(error, context)`.
 6. **Create the traveler** from the specification, the error, the face and
-   name sources and the day's list of criminals (`Traveler` constructor).
+   name sources and the day's list of criminals (`Traveler` constructor,
+   see `traveler-build.md`). This can replace or drop the error.
 7. If the traveler is one of the day's criminals, mark that criminal as
    used.
 8. Add the traveler's custom fact groups, expanded for their nationality.
@@ -134,13 +135,12 @@ literally.
 
 These are the large pieces this sequence calls:
 
-- **`Traveler` constructor** (about 9.6 KB of code): name, face, id number,
-  height, weight, fingerprints, contraband and the rest of the person.
-- The face and name cyclers, and the saved story.
+- The saved story, and where the face and name cyclers are created.
 
 Studied since, in their own docs: the error system (`errors-txt-format.md`),
 `applyOp` (`operations-and-fact-validity.md`), `makeFactValue`
-(`fact-values.md`), and `addPaper` with `addBulletinForDay`
-(`papers-on-desk.md`).
+(`fact-values.md`), `addPaper` with `addBulletinForDay`
+(`papers-on-desk.md`), and the `Traveler` constructor with the face and
+name cyclers (`traveler-build.md`).
 
 Nothing here has been checked against the running game.

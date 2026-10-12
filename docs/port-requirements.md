@@ -12,7 +12,12 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   error (error selection). Decide and document what the port does.
 - Keep the generators separate: per day there are news, border, night and
   traveler generators (`days-csv-format.md`) and the booth's own
-  (`traveler-creation.md`). The booth and its error maker share one.- Draw **exactly** when the original does:
+  (`traveler-creation.md`). The booth and its error maker share one.
+- Faces and names come from long-lived cyclers with their own generators,
+  not from the day. The face cycler's sequences have overlapping seeds; the
+  name cycler's position is saved with the game and advances even for
+  scripted names (`traveler-build.md`).
+- Draw **exactly** when the original does:
   - a `=` line in a traveler script draws even with a single value
     (`travelers-txt-format.md`);
   - `RANDOM100` draws each time it is evaluated;
@@ -24,6 +29,8 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
     (`traveler-creation.md`);
   - each fact value has its own draw pattern, and `~` facts are generated
     twice (`fact-values.md`);
+  - building the person draws in a fixed order with several conditional
+    steps (`traveler-build.md`, "Order of draws");
   - adding a paper draws once for its expiration date only if the document
     has an `ExpirationDate` fact, then generates every empty fact **even if
     the value will be discarded** because the path already exists

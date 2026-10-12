@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Building the traveler (the person) studied
+
+**Changed:** wrote `docs/traveler-build.md`; added `scripts/checks/traveler_build_check.py`; updated `docs/traveler-creation.md`, `docs/fact-values.md`, `docs/rand.md`, `docs/port-requirements.md`, `docs/PROGRESS.md` and the checks README.
+**Why:** the `Traveler` constructor decides the person behind the documents (face, name, id number, fingerprints, height, weight, criminal); it was next in `docs/PROGRESS.md`.
+**Tested how:** decompiled and read in full the constructor and 45 helpers (face and name cyclers, shuffled sequences, face metadata, fingerprints, criminals, id numbers); recovered from the raw instructions the six variable names the decompiler dropped, all numeric constants, the face-metadata lookup keys and one substring length; checked the findings against `Travelers.txt`, `Errors.txt`, `NamesM.txt`, `NamesF.txt`, `Bodies.xml` and `Faces.xml` with the new check script.
+**Result:** the exact order of the booth's random draws while building a person is written down (vaccine count, optional contraband type, optional face parts, confusing-gender or criminal pick, optional id number, fingerprints, height). Faces and names come from separate long-lived "cyclers", not from the day's seed; the face cycler's sequences have overlapping seeds, and the name position is saved with the game and advances even for scripted names. Weight comes from the face's body-mass index and height through a gender-specific factor. All error names the code looks for exist in `Errors.txt`. `canDetain` and `genderForced` are never set by the data.
+**Still broken / not tested:** where the face and name cyclers are created and seeded is not studied, so no traveler can be reproduced yet; the face image height, `Faces.xml` loading and `GregorianDate` are not studied. Not compared with the running game.
+**Next:** where the run is set up (cycler seeds, story seed); see `docs/PROGRESS.md`.
+
 ## 2026-10-13 Adding and removing papers studied
 
 **Changed:** wrote `docs/papers-on-desk.md`; added `scripts/checks/papers_on_desk_check.py`; updated `docs/operations-and-fact-validity.md`, `docs/traveler-creation.md`, `docs/fact-values.md`, `docs/facts-xml-format.md`, `docs/port-requirements.md`, `docs/PROGRESS.md` and the checks README.

@@ -131,8 +131,8 @@ These are called from here and decide the fine detail of several values:
 - `Lang.makeAlias`, `Lang.makeTypo`, `Lang.getReplaced`,
   `Uppercaser.toUpperCaseU`, `SpeechLib.applyGenderSwitches`.
 - `FaceSpec.getInvalid`, the face's feature lists, `FingerprintCode`.
-- `Traveler.getBirthDate`, `invalidateIdNumber`, `makeRandomIdNumber`, and
-  the `Traveler` constructor that sets height, weight and the rest.
+- (`Traveler.getBirthDate`, `invalidateIdNumber`, `makeRandomIdNumber` and
+  the `Traveler` constructor are now in `traveler-build.md`.)
 - `Settings.formatDate` and `GregorianDate`.
 
 When this function is called for a newly added paper, and with which

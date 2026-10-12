@@ -47,20 +47,23 @@ total: 100 to 200 hours of sessions, low confidence.
 | `operations-and-fact-validity.md` | Running an operation; invalid facts |
 | `fact-values.md` | How each document value is generated |
 | `papers-on-desk.md` | Adding and removing papers, staying papers, the bulletin |
+| `traveler-build.md` | Building the person: face, name, id, fingerprints, height, weight, criminals |
 | `port-requirements.md` | Exactness rules the Rust port must follow |
 
 ## Next steps, in order
 
 (Done 2026-10-13: `BoothEnv.addPaper` and the bulletin, see
-`papers-on-desk.md`.)
+`papers-on-desk.md`; the `Traveler` constructor, see `traveler-build.md`.)
 
-1. **`Traveler` constructor** (`0x180969140`, about 9.6 KB): name, face,
-   height, weight, id number, fingerprints, contraband.
+1. **Where the run is set up**: where the face and name cyclers are created
+   and seeded (`BoothEnvRun`, `play.Bootstrap`), and where a new game's
+   story seed comes from. Needed before any traveler can be reproduced.
 2. **Helpers used by the value generator**: `TravelerName`
    (`getFormatted`, `getRandomInvalidated`, `getRandomAlias`),
    `Lang.makeAlias` / `makeTypo` / `getReplaced`, `FaceSpec.getInvalid`,
-   `FingerprintCode`, `Traveler.getBirthDate` / `invalidateIdNumber` /
-   `makeRandomIdNumber`, `Settings.formatDate`, `GregorianDate`.
+   `FingerprintCode.makeInvalid`, `Settings.formatDate`, `GregorianDate`
+   (`afterYears`, `afterDays`), and the face image's height in pixels
+   (`Face` constructor).
 3. **Haxe `StringMap` order.** Adding a paper generates its facts in the
    hash order of a `StringMap`, and the order decides which random draws
    each fact gets (`papers-on-desk.md`). Study `haxe.ds.StringMap` as
@@ -111,6 +114,9 @@ Collected from the docs, so they are not lost:
 - 20 traveler entries nothing refers to (`travelers-txt-format.md`), and
   three data files never loaded by name (`Threads.txt`,
   `TravelerGraph.txt`, `Version.txt`). Purpose unknown.
+- One `contrabandTypes` value in `Travelers.txt` is `$Gun0`; what the `$`
+  means there is not known. What `canDetain`, `forceDeny`, `slow`,
+  `leaveDir` and `special` do in play (`traveler-build.md`).
 - What the day's token list (filled by `Token...` papers) and
   `Bulletin/PageMask` are used for; which classes outside `BoothEnv` call
   `addPaper` (`papers-on-desk.md`).
