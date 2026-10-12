@@ -167,9 +167,10 @@ inside responses (5 times each), where that is valid.
 ## Findings in the data
 
 - **A misspelled operator.** In `EZIC_DIPLO`, one response condition reads
-  `? Traveler/PassportConfiscated =! YES`. `=!` is not an operator. If
-  response conditions use the same comparison code as block conditions (not
-  yet confirmed), that comparison is always false and its lines never run.
+  `? Traveler/PassportConfiscated =! YES`. `=!` is not an operator.
+  Response conditions do use the same comparison code
+  (`responses-and-events.md`), so that comparison is always false and its
+  line ("Barbarian.") never runs.
 - `Traveler/...` on the left of a condition would be an error at block
   level. All block-level uses are inside `DEFAULT`, which is handled
   separately.
@@ -179,16 +180,18 @@ inside responses (5 times each), where that is valid.
 `TravelerLib` keeps a pointer to the entry `DEFAULT`. The designer's note
 there says it holds default responses, and that its conditions can see all
 facts and are evaluated when a response is needed rather than when a traveler
-is created. It is read by `BoothEnv.findDefaultRunOpNode`, not studied yet.
+is created. It is read by `BoothEnv.findDefaultRunOpNode`
+(`responses-and-events.md`).
 
 ## Not studied
 
-- How responses are run: `BoothEngine.handleEvent`, `BoothEnv`, and what
-  each event and button means in play.
+- How the player's actions trigger responses (part 2 of
+  `responses-and-events.md`). Events, default responses, conditions and
+  button commands are in part 1.
 - How a specification becomes an actual traveler with documents:
   `BoothEnv.makeNewTraveler`.
-- How conditions inside responses are evaluated, and what
-  `Traveler/...` and names like `TWO_PASSPORTS/...` refer to there.
+- What names like `TWO_PASSPORTS/...` refer to on the left of a response
+  condition. (Response conditions in general: `responses-and-events.md`.)
 - The custom error and custom fact group classes beyond how they are built.
 - What reads each variable (`want`, `special`, `slow`, `face` and so on).
 - How the language packs alter the tree.

@@ -117,7 +117,7 @@ error and no traveler script invalidates `Traveler/Nationality`.)
 - (`getSpeech` is covered in `speech.md`, `makeFactValue` in
   `fact-values.md`, `addPaper` and `saveStayingPaperIds` in
   `papers-on-desk.md`.)
-- Who runs named groups and enable-button operations
-  (`BoothEngine.handleEvent`), and how the stored `Interrogate` response is
-  used.
+- How the stored `Interrogate` response is used (part 2 of
+  `responses-and-events.md`; part 1 covers who runs named groups and button
+  operations).
 - Nothing here has been compared with the running game.

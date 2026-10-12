@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Booth events, responses and operations studied (part 1)
+
+**Changed:** wrote `docs/responses-and-events.md`; added `scripts/checks/responses_check.py`; updated `docs/travelers-txt-format.md`, `docs/operations-and-fact-validity.md`, `docs/port-requirements.md` and the checks README.
+**Why:** to know what the booth does at each step of a visit, how scripted responses and their conditions run, and how citations are decided.
+**Tested how:** decompiled and read in full 20 functions (`BoothEngine.handleEvent`, the response runners, `expandConditionalOps`, `applyOps`, the operation queue, `BoothEnv` default-response lookup and condition testing, the engine constructor); read dropped text keys and timing constants from the raw instructions; checked `Travelers.txt` response names, `@` commands and the `DEFAULT` entry against the engine with the new script.
+**Result:** every event of a visit is written down, including the order of `Intro`, `Approved`/`Denied` and `Leave` responses and when defaults are used; response conditions see any fact; conditional groups are flattened, other named groups are skipped until asked for; Say operations and anything behind them are queued 1.5 s apart (3 s for slow travelers); all 14 kinds of `@` command used in the data are handled; the citation reasons (confiscation, cited facts, missing denial reason) and statistics are written down. Settles the `=!` question: that group never runs.
+**Still broken / not tested:** the player's actions (stamping, giving papers back, confiscating, interrogating, detaining, fingerprinting, searching), `hasErrors`, `getCiteText`, `mistakeCaught` and `Day.addCitation` are part 2. The stamp-result bit values are inferred. Not compared with the running game.
+**Next:** part 2: the player's actions and how mistakes are judged.
+
 ## 2026-10-13 Speech studied
 
 **Changed:** wrote `docs/speech.md`; added `scripts/checks/speech_check.py`; updated `docs/travelers-txt-format.md`, `docs/errors-txt-format.md`, `docs/operations-and-fact-validity.md`, `docs/fact-values.md`, `docs/value-helpers.md`, `docs/data-files.md`, `docs/port-requirements.md` and the checks README.

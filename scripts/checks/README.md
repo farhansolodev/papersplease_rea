@@ -25,6 +25,7 @@ Run from the project root with `python -I`. Paths below assume
 | `errors_check2.py` | `scripts\reference D\Errors.txt D\Facts.xml D\Travelers.txt` | same (tilde paths, error names used by travelers) |
 | `papers_on_desk_check.py` | `scripts\reference D\Facts.xml D\Papers.xml D\Days.csv D\Errors.txt` | `papers-on-desk.md` |
 | `map_order_check.py` | `scripts\reference D\Facts.xml D\Text.xml D\NamesM.txt D\NamesF.txt` | `haxe-maps.md` |
+| `responses_check.py` | `scripts\reference D\Travelers.txt dumps\il2cppdumper\stringliteral.json` | `responses-and-events.md` |
 | `speech_check.py` | `scripts\reference D\Speeches.txt D\Travelers.txt D\Errors.txt D\Facts.xml` | `speech.md` (also reads `dumps\il2cppdumper\stringliteral.json` if present) |
 | `traveler_build_check.py` | `scripts\reference D\Travelers.txt D\Errors.txt D\NamesM.txt D\NamesF.txt D\Bodies.xml D\Faces.xml` | `traveler-build.md` |
 

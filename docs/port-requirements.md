@@ -46,6 +46,11 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
 
 ## Order
 
+- Responses and operations: conditional groups are flattened before
+  anything runs; operations run now or are queued by the queue rules;
+  `Break`, `End` and an early leave cut the rest of the list; a default
+  response search continues after a true condition block that did not
+  contain the name (`responses-and-events.md`).
 - Haxe `List.push` adds to the **front**; `List.add` to the back. The
   original uses `push` for: papers in `PaperDefLib` (so lookups see the file
   in reverse), a traveler's starting papers, the recent error groups, and
