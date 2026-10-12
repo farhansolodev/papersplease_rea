@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Second handoff: PROGRESS.md and the data-file index brought up to date
+
+**Changed:** rewrote `docs/PROGRESS.md` (summary, estimate, doc list, next steps, open questions, verification, local-only files, scripts, working agreements); updated `docs/data-files.md` (Travelers.txt, Errors.txt, Faces.xml, Bodies.xml and Text.xml rows).
+**Why:** the session's context was nearly full; `PROGRESS.md` had not been updated since the first handoff (it is now updated only on request).
+**Tested how:** not applicable (documentation). Checked that `decompiled/ghidra_backup_named/` no longer exists and updated the local-files table to say so.
+**Result:** a new session can start from `docs/PROGRESS.md`; the next step is part 2 of the booth responses (the player's actions and judging mistakes).
+**Still broken / not tested:** nothing new.
+**Next:** see `docs/PROGRESS.md`, "Next steps".
+
 ## 2026-10-13 Booth events, responses and operations studied (part 1)
 
 **Changed:** wrote `docs/responses-and-events.md`; added `scripts/checks/responses_check.py`; updated `docs/travelers-txt-format.md`, `docs/operations-and-fact-validity.md`, `docs/port-requirements.md` and the checks README.

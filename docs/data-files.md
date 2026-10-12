@@ -11,21 +11,21 @@ cross-checked, with a write-up in `docs/`.
 | `Endless.csv` | `data.DayLib` (via `Db`) | Same table format; content not studied |
 | `Papers.xml` | `data.PaperDefLib` | Studied: `papers-xml-format.md` |
 | `Facts.xml` | `data.FactLib` | Studied: `facts-xml-format.md` |
-| `Travelers.txt` | `data.TravelerLib` | Studied up to traveler creation: `travelers-txt-format.md`. Running responses not studied |
-| `Errors.txt` | `data.ErrorLib` | Studied (file and error selection): `errors-txt-format.md`. Applying an error not studied |
+| `Travelers.txt` | `data.TravelerLib` | Studied: `travelers-txt-format.md`; responses at the booth in `responses-and-events.md` (part 1; the player's actions are part 2) |
+| `Errors.txt` | `data.ErrorLib` | Studied: `errors-txt-format.md`; applying an error in `operations-and-fact-validity.md` |
 | `Speeches.txt` | `data.SpeechLib` | Studied: `speech.md` |
 | `News.txt` | `data.NewsArticleLib` | Not studied |
 | `Nights.txt` | `data.NightLib` | Not studied |
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Not studied |
 | `Endlesses.xml` | `data.EndlessLib` | Not studied |
-| `Faces.xml` | `data.FaceLib` | Not studied |
-| `Bodies.xml` | `data.BodyLib` | Not studied |
+| `Faces.xml` | `data.FaceLib` | Partly: how face metadata is combined and counted in `traveler-build.md`; the loader (`FaceLib` constructor) not read |
+| `Bodies.xml` | `data.BodyLib` | Partly: the contraband types in `traveler-build.md`; the rest not studied |
 | `Emblems.xml` | `data.EmblemLib` | Not studied |
 | `Fonts.xml` | `data.FontLib` | Not studied |
 | `Paths.xml` | `data.PathLib` | Not studied |
 | `Sounds.xml` | `data.SoundDefLib` | Not studied |
 | `BorderAnim.xml` | `play.day.border.Border` | Not studied |
-| `Text.xml` | `data.Lang` | Not studied |
+| `Text.xml` | `data.Lang` | Partly: `env_typochars` and a few keys in `value-helpers.md` and `responses-and-events.md`; the loader (`Lang.loadFromXml`) not read |
 | `UpperCase.txt` | `data.Uppercaser` | Studied: `value-helpers.md` |
 | `NamesF.txt`, `NamesM.txt` | `data.NameLib`, `data.NameCycler` | Studied: `traveler-build.md` |
 | `Credits.txt` | `play.screen.CreditList` | Not studied |
@@ -46,6 +46,7 @@ localization tooling and is not studied.
 
 Shared formats and helpers:
 
-- `tab-tree-format.md`: the indented-tree reader (`Travelers.txt`).
+- `tab-tree-format.md`: the indented-tree reader (`Travelers.txt`,
+  `Errors.txt`, `Speeches.txt`).
 - `rand.md`: the random number generator.
 - `art-dat-format.md`: the archive all of these come from.
