@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-12 Operations and fact validity studied
+
+**Changed:** wrote `docs/operations-and-fact-validity.md`; updated notes in `docs/facts-xml-format.md` and `docs/errors-txt-format.md`.
+**Why:** to know what applying an error actually does to the facts on a traveler's documents.
+**Tested how:** decompiled and read in full 8 `BoothEnv` functions (`applyOp`, `setFactInvalid`, `setFactValid`, `setFactValue`, `findInvalidFactPath`, `isValid`, `getFactValue`, `getFactValueText`); checked `Errors.txt` and `Travelers.txt` for anything that invalidates `Traveler/Nationality`.
+**Result:** each operation kind's effect is written down. A fact is invalid if it is on the invalid list or if a listed fact's current value invalidates it per `Facts.xml`. Invalidating a fact generates a wrong value at once; `~` means "confusing"; validating regenerates a value only for editable facts. The misspelled `whennot` in `Facts.xml` is shown to have no effect with the current data.
+**Still broken / not tested:** `makeFactValue`, `addPaper` and `getSpeech` are not studied. The `++` arithmetic was dropped by the decompiler and is assumed from the visible `--` case. Not compared with the running game.
+**Next:** `BoothEnv.makeFactValue`.
+
 ## 2026-10-12 Errors.txt and error selection studied
 
 **Changed:** wrote `docs/errors-txt-format.md`; added template expansion to `scripts/reference/tabtree.py`; corrected the template section of `docs/tab-tree-format.md`; updated `docs/data-files.md`.

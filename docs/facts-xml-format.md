@@ -146,8 +146,8 @@ some `<invalidate>` of this fact has:
 lower case) with path `Rules/RuleArstotzkaOnly`. The code looks up
 `whenNot`, and names are case-sensitive, so the attribute is not read and
 that entry carries no condition. The `nation` attribute is supported by the
-code but never used in the file. What effect the unconditioned entry has in
-play depends on how invalidation is used, which is not studied.
+code but never used in the file. In practice the lost condition changes
+nothing: see `operations-and-fact-validity.md`.
 
 ### `<cite when val>`: what to say when citing the fact
 

@@ -62,8 +62,8 @@ Name<tags>    GroupId
   traveler. See below.
 - **`!` fact** (141): a fact to make invalid, with the response to give when
   the inspector challenges it. 107 distinct paths. 22 start with `~`; with
-  the `~` removed all 107 are real fact paths in `Facts.xml`. What `~` means
-  is not studied.
+  the `~` removed all 107 are real fact paths in `Facts.xml`. `~` marks the
+  fact as "confusing" (`operations-and-fact-validity.md`).
 - **`=` fact value** (7): on the seven `...-ConfusingName` errors, sets
   `IdentityRecord/Alias` to the name of another fact.
 - Inside the 141 `> Interrogate` groups: 255 speech lines (74 distinct ids),
@@ -178,8 +178,9 @@ expansion:
 
 ## Not studied
 
-- What invalidating a fact does, the `~` prefix, and how the replacement
-  value is generated (`BoothEnv.applyOp`, `setFactInvalid`, `makeFactValue`).
+- How the replacement value for an invalidated fact is generated
+  (`makeFactValue`). What invalidating does is in
+  `operations-and-fact-validity.md`.
 - How the `Interrogate` response is run and how speech ids become text.
 - `Error.validate` and `ErrorLib.validateAll` (checks run by the
   developers' tooling, by their names).
