@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Reference script for the face and name cyclers (traveler answer key, layer 1)
+
+**Changed:** added `scripts/reference/cyclers.py` (shuffle, maximum-separation reshuffle, `ShuffledSequence`, `FaceCycler`, `NameCycler`); added an `overview` mode to `scripts/reference/faces.py` (one labelled picture of every base face); noted both in `docs/traveler-build.md`.
+**Why:** first layer of the Python reference of traveler creation from a master seed (second half of step 2 in `PROGRESS.md`); the overview was asked for to pick faces by eye.
+**Tested how:** re-read the decompiled `ShuffledSequence`, `makeShuffled`, `getShuffledWithMaxSeparation`, `FaceCycler` and `NameCycler` before writing; ran `cyclers.py` with master seeds 12345 and 987654; ran `faces.py overview` and looked at the picture.
+**Result:** self-checks pass (permutations, four-pass repeat, overlapping seeds, no repeated name in a pass; 1341 male and 1300 female name entries, no carriage returns). The overview shows all 45 faces with artwork.
+**Still broken / not tested:** not compared with the running game. A saved name position is not modelled. The two "draw of exactly 1.0" cases follow Haxe's documented array behaviour, not checked in this build.
+**Next:** layer 2: the person (the `Traveler` constructor: id number, fingerprints, height, weight, birth date) on top of the cyclers and `faces.py`; then scripts, errors and document values.
+
 ## 2026-10-13 Faces: the loader, how a face is built, and the pixel height
 
 **Changed:** wrote `docs/faces.md`; added `scripts/reference/faces.py` (builds a face from the local sheet images, needs Pillow) and `scripts/checks/faces_check.py`; updated `docs/traveler-build.md`, `data-files.md`, `port-requirements.md` and the checks README.

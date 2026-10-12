@@ -165,6 +165,23 @@ starts again.
 - Names use the **basic** kind, which repeats the same order when it runs
   out.
 
+### Reference implementation
+
+`scripts/reference/cyclers.py` implements the shuffle, the
+maximum-separation reshuffle, the shuffled sequence and both cyclers, written
+from the decompiled code (re-read on 2026-10-13). Given a master seed and the
+two name files it prints the first faces and names a launch hands out, and
+checks itself: every pass is a permutation, a reshuffling sequence repeats
+every four passes, male heads and female shoulders come out in the same
+order (the overlapping seeds), and no name repeats within a pass. With 20
+items the reshuffle keeps an item from returning for at least 10 steps.
+
+It models a fresh name cycler; a saved position (the `names` entry of the
+encrypted store) is not modelled. Two cases where a draw of exactly 1.0
+reads past the end of an array follow Haxe's documented behaviour and are
+marked in the script; they were not checked in this build. The output has
+not been compared with the running game.
+
 ### Face metadata (`FaceLib.getMetadata`)
 
 Each of the four pieces belongs to a face on a sheet in `Faces.xml`: piece
