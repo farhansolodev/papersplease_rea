@@ -102,6 +102,10 @@ To list the string constants a function uses, in machine-code order (for
 when the decompiler drops a string argument from a call):
 `-readOnly -postScript ListStringUses.java 0xFUNCTION`.
 
+To print a function's machine instructions, with numeric constants shown
+(for when the decompiler drops a calculation):
+`-readOnly -postScript DumpAssembly.java 0xFUNCTION`.
+
 ## Running the game's code in the emulator
 
 Ghidra can execute a function's machine code without running the game. This

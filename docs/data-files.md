@@ -11,7 +11,7 @@ cross-checked, with a write-up in `docs/`.
 | `Endless.csv` | `data.DayLib` (via `Db`) | Same table format; content not studied |
 | `Papers.xml` | `data.PaperDefLib` | Studied: `papers-xml-format.md` |
 | `Facts.xml` | `data.FactLib` | Studied: `facts-xml-format.md` |
-| `Travelers.txt` | `data.TravelerLib` | Structure only: `travelers-txt-format.md` |
+| `Travelers.txt` | `data.TravelerLib` | Studied up to traveler creation: `travelers-txt-format.md`. Running responses not studied |
 | `Errors.txt` | `data.ErrorLib` | Not studied |
 | `Speeches.txt` | `data.SpeechLib` | Not studied |
 | `News.txt` | `data.NewsArticleLib` | Not studied |

@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-12 Traveler script meaning studied (creation side)
+
+**Changed:** rewrote `docs/travelers-txt-format.md` with confirmed meanings; added `scripts/ghidra/DumpAssembly.java`; added `__pycache__/` to `.gitignore`; updated `docs/data-files.md` and `docs/ghidra-workflow.md`.
+**Why:** to know what each line of a traveler script does, which the structure-only pass left unconfirmed.
+**Tested how:** decompiled and read in full 20 functions (`TravelerContext`, `OpHelper.makeOp`/`getRunOps`, `ExpressionTester`, `joinQuoted`); read the `RANDOM100` calculation from the raw instructions; walked every line of the real file with the reference tree reader and checked it against the line kinds the code accepts at each level.
+**Result:** every block-level and operation-level line kind is identified, and the real file contains nothing the code would reject. The order of random draws when a traveler is created is written down. Notable: `BREAK` stops the whole traveler; a single-value `=` still makes a random draw; conditions have no operator precedence and ignore case; `fallback` discards the result and builds another entry. One data error found: a condition in `EZIC_DIPLO` uses `=!` instead of `!=`.
+**Still broken / not tested:** nothing is tested against the running game. How responses run, how a specification becomes a traveler with documents, and how response conditions are evaluated are not studied. Whether `$name` speech lines refer to `Speeches.txt` is not confirmed.
+**Next:** `BoothEnv.makeNewTraveler`: how a specification becomes a traveler and their documents.
+
 ## 2026-10-12 Indented-tree reader studied; Travelers.txt structure mapped
 
 **Changed:** wrote `docs/tab-tree-format.md`, `docs/travelers-txt-format.md` and `docs/data-files.md`; added `scripts/reference/tabtree.py`.
