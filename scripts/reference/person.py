@@ -6,8 +6,9 @@ generator and produces the face, name, id number, fingerprints, height,
 weight and birth date, drawing random numbers in the game's order.
 
 Not modelled here (other layers): evaluating the traveler script that
-produces the variables, choosing the error, picking a criminal from the
-day's list, and generating document values.
+produces the variables, choosing the error, and generating document values.
+Picking a criminal from the day's list is passed in as a function; booth.py
+supplies it.
 
 Run as a script for a demonstration:
 
@@ -131,16 +132,18 @@ class Person:
 
 
 def build_person(variables, rand, face_cycler, name_cycler, lib, faces_dir, contra_types,
-                 error_id=None, criminal_face=None):
+                 error_id=None, pick_criminal=None):
     """The Traveler constructor.
 
     variables: the specification's variables (text values, absent when unset).
-    error_id: the id of the error chosen for this traveler, if any.
-    criminal_face: for a Traveler-Criminal error, the face of the criminal
-        picked by the caller (None when none was found). Picking the criminal
-        can itself take one draw; that belongs to the caller.
+    error_id: the id of the error chosen for this traveler, if any (the
+        specification's custom error, when it has one).
+    pick_criminal: for a Traveler-Criminal error, a function (rand, male) that
+        returns (criminal index, face) or None (Criminal.selectRandom; it may
+        draw once). Called at the point the game calls it.
     """
     p = Person()
+    p.criminal_index = None
     p.draws_before = getattr(rand, "count", None)
     p.num_vaccines = 3 if rand.random() <= 0.5 else 2
     p.contraband_types = variables.get("contrabandTypes")
@@ -159,11 +162,13 @@ def build_person(variables, rand, face_cycler, name_cycler, lib, faces_dir, cont
         confusing = True
         name_other_gender = rand.random() > 0.5
     elif error_id and "Traveler-Criminal" in error_id:
-        if criminal_face is None:
+        found = pick_criminal(rand, p.male) if pick_criminal else None
+        if found is None:
             p.error_id = None                 # no criminal found: the traveler gets no error
         else:
-            spec = criminal_face
+            p.criminal_index, spec = found
             p.male = spec[0]
+            p.error_id = "Bulletin-Criminal%d" % p.criminal_index
 
     if spec is None:
         if confusing:
@@ -179,6 +184,7 @@ def build_person(variables, rand, face_cycler, name_cycler, lib, faces_dir, cont
     p.face = face
 
     name_male = (not p.male) if name_other_gender else p.male
+    p.name_male = name_male
     p.first, p.last = name_cycler.get(name_male)
     if variables.get("name") is not None:
         parts = variables["name"].split("-")

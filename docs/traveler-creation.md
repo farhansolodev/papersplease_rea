@@ -131,6 +131,53 @@ ignore, and a table with the keys `FEATURES`, `RULES`, `NATION`, `PURPOSE`,
 keys on its left side, the table value is used; any other left side is taken
 literally.
 
+## Reference implementation
+
+`scripts/reference/booth.py` (written 2026-10-13 after re-reading
+`makeFactValue`, `addPaper`, `setFactInvalid`, `setFactValid`,
+`findInvalidFactPath`, `applyOp`, `getRandomAccessNations`,
+`Criminal.selectRandom` and the criminal branch of the `Traveler`
+constructor) is the whole sequence above in Python. It chains the earlier
+layers: `travspec.py` (the script), `errormaker.py` (the error),
+`person.py` (the person), `values.py` (wrong values), `factlib.py` (the
+documents' facts) and `faces.py` (the face picture, for the height).
+
+    python -I scripts/reference/booth.py <master seed> <day> <count> extracted\art\assets --facts
+
+prints the first travelers of a day with their details, errors and every
+generated document value (`*` marks a value that is wrong).
+
+Details settled while writing it:
+
+- **Criminals.** The rules in `traveler-build.md` ("Criminals") were
+  re-read and are implemented here: `booth.py` hands the pick to
+  `person.py`. With no candidate the traveler gets no error at all. A
+  custom error in the script replaces the chosen error before the pick.
+- **Wrong names move the name cycler.** A wrong name takes one or two names
+  from the same name cycler that names travelers, so it changes the names of
+  everyone after.
+
+`scripts/checks/booth_check.py` (run 2026-10-13) first asks for wrong values
+directly (results in `fact-values.md`), then builds 1,892 travelers over
+all 31 days and four master seeds. Result: no failure; every fact not marked
+wrong shows the traveler's real detail and every fact marked wrong shows
+something else (name, id number, gender, height, weight, duration, purpose,
+city, district, birth date, fingerprints, emblem, face); wrong expiration
+dates are in the past and valid ones in the future; access-nation lists have
+2 to 4 names with Arstotzka exactly when valid; vaccine lists have no repeat
+and polio exactly when valid. 28 confusing-gender facts keep the real
+letter, as designed. 8 to 55 booth draws per traveler, 25 on average. The
+errors applied carry only requirement, invalidate and set-fact lines at
+their top level (no add-paper or remove-paper line). Two runs with the same
+seed print the same text.
+
+Not modelled in `booth.py`: the bulletin's text and page mask and the
+rulebook's page mask and upgrade marks (they make no draws); speech; custom
+fact groups (they add no values); tokens and achievements; saving the
+staying papers; anything the player does after the traveler arrives.
+Travelers are made one after another with no player action in between, and
+with an empty saved story unless one is passed in.
+
 ## Not studied
 
 These are the large pieces this sequence calls:

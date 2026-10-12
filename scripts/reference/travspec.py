@@ -271,6 +271,7 @@ class Spec:
         self.initial_papers = []               # push adds at the front
         self.custom_fact_groups = []
         self.custom_error = None
+        self.custom_error_node = None
         self.responses = []
 
 
@@ -357,6 +358,7 @@ class TravelerContext:
                 spec.custom_fact_groups.append((params[1], [c.params[0] for c in child.nodes]))
             elif kind == "*":
                 spec.custom_error = params[1]
+                spec.custom_error_node = child
             else:
                 raise ValueError("Unknown block node: " + " ".join(params))
         return True

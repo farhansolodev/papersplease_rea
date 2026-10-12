@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Reference script for the booth: a whole traveler from a master seed (answer key, layer 5b part 2 and the chaining layer)
+
+**Changed:** added `scripts/reference/booth.py` (fact stores, `addPaper`, every branch of `makeFactValue`, `setFactInvalid`/`setFactValid`, the lines of an error, criminal selection, and `makeNewTraveler` chaining all earlier layers) and `scripts/checks/booth_check.py`; `person.py` now takes the criminal pick as a function and records the criminal's number and the name's gender; `travspec.py` keeps a specification's custom error lines; updated `docs/traveler-creation.md` (reference section), `fact-values.md` (access nations, description words, date text, check results) and the checks README.
+**Why:** last layer of the Python reference of traveler creation: the port's Rust code can now be compared with it traveler by traveler.
+**Tested how:** re-read `makeFactValue` in full (1,516 lines), `addPaper`, the fact-validity functions, `applyOp`, `getRandomAccessNations`, `Criminal.selectRandom`; read twelve constants from the DLL; ran `booth.py` for days 1, 8, 12 and 20 (twice for day 12: identical output); re-ran `person_check.py`; ran `booth_check.py` (1,892 travelers, 31 days, four master seeds, plus fourteen wrong values asked for 300 times each on days 1 and 19).
+**Result:** `problems: none` in both checks. Valid facts equal the traveler's details, wrong facts differ, dates fall on the right side of today, typos appear only with `HARDER` and at the expected rates. 8 to 55 booth draws per traveler (average 25). Applied errors carry only requirement, invalidate and set-fact lines at top level. Failures on the way: the first full check would have taken about 40 minutes (face drawing; now each sheet is read once and it takes about 4.5 minutes); a section I added then hung for 10 minutes with no output, because asking for a wrong purpose for an Arstotzkan native redraws for ever (confirmed separately: more than 20,000 draws). The check now uses a foreign traveler, has a draw limit that reports a stuck loop, and prints a progress line per day.
+**Still broken / not tested:** not compared with the running game. Not modelled: bulletin and rulebook texts and page masks, speech, fact groups, tokens, the staying-papers save, and everything the player does between travelers (which also draws from the booth generator in the game). Story facts are empty unless passed in. A wrong name moves the name cycler; a saved name position is still not modelled.
+**Next:** step 3 of `PROGRESS.md` (the remaining data files), or first decide how to compare this reference with the running game.
+
 ## 2026-10-13 Reference model of Facts.xml as the game holds it (answer key, layer 5b, part 1)
 
 **Changed:** added `scripts/reference/factlib.py` (documents and facts after expansion, a document's fact copy in the game's table order, invalidate links, localization table, expiration-date rule); noted it in `docs/facts-xml-format.md`.

@@ -100,6 +100,33 @@ then shuffled (`facts-xml-format.md`) and joined with line breaks. So a
 valid certificate always includes polio and an invalid one never does. This
 is the "added automatically" note on `POLIO` in `Facts.xml`.
 
+### `AccessNations` (`getRandomAccessNations`)
+
+After the draw for the count: the nation list is shuffled
+(`makeShuffled`), and **the shuffle is applied twice**: entry `i` is nation
+`order[order[i]]`. `Arstotzka` is removed when the value is invalid. Then,
+while the list is longer than the count: one draw picks an entry; if the
+value is valid and the entry is `Arstotzka`, draw again; otherwise remove
+it.
+
+### `Description`
+
+The four face pieces' records in `Faces.xml` carry "has" words (`shoulders`,
+`head`, `eyes`, `mouth`) and "has not" words (the same with `n` in front);
+see `faces.md`. For the traveler's face, the words present are put in a
+table keyed by piece (shoulders from the shoulders piece, head from the
+head piece, eyes from the eyes piece, mouth from the nose-and-mouth piece),
+inserted in that order. The value is one random entry of the table's values
+**in hash order** (`haxe-maps.md`), in upper case. The English data has no
+gender switches in these words.
+
+### Dates as text
+
+`Settings.formatDate(date, long)`: with the default date setting the short
+form is `%y.%m.%d` (`82.11.23`) and the long form `%Y.%m.%d`. Only
+`VaccineDates` uses the long form. A valid `ExpirationDate` reads the
+paper's desk record, so it needs the paper to be on the desk.
+
 ## What "confusing" means
 
 The `confusing` flag changes only one thing in this function: for `Gender`
@@ -130,10 +157,9 @@ Now covered in `value-helpers.md`: `TravelerName` (`getFormatted`,
 `getRandomInvalidated`, `getRandomAlias`), `Lang.makeAlias`,
 `Lang.makeTypo`, `Lang.getReplaced`, `Uppercaser.toUpperCaseU`,
 `FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`, `Settings.formatDate`
-and `GregorianDate`. Still not studied:
-
-- The face's feature lists. (`SpeechLib.applyGenderSwitches` is in
-  `speech.md`: `[m]...[/m]` and `[f]...[/f]` keep or drop text by gender.)
+and `GregorianDate`. The face's feature lists are above (`Description`).
+(`SpeechLib.applyGenderSwitches` is in `speech.md`: `[m]...[/m]` and
+`[f]...[/f]` keep or drop text by gender.)
 
 (`Traveler.getBirthDate`, `invalidateIdNumber`, `makeRandomIdNumber` and
 the `Traveler` constructor are in `traveler-build.md`.)
@@ -142,5 +168,22 @@ When this function is called for a newly added paper, and with which
 `valid`, is in `papers-on-desk.md`: only for facts with no written value,
 and in hash order within the paper.
 
-Nothing here has been compared with the running game. No reference
-implementation exists yet for this function; it depends on the pieces above.
+Nothing here has been compared with the running game.
+
+Reference implementation: `Booth.make_fact_value` in
+`scripts/reference/booth.py`, checked by `scripts/checks/booth_check.py`
+(`traveler-creation.md` has the results). Over 1,892 travelers the errors
+asked for every row of the table except a wrong `Job`, `Nation` and
+`NowDate`. The check therefore also asks for fourteen wrong values directly,
+300 times each, for a foreign traveler on day 1 and on day 19 (where
+`HARDER` is switched on). Result: `Job` and `NowDate` come out unchanged;
+`Nation` gives the six other nations; typos appear only on day 19 and at the
+expected rates (city about 19% of calls, id number about 12%, district about
+half); aliases are made twice per call (text and display text).
+
+**A wrong `Purpose` for an Arstotzkan never ends** in the reference: the
+only purpose such a traveler can draw is `native`, so "redraw until
+different" loops for ever (tested: more than 20,000 draws). No error in the
+data asks for it, because the documents that carry a purpose are not given
+to natives. The port should keep the question from being asked rather than
+copy the loop.
