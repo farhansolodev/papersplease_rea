@@ -277,5 +277,8 @@ engine paper and is reported to the screen.
 - The screen side: who calls these functions and when, the denial-reason
   button, how wires and screws are numbered on screen, when the engine is
   given a slow-mode timer.
-- Whether the `Want` and `Reject` patterns ignore case.
 - Nothing here has been compared with the running game.
+
+(Settled later: the `Want` and `Reject` patterns are both created as
+case-insensitive regular expressions, `Traveler.addWantPaperId` and
+`addRejectPaperId`.)

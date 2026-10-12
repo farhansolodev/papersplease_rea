@@ -176,6 +176,23 @@ every four passes, male heads and female shoulders come out in the same
 order (the overlapping seeds), and no name repeats within a pass. With 20
 items the reshuffle keeps an item from returning for at least 10 steps.
 
+`scripts/reference/person.py` builds the person on top of that and of
+`faces.py`: the constructor's draws in the order above, the scripted-face
+parser, the combined face metadata, id number, fingerprints, height, weight
+and birth date. The arithmetic was re-read from the decompiled constructor
+and its constants from the DLL (0.1, 10, 60/100 and 1.3/1.0 for men, 40/100
+and 1.0/0.8 for women, 0.5/0.3/0.2 for age, 0.8/0.2 for body-mass index).
+It does not evaluate traveler scripts, choose errors or pick criminals; the
+caller passes those in. `scripts/checks/person_check.py` (run 2026-10-13)
+confirms the number of draws in each case (18 with nothing scripted; one
+fewer with a contraband type given, ten fewer with an id number, one more
+per missing face part, one more for a confusing-gender error), that the name
+cycler advances even for a scripted name, and that all 35 scripted face
+values found in the raw text of `Travelers.txt` can be built (face heights
+1.455 m to 1.882 m). About one person in five needs a fingerprint redraw.
+A man given a woman's face always gets the first one tried; a woman given a
+man's face needed up to five tries over 40 master seeds.
+
 It models a fresh name cycler; a saved position (the `names` entry of the
 encrypted store) is not modelled. Two cases where a draw of exactly 1.0
 reads past the end of an array follow Haxe's documented behaviour and are

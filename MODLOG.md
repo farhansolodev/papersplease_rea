@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Reference script for building the person (traveler answer key, layer 2)
+
+**Changed:** added `scripts/reference/person.py` (the `Traveler` constructor: draw order, scripted-face parser, face metadata, id number, fingerprints, height, weight, birth date) and `scripts/checks/person_check.py`; noted both in `docs/traveler-build.md`; settled one open item in `docs/player-actions.md` (`Want` and `Reject` patterns are case-insensitive); added the check to the checks README.
+**Why:** second layer of the Python reference of traveler creation from a master seed.
+**Tested how:** re-read the decompiled constructor, `makeRandomIdNumber`, `FingerprintCode.randomize`, `getMetadata`, `lerpScale`, `get_heightInCm` and `getBirthDate`; read nine constants from the DLL; ran the demonstration (`person.py 12345 1 6 extracted\art\assets`) and `person_check.py`; checked one person's age, height and weight by hand.
+**Result:** draw counts match the write-up in all eight cases tried; fingerprints never break the two "must differ" rules over 2000 seeds; the name cycler advances for scripted names; all 35 scripted face values in `Travelers.txt` build.
+**Still broken / not tested:** not compared with the running game. The demonstration's people are not what the game would produce for that seed, because the other layers' draws are missing. Rounding of the height to centimetres assumes Haxe's `Math.round` is "add 0.5 and round down" (not read in this build). Criminal selection and a saved name position are not modelled.
+**Next:** layer 3: evaluating a traveler script into a specification (the day's traveler list, `=` lines, conditions, `RANDOM100`, filling unset details), then errors and document values.
+
 ## 2026-10-13 Reference script for the face and name cyclers (traveler answer key, layer 1)
 
 **Changed:** added `scripts/reference/cyclers.py` (shuffle, maximum-separation reshuffle, `ShuffledSequence`, `FaceCycler`, `NameCycler`); added an `overview` mode to `scripts/reference/faces.py` (one labelled picture of every base face); noted both in `docs/traveler-build.md`.
