@@ -15,6 +15,24 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-12 Correction: `journalist` is a real purpose; comments were skipped
+
+**Changed:** corrected `docs/facts-xml-format.md` (new section "The comments matter"); added comment notes to `docs/papers-xml-format.md`; added two steps to the study method in `docs/ghidra-workflow.md`.
+**Why:** I described the `journalist` purpose as undefined and suggested it was cut content. The user pointed out journalists exist in the game.
+**Tested how:** searched all data files and the code's strings for `journalist` and `RuleDetainKolechia`; extracted and read all 68 comments in `Facts.xml` and all 43 in `Papers.xml`.
+**Result:** the user was right. `Facts.xml` line 21 has `<purpose val="journalist"/>` commented out with the note "set manually only", and `Travelers.txt` sets `= purpose journalist` for two scripted travelers. The cause of my error: the XML parser I used for the inventory drops comments, and I never read them. `RuleDetainKolechia` is a fact whose definition is commented out while one group still refers to it.
+**Still broken / not tested:** comments in the other data files (`Days.csv` has none; the `.txt` files use `#`) have not been reviewed.
+**Next:** unchanged: `app.Rand`, then traveler and fact generation.
+
+## 2026-10-12 Facts.xml format studied in full
+
+**Changed:** wrote `docs/facts-xml-format.md`; `scripts/ghidra/clean_decompile.py` now collapses checked type casts; updated its note in `docs/ghidra-workflow.md`.
+**Why:** `Facts.xml` holds the world (nations, purposes, durations), every document's facts, and the definitions of what a fact's value can invalidate. Days, papers and travelers all depend on it.
+**Tested how:** inventoried all tags and attributes; decompiled and read in full 45 functions (loaders, the query methods, random-pick helpers, the XML attribute lookup); searched the code for attribute names that no loader used; cross-checked every section of the file against the code and against `Papers.xml`.
+**Result:** the file is not valid XML (a raw `&&` in one attribute). 191 written facts expand to 203. `<invalidate when>` is a plain equality test, not an expression. Attribute names are case-sensitive, so the file's `whennot` (code reads `whenNot`) is never read, and neither are document `cite` (code reads `desc`), nation `citizen` and loc `section`. Two dangling references found (`Rules/RuleDetainKolechia`, purpose `journalist`). Random-pick procedures written down for exact reproduction.
+**Still broken / not tested:** no reader written for the port. Fact value generation, how invalidation and groups decide errors, the `<confiscation when>` expression evaluator and `app.Rand` not studied. Whether `*` is stripped in `<cite when="*...">` and the error-pattern filter in random purpose are not confirmed.
+**Next:** `app.Rand`, then how a traveler and their facts are generated.
+
 ## 2026-10-12 Papers.xml format studied in full
 
 **Changed:** wrote `docs/papers-xml-format.md`; added `scripts/ghidra/clean_decompile.py`; added a study method and two tool notes to `docs/ghidra-workflow.md`.

@@ -27,7 +27,11 @@ accepts (results at the end).
     <forceorder .../>    4   sort order overrides
 ```
 
-The file is well-formed XML. Load order in the game: all `<sounds>`, then all
+The file is well-formed XML. Its 43 comments are section labels, two notes
+("wrap to enable multiline"), and three switched-off items: a mark on the
+transcript, the paper `EzicColor`, and a bulletin page `diplotut`.
+
+Load order in the game: all `<sounds>`, then all
 `<paper>`, then `<ink>`, then the carousel.
 
 On desktop the file is used as-is. On phone a "mogrifier" object rewrites
