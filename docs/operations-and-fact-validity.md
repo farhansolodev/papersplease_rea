@@ -117,7 +117,7 @@ error and no traveler script invalidates `Traveler/Nationality`.)
 - (`getSpeech` is covered in `speech.md`, `makeFactValue` in
   `fact-values.md`, `addPaper` and `saveStayingPaperIds` in
   `papers-on-desk.md`.)
-- How the stored `Interrogate` response is used (part 2 of
-  `responses-and-events.md`; part 1 covers who runs named groups and button
-  operations).
+- (How the stored `Interrogate` response is used is in
+  `player-actions.md`; who runs named groups and button operations is in
+  `responses-and-events.md`.)
 - Nothing here has been compared with the running game.

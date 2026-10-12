@@ -26,6 +26,7 @@ Run from the project root with `python -I`. Paths below assume
 | `papers_on_desk_check.py` | `scripts\reference D\Facts.xml D\Papers.xml D\Days.csv D\Errors.txt` | `papers-on-desk.md` |
 | `map_order_check.py` | `scripts\reference D\Facts.xml D\Text.xml D\NamesM.txt D\NamesF.txt` | `haxe-maps.md` |
 | `responses_check.py` | `scripts\reference D\Travelers.txt dumps\il2cppdumper\stringliteral.json` | `responses-and-events.md` |
+| `actions_check.py` | `scripts\reference D\Travelers.txt D\Errors.txt D\Papers.xml D\Facts.xml D\Text.xml D\Speeches.txt` | `player-actions.md` (also models the stamp-result rules and the penalty formula) |
 | `speech_check.py` | `scripts\reference D\Speeches.txt D\Travelers.txt D\Errors.txt D\Facts.xml` | `speech.md` (also reads `dumps\il2cppdumper\stringliteral.json` if present) |
 | `traveler_build_check.py` | `scripts\reference D\Travelers.txt D\Errors.txt D\NamesM.txt D\NamesF.txt D\Bodies.xml D\Faces.xml` | `traveler-build.md` |
 

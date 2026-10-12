@@ -51,6 +51,14 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   `Break`, `End` and an early leave cut the rest of the list; a default
   response search continues after a true condition block that did not
   contain the name (`responses-and-events.md`).
+- The player's actions (`player-actions.md`): the nine-step test for
+  handing a paper back; denied beats approved when stamp results are
+  combined; a wrong stamp is noted at stamp time and cited only if the final
+  result is still wrong; interrogation picks the earliest-invalidated fact
+  of the marked pair and runs its before / replace / operations / after
+  responses in a fixed order; time-bomb wires must be cut in index order.
+- Citations are counted per day: warning, last warning, then penalties of
+  `max(1, count - 2) × 5` credits.
 - Haxe `List.push` adds to the **front**; `List.add` to the back. The
   original uses `push` for: papers in `PaperDefLib` (so lookups see the file
   in reverse), a traveler's starting papers, the recent error groups, and
@@ -94,8 +102,11 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
 ## Data quirks to preserve, not fix
 
 - `BREAK` stops the whole traveler; `fallback` discards and rebuilds.
-- The `=!` operator typo in `EZIC_DIPLO` (pending confirmation of its
-  effect).
+- The `=!` operator typo in `EZIC_DIPLO`: the group never runs
+  (`responses-and-events.md`).
+- A `@ Reject` pattern does nothing on a traveler with no `@ Want`
+  pattern. Set-fact works on paths with no definition
+  (`player-actions.md`).
 - An invalid weight is always lower; a valid vaccine list always has polio;
   a valid access list always has Arstotzka (`fact-values.md`).
 - The "rare error" re-roll exists but no error uses it.

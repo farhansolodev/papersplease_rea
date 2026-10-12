@@ -171,7 +171,9 @@ filled with the paper name and the fact name.
 `<group id>` holds `<path val proxy?>` entries. The file's own comments and
 the method name `FactGroup.autoGetCorrelationPairs` both call this
 "correlation": the sets of facts that can be compared against each other.
-How correlation works in play is not studied.
+How they are used in play (interrogating two marked facts, and the
+agree/disagree test, including what `proxy` does) is in
+`player-actions.md`.
 
 - A `val` containing `*` is treated as a **regular expression**
   (case-insensitive) and replaced by every fact path it matches, each keeping
@@ -202,7 +204,8 @@ Most are kept as raw nodes and read when needed.
 - **`<district val>`, `<job val>`, `<vaccine val>`**: plain lists.
 - **`<confiscation id when desc error>`**: all four required. `when` is a
   condition written as an expression (this is where the `&&` is). It is
-  returned as text by `getConfiscationWhen`; the evaluator is not studied.
+  returned as text by `getConfiscationWhen` and tested with the booth's
+  condition tester (`player-actions.md`, `responses-and-events.md`).
   Ids match the `CONFISCATE` row of `Days.csv` (`DistrictAltan`, `Native`).
 - **`<misc>`**: attributes fetched by name; missing ones give empty text.
   Present: `hiddenAdditionalErrorPerc`, `speechAdditionalErrorPerc`,

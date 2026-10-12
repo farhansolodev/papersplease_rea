@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 The player's actions and judging mistakes (booth part 2)
+
+**Changed:** wrote `docs/player-actions.md`; added `scripts/checks/actions_check.py`; updated `docs/responses-and-events.md`, `operations-and-fact-validity.md`, `facts-xml-format.md`, `port-requirements.md`, `data-files.md` and the checks README to point at it.
+**Why:** next step 1 in `PROGRESS.md`: stamping, handing back, confiscating, interrogating, buttons, bomb and poison, and how mistakes and penalties are decided.
+**Tested how:** read the decompiled functions in full (`decompiled/actions.clean.c`, `judging.clean.c`, `judging2.clean.c`); checked dropped arguments in the raw instructions; read the constants 1.0, 2.0, 5.0 and 15.0 from the DLL; ran `actions_check.py` against the data files.
+**Result:** the stamp flags are confirmed as bits 2/4/8; all 45 response names in `Travelers.txt` are accounted for (19 fixed, 23 `Give-`, 2 `Interrogate-<button>-Replace`, 1 `LinkClicked-`); all 141 invalidate lines in `Errors.txt` carry an `Interrogate` response; penalties are 5, 5, 10, 15... from the third citation of a day.
+**Still broken / not tested:** not compared with the running game. The screen code that calls these functions is not studied. `docs/PROGRESS.md` not updated (only on request), so three of its open questions (stamp bits, built response names, the `=!` note in the port rules) are now settled but still listed there.
+**Next:** step 2 in `PROGRESS.md`: faces (`FaceLib` and `Face` constructors), then the Python reference of traveler creation.
+
 ## 2026-10-13 Second handoff: PROGRESS.md and the data-file index brought up to date
 
 **Changed:** rewrote `docs/PROGRESS.md` (summary, estimate, doc list, next steps, open questions, verification, local-only files, scripts, working agreements); updated `docs/data-files.md` (Travelers.txt, Errors.txt, Faces.xml, Bodies.xml and Text.xml rows).

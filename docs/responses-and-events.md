@@ -6,7 +6,8 @@ conditions are tested, how their **operations** are applied and spaced out in
 time, what the `@` button commands do, and how the game decides at the end of
 a visit whether you earn a **citation**. The player's own actions (stamping,
 handing papers back, confiscating, interrogating, detaining, fingerprinting,
-searching) are part 2.
+searching) are part 2: `player-actions.md`. Wherever this file says
+"part 2", that is the place.
 
 Functions read in full: `play.day.BoothEngine.handleEvent` (`0x180468a30`),
 `applyTravelerResponseOps`, `applyDefaultResponseOps`,
@@ -182,10 +183,9 @@ At the end of each visit the engine builds a list of reasons:
    `mistake`, `detain` or `process`.
 
 The stamp result has four flags: approved, denied, reasoned (a denial
-reason was given), and none. They are named in `StampApprovalKind`; that
-`APPROVED`, `DENIED` and `REASONED` are the bits 2, 4 and 8 tested here is
-inferred from the order of the names and from their use, and is checked in
-part 2.
+reason was given), and none. They are named in `StampApprovalKind`;
+`APPROVED`, `DENIED` and `REASONED` are the bits 2, 4 and 8 tested here
+(confirmed in `player-actions.md`).
 
 ## Response names
 
@@ -196,9 +196,10 @@ so the engine calls them by name: `Approved`, `ApprovedDenied`, `Denied`,
 `Intro-Before`, `Intro-Replace`, `Leave`, `Poisoned`, `Search-After`,
 `ShutterClose`, `TimeBomb-Disarmed`, `TimeBomb-Opened`. The others are
 `Give-...` (23), `Interrogate-Detain-Replace`, `Interrogate-Search-Replace`
-and `LinkClicked-EzicNote-open`; that the code builds these from parts is
-inferred and checked in part 2. `Enable-Fingerprint` and `Enable-Search`
-are called by the code but no traveler uses them.
+and `LinkClicked-EzicNote-open`; the code builds these from parts
+(confirmed in `player-actions.md`, which also lists the names the code asks
+for that no traveler defines, such as `Enable-Fingerprint` and
+`Enable-Search`).
 
 ## Notes for the port
 
@@ -209,12 +210,10 @@ are called by the code but no traveler uses them.
   missing reason.
 - Timing values are in seconds of game time.
 
-## Not studied (part 2)
+## Not studied
 
-- The player's actions: stamping, giving papers back (`Give-...`),
-  confiscating, the filer, interrogating, detaining, fingerprinting,
-  searching, poison and the time bomb, link clicks.
-- `BoothEnv.hasErrors`, `getCiteText`, `wantConfiscatePassport`; how
-  `mistakeCaught` is set; `Day.addCitation` and penalties;
-  `addNewEnvPapers`; `StampApproval`.
+- (The player's actions, how `mistakeCaught` is set, `hasErrors`,
+  `getCiteText`, `wantConfiscatePassport`, penalties, `addNewEnvPapers` and
+  `StampApproval` are now in `player-actions.md`.)
+- The screen code that sends the events.
 - Nothing here has been compared with the running game.
