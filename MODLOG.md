@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Reference model of Facts.xml as the game holds it (answer key, layer 5b, part 1)
+
+**Changed:** added `scripts/reference/factlib.py` (documents and facts after expansion, a document's fact copy in the game's table order, invalidate links, localization table, expiration-date rule); noted it in `docs/facts-xml-format.md`.
+**Why:** the booth (next) needs the fact definitions, the order facts are generated in and the expiration rule.
+**Tested how:** re-read the `DocDef`, `FactDef` and `InvalidateDef` constructors, `addFactDefs`, `generateExpirationDate`, `getLocalized`, `getFacts`, `getFactInvalidatesPath`, `FactDef.getInvalidatesPath`; read three constants from the DLL; ran `factlib.py` and compared with `map_order_check.py`.
+**Result:** `problems: none`; 63 documents, 203 facts (146 empty), 56 invalidate links; the `VaccineCert` order equals the one found earlier. First run crashed on a fact with an empty id in my own printing code (fixed; the model was right).
+**Still broken / not tested:** not compared with the running game. Fact groups and `<cite>` rules are not modelled here.
+**Next:** layer 5b part 2: the booth (`addPaper`, `makeFactValue`, applying an error's lines), then chaining all layers.
+
 ## 2026-10-13 Reference script for the wrong-value helpers (answer key, layer 5a)
 
 **Changed:** added `scripts/reference/values.py` (name layouts, wrong names, aliases, the alias swap sets, typos, the upper-case table, wrong faces, wrong fingerprints, altered id numbers); noted it in `docs/value-helpers.md`.

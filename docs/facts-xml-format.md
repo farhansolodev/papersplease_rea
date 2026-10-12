@@ -282,6 +282,30 @@ A "draw" is one call to `random()`, giving a fraction from 0.0 to 1.0
   Three rule facts are never used by any day: `RuleNoAntegria`,
   `RuleNoKolechia`, `RuleNoObristan`.
 
+## Reference implementation
+
+`scripts/reference/factlib.py` (written 2026-10-13 after re-reading the
+`DocDef`, `FactDef` and `InvalidateDef` constructors, `addFactDefs`,
+`generateExpirationDate`, `WorldDef.getLocalized`, `FactLib.getFacts`,
+`getFactInvalidatesPath` and `FactDef.getInvalidatesPath`; the constants 30,
+700 and 31 were read from the DLL) models the documents and facts as the
+game holds them: expansion per nation and district, the copy of a
+document's facts in the game's table order (through `haxemap.py`), the
+invalidate links, the localization table and the expiration-date rule. The
+world sections used for random picks are modelled in `travspec.py`.
+
+Its output agrees with the counts above (63 documents, 203 facts, 146 of
+them empty, 56 invalidate links of which 31 have a `when`) and with the
+`VaccineCert` order found earlier (`haxe-maps.md`): dates, the document
+itself, name, id number, exists, drugs, visible. Counting all facts, 20
+documents are walked in a different order than written; counting only the
+empty facts that get generated, 19, as `haxe-maps.md` says.
+
+Expiration dates over 400 seeds: a passport expires 123 to 717 days from
+today (range 120 to 720), an entry permit 10 to 30. Six documents have an
+`ExpirationDate` fact; `WorkPermit` has none (it uses `WorkEndDate`), so its
+stored expiration date is today and no draw is made for it.
+
 ## Not studied
 
 - How fact groups are used to decide what is an error. (Value generation and
@@ -290,5 +314,5 @@ A "draw" is one call to `random()`, giving a fraction from 0.0 to 1.0
 - The expression evaluator for `<confiscation when>`.
 - Most of `FactSet` and `FactValue`, and the `FactLib` methods not listed
   here or in `papers-on-desk.md`.
-- No reader has been written for the port, so none of this is tested end to
-  end.
+- (Reference readers now exist: `factlib.py` above and `travspec.py` for
+  the world sections. Fact groups and the `<cite>` rules are not in them.)
