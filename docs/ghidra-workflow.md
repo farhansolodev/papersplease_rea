@@ -118,6 +118,13 @@ Notes for reuse: a class's method table starts at offset `0x138` with 16
 bytes per slot; arguments go in `RCX`, `RDX`, `R8`, `R9`; the function must
 not reach the one-time metadata setup block or any engine call.
 
+`EmulateStringHash.java` is the second example: it builds a fake string
+(length at `0x10`, UTF-16 text from `0x14`, ending in a NUL) and a fake
+`StringMap`, runs the real `StringMap.lookup`, and stops at breakpoints
+placed partway through to read values from registers. Breakpoints are the
+way to read an intermediate result without letting the code reach the
+allocator or an exception path.
+
 ## Cleaning the output for reading
 
 ```powershell

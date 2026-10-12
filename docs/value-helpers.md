@@ -75,7 +75,8 @@ An alias changes exactly one letter into a similar one.
 upper case (using `Uppercaser`); the letters of each set sorted; duplicate
 sets removed. The resulting list is in **hash order** (it comes out of a
 `StringMap`). In English `env_typochars` is the same as the built-in text,
-so there are 12 distinct sets: six lower case and six upper case.
+so there are 12 distinct sets, in this order (`haxe-maps.md`): `CK, IUY,
+JL, aeiou, jl, bh, GPQ, BH, gpq, AEIOU, iuy, ck`.
 
 Making an alias of a word:
 
@@ -83,7 +84,7 @@ Making an alias of a word:
    character (in swap-set order).
 2. If no position has any, make a typo instead (below).
 3. One draw: pick a position, from the positions in the order an `IntMap`
-   gives them (that order is not studied).
+   gives them, which is often not left to right (`haxe-maps.md`).
 4. One draw: pick one of that position's swap sets.
 5. Draw a letter from that set, one draw each time, until it differs from
    the original letter.
@@ -172,11 +173,10 @@ dropped by the decompiler and not checked).
   plus redraws.
 - Wrong names and female aliases take names from the shared name cycler.
 - The alias swap-set order (a `StringMap`) and position order (an `IntMap`)
-  are hash orders; see the `StringMap` item in `PROGRESS.md`.
+  are hash orders; both are worked out in `haxe-maps.md`.
 
 ## Not studied
 
 - `SpeechLib.applyGenderSwitches` (with speech).
 - Where the saved date-format setting is loaded.
-- `IntMap` iteration order.
 - Nothing here has been compared with the running game.

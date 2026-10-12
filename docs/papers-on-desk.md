@@ -171,7 +171,7 @@ Script: `scripts/checks/papers_on_desk_check.py` (see its README entry).
   generated when their document is added.
 - **Only `VaccineCert` has two facts that make random draws when generated
   valid** (`VaccineDates` and `VaccineDrugs`). Which of the two is generated
-  first depends on the hash order above.
+  first depends on the hash order above: `VaccineDates` (`haxe-maps.md`).
 - No `game`- or `day`-staying document has a fact that draws when valid, an
   `ExpirationDate`, or a fact that needs a traveler (40 documents checked).
 - `<clearconfusion>`: 25 entries on 3 documents (`Fingerprints`,
@@ -192,8 +192,9 @@ Script: `scripts/checks/papers_on_desk_check.py` (see its README entry).
 - **Order of generation within a paper is the hash order of a Haxe
   `StringMap`** built by inserting the document's facts in file order. To
   reproduce the random draws (at least for `VaccineCert`, and for every paper
-  added after errors exist), the port needs Haxe's `StringMap` iteration
-  order on this platform. Not studied yet; see `PROGRESS.md`.
+  added after errors exist), the port needs that order. It is worked out in
+  `haxe-maps.md`: 19 documents differ from file order, and for `VaccineCert`
+  the dates are generated before the drugs.
 - Generate values for empty facts even when the path already exists, and
   then keep the old value.
 - Removing a paper does not remove its facts.

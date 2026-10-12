@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Haxe StringMap and IntMap order worked out
+
+**Changed:** wrote `docs/haxe-maps.md`; added `scripts/reference/haxemap.py`, `scripts/ghidra/EmulateStringHash.java` and `scripts/checks/map_order_check.py`; updated `docs/papers-on-desk.md`, `docs/value-helpers.md`, `docs/port-requirements.md`, `docs/ghidra-workflow.md` and the checks README.
+**Why:** the order of these lookup tables decides random draws in fact generation and in aliases.
+**Tested how:** decompiled and read in full both tables, their iterators and `String.GetHashCode`; read the load factors (0.77, 0.7) and the swap-set insert from the raw instructions. Ran the game's own `StringMap.lookup` and `GetHashCode` in Ghidra's emulator for 12 strings and compared with the Python reference. Self-tested the reference tables with 200 random runs. Applied them to `Facts.xml`, `Text.xml` and the name lists.
+**Result:** the emulator and the reference agree on all 12 hashes (raw and mixed). The tables are Haxe's khash-style open addressing. `VaccineCert` generates its dates before its drugs; 19 documents generate facts in an order different from file order; the English alias groups are ordered `CK, IUY, JL, aeiou, jl, bh, GPQ, BH, gpq, AEIOU, iuy, ck`; 1,237 of 5,278 name parts have their alias positions walked out of left-to-right order. Self-test: contents always matched a Python dictionary.
+**Still broken / not tested:** table insertion, growth and walking checked by reading and self-test only, not in the emulator (needs the allocator). Not compared with the running game.
+**Next:** speech (`BoothEnv.getSpeech`, `Speeches.txt`), then running responses.
+
 ## 2026-10-13 Helpers behind wrong values and dates studied
 
 **Changed:** wrote `docs/value-helpers.md`; added `scripts/reference/gdate.py`; updated `docs/fact-values.md`, `docs/data-files.md` and `docs/port-requirements.md`. `docs/PROGRESS.md` not updated (now updated only on request).

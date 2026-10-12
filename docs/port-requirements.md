@@ -55,11 +55,11 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
 - **At least one outcome does depend on that order**: when a paper is put on
   the desk, its empty facts are generated in the hash order of a fresh
   `StringMap` (`papers-on-desk.md`). `VaccineCert` has two facts that draw
-  random numbers, so their order decides who gets which draws. The port
-  needs Haxe's `StringMap` (hash function, table growth, iteration) as built
-  for this game. Not studied yet. Aliases also depend on hash order: the
-  swap-set list comes from a `StringMap` and the letter positions from an
-  `IntMap` (`value-helpers.md`).
+  random numbers, so their order decides who gets which draws. Aliases also
+  depend on hash order: the swap-set list comes from a `StringMap` and the
+  letter positions from an `IntMap` (`value-helpers.md`). Both tables are
+  worked out in `haxe-maps.md` and modelled in
+  `scripts/reference/haxemap.py` (text hash checked in the emulator).
 - `Days.csv` carry-over lists are built left to right through the day
   columns.
 
