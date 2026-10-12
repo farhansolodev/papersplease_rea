@@ -30,7 +30,7 @@ Port my own copy of Papers, Please to run in the browser:
 ## Target
 
 - Install: `C:\GOG Games\PapersPlease` (GOG, Windows x64, about 90 MB), game
-  version v1.4.11.124 (63294).
+  version 1.4.11.124 (63294).
 - Unity 2020.3.34, IL2CPP build. There are no managed C# assemblies.
   - `GameAssembly.dll` (13.8 MB): all game logic, compiled to native code.
   - `PapersPlease_Data\il2cpp_data\Metadata\global-metadata.dat`: the type,
