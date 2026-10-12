@@ -72,7 +72,8 @@ for the commands and how to read decompiled output.
   JDK above. Ghidra runs fine regardless; call `javap` and `jar` by their
   full JDK path.
 - Python 3.12 is installed and used for the helper scripts (run with
-  `python -I`).
+  `python -I`). Pillow 11.1.0 is installed for it; the face scripts
+  (`scripts/reference/faces.py` and everything built on it) need it.
 - Rust 1.99 and the `wasm32-unknown-unknown` target are installed (checked
   2026-10-12). `trunk`, `wasm-pack` and `wasm-bindgen` are not installed, and
   Bevy has not been set up or tried.

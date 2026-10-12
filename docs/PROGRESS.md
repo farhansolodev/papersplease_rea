@@ -1,7 +1,7 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-13, at the end of
-the second long session. `MODLOG.md` has the step-by-step history; this file
+the third long session. `MODLOG.md` has the step-by-step history; this file
 is the current state, what to do next and what is still open. It is updated
 only when the user asks (see "Working agreements"), so the newest
 `MODLOG.md` entries may be ahead of it.
@@ -18,22 +18,24 @@ random numbers; how a traveler is chosen, built (face, name, id,
 fingerprints, height, weight, criminals) and given documents with right or
 deliberately wrong values; how errors are chosen and applied; how say lines
 become speech; how the booth runs a visit, its scripted responses and
-button commands, and when it issues a citation. Reference implementations
-exist for the random generator, the date maths, the seed chain and Haxe's
-lookup tables, each checked (against the game's machine code or the real
-calendar). No Rust code exists yet.
+button commands; the player's actions and how mistakes are judged and
+penalised; how a face picture is built; and which headlines a day's
+newspaper gets. **A Python reference now builds a complete traveler
+(person, papers, every document value, errors) from a master seed**
+(`scripts/reference/booth.py`); it is checked against the data files and
+its own rules, not yet against the running game. No Rust code exists yet.
 
 ## How far along
 
-Rough estimate: **about 20% of the work**, low confidence. Estimated total:
+Rough estimate: **about 27% of the work**, low confidence. Estimated total:
 100 to 200 hours of sessions.
 
 | Stage | Share | State |
 |---|---|---|
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
-| 3. Understanding the data files | 12% | 8 of the 23 game data files studied, 3 more in part (`data-files.md`) |
-| 4. Understanding the game logic | 30% | Roughly 40%: the traveler pipeline, speech and booth events are done; the player's actions, judging mistakes, news, nights, endings, saves, endless mode and the screen side are not |
+| 3. Understanding the data files | 12% | 10 of the 23 game data files studied, 2 more in part (`data-files.md`) |
+| 4. Understanding the game logic | 30% | Roughly 60%: the traveler pipeline (with a full Python reference), speech, booth events, the player's actions, judging, faces and news selection are done; the newspaper picture, nights, endings, saves, endless mode and the screen side are not |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Not started; see "Verification" below |
 
@@ -62,41 +64,38 @@ Rough estimate: **about 20% of the work**, low confidence. Estimated total:
 | `haxe-maps.md` | Haxe's `StringMap` and `IntMap`: hash, layout and the order they are walked in |
 | `speech.md` | `Speeches.txt` and how say lines become speech |
 | `responses-and-events.md` | Part 1: the booth's events, responses, conditions, operation queue, button commands, citations |
+| `player-actions.md` | Part 2: stamping, giving and confiscating papers, the filer, interrogation, fingerprint / search / detain, poison and bomb, judging mistakes, citations and penalties |
+| `faces.md` | `Faces.xml`, the face sheets and key colours, how a face picture is composed, the pixel height that sets a traveler's height |
+| `news-txt-format.md` | `News.txt`, which headlines a day gets and in what order, the `News<i>` names (drawing the newspaper not studied) |
 | `port-requirements.md` | Exactness rules the Rust port must follow |
 
 ## Next steps, in order
 
-(Done in the second session: papers on the desk, building the traveler,
-start-up and seeds, the value helpers, Haxe's lookup tables, speech, and part 1
-of the booth responses. See the docs above and `MODLOG.md`.)
+(Done in the third session: booth responses part 2 (player actions and
+judging), faces, the whole Python reference of traveler creation in seven
+layers, and the first remaining data file, `News.txt`. See the docs above
+and `MODLOG.md`.)
 
-1. **Booth responses, part 2: the player's actions and judging mistakes.**
-   `BoothEngine` (`0x1804640f0` constructor; methods listed in `dump.cs`):
-   `stampPaper`, `canGivePaperToTraveler` / `givePaperToTraveler` (the
-   `Give-...` responses), `confiscatePaper`, `putPaperInFiler` /
-   `removePaperFromFiler`, `interrogateFactPaths` (inspect mode) with
-   `BoothEnv.getOpForInvalidFactPaths` and `getFactRelationship`,
-   `clickAction` (fingerprint, search, detain, denial reason),
-   `printSearchPhoto`, poison and time bomb, `handlePaperCustomLinkClicked`,
-   `addNewEnvPapers`, `setEnabled` / `getEnabled`, `StampApproval`; and
-   `BoothEnv.hasErrors`, `getCiteText`, `wantConfiscatePassport`, where
-   `mistakeCaught` is set, `Day.addCitation` and penalties. Also fact
-   groups / correlation (`FactGroup.autoGetCorrelationPairs`).
-2. **Faces**: `FaceLib` constructor (`Faces.xml` into metadata keys) and the
-   `Face` constructor (`heightInPixels`, which sets the traveler's height).
-   With that, nothing blocks a **Python reference implementation of traveler
-   creation** driven from a master seed (`run-and-seeds.md`), to serve as
-   the answer key for testing the Rust code.
-3. Remaining data files (`data-files.md`): news (`DayNews`,
-   `NewsArticle`), nights, ends, paths, sounds, text (`Lang.loadFromXml`),
-   fonts, emblems, bodies.
+1. **Remaining data files** (`data-files.md`), one per step: `Nights.txt`
+   (`data.NightLib`), `Ends.xml` / `Intro.xml` (`data.EndLib`), `Paths.xml`,
+   `Sounds.xml`, `Text.xml` (`Lang.loadFromXml`), `Fonts.xml`,
+   `Emblems.xml`, the rest of `Bodies.xml`, `BorderAnim.xml`,
+   `Endless.csv` / `Endlesses.xml`, `Credits.txt`, `Languages.txt`.
+2. **The newspaper picture**: `play.day.DayNewsImage.make` (about 9 KB),
+   `play.day.LayoutImage`, the `NewsLayout0` to `5` images. Settles whether
+   the first article in the list is the main headline
+   (`news-txt-format.md`). Can be done with step 1 or left for step 6.
+3. **Decide how to compare the reference with the running game** (see
+   "Verification"): the game's own debug log (`trace`), or the test
+   automation with a fixed master seed. Running the game needs the user's
+   go-ahead.
 4. Saves (`play.EncryptedStore`, `play.save`, `StoryState.load`), the rest
    of `Game.applyScreenChange` (new game versus load), endless mode, and the
    night and ending screens.
 5. Audio extraction (probably `sharedassets0.resource`; not checked) and the
-   language zips in `StreamingAssets/loc/`. This does not depend on steps 1
-   to 4 and can be moved earlier if wanted; it may need a Unity asset tool
-   (ask before downloading).
+   language zips in `StreamingAssets/loc/`. This does not depend on the
+   steps above and can be moved earlier if wanted; it may need a Unity asset
+   tool (ask before downloading).
 6. Rendering and input side of the original (`app.vis`, `play.ui`,
    `play.screen`), then design and build the Rust port.
 
@@ -104,11 +103,28 @@ of the booth responses. See the docs above and `MODLOG.md`.)
 
 Collected from the docs, so they are not lost:
 
-- The stamp-result flags: that `APPROVED`, `DENIED`, `REASONED` are bits 2,
-  4 and 8 is inferred (`responses-and-events.md`); part 2 checks it.
-- 26 response names are not whole strings in the code (`Give-...`,
-  `Interrogate-Detain-Replace`, `Interrogate-Search-Replace`,
-  `LinkClicked-EzicNote-open`); that the code builds them is inferred.
+- (Settled in the third session, see `player-actions.md`: the stamp-result
+  flags are 2, 4 and 8; the `Give-...`, `Interrogate-...` and
+  `LinkClicked-...` response names are built in code.)
+- Whether a `Day` object is constructed more than once per day. Each
+  construction makes three criminal faces (using the face cycler and the
+  traveler generator) and a `DayNews` (`traveler-build.md`,
+  `news-txt-format.md`).
+- Whether the newspaper shows the first article of the day's list as the
+  main headline. The game's sort swaps equal articles, so on days 2, 3, 13
+  and 16 the list order is the reverse of `News.txt`.
+- The news entry `DIPLOMAT_FIRST` is named by nothing found; who sets
+  `Day.whenAddNews`; whether endless mode has news.
+- Other callers of `Array.sort` (an unstable quicksort) have not been
+  listed.
+- A wrong `Purpose` for an Arstotzkan never ends in the reference
+  (`fact-values.md`); the data never asks for it.
+- Face sheet `M6` has artwork for one face only (piece 24); face `F1:0` has
+  its shoulder dots in reverse order (`faces.md`).
+- A saved name-cycler position and the non-English alias swap sets are not
+  modelled in the reference scripts.
+- `FilerEnvelope/Title`, `Citation/Message` and `Citation/Penalty` have no
+  fact definitions in `Facts.xml` (`player-actions.md`).
 - `Facts.xml` `<cite when="*...">`: whether the `*` is stripped before the
   "contains" test (one entry, `*bomb`).
 - `Error.requiredPaperIds` appears never to be filled. Not searched: whether
@@ -151,9 +167,17 @@ checked with numbers and logs.
   Ghidra's emulator. Used for `app.Rand` (`EmulateRand.java`) and the
   string hash (`EmulateStringHash.java`). Breakpoints let it read an
   intermediate result before the code reaches the allocator.
-- **Reference scripts** checked so far: `rand.py` (emulator), `gdate.py`
-  (every day 1800 to 2200 against Python's calendar), `haxemap.py` (hash in
-  the emulator; table logic by reading and a self-test).
+- **Reference scripts** checked against the game's code or the calendar:
+  `rand.py` (emulator), `gdate.py` (every day 1800 to 2200 against Python's
+  calendar), `haxemap.py` (hash in the emulator; table logic by reading and
+  a self-test).
+- **The traveler answer key** (`scripts/reference/booth.py` and the layers
+  under it) builds complete travelers from a master seed. It is checked
+  against the data files and its own invariants (`booth_check.py`: 1,892
+  travelers, no problem), **not against the game**. It matches the game
+  only for a day's first traveler unless the player's actions are replayed,
+  because those also use the booth's random numbers. Comparing it with the
+  game is the main open verification task.
 - **The game's own debug logging.** Many functions call
   `Trace.customPrint` behind two switches, `Trace.enabled` and
   `Trace.showVerbose` (for example "New Traveler:" with a full description,
@@ -178,7 +202,8 @@ All gitignored. Nothing below is in git.
 | `game/` | 90 MB | Copy of the GOG install | Copy `C:\GOG Games\PapersPlease` |
 | `dumps/il2cppdumper/` | 31 MB | Names, layouts, string table | `il2cpp-name-recovery.md` |
 | `decompiled/ghidra/` | about 480 MB | Analysed Ghidra project with names and types | `ghidra-workflow.md` steps 1 to 3 (about 20 minutes) |
-| `decompiled/*.c`, `*.clean.c`, `*.txt` | small | Decompiled functions and instruction dumps read in the sessions (about 85 files) | Step 4 of `ghidra-workflow.md` |
+| `decompiled/*.c`, `*.clean.c`, `*.txt` | small | Decompiled functions and instruction dumps read in the sessions (over 100 files) | Step 4 of `ghidra-workflow.md` |
+| `extracted/checks/` | small | Test face pictures, the overview of all faces, the face height survey | `faces.py` (`show`, `overview`, `survey`) |
 | `extracted/Art.dat` | 3 MB | Archive cut from `sharedassets0.assets` by hand | Offsets in `art-dat-format.md` |
 | `extracted/art/` | 9 MB | The 614 unpacked files | `art-dat-format.md` commands |
 
@@ -196,7 +221,7 @@ Ghidra also keeps a small cache in `C:\Users\farha\AppData\Local\ghidra\`.
 |---|---|
 | `scripts/ghidra/` | Ghidra scripts (names, types, decompile, references, string uses, assembly dump, the two emulator checks) and `clean_decompile.py` |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations: `rand.py` (checked in the emulator), `tabtree.py` (checked against the data files), `seeds.py` (master seed to day seeds; from the code, not checked against the running game), `gdate.py` (checked against Python's calendar), `haxemap.py` (hash checked in the emulator) |
+| `scripts/reference/` | Reference implementations. Base: `rand.py` (checked in the emulator), `tabtree.py` (checked against the data files), `seeds.py` (master seed to day seeds), `gdate.py` (checked against Python's calendar), `haxemap.py` (hash checked in the emulator). Traveler answer key, in layers: `cyclers.py` (faces and names in order), `faces.py` (face pictures; needs Pillow), `person.py`, `travspec.py` (scripts and the day's traveler list), `errormaker.py`, `values.py` (wrong values), `factlib.py` (`Facts.xml`), `booth.py` (everything chained: `python -I scripts/reference/booth.py <seed> <day> <count> extracted/art/assets --facts`). Also `news.py` (the day's headlines). None of the answer key is checked against the running game |
 | `scripts/checks/` | Checks run against the real data files; see its `README.md` for each script's arguments |
 
 ## Working agreements
