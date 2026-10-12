@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Handoff: state, open items and reading notes written down
+
+**Changed:** wrote `docs/PROGRESS.md` (current state, ordered next steps, open questions, local-only files, verification ideas) and `docs/port-requirements.md` (exactness rules for the Rust port); added a "runtime helpers" and "calls by slot number" guide to `docs/ghidra-workflow.md`; copied the session's 12 one-off check scripts from the temporary folder into `scripts/checks/` with a README; resolved the "extra filter" note in `docs/facts-xml-format.md`; added a "Start here" pointer and three tooling facts to `CLAUDE.md`.
+**Why:** the session's context was nearly full; knowledge that existed only in the conversation or a temporary folder would have been lost.
+**Tested how:** re-ran two of the copied check scripts from their new location (`days_shape.py`, `errors_check.py`).
+**Result:** both print the same counts as before (20 rows of 34 columns; 11 templates, 110 errors). A new session can start from `docs/PROGRESS.md`.
+**Still broken / not tested:** the other ten check scripts were not re-run after copying.
+**Next:** see `docs/PROGRESS.md`, "Next steps".
+
 ## 2026-10-13 Document value generator studied
 
 **Changed:** wrote `docs/fact-values.md`; updated two notes in `docs/operations-and-fact-validity.md`.

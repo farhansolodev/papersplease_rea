@@ -1,0 +1,31 @@
+# One-off checks
+
+Small scripts written while studying the data files. Each compares a real
+file from `extracted/art/assets/data/` with what the game's code accepts, and
+prints counts. They back the "Cross-check" and "Checks" sections of the docs.
+They are kept as evidence and as a starting point for port tests; they are
+not polished tools.
+
+Run from the project root with `python -I`. Paths below assume
+`D = extracted\art\assets\data`.
+
+| Script | Arguments | Backs |
+|---|---|---|
+| `days_shape.py` | `D\Days.csv` | `days-csv-format.md` |
+| `xml_shape.py` | `D\Papers.xml` (any well-formed XML) | tag and attribute inventory |
+| `papers_check.py` | `D\Papers.xml` | `papers-xml-format.md` |
+| `facts_shape.py` | `D\Facts.xml` | inventory of `Facts.xml` (handles the raw `&&`) |
+| `facts_check.py` | `D\Facts.xml D\Papers.xml dumps\il2cppdumper\stringliteral.json` | `facts-xml-format.md` |
+| `trav_check.py` | `scripts\reference D\Travelers.txt D\Days.csv` | `tab-tree-format.md` |
+| `trav_semantics.py` | `scripts\reference D\Travelers.txt` | `travelers-txt-format.md` |
+| `trav_levels.py` | `scripts\reference D\Travelers.txt` | same (block level versus operation level) |
+| `trav_refs.py` | `scripts\reference D\Travelers.txt D\Days.csv` | same (includes, events, buttons) |
+| `errors_shape.py` | `scripts\reference D\Errors.txt` | `errors-txt-format.md` |
+| `errors_check.py` | `scripts\reference D\Errors.txt D\Facts.xml` | same (after template expansion) |
+| `errors_check2.py` | `scripts\reference D\Errors.txt D\Facts.xml D\Travelers.txt` | same (tilde paths, error names used by travelers) |
+
+The ones taking `scripts\reference` as their first argument import
+`tabtree.py` from there.
+
+The XML inventory scripts use a parser that **drops comments**. Read the
+comments separately (see the study method in `docs/ghidra-workflow.md`).

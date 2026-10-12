@@ -235,8 +235,15 @@ A "draw" is one call to `random()`, giving a fraction from 0.0 to 1.0
   a random entry of that purpose's nation list.
 - **Random purpose**: a weighted pick over purposes that apply, using
   `chance`. When choosing for an invalid traveler, purposes with
-  `chooseforinvalid` false are left out. An extra filter on error patterns
-  is present but only skimmed here; **not confirmed**.
+  `chooseforinvalid` false are left out. There is also a filter on error
+  patterns: when patterns are given and at least one error matches them, a
+  purpose is kept only if some matching error's required papers are all
+  among the purpose's automatic papers. Because an error's required-paper
+  list appears never to be filled (`errors-txt-format.md`), that test passes
+  for the first matching error, so with the current code and data **the
+  filter excludes nothing**. (Worked out from the decompiled
+  `WorldDef.getRandomPurpose`; depends on the required-paper list really
+  being empty, which is an open item in `PROGRESS.md`.)
 - **Random duration**: a pick from durations whose `purposes` contains the
   purpose. **Issuing city**: a pick from the nation's cities.
 - **Access nations**: shuffle the nations, drop Arstotzka unless asked to

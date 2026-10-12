@@ -149,6 +149,66 @@ unusual shape are left as they are.
    explain why something is the way it is (for example "cut content")
    without evidence.
 
+## Runtime helpers you will see everywhere
+
+Identified by how they are used across many functions. None carries game
+logic.
+
+| In the output | What it is |
+|---|---|
+| `thunk_FUN_1800f3b80(X_TypeInfo)` | Create a new object of class `X` |
+| `FUN_180126c60(type, n)` | Create a new array of `n` items |
+| `il2cpp_value_box(type, &v)` | Wrap a number or boolean as an object. **The decompiler often drops the value**; check the instructions if it matters |
+| `FUN_1800029d0(obj, X_TypeInfo)` | "Is this an `X`?": returns the object or nothing |
+| `FUN_180126c20(obj, ...)` | Raise "wrong type" |
+| `FUN_1801271d0()` | Raise "null reference" |
+| `FUN_1801271a0(exception, ...)` | Raise an exception (usually after building an error message) |
+| `thunk_FUN_1800eeee0(&X)` | One-time metadata setup, or fetch of a late-loaded constant |
+| `thunk_FUN_180125b00(...)` | Garbage-collector bookkeeping after storing a field |
+| `haxe_lang_Runtime__getField(obj, "name", hash, ...)` | Read a field by name from a loosely typed object |
+| `haxe_lang_Runtime__callField(it, "hasNext" / "next", ...)` | Step through a collection |
+| `Mono_Globalization_Unicode_ContractionComparer___ctor(obj)` | The shared empty constructor; means "plain new object" |
+| `ScreenChange___ctor(obj, a, b)` | A shared two-field constructor. Seen for `FactGroupPath`, `FactGroup` and citation entries |
+| `play_DateFormat___ctor(obj, a, b, c)` | A shared three-field constructor |
+| `play_night_CalendarEvent___ctor` | Stands in for the `haxe.io.Bytes` constructor |
+| `Locale__GetText(x)` | A pass-through; returns `x` |
+| A block building `"Source/….hx"`, a function name and a line number, ending in `Trace__customPrint` | Debug logging. Skip it, but note the message text: it often names what the code is doing |
+
+### Calls by slot number
+
+A call through an object looks like
+`(*(obj->klass->vtable)._38_get.methodPtr)(obj, args, …)`. The number is the
+method's slot. Two things go wrong:
+
+- **Trampolines.** `FUN_180034940`, `FUN_180034970`, `FUN_180034a10`,
+  `FUN_180034a60`, `FUN_180068300` and `FUN_180056080` are generic "call
+  slot N" helpers. Their first argument is the slot number, the second is
+  the object, the rest are the real arguments (in the instructions: `ECX` =
+  slot, `RDX` = object, `R8`, `R9` = arguments). The decompiler frequently
+  drops arguments on these.
+- **Wrong class, wrong name.** If Ghidra has the variable typed as the wrong
+  class, the name after the slot number is wrong but the number is right.
+  Look the number up in `dump.cs`, where each method has a `Slot: N`
+  comment. A method's entry sits at offset `0x138 + 16 * N` in the class
+  record.
+
+Slots worth knowing:
+
+| Class | Slots |
+|---|---|
+| `haxe.ds.StringMap` | 36 `set`, 38 `get`, 41 `exists`, 43 `remove` (when mis-typed as `ObjectMap` these print as `get`, `exists`, `iterator`, `toString`) |
+| `haxe.ds.List` | 25 `add` (to the back), 26 `push` (to the **front**), 28 `last`, 32 `remove` (first match), 34 `join` |
+| `app.Rand` | 25 `nextInt`, 26 `nextFloat`, 27 `random` |
+| `data.FactSet` | 25 `get`, 26 `set`, 28 `getValue`, 29 `getValueText` |
+| `data.Node` | 25 `findNode`, 26 `expandParams`, 27 `getExpanded`, 28 `consume` |
+
+### Static data and enum values
+
+`*(X_TypeInfo + 0xb8)` is class `X`'s block of static values. For a Haxe
+enum, the values sit in it in declaration order, 8 bytes apart, so
+`+ 0x10` is the third value. The order is listed in `dump.cs`. An enum
+object's number is at `obj + 0x10` (`_hx_index`).
+
 ## Known analysis errors
 
 Ghidra logged two errors during the first analysis. `1801523d0` is in the

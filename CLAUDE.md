@@ -40,6 +40,12 @@ Port my own copy of Papers, Please to run in the browser:
     `globalgamemanagers.assets(.resS)`, `level0`, `Resources\`,
     `StreamingAssets\`: the assets.
 
+## Start here in a new session
+
+Read `docs/PROGRESS.md` first: it has the current state, the ordered next
+steps, the open questions and the list of docs. Then `docs/ghidra-workflow.md`
+for the commands and how to read decompiled output.
+
 ## Tooling state
 
 - REA 6.4.0 is registered for Claude Code, with the `reverse-engineer-anything`
@@ -58,7 +64,15 @@ Port my own copy of Papers, Please to run in the browser:
   output for this game is in `dumps/il2cppdumper/`; see
   `docs/il2cpp-name-recovery.md`.
 - REA's Ghidra requests time out on `GameAssembly.dll` (see `STATUS.md`), so
-  that DLL is analysed by running Ghidra's `analyzeHeadless` directly.
+  that DLL is analysed by running Ghidra's `analyzeHeadless` directly. The
+  analysed project is saved in `decompiled/ghidra/`; scripts are in
+  `scripts/ghidra/`.
+- In Claude Code's PowerShell tool, `JAVA_HOME` resolves to
+  `C:\Program Files\Eclipse Adoptium\jre-21.0.4.7-hotspot` (a JRE), not the
+  JDK above. Ghidra runs fine regardless; call `javap` and `jar` by their
+  full JDK path.
+- Python 3.12 is installed and used for the helper scripts (run with
+  `python -I`).
 - Rust 1.99 and the `wasm32-unknown-unknown` target are installed (checked
   2026-10-12). `trunk`, `wasm-pack` and `wasm-bindgen` are not installed, and
   Bevy has not been set up or tried.
