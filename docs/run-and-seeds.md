@@ -1,0 +1,149 @@
+# From launching the game to each day's random numbers
+
+Studied on 2026-10-13. This answers "where does the randomness of a
+playthrough come from?": how the game picks its master seed at start-up, and
+how every generator used by days, faces and names is derived from it.
+
+Functions read in full: `HostUnity.CreateGame` (`0x1809e7b00`), the `Game`
+constructor (`0x180585270`), `Main.main`, the `play.Bootstrap` constructor
+(`0x180435530`), `setLanguage`, `advanceStorySeed`,
+`autoReapplyRandomSeed`, `set_storyState`; the `DayRun` and `BoothEnvRun`
+constructors; Haxe's `Math` static setup and `Math.random`;
+`System.Random`'s parameterless constructor; `app.CommandLine.fromArgs`;
+`Trace` (`init`, `info`, `verbose`, `customPrint`, static setup). The
+`LOAD_TO_SCREEN` branch of `Game.applyScreenChange` was read; the rest of
+that function was not. The seed-scaling constant was read from the raw
+instructions.
+
+Everything here is confirmed in the code unless marked otherwise.
+
+## The master seed
+
+The Unity start-up (`HostUnity.CreateGame`) builds the game's parameters
+**without a seed**. The `Game` constructor then picks one:
+
+```
+master = floor(Math.random() * 16777215)
+```
+
+`Math.random()` is .NET's `System.Random.NextDouble()` on a generator made
+once with the parameterless constructor, which seeds it from
+`Environment.TickCount` (milliseconds since the computer started). So **every
+launch has a different master seed**, between 0 and 16,777,214.
+
+If the parameters do carry a seed, it is used as is. `Main.main`, a second
+entry point, passes 0 and always starts the test automation; whether the
+Windows build ever uses `Main.main` is not checked (inferred: no, Unity uses
+`HostUnity`).
+
+`HostUnity.CreateGame` also asks the test automation for a plan
+(`test.auto.AutoPlan.make`, from the disk and the command line). If the plan
+is valid, an automated game (`AutoGame`) is started instead of the normal
+one. Not studied further.
+
+## What `play.Bootstrap` derives from it
+
+| Generator | Seed | Used for |
+|---|---|---|
+| `endlessSeedGenRand` | master + 26 | endless mode (not studied) |
+| `storySeedGenRand` | master + 73 | story seeds (below) |
+| face cycler | master (its parts use master + 1 to + 5, `traveler-build.md`) | random faces, for the whole launch |
+| name cycler | master and master + 1, **only if no saved position exists** | names |
+
+Then `setLanguage` (called at the end of the constructor, and again whenever
+the language is changed) loads the language's data and creates:
+
+- the **day run**, with `storySeed = storySeedGenRand.nextInt()`;
+- the **booth run**, which holds the same face and name cyclers.
+
+## The story seed
+
+- First value: drawn when the day run is created (above).
+- **Every time a save is loaded** (`LOAD_TO_SCREEN`), the story state is
+  loaded from the save and then a **new story seed is drawn**
+  (`advanceStorySeed`: `storySeed = storySeedGenRand.nextInt()`).
+- Each day's generators come from it: `day * 50 + storySeed`, then `+ 0x1000`
+  and so on (`days-csv-format.md`, `rand.md`).
+
+So the story seed is **not stored in the save**. Loading the same save twice
+in one launch gives two different story seeds, and so different random
+travelers; relaunching gives a different sequence again. (That replays
+differ fits how the game plays; the mechanism is what is confirmed here.)
+
+## Faces and names over time
+
+- The face cycler is created once per launch from the master seed and is
+  never saved. Faces depend on the launch and on how many faces have been
+  handed out since.
+- The name cycler's position is saved in the encrypted store (`names`) after
+  every name, and loaded at start-up when present. The saved position is a
+  seed, a position and a reshuffle count (the fields of
+  `ShuffledSequenceState`; `makeFromState` itself was not read), so the
+  name order is fixed by the launch that first created it, and continues
+  across launches.
+
+## Consequences
+
+- **A particular session of the original cannot be reproduced** without
+  knowing its tick count at launch (and, for names, the saved position).
+  Checking the port against the original therefore needs either the
+  original's own logs, or running both from a chosen master seed.
+- **For the port**: implement the same chain from a master seed: the two
+  seed generators, the cyclers, a story seed per load, and day seeds from
+  it. How the port picks its master seed is a design choice for
+  `docs/DESIGN.md` (for tests it should be settable).
+- `autoReapplyRandomSeed` (used by the automation) recreates the two seed
+  generators, both cyclers and the story seed from the master seed, which
+  is how the automation can replay deterministically. (Inferred from what
+  it does; its callers are not studied.)
+
+## Reference script
+
+`scripts/reference/seeds.py` computes the chain for a given master seed:
+
+```
+python -I scripts/reference/seeds.py 0 2 1 2
+master 0: story seeds [697711081, 1537513867, 1445636628]
+day 1: day=697711131 news=697715227 border=697719323 night=697723419 traveler=697727515 booth=-1449768421
+...
+```
+
+The story seeds equal the first three outputs of `rand.py` for seed 73, as
+they should. This checks the script against the description above, not
+against the running game.
+
+## Command-line words
+
+`CommandLine.fromArgs` (called from `HostUnity.Start`) recognises these
+exact words, without dashes:
+
+| Word | Effect (where known) |
+|---|---|
+| `trace` | turns on the game's debug log (`Trace.enabled`) |
+| `soak <name>` | names an automated soak test (automation; not studied) |
+| `savedir <path>` | where saves go (quotes are removed) |
+| `expo` | shows a pause button (exhibition mode) |
+| `nosync`, `fps`, `stretch`, `720p`, `1080p` | display options (not studied) |
+| `nosteam` | Steam-related; **out of scope** (online platform) |
+
+### The debug log
+
+`Trace` has two switches: `enabled` and `showVerbose`. Both start off.
+`trace` on the command line sets `enabled`. Most of the game's detailed
+messages (for example "New Traveler:" and "Additional error:") are printed
+only when **both** are on. No code was found that turns `showVerbose` on,
+and the game has no text constant for it; a full search of writes to it has
+**not** been done. Messages go to the platform's log function; where that
+writes on Windows (probably Unity's `Player.log`) is **not checked**.
+
+So `trace` alone probably gives only the less detailed messages. Whether it
+is useful for checking the port is untested. Running the original game with
+it has not been done and would need your go-ahead.
+
+## Not studied
+
+- The rest of `Game.applyScreenChange` (new game versus load, endless mode).
+- `StoryState.load` and the save format.
+- The test automation (`AutoPlan`, `AutoGame`, `test.auto.*`).
+- Where `Trace`'s output ends up, and whether anything sets `showVerbose`.
+- Nothing here has been compared with the running game.

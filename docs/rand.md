@@ -65,10 +65,18 @@ this is used (probably the mid-day "stash") is not studied.
 
 ## Is this the only source of randomness?
 
-Yes, as far as the code references show:
+Yes, **with one exception at start-up**:
 
-- Nothing in the game calls the Haxe library's `Std.random` or `Math.random`,
-  and nothing calls `System.Random`'s `Next`, `NextDouble` or `Sample`.
+- **Correction (2026-10-13).** The first check looked only for direct calls
+  to `System.Random`'s `Next`, `NextDouble` and `Sample`, and found none.
+  That missed calls made through an object's method table. The `Game`
+  constructor makes one: when no seed is given (the normal Windows start),
+  it takes the game's **master seed** from Haxe's `Math.random()`, which is
+  `System.Random.NextDouble()` on a generator seeded from the system's
+  tick count. See `run-and-seeds.md`. Every other random number in the game
+  comes from `app.Rand` generators derived from that master seed.
+- Nothing else in the game was found calling the Haxe library's
+  `Std.random` or `Math.random`.
 - No class derives from `app.Rand`, so every call lands in the code above.
 - The system clock is read by the save header (a timestamp), the frame-rate
   counter, `app.Clock.getSystemTime`, the test automation and the online
@@ -82,10 +90,12 @@ see `docs/days-csv-format.md`), `play.Bootstrap`, `BoothEnv`,
 generator with its error maker (`traveler-creation.md`). `FaceCycler` and
 `ShuffledSequence` derive several generators from one seed, some of them
 overlapping; the name cycler's position is saved with the game
-(`traveler-build.md`). **What seed each of the others uses is not
-studied**, nor which seed the face and name cyclers are given. In
-particular, where a new game's story seed comes from is unknown; if it is
-taken from the clock, two new games differ, which is expected behaviour.
+(`traveler-build.md`). `play.Bootstrap` makes the story-seed and
+endless-seed generators and gives the face and name cyclers the master
+seed; the whole chain is in `run-and-seeds.md`. **What seed each of the
+remaining sites uses** (`CriminalPoster`, `TakeBursts`, `BorderCam`,
+`ScreenShake`, `PullChain`, `LoadScreen`, `SoundDefLib`) **is not
+studied.**
 
 ## How it was verified
 

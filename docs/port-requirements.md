@@ -7,6 +7,11 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
 ## Randomness
 
 - Use the game's generator: sfc32 with the game's seeding (`rand.md`).
+- Derive every generator from one master seed exactly as the original does:
+  story seeds from `Rand(master + 73)`, one at start-up and one more per
+  loaded save; endless seeds from `Rand(master + 26)`; face and name cyclers
+  from the master seed (`run-and-seeds.md`, `scripts/reference/seeds.py`).
+  The story seed is not saved. Make the master seed settable for tests.
 - `random()` returns 0.0 to 1.0 **inclusive**. `floor(length * r)` can
   equal `length`; the original then yields nothing (pick one) or raises an
   error (error selection). Decide and document what the port does.

@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Start-up and seeds studied
+
+**Changed:** wrote `docs/run-and-seeds.md`; added `scripts/reference/seeds.py`; corrected `docs/rand.md`; updated `docs/traveler-build.md`, `docs/port-requirements.md` and `docs/PROGRESS.md`.
+**Why:** a traveler cannot be reproduced without knowing where the face cycler, name cycler and story seed get their seeds; this was first in the next-steps list.
+**Tested how:** decompiled and read in full the Unity start-up (`HostUnity.CreateGame`), the `Game` and `Bootstrap` constructors, `setLanguage`, `advanceStorySeed`, `autoReapplyRandomSeed`, the day-run and booth-run constructors, Haxe `Math.random` and its setup, `System.Random()`, `CommandLine.fromArgs` and `Trace`; read the `LOAD_TO_SCREEN` branch of `Game.applyScreenChange`; read the seed-scaling constant (16777215) from the raw instructions. Ran `seeds.py` for master seeds 0 and 16777214; its story seeds for master 0 equal `rand.py`'s first three outputs for seed 73.
+**Result:** each launch takes a master seed from the system tick count; story seeds come from `Rand(master + 73)`, one at start-up and one per loaded save (the story seed is not saved); the face cycler and name cycler start from the master seed, and only the name position is saved. **Correction:** `docs/rand.md` said nothing uses `System.Random`; the start-up does, through a call the first search could not see. The command-line word `trace` turns on one of the two debug-log switches; nothing found turns on the other.
+**Still broken / not tested:** nothing checked against the running game; the rest of `applyScreenChange`, saves, the test automation, where the log output goes, and a full search for writes to `Trace.showVerbose` are not done.
+**Next:** the helpers used by the value generator (see `docs/PROGRESS.md`).
+
 ## 2026-10-13 Building the traveler (the person) studied
 
 **Changed:** wrote `docs/traveler-build.md`; added `scripts/checks/traveler_build_check.py`; updated `docs/traveler-creation.md`, `docs/fact-values.md`, `docs/rand.md`, `docs/port-requirements.md`, `docs/PROGRESS.md` and the checks README.

@@ -36,8 +36,8 @@ Everything here is confirmed in the code unless marked otherwise.
 | The **name cycler** | Which name a traveler gets | Its own generators. Its position is **saved** in the encrypted store under `names` and continues across play sessions |
 
 So a traveler's face and name do not depend on the day's seed but on how
-many faces and names were handed out before. Where the two cyclers are
-created and with which seed is not studied.
+many faces and names were handed out before. Both cyclers are created at
+start-up from the launch's master seed (`run-and-seeds.md`).
 
 ## What is copied from the specification
 
@@ -128,7 +128,7 @@ random faces never get.
 
 ### The face cycler
 
-Created with a seed `s` (where `s` comes from is not studied):
+Created with a seed `s` (the launch's master seed, `run-and-seeds.md`):
 
 - its own generator `Rand(s)`, used only for the mirror flag
   (`r > 0.5`);
@@ -303,7 +303,6 @@ Script: `scripts/checks/traveler_build_check.py`.
 
 - How a face image is built (`Face` constructor, `heightInPixels`) and the
   `Faces.xml` and `Bodies.xml` formats in general.
-- Where the run creates the face and name cyclers, and their seeds.
 - `GregorianDate.afterYears`, `TravelerName.getFormatted` and the other
   name methods, `FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`.
 - What `canDetain`, `forceDeny`, `slow`, `leaveDir` and `special` do in

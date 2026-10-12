@@ -48,49 +48,50 @@ total: 100 to 200 hours of sessions, low confidence.
 | `fact-values.md` | How each document value is generated |
 | `papers-on-desk.md` | Adding and removing papers, staying papers, the bulletin |
 | `traveler-build.md` | Building the person: face, name, id, fingerprints, height, weight, criminals |
+| `run-and-seeds.md` | Start-up: the master seed, story seeds, cyclers, command-line words, the debug log switches |
 | `port-requirements.md` | Exactness rules the Rust port must follow |
 
 ## Next steps, in order
 
 (Done 2026-10-13: `BoothEnv.addPaper` and the bulletin, see
-`papers-on-desk.md`; the `Traveler` constructor, see `traveler-build.md`.)
+`papers-on-desk.md`; the `Traveler` constructor, see `traveler-build.md`;
+start-up and seeds, see `run-and-seeds.md`.)
 
-1. **Where the run is set up**: where the face and name cyclers are created
-   and seeded (`BoothEnvRun`, `play.Bootstrap`), and where a new game's
-   story seed comes from. Needed before any traveler can be reproduced.
-2. **Helpers used by the value generator**: `TravelerName`
+1. **Helpers used by the value generator**: `TravelerName`
    (`getFormatted`, `getRandomInvalidated`, `getRandomAlias`),
    `Lang.makeAlias` / `makeTypo` / `getReplaced`, `FaceSpec.getInvalid`,
    `FingerprintCode.makeInvalid`, `Settings.formatDate`, `GregorianDate`
    (`afterYears`, `afterDays`), and the face image's height in pixels
    (`Face` constructor).
-3. **Haxe `StringMap` order.** Adding a paper generates its facts in the
+2. **Haxe `StringMap` order.** Adding a paper generates its facts in the
    hash order of a `StringMap`, and the order decides which random draws
    each fact gets (`papers-on-desk.md`). Study `haxe.ds.StringMap` as
    compiled here (its hash function, which probably calls
    `String.GetHashCode`, how the table grows, how iteration walks it), check
    it in the Ghidra emulator, and add it to `scripts/reference/`.
-4. **Speech**: `BoothEnv.getSpeech` (`0x1804798f0`), `Speeches.txt`,
+3. **Speech**: `BoothEnv.getSpeech` (`0x1804798f0`), `Speeches.txt`,
    `data.SpeechLib`. Settles how `$name` (travelers) and bare ids (errors)
    become text.
-5. **Running responses**: `BoothEngine.handleEvent` (`0x180468a30`, about
+4. **Running responses**: `BoothEngine.handleEvent` (`0x180468a30`, about
    8 KB), `BoothEnv.findDefaultRunOpNode` (`0x180476030`),
    `BoothEnv.testExpression` (`0x180480ec0`) and
    `BoothEnv.expandExpressionLhs` (`0x180475f20`). Settles what each event
    and button does, how `DEFAULT` is used, and how response conditions with
    `Traveler/...` on the left are evaluated.
-6. Remaining data files (see `data-files.md`): faces and bodies, names,
+5. Remaining data files (see `data-files.md`): faces and bodies, names,
    news, nights, ends, paths, sounds, text, fonts, emblems.
-7. Saves (`play.EncryptedStore`, `play.save`), where the story seed comes
-   from, and the night and ending screens.
-8. Audio extraction (probably `sharedassets0.resource`; not checked) and the
+6. Saves (`play.EncryptedStore`, `play.save`, `StoryState.load`), the rest
+   of `Game.applyScreenChange` (new game versus load), and the night and
+   ending screens.
+7. Audio extraction (probably `sharedassets0.resource`; not checked) and the
    language zips in `StreamingAssets/loc/`.
-9. Rendering and input side of the original (`app.vis`, `play.ui`,
+8. Rendering and input side of the original (`app.vis`, `play.ui`,
    `play.screen`), then design and build the Rust port.
 
-Once steps 1 to 3 are done, a reference implementation of traveler creation
+Once steps 1 and 2 are done, a reference implementation of traveler creation
 can be written in Python (like `scripts/reference/rand.py`) and used as the
-answer key for testing the Rust code.
+answer key for testing the Rust code. Given a master seed, it can now be
+driven from the very start (`run-and-seeds.md`).
 
 ## Open questions and unconfirmed items
 
@@ -109,8 +110,8 @@ Collected from the docs, so they are not lost:
   port, noted in case mobile matters.
 - Who uses `TabParser.expandParams` besides `ErrorLib` was not searched
   beyond the data files studied.
-- Where a new game's story seed comes from, and the seeds of 12 minor
-  generators (`rand.md`).
+- The seeds of 7 minor generators (`rand.md`). (The story seed is now
+  known: `run-and-seeds.md`.)
 - 20 traveler entries nothing refers to (`travelers-txt-format.md`), and
   three data files never loaded by name (`Threads.txt`,
   `TravelerGraph.txt`, `Version.txt`). Purpose unknown.
@@ -132,11 +133,16 @@ checked with numbers and logs.
 - **Emulator** (works, used for `app.Rand`): run small self-contained
   functions of the real code in Ghidra's emulator. See `EmulateRand.java`.
 - **The game's own debug logging.** Many functions call
-  `Trace.customPrint` behind two flags stored in `Trace`'s static data
-  (for example "New Traveler:" with a full description, "Additional
-  error:", "ErrorIds:"). If those flags can be switched on, the original
-  would log exactly the numbers needed. Not investigated: where the flags
-  are set and where the output goes.
+  `Trace.customPrint` behind two switches, `Trace.enabled` and
+  `Trace.showVerbose` (for example "New Traveler:" with a full description,
+  "Additional error:", "ErrorIds:"). The command-line word `trace` turns on
+  `enabled`; nothing found so far turns on `showVerbose`
+  (`run-and-seeds.md`). Not done: a full search for writes to
+  `showVerbose`, finding where the output goes, and running the game with
+  `trace` (needs your go-ahead).
+- **The test automation** can replay from a fixed master seed
+  (`autoReapplyRandomSeed`) and is chosen at start-up when a valid plan
+  exists (`AutoPlan.make`, command-line word `soak`). Not studied.
 - **The game's own test automation.** `test.auto.*` (103 classes),
   `Auto.txt` and `TestScenarios.xml` are still in the build. Not
   investigated.
@@ -167,7 +173,7 @@ project). Ghidra also keeps a small cache in
 |---|---|
 | `scripts/ghidra/` | Ghidra scripts (names, types, decompile, references, string uses, assembly dump, emulator) and `clean_decompile.py` |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations checked against the game: `rand.py`, `tabtree.py` |
+| `scripts/reference/` | Reference implementations: `rand.py` (checked against the game's machine code), `tabtree.py` (checked against the data files), `seeds.py` (master seed to day seeds; written from the code, not checked against the running game) |
 | `scripts/checks/` | The one-off checks run against the real data files this session; see its `README.md` |
 
 ## Working agreements reached this session
