@@ -88,6 +88,15 @@ address. Names look like `namespace.Class$$method`.
 - `FUN_1801271d0()` at the end is the null-reference error path.
 - "Unknown calling convention -- yet parameter storage is locked" is a
   harmless Ghidra notice caused by applying signatures.
+- **A called function's name can be wrong.** When several methods compile to
+  identical code they share one address, and only the first name is shown.
+  Seen so far: `Locale__GetText` standing in for a pass-through conversion,
+  and `play_night_CalendarEvent___ctor` standing in for the `haxe.io.Bytes`
+  constructor. If a callee's name makes no sense in context, check the
+  "also:" names in its comment.
+
+To find which functions use an address (a string constant or a function):
+`-readOnly -postScript FindReferences.java 0xADDRESS`.
 
 ## Known analysis errors
 
