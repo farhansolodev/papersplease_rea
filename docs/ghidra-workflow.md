@@ -102,6 +102,18 @@ To list the string constants a function uses, in machine-code order (for
 when the decompiler drops a string argument from a call):
 `-readOnly -postScript ListStringUses.java 0xFUNCTION`.
 
+## Running the game's code in the emulator
+
+Ghidra can execute a function's machine code without running the game. This
+gives ground truth for small, self-contained functions (pure arithmetic, no
+calls into the engine). `EmulateRand.java` is the worked example: it builds a
+fake object in scratch memory, points a fake class record's method slot at
+the real function, and calls the real constructor and `nextInt`.
+
+Notes for reuse: a class's method table starts at offset `0x138` with 16
+bytes per slot; arguments go in `RCX`, `RDX`, `R8`, `R9`; the function must
+not reach the one-time metadata setup block or any engine call.
+
 ## Cleaning the output for reading
 
 ```powershell

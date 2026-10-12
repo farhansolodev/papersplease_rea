@@ -220,7 +220,12 @@ Rule tests throughout are **substring tests** on a rules text, so
 These decide how many numbers are drawn from the random generator, so the
 port must match them exactly.
 
-- **Pick one from a list**: one draw `r`; index = `floor(length * r)`.
+A "draw" is one call to `random()`, giving a fraction from 0.0 to 1.0
+**inclusive** (see `docs/rand.md`).
+
+- **Pick one from a list**: one draw `r`; index = `floor(length * r)`. If
+  that equals the length (only when `r` is exactly 1.0), the result is
+  nothing rather than an item.
 - **Weighted pick** (`app.Probability`): one draw `r`; walk the choices
   adding up weights and return the first where `r * total < running sum`.
 - **Shuffle** (`ArrayUtil.makeShuffled(count)`): start with `0..count-1`;
@@ -269,6 +274,5 @@ port must match them exactly.
 - The expression evaluator for `<confiscation when>`.
 - `FactSet`, `FactValue` and the rest of the 44 `FactLib` methods beyond
   those listed.
-- `app.Rand` itself.
 - No reader has been written for the port, so none of this is tested end to
   end.
