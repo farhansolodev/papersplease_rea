@@ -95,6 +95,50 @@ def parse(text: str) -> Node:
     return root
 
 
+TEMPLATE_NAME = re.compile(r"\*([^:]*)")
+
+
+def get_expanded(template: Node, arguments: list[str]) -> Node:
+    """Copy of a template with $1, $2, ... replaced by the arguments.
+
+    Any parameter containing "*name" or "*name:variant" becomes "name".
+    """
+    copy = Node()
+    copy.params = []
+    for param in template.params:
+        for index, argument in enumerate(arguments):
+            param = param.replace("$" + str(index + 1), argument)
+        match = TEMPLATE_NAME.search(param)
+        if match:
+            param = match.group(1)
+        copy.params.append(param)
+    copy.nodes = [get_expanded(child, arguments) for child in template.nodes]
+    return copy
+
+
+def expand_params(node: Node, root: Node | None = None) -> None:
+    """Replace "$Template args..." with the top-level node "*Template".
+
+    Only the first "$" word (three characters or longer) on a line is
+    expanded. The template's children go before the node's own children.
+    Used for Errors.txt; not applied to Travelers.txt.
+    """
+    root = root if root is not None else node
+    params = node.params or []
+    for index, param in enumerate(params):
+        if param.startswith("$") and len(param) >= 3:
+            name = "*" + param[1:]
+            template = root.find(name)
+            if template is None:
+                raise ValueError("Node not found: " + name)
+            expanded = get_expanded(template, params[index + 1:])
+            node.nodes = expanded.nodes + node.nodes
+            node.params = params[:index] + expanded.params
+            break
+    for child in node.nodes:
+        expand_params(child, root)
+
+
 def walk(node: Node, depth: int = 0):
     for child in node.nodes:
         yield depth, child

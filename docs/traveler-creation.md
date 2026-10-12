@@ -43,7 +43,11 @@ Building the specification from the script is in
 `BoothEnv`'s error maker is given the same generator object as `BoothEnv`
 itself, so their draws interleave.
 
-## When the booth is set up (once per day)
+## When the booth is set up
+
+`BoothEnv` is created by the `BoothEngine` constructor, which is given a
+day. That this happens once per day is inferred from that; where engines are
+created has not been checked.
 
 The `BoothEnv` constructor, in order:
 

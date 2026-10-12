@@ -15,6 +15,16 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-12 Errors.txt and error selection studied
+
+**Changed:** wrote `docs/errors-txt-format.md`; added template expansion to `scripts/reference/tabtree.py`; corrected the template section of `docs/tab-tree-format.md`; updated `docs/data-files.md`.
+**Why:** `Errors.txt` defines what can be wrong with a traveler, and `ErrorMaker` decides which error they get.
+**Tested how:** decompiled 12 functions and read 11 in full (the twelfth for its logic, with its debug-logging lines filtered out); read two dropped details from the raw instructions; expanded the templates in the real file with the reference reader and checked every error against the code and against `Facts.xml` and `Travelers.txt`.
+**Result:** 11 templates, 110 errors (3 always, 107 random, 76 groups). Errors are selected by matching case-insensitive patterns against their names, filtered by requirements, then picked with two random draws while avoiding the last four groups used. All 82 template uses expand cleanly (768 nodes become 981). Every requirement, condition and fact path in the file is valid. No error uses `<rare>`, so that branch never fires.
+**Correction:** `docs/tab-tree-format.md` said template arguments are `$0`, `$1`, ...; they are numbered from 1. It also said it was unknown whether any file uses templates; `Errors.txt` does.
+**Still broken / not tested:** what applying an error does, the `~` prefix on 22 fact paths, and how invalid values are generated are not studied. Not compared with the running game.
+**Next:** `BoothEnv.applyOp` and `setFactInvalid`, then `makeFactValue`.
+
 ## 2026-10-12 Traveler creation sequence studied (top level)
 
 **Changed:** wrote `docs/traveler-creation.md`; updated the `FILL` entry in `docs/days-csv-format.md` and the seed note in `docs/rand.md`.

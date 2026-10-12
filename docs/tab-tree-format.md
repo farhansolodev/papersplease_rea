@@ -50,18 +50,21 @@ The reader has a template feature (`Node.expandParams`, `getExpanded`):
 
 - A node whose parameters include one starting with `$` (three characters or
   longer) is replaced by a copy of the top-level node named `*` plus the rest
-  of that word. In the copy, `$0`, `$1`, ... become the parameters that
-  followed, and a parameter of the form `*name:...` becomes `name`.
+  of that word. In the copy, `$1`, `$2`, ... become the parameters that
+  followed (**numbered from 1**; confirmed from the raw instructions), and a
+  parameter of the form `*name` or `*name:variant` becomes `name`.
 - The copy's parameters replace the `$` word and everything after it; its
   children are placed before the node's own children. Only the first `$`
   word on a line is handled. Children are then expanded the same way.
 
-**Whether any file uses this is not determined.** No direct caller of
-`TabParser.expandParams` was found, but it could be reached through a method
-table, which the search cannot see. It is not applied to `Travelers.txt`:
-that file has speech lines such as `" $ask-purpose` with no matching
-`*ask-purpose` node, which would raise "Node not found" (a deduction from
-the code, not something observed).
+Expansion is a separate step that the loader has to ask for:
+
+- **`Errors.txt` uses it.** `ErrorLib` calls `expandParams` (through a
+  method table, which is why a search for direct callers found none). See
+  `errors-txt-format.md`.
+- **`Travelers.txt` does not.** `TravelerLib` never asks for it. That file
+  has speech lines such as `" $ask-purpose` with no matching `*ask-purpose`
+  node, which would raise "Node not found" if it were expanded.
 
 ## Language packs
 
@@ -79,6 +82,9 @@ Run on the real `Travelers.txt`:
 - All 142 distinct traveler ids named in `Days.csv` (`TRAVELERS` and `FILL`
   rows, 287 uses) exist as top-level nodes.
 - All 113 `INCLUDE` lines name an existing top-level node.
+
+Run on the real `Errors.txt` with template expansion: 768 nodes become 981,
+all 82 template uses are replaced, and no `$` reference is left.
 
 The reference reader has not been compared with the game's own output,
 because the tree only exists inside the running game.
