@@ -45,8 +45,8 @@ invalidate line is stored with the fact (below) for later.
 `= Path value`, where the value is one word:
 
 - `++N` / `--N`: the fact's current value (0 if unset) plus or minus `N`.
-  The subtraction is visible in the code; the addition for `++` was dropped
-  by the decompiler and is assumed by symmetry.
+  (The decompiler dropped the addition; it was confirmed from the raw
+  instructions.)
 - A word containing `/`: **copy from another fact.** The text is the target
   fact's `prefix` (`Facts.xml`) followed by the source's text. If the source
   holds a traveler name, the name is re-formatted with the target fact's
@@ -90,8 +90,9 @@ comparing the two is a discrepancy.
 
 `! ~Path` (22 uses in `Errors.txt`) does the same, then generates the value
 again in "confusing" mode (`makeFactValue(path, valid = false, confusing =
-true)`), stores that, and records the path as confusing. What a confusing
-value looks like is inside `makeFactValue`, not studied.
+true)`), stores that, and records the path as confusing. Inside
+`makeFactValue` the flag changes only `Gender`, which keeps its correct
+value; every other fact simply gets a second wrong value (`fact-values.md`).
 
 ### Validate (`setFactValid`)
 
@@ -113,9 +114,8 @@ error and no traveler script invalidates `Traveler/Nationality`.)
 
 ## Not studied
 
-- **`makeFactValue`** (about 13 KB): how valid, invalid and confusing
-  values are generated. This is the next step.
-- `addPaper`, `getSpeech`, `saveStayingPaperIds`.
+- `addPaper`, `getSpeech`, `saveStayingPaperIds`. (`makeFactValue` is now
+  covered in `fact-values.md`.)
 - Who runs named groups and enable-button operations
   (`BoothEngine.handleEvent`), and how the stored `Interrogate` response is
   used.

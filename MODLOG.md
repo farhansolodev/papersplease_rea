@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Document value generator studied
+
+**Changed:** wrote `docs/fact-values.md`; updated two notes in `docs/operations-and-fact-validity.md`.
+**Why:** `BoothEnv.makeFactValue` decides what every field on every document says, valid or wrong.
+**Tested how:** decompiled and read the whole function (1,516 lines after cleaning) and `app.Num.lerpScale`; read its 16 numeric constants from the DLL; named the methods it calls by slot number from the recovered metadata; checked three dropped-argument calls and the `++` arithmetic in `applyOp` against the raw instructions.
+**Result:** all 30 kinds of fact are tabulated with their valid and invalid values and the random draws each makes. Findings: "confusing" only changes `Gender` (it keeps the correct letter); an invalid weight is always lower, never higher; a valid vaccine certificate always includes polio and an invalid one never does; valid access permits always include Arstotzka; several fields get typos only when the `HARDER` feature is on. The `++` addition in `applyOp` is confirmed.
+**Still broken / not tested:** the helpers this function calls (name alteration, aliases and typos, wrong faces, fingerprints, birth date, id numbers, date formatting) are not studied, so no reference implementation exists yet. Not compared with the running game.
+**Next:** `BoothEnv.addPaper`, then the `Traveler` constructor.
+
 ## 2026-10-12 Operations and fact validity studied
 
 **Changed:** wrote `docs/operations-and-fact-validity.md`; updated notes in `docs/facts-xml-format.md` and `docs/errors-txt-format.md`.
