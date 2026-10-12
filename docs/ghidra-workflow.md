@@ -98,6 +98,33 @@ address. Names look like `namespace.Class$$method`.
 To find which functions use an address (a string constant or a function):
 `-readOnly -postScript FindReferences.java 0xADDRESS`.
 
+To list the string constants a function uses, in machine-code order (for
+when the decompiler drops a string argument from a call):
+`-readOnly -postScript ListStringUses.java 0xFUNCTION`.
+
+## Cleaning the output for reading
+
+```powershell
+python -I scripts\ghidra\clean_decompile.py decompiled\in.c dumps\il2cppdumper\stringliteral.json decompiled\out.c
+```
+
+Removes four kinds of runtime boilerplate (the metadata setup block, class
+initialisation checks, bare null checks, garbage-collector write barriers)
+and shows string constants as their text. It prints how many of each it
+removed. On the Papers loaders it cut 2,379 lines to 1,892. Type-cast checks
+(`typeHierarchyDepth`) are not removed yet and are still noisy.
+
+## Method for studying a data file
+
+1. Inventory the file: every tag, attribute and count.
+2. Find the loader with `FindReferences.java` on the file-name string.
+3. Decompile the loader and everything it calls; clean; read all of it.
+4. List the strings each loader uses and compare with the file's attribute
+   names. An attribute with no matching string is unused or read elsewhere;
+   check with `FindReferences.java`.
+5. Check every attribute value in the file against what the code accepts.
+6. Write down what is confirmed, and mark anything else as inferred.
+
 ## Known analysis errors
 
 Ghidra logged two errors during the first analysis. `1801523d0` is in the
