@@ -15,7 +15,7 @@ cross-checked, with a write-up in `docs/`.
 | `Errors.txt` | `data.ErrorLib` | Studied: `errors-txt-format.md`; applying an error in `operations-and-fact-validity.md` |
 | `Speeches.txt` | `data.SpeechLib` | Studied: `speech.md` |
 | `News.txt` | `data.NewsArticleLib` | Studied: `news-txt-format.md` (the file and which headlines a day gets; drawing the newspaper not studied) |
-| `Nights.txt` | `data.NightLib` | Not studied |
+| `Nights.txt` | `data.NightLib` | Studied: `nights-txt-format.md` (the file, the calendar, running an event; the family and the budget itself not studied) |
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Not studied |
 | `Endlesses.xml` | `data.EndlessLib` | Not studied |
 | `Faces.xml` | `data.FaceLib` | Studied: `faces.md` (the loader and how a face picture is built); how the metadata of four pieces is combined in `traveler-build.md` |

@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Nights.txt and how a night event is run (remaining data files, second)
+
+**Changed:** added `docs/nights-txt-format.md`, `scripts/reference/nights.py` (the event table, the calendar, running an event's lines, budget lines and their ordering, the YES / NO step, the commands) and `scripts/checks/nights_check.py`; updated `docs/data-files.md`, `days-csv-format.md` and the checks README.
+**Why:** next of the remaining data files.
+**Tested how:** read `Nights.txt` with its comments; decompiled and read `NightLib`, `NightEvent`, `Calendar`, `CalendarEvent`, `Family.applyEvent`/`applyOp`/`applyRentAndHeatAffectingEvents`, `Budget.addLine` with its sorting function, `Line`; re-read `OpHelper.makeOp` and `getRunOps`; read two constants from the DLL and five dropped arguments from the raw instructions; ran `nights.py` and `nights_check.py`.
+**Result:** `problems: none`. 40 events, all named by something (Days.csv, traveler scripts, scheduling, includes, or the code). Findings: `+` schedules an event here (it adds a paper in traveler scripts); a budget line with no third part is optional if it costs money and fixed if it pays; the budget is re-sorted after every added line with the quicksort that swaps equal lines; `End` keeps the first ending asked for but `Escape` overrides it; `GivePaper` stores the paper under the day that just ended.
+**Still broken / not tested:** not compared with the running game. Not studied: the `Family` constructor (which events run and in what order, the family members, the standard budget lines), the rest of `applyBudget` (health, death, debt), `buildMessage`. In `nights.py` the fact names behind `AdoptNiece`, `RemoveSavings` and `TakeFamilyPassports` are names found in the code's strings; that those commands use them is inferred until the constructor is read.
+**Next:** the `Family` constructor and `applyBudget` (the night itself), or the next data file (`Ends.xml` / `Intro.xml`).
+
 ## 2026-10-13 News.txt and the day's headlines (step 3, first data file)
 
 **Changed:** added `docs/news-txt-format.md`, `scripts/reference/news.py` (articles, scores, the game's quicksort, the day's headline list, fillers, the `News<i>` names, traveler news) and `scripts/checks/news_check.py`; updated `docs/data-files.md`, `days-csv-format.md`, `papers-on-desk.md`, `port-requirements.md` (sorting is not stable) and the checks README.
