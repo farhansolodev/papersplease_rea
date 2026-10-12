@@ -100,6 +100,9 @@ have no entry here: `FingerprintsBlank` and `HintMissing`.
 Children: each `<fact>` is expanded (below); each `<clearconfusion path>`
 adds a path to `clearConfusionPaths`.
 
+What `multi`, `money`, `stay` and `<clearconfusion>` do when the document is
+put on the desk is in `papers-on-desk.md`.
+
 ## `<fact>`
 
 | Attribute | Field | Default | Notes |
@@ -127,7 +130,9 @@ adds a path to `clearConfusionPaths`.
 - Otherwise the fact is used as written.
 
 So a value can be a list of acceptable choices separated by line breaks.
-How a traveler's actual value is chosen from a fact is not studied.
+When a document is put on the desk, a fact with a written value keeps it;
+a fact with an empty value gets a generated one (`papers-on-desk.md`,
+`fact-values.md`).
 
 ### `<invalidate path when>`: what a fact's value can break
 
@@ -276,10 +281,11 @@ A "draw" is one call to `random()`, giving a fraction from 0.0 to 1.0
 
 ## Not studied
 
-- How a traveler's fact values are generated, and how invalidation and fact
-  groups are used to decide what is an error. This is the core of the game.
+- How fact groups are used to decide what is an error. (Value generation and
+  invalidation are now in `fact-values.md` and
+  `operations-and-fact-validity.md`.)
 - The expression evaluator for `<confiscation when>`.
-- `FactSet`, `FactValue` and the rest of the 44 `FactLib` methods beyond
-  those listed.
+- Most of `FactSet` and `FactValue`, and the `FactLib` methods not listed
+  here or in `papers-on-desk.md`.
 - No reader has been written for the port, so none of this is tested end to
   end.

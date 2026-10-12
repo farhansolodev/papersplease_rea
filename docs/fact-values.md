@@ -134,8 +134,10 @@ These are called from here and decide the fine detail of several values:
 - `Traveler.getBirthDate`, `invalidateIdNumber`, `makeRandomIdNumber`, and
   the `Traveler` constructor that sets height, weight and the rest.
 - `Settings.formatDate` and `GregorianDate`.
-- When this function is called with `valid = true` for a freshly added paper
-  (`addPaper`).
+
+When this function is called for a newly added paper, and with which
+`valid`, is in `papers-on-desk.md`: only for facts with no written value,
+and in hash order within the paper.
 
 Nothing here has been compared with the running game. No reference
 implementation exists yet for this function; it depends on the pieces above.

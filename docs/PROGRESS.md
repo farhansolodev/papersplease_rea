@@ -46,19 +46,27 @@ total: 100 to 200 hours of sessions, low confidence.
 | `traveler-creation.md` | The sequence that creates a traveler |
 | `operations-and-fact-validity.md` | Running an operation; invalid facts |
 | `fact-values.md` | How each document value is generated |
+| `papers-on-desk.md` | Adding and removing papers, staying papers, the bulletin |
 | `port-requirements.md` | Exactness rules the Rust port must follow |
 
 ## Next steps, in order
 
-1. **`BoothEnv.addPaper`** (`0x180471a30`, about 3 KB): what adding a paper
-   does, including when `makeFactValue` is called with `valid = true`.
-2. **`Traveler` constructor** (`0x180969140`, about 9.6 KB): name, face,
+(Done 2026-10-13: `BoothEnv.addPaper` and the bulletin, see
+`papers-on-desk.md`.)
+
+1. **`Traveler` constructor** (`0x180969140`, about 9.6 KB): name, face,
    height, weight, id number, fingerprints, contraband.
-3. **Helpers used by the value generator**: `TravelerName`
+2. **Helpers used by the value generator**: `TravelerName`
    (`getFormatted`, `getRandomInvalidated`, `getRandomAlias`),
    `Lang.makeAlias` / `makeTypo` / `getReplaced`, `FaceSpec.getInvalid`,
    `FingerprintCode`, `Traveler.getBirthDate` / `invalidateIdNumber` /
    `makeRandomIdNumber`, `Settings.formatDate`, `GregorianDate`.
+3. **Haxe `StringMap` order.** Adding a paper generates its facts in the
+   hash order of a `StringMap`, and the order decides which random draws
+   each fact gets (`papers-on-desk.md`). Study `haxe.ds.StringMap` as
+   compiled here (its hash function, which probably calls
+   `String.GetHashCode`, how the table grows, how iteration walks it), check
+   it in the Ghidra emulator, and add it to `scripts/reference/`.
 4. **Speech**: `BoothEnv.getSpeech` (`0x1804798f0`), `Speeches.txt`,
    `data.SpeechLib`. Settles how `$name` (travelers) and bare ids (errors)
    become text.
@@ -77,9 +85,9 @@ total: 100 to 200 hours of sessions, low confidence.
 9. Rendering and input side of the original (`app.vis`, `play.ui`,
    `play.screen`), then design and build the Rust port.
 
-Once step 3 is done, a reference implementation of traveler creation can be
-written in Python (like `scripts/reference/rand.py`) and used as the test
-oracle for the Rust code.
+Once steps 1 to 3 are done, a reference implementation of traveler creation
+can be written in Python (like `scripts/reference/rand.py`) and used as the
+answer key for testing the Rust code.
 
 ## Open questions and unconfirmed items
 
@@ -103,6 +111,9 @@ Collected from the docs, so they are not lost:
 - 20 traveler entries nothing refers to (`travelers-txt-format.md`), and
   three data files never loaded by name (`Threads.txt`,
   `TravelerGraph.txt`, `Version.txt`). Purpose unknown.
+- What the day's token list (filled by `Token...` papers) and
+  `Bulletin/PageMask` are used for; which classes outside `BoothEnv` call
+  `addPaper` (`papers-on-desk.md`).
 - Two Ghidra analysis errors and 36 functions without a typed signature
   (`ghidra-workflow.md`); neither has mattered so far.
 - Nothing has been compared with the running game.

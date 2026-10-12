@@ -23,6 +23,7 @@ Run from the project root with `python -I`. Paths below assume
 | `errors_shape.py` | `scripts\reference D\Errors.txt` | `errors-txt-format.md` |
 | `errors_check.py` | `scripts\reference D\Errors.txt D\Facts.xml` | same (after template expansion) |
 | `errors_check2.py` | `scripts\reference D\Errors.txt D\Facts.xml D\Travelers.txt` | same (tilde paths, error names used by travelers) |
+| `papers_on_desk_check.py` | `scripts\reference D\Facts.xml D\Papers.xml D\Days.csv D\Errors.txt` | `papers-on-desk.md` |
 
 The ones taking `scripts\reference` as their first argument import
 `tabtree.py` from there.

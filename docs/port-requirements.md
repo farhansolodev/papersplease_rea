@@ -12,8 +12,7 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   error (error selection). Decide and document what the port does.
 - Keep the generators separate: per day there are news, border, night and
   traveler generators (`days-csv-format.md`) and the booth's own
-  (`traveler-creation.md`). The booth and its error maker share one.
-- Draw **exactly** when the original does:
+  (`traveler-creation.md`). The booth and its error maker share one.- Draw **exactly** when the original does:
   - a `=` line in a traveler script draws even with a single value
     (`travelers-txt-format.md`);
   - `RANDOM100` draws each time it is evaluated;
@@ -24,7 +23,11 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   - the additional-error roll draws only for hidden-paper and speech errors
     (`traveler-creation.md`);
   - each fact value has its own draw pattern, and `~` facts are generated
-    twice (`fact-values.md`).
+    twice (`fact-values.md`);
+  - adding a paper draws once for its expiration date only if the document
+    has an `ExpirationDate` fact, then generates every empty fact **even if
+    the value will be discarded** because the path already exists
+    (`papers-on-desk.md`).
 - Pick, weighted pick and shuffle procedures: `facts-xml-format.md`.
 
 ## Order
@@ -35,8 +38,14 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   the compiled error patterns.
 - A `StringMap` is iterated in hash order, not insertion order. Where the
   original iterates one (expanding `*` patterns in fact groups, carrying
-  facts between travelers), do not assume file order. Whether any outcome
-  depends on that order has not been checked.
+  facts between travelers, saving staying papers), do not assume file
+  order.
+- **At least one outcome does depend on that order**: when a paper is put on
+  the desk, its empty facts are generated in the hash order of a fresh
+  `StringMap` (`papers-on-desk.md`). `VaccineCert` has two facts that draw
+  random numbers, so their order decides who gets which draws. The port
+  needs Haxe's `StringMap` (hash function, table growth, iteration) as built
+  for this game. Not studied yet.
 - `Days.csv` carry-over lists are built left to right through the day
   columns.
 
@@ -69,6 +78,10 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
 - An invalid weight is always lower; a valid vaccine list always has polio;
   a valid access list always has Arstotzka (`fact-values.md`).
 - The "rare error" re-roll exists but no error uses it.
+- Removing a paper keeps its facts; a re-added paper keeps the old values.
+  A stackable paper's index is one more than the highest present. With no
+  notice pages the bulletin emblem goes to `Bulletin/Emblem-1`
+  (`papers-on-desk.md`).
 
 ## Dates
 

@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Adding and removing papers studied
+
+**Changed:** wrote `docs/papers-on-desk.md`; added `scripts/checks/papers_on_desk_check.py`; updated `docs/operations-and-fact-validity.md`, `docs/traveler-creation.md`, `docs/fact-values.md`, `docs/facts-xml-format.md`, `docs/port-requirements.md`, `docs/PROGRESS.md` and the checks README.
+**Why:** every document's values are created when it is put on the desk (`BoothEnv.addPaper`); this was the first item in the next-steps list.
+**Tested how:** decompiled and read in full `addPaper`, `addBulletinForDay` and 35 helpers; read four dropped numbers from the raw instructions (three in the bulletin code, one in `PaperDef.getIdAndIndex`); re-read the remove-paper branch of `applyOp`; checked the findings against `Facts.xml`, `Papers.xml`, `Days.csv` and `Errors.txt` with the new check script.
+**Result:** the sequence is written down: money, achievement, tokens, papers-seen list, expiration date (one draw only when the document has an `ExpirationDate` fact), fresh copy of the document's facts, generation of every empty fact (146 of 191), merge that keeps existing values, then clearing of "confusing" facts. Stackable papers get no facts. Removing a paper keeps its facts. The bulletin's page numbers match all 13 bulletin pages in `Papers.xml`. New exactness problem found: a paper's facts are generated in the hash order of a Haxe `StringMap`, and `VaccineCert` has two facts that draw random numbers, so the port needs that hash order.
+**Still broken / not tested:** Haxe `StringMap` order not studied; token list, news articles and `Bulletin/PageMask` use not studied; callers of `addPaper` outside `BoothEnv` not searched. Achievement awarding deliberately not followed (platform feature, out of scope). Not compared with the running game.
+**Next:** the `Traveler` constructor (see `docs/PROGRESS.md`).
+
 ## 2026-10-13 Handoff: state, open items and reading notes written down
 
 **Changed:** wrote `docs/PROGRESS.md` (current state, ordered next steps, open questions, local-only files, verification ideas) and `docs/port-requirements.md` (exactness rules for the Rust port); added a "runtime helpers" and "calls by slot number" guide to `docs/ghidra-workflow.md`; copied the session's 12 one-off check scripts from the temporary folder into `scripts/checks/` with a README; resolved the "extra filter" note in `docs/facts-xml-format.md`; added a "Start here" pointer and three tooling facts to `CLAUDE.md`.

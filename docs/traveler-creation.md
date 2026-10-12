@@ -69,7 +69,7 @@ The `BoothEnv` constructor, in order:
      `RULEBOOK_TABS` gives `Upgrade1 = RulesUpgrade2.png`.
    - phone: `RULEBOOK_TABS` gives `Upgrade0 = RulesUpgrade2.png`.
 7. Adds the paper `Transcript`.
-8. Adds the day's bulletin (`addBulletinForDay`, not studied).
+8. Adds the day's bulletin (`addBulletinForDay`, see `papers-on-desk.md`).
 9. Adds each of the day's extra papers.
 10. Adds each paper listed in the saved story fact `Game/StayingPapers`
     (separated by `;`).
@@ -136,13 +136,11 @@ These are the large pieces this sequence calls:
 
 - **`Traveler` constructor** (about 9.6 KB of code): name, face, id number,
   height, weight, fingerprints, contraband and the rest of the person.
-- **The error system**: `Errors.txt`, `data.ErrorLib`, `data.ErrorMaker`
-  (how `makeError` picks an error, `<generic>`, hidden-paper and speech
-  errors, "always" errors).
-- **`BoothEnv.addPaper`** (about 3 KB): what adding a paper does.
-- **`BoothEnv.makeFactValue`** (about 13 KB): how each value on a document
-  is generated, valid or deliberately wrong.
-- **`BoothEnv.applyOp`** (about 5 KB): what each operation does when run.
-- `addBulletinForDay`, the face and name cyclers, and the saved story.
+- The face and name cyclers, and the saved story.
+
+Studied since, in their own docs: the error system (`errors-txt-format.md`),
+`applyOp` (`operations-and-fact-validity.md`), `makeFactValue`
+(`fact-values.md`), and `addPaper` with `addBulletinForDay`
+(`papers-on-desk.md`).
 
 Nothing here has been checked against the running game.
