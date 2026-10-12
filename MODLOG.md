@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Helpers behind wrong values and dates studied
+
+**Changed:** wrote `docs/value-helpers.md`; added `scripts/reference/gdate.py`; updated `docs/fact-values.md`, `docs/data-files.md` and `docs/port-requirements.md`. `docs/PROGRESS.md` not updated (now updated only on request).
+**Why:** `makeFactValue` relies on these helpers for wrong names, aliases, typos, wrong faces, wrong fingerprints and every date; they were next in the plan.
+**Tested how:** decompiled and read in full 30 functions (`TravelerName`, `Lang` alias and typo code, `Uppercaser`, `FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`/`fromString`, `Settings` date formats, `GregorianDate`); read dropped thresholds, date constants, the alias text key (`env_typochars`) and the format arithmetic from the raw instructions; checked `Text.xml` and `UpperCase.txt`; ran `gdate.py`, which checks the date conversion both ways against Python's calendar.
+**Result:** all helpers written down with their exact draws. A wrong name takes one or two names from the shared name cycler; an alias changes one letter within a set of similar letters; a typo deletes one letter; a wrong face shifts all four pieces; wrong fingerprints differ on every finger. `gdate.py` agrees with the real calendar for all 146,462 days from 1800 to 2200 (23 Nov 1982 = Julian Day 2445296.5).
+**Still broken / not tested:** alias swap-set order and letter-position order are hash orders (`StringMap`, `IntMap`), not studied; `SpeechLib.applyGenderSwitches` and loading the saved date format not studied. Not compared with the running game.
+**Next:** Haxe `StringMap` and `IntMap` iteration order.
+
 ## 2026-10-13 Start-up and seeds studied
 
 **Changed:** wrote `docs/run-and-seeds.md`; added `scripts/reference/seeds.py`; corrected `docs/rand.md`; updated `docs/traveler-build.md`, `docs/port-requirements.md` and `docs/PROGRESS.md`.

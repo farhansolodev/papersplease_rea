@@ -125,15 +125,17 @@ The second generation uses more random draws, which the port must also do.
 
 ## Not studied
 
-These are called from here and decide the fine detail of several values:
+These are called from here and decide the fine detail of several values.
+Now covered in `value-helpers.md`: `TravelerName` (`getFormatted`,
+`getRandomInvalidated`, `getRandomAlias`), `Lang.makeAlias`,
+`Lang.makeTypo`, `Lang.getReplaced`, `Uppercaser.toUpperCaseU`,
+`FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`, `Settings.formatDate`
+and `GregorianDate`. Still not studied:
 
-- `TravelerName`: `getFormatted`, `getRandomInvalidated`, `getRandomAlias`.
-- `Lang.makeAlias`, `Lang.makeTypo`, `Lang.getReplaced`,
-  `Uppercaser.toUpperCaseU`, `SpeechLib.applyGenderSwitches`.
-- `FaceSpec.getInvalid`, the face's feature lists, `FingerprintCode`.
-- (`Traveler.getBirthDate`, `invalidateIdNumber`, `makeRandomIdNumber` and
-  the `Traveler` constructor are now in `traveler-build.md`.)
-- `Settings.formatDate` and `GregorianDate`.
+- `SpeechLib.applyGenderSwitches`, and the face's feature lists.
+
+(`Traveler.getBirthDate`, `invalidateIdNumber`, `makeRandomIdNumber` and
+the `Traveler` constructor are in `traveler-build.md`.)
 
 When this function is called for a newly added paper, and with which
 `valid`, is in `papers-on-desk.md`: only for facts with no written value,

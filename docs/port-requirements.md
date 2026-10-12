@@ -57,7 +57,9 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
   `StringMap` (`papers-on-desk.md`). `VaccineCert` has two facts that draw
   random numbers, so their order decides who gets which draws. The port
   needs Haxe's `StringMap` (hash function, table growth, iteration) as built
-  for this game. Not studied yet.
+  for this game. Not studied yet. Aliases also depend on hash order: the
+  swap-set list comes from a `StringMap` and the letter positions from an
+  `IntMap` (`value-helpers.md`).
 - `Days.csv` carry-over lists are built left to right through the day
   columns.
 
@@ -99,3 +101,6 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
 
 - Day `n` of the story is 23 November 1982 plus `n - 1` days. Month numbers
   in the date helpers start at 0.
+- Dates are Julian Day numbers in a float; use the same conversion
+  (`scripts/reference/gdate.py`), `afterYears` as `years × 365.242199` days,
+  and the three player date formats (`value-helpers.md`).

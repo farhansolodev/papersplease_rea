@@ -26,8 +26,8 @@ cross-checked, with a write-up in `docs/`.
 | `Sounds.xml` | `data.SoundDefLib` | Not studied |
 | `BorderAnim.xml` | `play.day.border.Border` | Not studied |
 | `Text.xml` | `data.Lang` | Not studied |
-| `UpperCase.txt` | `data.Uppercaser` | Not studied |
-| `NamesF.txt`, `NamesM.txt` | `data.NameLib`, `data.NameCycler` | Not studied |
+| `UpperCase.txt` | `data.Uppercaser` | Studied: `value-helpers.md` |
+| `NamesF.txt`, `NamesM.txt` | `data.NameLib`, `data.NameCycler` | Studied: `traveler-build.md` |
 | `Credits.txt` | `play.screen.CreditList` | Not studied |
 | `Languages.txt`, `Languages.png` | `play.screen.LangChooser` | Not studied |
 | `TestScenarios.xml` | `data.TestScenarioLib` | Test tooling; not studied |
