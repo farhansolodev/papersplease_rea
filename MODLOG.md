@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Speech studied
+
+**Changed:** wrote `docs/speech.md`; added `scripts/checks/speech_check.py`; updated `docs/travelers-txt-format.md`, `docs/errors-txt-format.md`, `docs/operations-and-fact-validity.md`, `docs/fact-values.md`, `docs/value-helpers.md`, `docs/data-files.md`, `docs/port-requirements.md` and the checks README.
+**Why:** say lines in traveler scripts and errors become text through `BoothEnv.getSpeech` and `Speeches.txt`; this was next in the plan.
+**Tested how:** decompiled and read in full 11 functions (`getSpeech`, `SpeechLib`, `Response`, `Speech`, `expandComplexVars`, `getLocalizedText`, `getRemappedFactId`, the line picker); checked two dropped arguments in the raw instructions; checked `Speeches.txt` and every say line in `Travelers.txt` and `Errors.txt` with the new script.
+**Result:** a say line is a response id (a leading `$` is optional) or literal text. A response picks one line among those whose `=value` and `?expression` fit, with one draw, then expands `$` references and `${fact}` fields. `@` makes the inspector speak, `;` gives alternatives (one draw), `~` pauses, `[m]`/`[f]` switch by the face's gender. All 40 `$` lines and all 74 error speech ids resolve. Found: one response reads a fact that does not exist (`WorkPermit/Emblem/MinistryOfAdmission`), so one of its lines can never be picked; six responses are named nowhere found.
+**Still broken / not tested:** `testExpression` and what the recorded speech fact path is used for are not studied. Gender switches are unused in the English data; language packs not checked. Not compared with the running game.
+**Next:** running responses (`BoothEngine.handleEvent`, `testExpression`).
+
 ## 2026-10-13 Haxe StringMap and IntMap order worked out
 
 **Changed:** wrote `docs/haxe-maps.md`; added `scripts/reference/haxemap.py`, `scripts/ghidra/EmulateStringHash.java` and `scripts/checks/map_order_check.py`; updated `docs/papers-on-desk.md`, `docs/value-helpers.md`, `docs/port-requirements.md`, `docs/ghidra-workflow.md` and the checks README.

@@ -27,7 +27,7 @@ returns a result that tells the booth what changed.
 
 | Operation | Effect | Result |
 |---|---|---|
-| Say | Looks up the speech (`getSpeech`, not studied). If it has text: stores it as fact `Transcript/Speech<n>`, where `n` is the number of transcript lines so far, with `@` in front when the inspector is speaking; remembers the speech's fact path. Past 10 lines it sets `Transcript/NextPage0` to `TranscriptNext.png`, past 20 lines `Transcript/NextPage1` | Speak (text, who, pause after) |
+| Say | Looks up the speech (`getSpeech`, see `speech.md`). If it has text: stores it as fact `Transcript/Speech<n>`, where `n` is the number of transcript lines so far, with `@` in front when the inspector is speaking; remembers the speech's fact path. Past 10 lines it sets `Transcript/NextPage0` to `TranscriptNext.png`, past 20 lines `Transcript/NextPage1` | Speak (text, who, pause after) |
 | Add paper | `addPaper` (`papers-on-desk.md`), then saves the list of staying papers | Added paper |
 | Remove paper | If the paper is on the desk: removes it, saves the staying papers, and subtracts the paper's `money` value (`Facts.xml`) from the day's bribe money. The paper's facts are kept (`papers-on-desk.md`) | Removed paper, or nothing if it was not there |
 | Invalidate fact | See below | Updated facts (the paper) |
@@ -114,8 +114,9 @@ error and no traveler script invalidates `Traveler/Nationality`.)
 
 ## Not studied
 
-- `getSpeech`. (`makeFactValue` is covered in `fact-values.md`; `addPaper`
-  and `saveStayingPaperIds` in `papers-on-desk.md`.)
+- (`getSpeech` is covered in `speech.md`, `makeFactValue` in
+  `fact-values.md`, `addPaper` and `saveStayingPaperIds` in
+  `papers-on-desk.md`.)
 - Who runs named groups and enable-button operations
   (`BoothEngine.handleEvent`), and how the stored `Interrogate` response is
   used.

@@ -137,7 +137,7 @@ operation.
 
 | Line | Count | Operation |
 |---|---|---|
-| `" words...` | 1,169 | Say. The words are rejoined with single spaces. One word starting with `$` (31 lines) appears to name a stock line in `Speeches.txt`; not confirmed |
+| `" words...` | 1,169 | Say. The words are rejoined with single spaces. One word starting with `$` names a stock response in `Speeches.txt`; other text is said literally (`speech.md`) |
 | `@ Button ...` | 175 | Enable a button. Seen: `Leave`, `Want`, `News`, `Detain`, `Resist`, `Night`, `End`, `Tomorrow`, `Search`, `Reject`, `Custom`, `Unresist`, `NoFiler` |
 | `= Fact/Path value` | 120 | Set a fact. **Only the first word after the path is the value**; all 120 in the file have exactly one |
 | `? condition` | 113 | A conditional group: stored with the whole line as its id; its children run if the condition holds |

@@ -177,6 +177,6 @@ dropped by the decompiler and not checked).
 
 ## Not studied
 
-- `SpeechLib.applyGenderSwitches` (with speech).
+- (`SpeechLib.applyGenderSwitches` is in `speech.md`.)
 - Where the saved date-format setting is loaded.
 - Nothing here has been compared with the running game.

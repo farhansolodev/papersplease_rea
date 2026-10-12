@@ -71,8 +71,10 @@ Name<tags>    GroupId
   lines and one `+` add-paper line.
 
 Speech lines here are bare ids such as `ask-missing-passport`. In
-`Travelers.txt` the same stock lines are written with a leading `$`. How the
-two are told apart at run time is not studied.
+`Travelers.txt` the same stock lines are written with a leading `$`. Both
+work: the speech lookup removes a leading `$` and then checks whether the
+text is a response id (`speech.md`). All 74 ids used here exist in
+`Speeches.txt`.
 
 ## Loading
 
@@ -181,7 +183,8 @@ expansion:
 - How the replacement value for an invalidated fact is generated
   (`makeFactValue`). What invalidating does is in
   `operations-and-fact-validity.md`.
-- How the `Interrogate` response is run and how speech ids become text.
+- How the `Interrogate` response is run. (How speech ids become text is in
+  `speech.md`.)
 - `Error.validate` and `ErrorLib.validateAll` (checks run by the
   developers' tooling, by their names).
 - Nothing here has been compared with the running game.

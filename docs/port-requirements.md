@@ -36,6 +36,8 @@ with the evidence. Collected 2026-10-13; add to it as more is studied.
     twice (`fact-values.md`);
   - building the person draws in a fixed order with several conditional
     steps (`traveler-build.md`, "Order of draws");
+  - speech draws once per stock response with a fitting line, once more per
+    `$` reference inside it, and once per `;` alternative (`speech.md`);
   - adding a paper draws once for its expiration date only if the document
     has an `ExpirationDate` fact, then generates every empty fact **even if
     the value will be discarded** because the path already exists

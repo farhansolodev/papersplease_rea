@@ -13,7 +13,7 @@ cross-checked, with a write-up in `docs/`.
 | `Facts.xml` | `data.FactLib` | Studied: `facts-xml-format.md` |
 | `Travelers.txt` | `data.TravelerLib` | Studied up to traveler creation: `travelers-txt-format.md`. Running responses not studied |
 | `Errors.txt` | `data.ErrorLib` | Studied (file and error selection): `errors-txt-format.md`. Applying an error not studied |
-| `Speeches.txt` | `data.SpeechLib` | Not studied |
+| `Speeches.txt` | `data.SpeechLib` | Studied: `speech.md` |
 | `News.txt` | `data.NewsArticleLib` | Not studied |
 | `Nights.txt` | `data.NightLib` | Not studied |
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Not studied |

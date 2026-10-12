@@ -132,7 +132,8 @@ Now covered in `value-helpers.md`: `TravelerName` (`getFormatted`,
 `FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`, `Settings.formatDate`
 and `GregorianDate`. Still not studied:
 
-- `SpeechLib.applyGenderSwitches`, and the face's feature lists.
+- The face's feature lists. (`SpeechLib.applyGenderSwitches` is in
+  `speech.md`: `[m]...[/m]` and `[f]...[/f]` keep or drop text by gender.)
 
 (`Traveler.getBirthDate`, `invalidateIdNumber`, `makeRandomIdNumber` and
 the `Traveler` constructor are in `traveler-build.md`.)
