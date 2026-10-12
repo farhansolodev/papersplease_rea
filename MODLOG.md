@@ -15,6 +15,24 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-12 Indented-tree reader studied; Travelers.txt structure mapped
+
+**Changed:** wrote `docs/tab-tree-format.md`, `docs/travelers-txt-format.md` and `docs/data-files.md`; added `scripts/reference/tabtree.py`.
+**Why:** travelers are defined in `Travelers.txt`, which is a script in an indented-tree format; the port needs the same reader before the script's meaning can be studied.
+**Tested how:** decompiled and read in full 13 functions (`TabParser`, `Node`, the tokeniser, `Res.getTabParser`/`getText`/`toAsset`); wrote a reference reader and ran it on the real file; cross-checked against `Days.csv`; read the file's comments; searched the code for every data file name.
+**Result:** the reference reader parses the whole file without error (185 top-level entries, 2,974 nodes, depth 6). All 142 traveler ids used by `Days.csv` and all 113 `INCLUDE` targets resolve. One 12-line block comment is removed. Every data file is now mapped to the class that loads it; three files (`Threads.txt`, `TravelerGraph.txt`, `Version.txt`) are never asked for by name.
+**Still broken / not tested:** the meaning of every line kind in `Travelers.txt` is unconfirmed; the code that interprets the tree has not been read. Whether the template feature is used anywhere is not determined. The reference reader has not been compared with the game's own tree.
+**Next:** the code that turns a traveler's tree into a `TravelerSpec` and runs its responses.
+
+## 2026-10-12 Random number generator studied and checked against the machine code
+
+**Changed:** wrote `docs/rand.md`; added `scripts/reference/rand.py` and `scripts/ghidra/EmulateRand.java`; added an emulator note to `docs/ghidra-workflow.md`; corrected the "pick one" description in `docs/facts-xml-format.md`.
+**Why:** every generated traveler, document and event depends on `app.Rand`; the port must reproduce it exactly.
+**Tested how:** decompiled and read all nine methods; ran the game's real constructor and `nextInt` code in Ghidra's emulator for seven seeds and compared the state plus 20 outputs each with the Python reference; searched the code for any other randomness source.
+**Result:** it is the published sfc32 generator with the game's own seeding (three constants, seed in the counter, 15 discarded outputs). All seven emulator lines match the reference exactly. `random()` divides by 2^31 - 1, so it can return exactly 1.0. Nothing in the game uses any other random source.
+**Still broken / not tested:** not compared against the running game. The division in `nextFloat` was not emulated (divisor read from the DLL). The seeds used by the 13 generator creation sites other than `Day` are not studied, including where a new game's story seed comes from.
+**Next:** how travelers are defined (`Travelers.txt`) and generated.
+
 ## 2026-10-12 Correction: `journalist` is a real purpose; comments were skipped
 
 **Changed:** corrected `docs/facts-xml-format.md` (new section "The comments matter"); added comment notes to `docs/papers-xml-format.md`; added two steps to the study method in `docs/ghidra-workflow.md`.
