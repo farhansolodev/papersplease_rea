@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-12 Art.dat decrypted and unpacked
+
+**Changed:** added `scripts/ghidra/FindReferences.java`, `scripts/extract/decrypt_art.py`, `scripts/extract/unpack_art.py`; wrote `docs/art-dat-format.md`; added a pitfall note to `docs/ghidra-workflow.md`; added `/.claude/settings.local.json` to `.gitignore`.
+**Why:** the game's content (images, fonts, day/paper/traveler definitions) is in one encrypted archive; the port needs to read it.
+**Tested how:** cut `Art.dat` out of `sharedassets0.assets`, ran both scripts, checked PNG signatures and that the listed sizes add up to the file length.
+**Result:** decryption and unpacking both worked on the first run. 614 files (572 PNG, 12 fonts, 14 XML, 14 text, 2 CSV); 3,309,984 of 3,309,984 bytes accounted for; 572 of 572 PNGs have a valid signature.
+**Still broken / not tested:** no script for cutting `Art.dat` out of the Unity file (offsets found by hand). Only one image opened and looked at (`papers/PassportInnerArstotzka.png`, displays correctly). Data file formats, the language zips, `Res.toAsset`, audio and `EncryptedStore` not studied. The four 2026-10-12 commits predate this; these changes are uncommitted.
+**Next:** study the formats of the files in `assets/data/`, starting with `Days.csv` and `Papers.xml`.
+
 ## 2026-10-12 Data layouts and typed signatures loaded into Ghidra
 
 **Changed:** added `scripts/ghidra/ApplyIl2CppTypes.java`; ran it on the Ghidra project; updated `docs/ghidra-workflow.md`; backup of the names-only project in `decompiled/ghidra_backup_named/`.
