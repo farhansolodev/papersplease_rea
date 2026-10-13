@@ -12,8 +12,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Tested how:** what was done to check it
 **Result:** what happened, with numbers or log lines where possible
 **Still broken / not tested:** be honest
-**Next:** what to do next
 ```
+
+## 2026-10-14 "Next:" line removed from the MODLOG template
+
+**Changed:** the entry template at the top of `MODLOG.md` no longer has a `**Next:**` line. Older entries keep theirs.
+**Why:** next steps now live only in `docs/PROGRESS.md`, so they are not written in two places.
+**Tested how:** read the template back after the edit; searched the file for `**Next:**`.
+**Result:** the template has six fields; `**Next:**` remains only in entries dated before this one.
+**Still broken / not tested:** nothing to test; documentation only.
 
 ## 2026-10-14 The newspaper picture
 
