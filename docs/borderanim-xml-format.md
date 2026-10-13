@@ -13,8 +13,8 @@ Functions read in full: `data.AtlasLib.make`; `app.vis.Atlas` (constructor,
 Read in part: `play.day.border.CustomTile` (`init`, `get_currentFrame`,
 `restartAnim`, `stepAnim`). **Not studied here:** the rest of the border
 scene. Its figures and waiting line (`border-figures.md`) and `Border`
-itself (`border-scene.md`) have been studied since; sniping and the cameras
-have not.
+itself (`border-scene.md`) and shooting (`border-shooting.md`) have been
+studied since; the cameras and panning have not.
 
 ## The file
 
@@ -86,6 +86,8 @@ at the end of a non-looping animation was not read in full.)
 
 ## Not known / not tested
 
-- How figures are created, with which prefixes and idle suffixes, and the
-  rest of the border scene.
+- (Answered since: which figures are created, with which prefixes and idle
+  endings, is the table at the top of `border-scene.md`; the waiting line's
+  figures are in `border-figures.md`.) Still not studied: the cameras and
+  panning.
 - Nothing here was compared with the running game.

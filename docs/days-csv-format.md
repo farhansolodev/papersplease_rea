@@ -114,7 +114,7 @@ A string of single characters, each tested independently:
 
 | Character | Effect |
 |---|---|
-| `0` `1` `2` `3` `4` | Set `guardFlags` bits 1, 2, 4, 8, 16. Presumably one guard position each; which position is which is not studied |
+| `0` `1` `2` `3` `4` | Set `guardFlags` bits 1, 2, 4, 8, 16. Character `n` puts the border figure `guard<n>` on duty (`border-scene.md`: guards 0 and 1 are on the left, 2 to 4 on the right, going by their path names) |
 | `J` | `hasLeftJailors` = true |
 | `F` | Friendly guard is present (`GUARDING`) |
 
@@ -204,6 +204,9 @@ data.
   to play out the same; `DayNews` in `news-txt-format.md`; `FaceSpec` and
   `FaceCycler` in `traveler-build.md`; the text templates in
   `text-xml-format.md`.)
-- What each feature, rule and guard flag does in play.
+- What each feature and rule does in play. (Known since, from the border
+  scene: the guard flags, the `ATTACK` values and the `SNIPING` and
+  `BORDER_TARGET` features, in `border-scene.md`, `border-shooting.md` and
+  `border-figures.md`.)
 - No reader has been written for the port, so none of this is tested end to
   end.

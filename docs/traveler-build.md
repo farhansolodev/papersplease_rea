@@ -342,8 +342,12 @@ Script: `scripts/checks/traveler_build_check.py`.
   are now in `faces.md`.) The `Bodies.xml` format in general.
 - `GregorianDate.afterYears`, `TravelerName.getFormatted` and the other
   name methods, `FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`.
-- What `canDetain`, `forceDeny`, `slow`, `leaveDir` and `special` do in
-  play.
+- What `canDetain`, `forceDeny`, `slow` and `special` do in play.
+  (`leaveDir` is known since: it is the direction text the border scene gets
+  when the traveler leaves, and it picks the exit path; see "When the
+  traveler leaves the booth" in `border-scene.md`. The four values in
+  `Travelers.txt` are `left-killer`, `left-timebomber`, `right-elisa` and
+  `right-police`.)
 - Compared with the running game since, indirectly
   (`comparing-with-the-game.md`): for seed 12345, days 1 to 4, the
   reference picks the same errors as the game for all 36 travelers, which

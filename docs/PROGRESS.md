@@ -1,7 +1,7 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-14, in the
-sixth session (after part 2 of the border scene: `Border` itself).
+sixth session (after part 3 of the border scene: shooting).
 `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
@@ -22,7 +22,8 @@ the day's headlines and the newspaper picture; the night (family, budget, ending
 endings, text, sounds, seals, bodies, endless mode, fonts, the border
 scene's paths and pictures, how its figures follow a path, how the
 waiting line works, and what runs the scene (its states, the 36 path events,
-the four attack scenes, how the day ends there), credits, languages. A Python reference builds
+the four attack scenes, shooting and its six endings, how the day ends
+there), credits, languages. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
 game**: the game's own test player was run with a fixed seed, and for the 36
 travelers of days 1 to 4 the reference gives the same entry, nationality,
@@ -38,7 +39,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 75%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, parts 1 and 2 of 4 of the border scene (figures, the waiting line, `Border` itself). Not done: the rest of the border scene (shooting, cameras), saves, the screens (title, night, ending, endless, language chooser), drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 75%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, parts 1 to 3 of 4 of the border scene (figures, the waiting line, `Border` itself, shooting). Not done: the last part of the border scene (cameras, panning, endless scoreboard), saves, the screens (title, night, ending, endless, language chooser), drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match (see "Verification") |
 
@@ -88,6 +89,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `borderanim-xml-format.md` | `BorderAnim.xml`: the picture atlas and how an animation finds its frames |
 | `border-figures.md` | **The border scene, part 1**: which random generator it uses, how a figure follows a path frame by frame (what `hold`, `delay`, `snap`, `warp`, `face` and the event attributes do), the waiting line (building, moving up, the ring of reused figures, dispersing, panic) and its random draws |
 | `border-scene.md` | **The border scene, part 2**: the figures `Border` owns, its 12 states, the normal call-in cycle, what happens when a traveler leaves or is detained, when and how the four attacks run, what each of the 36 path events does, explosions, how the day ends, saving, every random draw |
+| `border-shooting.md` | **The border scene, part 3**: when the player can shoot, the two rifles and their keys, what a shot does and whom it hits, the attack result and its six endings, bullet holes, the grenade's flight, slow motion and which clock runs what, the test player's aiming helpers |
 | `credits-txt-format.md` | `Credits.txt` and the layout of the credits list |
 | `languages-list.md` | `Languages.txt`, `Languages.png` |
 | `test-tooling-files.md` | `TestScenarios.xml`, `Auto.txt` (a recipe for reaching every ending) |
@@ -127,14 +129,11 @@ in the sixth: part 1 of the border scene.)
    - Part 1, **done**: `Person` and `WaitingLine` (`border-figures.md`).
    - Part 2, **done**: `Border` itself (`border-scene.md`). A condensed
      copy of its code is in `decompiled/border.short.c`.
-   - **Part 3, next**: shooting. `Border.snipe`, `checkSniped`,
-     `getPersonIsNearGuards`, `debugSnipeAll`, the `autoGet...` helpers for
-     the test player, `RifleButton`, `AutoSnipeTarget`, `Grenade` (its
-     flight), and how the day's attack result is set
-     (`Day.setAttackResultWithPriority`).
-   - Part 4: the cameras and panning (`BorderCam`, `BorderCamRenderer`,
-     `BorderCamVisual`, `BorderPan`) and the endless scoreboard
-     (`EndlessScoreboard`, `FlashingScore`).
+   - Part 3, **done**: shooting (`border-shooting.md`).
+   - **Part 4, next**: the cameras and panning (`BorderCam`,
+     `BorderCamRenderer`, `BorderCamVisual`, `BorderPan`,
+     `Border.panToPeople`) and the endless scoreboard (`EndlessScoreboard`,
+     `FlashingScore`).
 3. **Saves** (`play.EncryptedStore`, `play.save`, `StoryState.load`), and
    the rest of `Game.applyScreenChange` (new game versus load).
 4. **The screens**: title, the night screen, the ending player (slide
@@ -181,8 +180,10 @@ Collected from the docs, so they are not lost:
   play the border scene the same way twice. One thing the player can feel
   draws from it: the delay before an attack starts (`6 + 4 x r` seconds).
   How closely the port copies this is a design decision.
-- The "tweener" that runs `Border`'s delayed calls was not read: whether
-  its delays follow the scene's slowed clock or real time.
+- Layout values not looked up: the figures' hit box size and the
+  slow-motion scale during sniping (`border-shooting.md`).
+- What the rifle key paper does after unlocking, and whether an unlocked
+  rifle stays unlocked on later days.
 - Who sends the scene to `waiting-to-fade-to-night` on a day that ends by
   the clock, and when the scene is stashed and restored.
 - The booth's own state machine (`empty`, `entering`, `intro`,
@@ -260,8 +261,9 @@ Collected from the docs, so they are not lost:
 - 20 traveler entries nothing refers to (`travelers-txt-format.md`).
 - Six speech responses named nowhere found (`speech.md`). `[m]`/`[f]` gender
   switches are unused in English; the language packs were not checked.
-- What `canDetain`, `forceDeny`, `slow`, `leaveDir` and `special` do in play
-  beyond what `responses-and-events.md` shows.
+- What `canDetain`, `forceDeny`, `slow` and `special` do in play beyond what
+  `responses-and-events.md` shows. (`leaveDir` is known since part 2 of the
+  border scene: it picks the exit path, `border-scene.md`.)
 - What the day's token list (filled by `Token...` papers) and
   `Bulletin/PageMask` are used for; which classes outside `BoothEnv` call
   `addPaper`.

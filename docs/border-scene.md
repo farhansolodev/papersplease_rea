@@ -9,7 +9,8 @@ the waiting line works. Read that first: this doc uses its words (path, stop,
 strip, event).
 
 Not covered here: shooting (`snipe`, `checkSniped`, the rifle buttons, the
-grenade's flight, the test player's aiming helpers), which is part 3; the
+grenade's flight, the test player's aiming helpers), which is part 3,
+`border-shooting.md`; the
 cameras, panning and the endless scoreboard, which are part 4.
 
 Check script: `scripts/checks/border_events_check.py`.
@@ -201,7 +202,7 @@ The booth calls `booth_onTravelerLeaves(direction)`. A free leaving figure
 | `right-guard` | `guard4` gets `guard4-exitchat` (`p` gets no path) |
 | `left-guard` | `guard1` gets `guard1-exitchat` (`p` gets no path) |
 | `right-elisa` | With the friendly guard: `guard4` is put at the end of `guard4-enter`, `p` gets `exit-right-elisa`, then `guard4` gets `guard4-elisa-reunite`. Without him: `p` gets `exit-right` |
-| anything else | `p` gets a path **named by the direction text itself** |
+| anything else | `p` gets a path **named by the direction text itself**. One traveler script uses this: `leaveDir right-police`, and a path `right-police` exists |
 
 Then `p.moveToStop(1)` in every case.
 
@@ -246,8 +247,8 @@ and detained ones do not; they are freed by `resetLeavingPeopleAndEnemies()`.
   | hit the target | ending `killed-target`, or `tranqed-target` |
   | anything else | the night screen |
 
-  (The ending ids are in `ends-xml-format.md`. How the result is set is
-  part 3.)
+  (The ending ids are in `ends-xml-format.md`. How the result is set is in
+  `border-shooting.md`.)
 
 Who moves from the booth's "day over" to this state when there was no attack
 was not followed (it is on the booth side; `get_isWaitingToFadeToNight` is
@@ -490,8 +491,8 @@ All from the day's border generator (part 1).
 ## Not known / not tested
 
 - Nothing was compared with the running game.
-- Part 3: shooting, the grenade's flight, how the attack result is set,
-  `getPersonIsNearGuards`, the test player's aiming helpers.
+- Shooting, the grenade's flight, how the attack result is set and the test
+  player's aiming helpers are in part 3, `border-shooting.md`.
 - Part 4: `BorderPan`, the cameras, `panToPeople`'s offsets (two were
   dropped by the decompiler in the bike scenes), the endless scoreboard.
 - The booth's own state machine (`empty`, `entering`, `intro`,
@@ -500,9 +501,9 @@ All from the day's border generator (part 1).
 - Who sends the scene to `waiting-to-fade-to-night` on a day that ends by
   the clock.
 - When the scene is stashed and restored.
-- The "tweener" used for the delayed calls (1 s, 2 s, the attack delay): it
-  was not read, so whether its delays run on the scene's slowed clock or on
-  real time is not known.
+- (Answered in part 3: the delayed calls, including the attack delay, run on
+  the game's clock, not on the scene's slowed one. See "Slow motion" in
+  `border-shooting.md`.)
 - `Chip` (the picture class): the byte the code sets to make a figure
   visible was taken to be `visible` from its use; the class was not read.
 - `ArrayUtil.makeShuffled` (bullet-hole order) was not read here.

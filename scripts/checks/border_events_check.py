@@ -187,4 +187,52 @@ for day in range(1, 32):
 print("days with an attack:", dict(attacks))
 print("guard cells per day:", {day: table.cell(day, "GUARDS") for day in range(1, 32) if table.cell(day, "GUARDS")})
 
+# 7b. Leave directions set by traveler scripts: one the code names, or else a path id.
+DIRECTIONS = ["left", "right", "right-bomb", "right-poisoned", "left-poisoned", "left-killer", "left-timebomber",
+              "right-boss", "right-guard", "left-guard", "right-elisa"]
+travelers = open(os.path.join(data, "Travelers.txt"), encoding="utf-8").read()
+for value in sorted(set(re.findall(r"=\s*leaveDir\s+(\S+)", travelers))):
+    kind = "named by the code" if value in DIRECTIONS else ("used as a path id; that path exists: %s" % lib.has_path(value))
+    print("leaveDir %-16s %s" % (value, kind))
+    if value not in DIRECTIONS and not lib.has_path(value):
+        problems.append("leaveDir %s is neither a known direction nor a path" % value)
+
+# 8. Shooting (docs/border-shooting.md).
+anim_nodes = {a.get("id"): a for a in root.findall("anim")}
+for path_id in ("shot", "tranq", "bike-explode", "enemy-grenaded"):
+    if not lib.has_path(path_id):
+        problems.append("missing path " + path_id)
+        continue
+    node = lib.path_nodes[path_id]
+    anim = anim_nodes[node.get("anim", "walk")]
+    print("path %-15s animation %-12s death: %-5s points: %d  next: %s  start: %s" % (
+        path_id, anim.get("id"), anim.get("death", "false"), len(node.findall("p")), node.get("next"), node.get("start")))
+    if anim.get("death") != "true":
+        problems.append("%s does not use a death animation, so the figure would not count as dead" % path_id)
+shoot_sounds = ["border-tranqshot", "border-gunshot", "rifle-unlock", "rifle-keyinsert", "rifle-cock",
+                "button-drop", "booth-intro", "grenade-roll", "booth-boom", "border-boom"]
+print("shooting sounds not in Sounds.xml:", sorted(set(shoot_sounds) - sounds) or "none")
+problems += ["sound %s missing" % s for s in sorted(set(shoot_sounds) - sounds)]
+papers = open(os.path.join(data, "Papers.xml"), encoding="utf-8").read()
+for key in ("KeyTranq", "KeyKill"):
+    if not re.search(r'<paper id="%s"' % key, papers):
+        problems.append("paper %s not in Papers.xml" % key)
+ends = open(os.path.join(data, "Ends.xml"), encoding="utf-8").read()
+end_ids = ["killed-innocent", "tranqed-innocent", "killed-guard", "tranqed-guard", "killed-target", "tranqed-target"]
+print("endings named by the border scene that are not in Ends.xml:",
+      [e for e in end_ids if not re.search(r'["\']%s["\']' % e, ends)] or "none")
+problems += ["ending %s missing" % e for e in end_ids if not re.search(r'["\']%s["\']' % e, ends)]
+no_sniping = [day for day in attacks if "SNIPING" not in table.accumulated(day, "FEATURES")]
+print("attack days where the player cannot shoot (no SNIPING feature):", no_sniping or "none")
+print("days where the tranquilliser key is handed out by the PAPERS row:",
+      [day for day in range(1, 32) if "KeyTranq" in table.cell(day, "PAPERS")])
+try:
+    from PIL import Image
+    holes = Image.open(os.path.join(os.path.dirname(data), "BulletHoles.png"))
+    print("BulletHoles.png: %d x %d (the code cuts 4 pieces of 8 x 8 from its top row)" % holes.size)
+    if holes.size[0] < 32 or holes.size[1] < 8:
+        problems.append("BulletHoles.png is smaller than 32 x 8")
+except Exception as error:                                  # noqa: BLE001
+    print("BulletHoles.png not checked:", error)
+
 print("problems:", problems or "none")

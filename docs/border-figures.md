@@ -8,8 +8,8 @@ the queue, the guards, the vehicles. This doc covers two of its classes:
 - **`WaitingLine`**: the queue on the left, a list of `Person` figures.
 
 Not covered: `Border` itself (who is created, the 36 path events, guards,
-attacks, explosions), which is part 2, `border-scene.md`; sniping, the
-camera and the scoreboard, which are the later parts.
+attacks, explosions), which is part 2, `border-scene.md`; shooting, which is
+part 3, `border-shooting.md`; the cameras and the scoreboard, part 4.
 
 Check script: `scripts/checks/border_figures_check.py`. There is no reference
 script for this part.
@@ -239,7 +239,7 @@ the reading above (it does not prove it).
 
 - **Off screen** (`isOffscreen`): the picture's x is below 0 or above 570,
   or its y is below 0 or above 103.
-- **Hit test** (`hitTestPoint`, used for shooting; part 3): a box of
+- **Hit test** (`hitTestPoint`, used for shooting; `border-shooting.md`): a box of
   `Layout.borderPersonHitSize` centred on the picture position. A point
   counts as a hit if it is in the box now or in the box of the previous
   frame's position. The size's value was not looked up.

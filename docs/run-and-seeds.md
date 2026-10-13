@@ -84,7 +84,8 @@ differ fits how the game plays; the mechanism is what is confirmed here.)
 - The name cycler's position is saved in the encrypted store (`names`) after
   every name, and loaded at start-up when present. The saved position is a
   seed, a position and a reshuffle count (the fields of
-  `ShuffledSequenceState`; `makeFromState` itself was not read), so the
+  `ShuffledSequenceState`; `makeFromState`, read since, rebuilds the sequence
+  by running the ordinary constructor with those three values), so the
   name order is fixed by the launch that first created it, and continues
   across launches.
 
