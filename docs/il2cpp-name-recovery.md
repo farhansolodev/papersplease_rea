@@ -84,8 +84,9 @@ Addresses in `script.json` are RVAs (offsets from the image base). Add
   encryption algorithm. Corrected 2026-10-14; this line used to say its use
   was unknown. Found since: it decrypts the content archive `Art.dat`
   (confirmed by decrypting the real file, `art-dat-format.md`), and
-  `play.EncryptedStore.get` calls its `decryptString` (what that store holds
-  is not studied; saves are a later step). Whether anything else calls it
-  has not been searched.
+  `play.EncryptedStore` uses its `decryptString` and `encryptString` for
+  the save folder's files (saves, settings, statistics, the name position;
+  studied 2026-10-14 and confirmed by decrypting a real save folder,
+  `save-format.md`). Whether anything else calls it has not been searched.
 - `format.png` and `haxe.zip` are in the game code, so it likely reads PNG and
   ZIP data itself (the `StreamingAssets/loc/*.zip` files). Not verified.

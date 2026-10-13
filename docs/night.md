@@ -64,8 +64,10 @@ at 0 and cannot pass their limit:
   **Very sick** when sick is at the limit minus one.
 - A member is saved as text such as
   `hungry=0 cold=0 sick=0 justDied=false alive=true`, plus `moodEmotion=...`
-  when a mood is set. (The pairs go through a lookup table when written, so
-  their order in a real save was not determined.) This is the text that
+  when a mood is set. The pairs go through a lookup table when written, so
+  their order differs: in a real save (2026-10-14, `save-format.md`) all 12
+  member values read `cold=.. sick=.. justDied=.. alive=.. hungry=..`. No
+  save with a mood was seen. This is the text that
   conditions like `Night/wife has alive=true` test.
 - The face shown combines flags: dead alone; otherwise hungry (hungry above
   0), cold (cold above 0), very sick or sick, and the mood if any; plain "ok"
@@ -182,4 +184,52 @@ this is not read.
   command adds to its night events.
 - What the random generator given to `Family` is used for (nothing in the
   functions read).
-- Nothing here has been compared with the running game.
+- Compared with the running game on 2026-10-14, through a real save folder
+  (`save-format.md`): three nights of one hand-played game. For each night
+  `scripts/checks/save_night_check.py` tries every number of paid travelers
+  and every choice of food, heat and medicine (24, 56 and 288
+  possibilities) and exactly one reproduces every night fact the game
+  saved: 4, 6 and 8 travelers paid, nothing bought. That covers: savings
+  30 at the start, 5 per paid traveler, rent 20, hungry and cold going up
+  one a night, sickness from a counter at its limit (the son after one
+  night, the wife and mother-in-law after two, the uncle after three), the
+  son's death on night 3 with "just died" set, the family count, the
+  "after 6PM" flag set on a night with an unpaid traveler, `Night/Profit`,
+  the attack result `NONE`, and an empty calendar and token list.
+- **Buying was exercised too**, in a replay the same day: the user loaded
+  the day-3 save, played the day again and ticked every line at night
+  (confirmed by the user afterwards, so this night rests on the save and
+  on memory). The save
+  then has savings 25 (40 + 10 x 5 - 20 rent - 20 food - 10 heat - 15 for
+  three medicines), `Night/Profit` 70, everyone's cold and hungry one
+  lower, and the son's, wife's and mother-in-law's sickness one lower.
+  Again exactly one possibility of 352 reproduces every fact: 10 paid,
+  food, heat and the three medicines bought. That adds: food costs 5 per
+  living member, heat 10, medicine 5 each and only for sick members, and
+  each takes its counter down by one. **Not exercised**: penalties,
+  bribes, attacks, the scheduled events, the niece, the endings, a budget
+  that does not balance.
+- **An open conflict about night 3.** Asked afterwards, the user confirmed
+  buying nothing on nights 1 and 2, but remembers buying everything on
+  night 3, medicine for several sick members included. The save written
+  after night 3 says otherwise, independently of this doc's rules: savings
+  are 60, which is 40 + 8 x 5 - 20 with nothing else taken off (food, heat
+  and three medicines would cost 45 and leave 15), everyone's cold and
+  hungry counters went up, and the son's sickness went from 2 to 4. The
+  user's description of the screen does fit that night (three members were
+  sick, so three medicine lines). Not resolved. Possibilities, none
+  checked: the memory is off; the clicks did the opposite of what was meant
+  (whether a line starts ticked, and what a click does, is in the night
+  screen, which is not read); or something about when the budget is applied
+  is missing here. The replay (above) narrows it: buying everything on
+  that same night gives savings 25 and nobody dies, and the model follows
+  it, so the third possibility is unlikely and the first save was not a
+  "bought everything" night. The user's own explanation, given afterwards:
+  they probably unticked everything by mistake, thinking they were doing
+  the opposite. That would mean the lines start ticked; it is the likely
+  answer but not confirmed, and how ticking works is still to be read in
+  the night screen (the screens step).
+- The user saw no notice of the son's death before quitting 20 seconds
+  into day 4. That fits the death message being built at the start of the
+  **next** night from the saved "just died" mark (the `Family` constructor,
+  above); it does not test it, since that night was never reached.

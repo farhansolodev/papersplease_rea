@@ -71,7 +71,9 @@ the language is changed) loads the language's data and creates:
 - Each day's generators come from it: `day * 50 + storySeed`, then `+ 0x1000`
   and so on (`days-csv-format.md`, `rand.md`).
 
-So the story seed is **not stored in the save**. Loading the same save twice
+So the story seed is **not stored in the save**. (Seen in real saves on
+2026-10-14: a save is a list of 21 to 24 story facts and holds no seed,
+`save-format.md`.) Loading the same save twice
 in one launch gives two different story seeds, and so different random
 travelers; relaunching gives a different sequence again. (That replays
 differ fits how the game plays; the mechanism is what is confirmed here.)
@@ -87,7 +89,13 @@ differ fits how the game plays; the mechanism is what is confirmed here.)
   `ShuffledSequenceState`; `makeFromState`, read since, rebuilds the sequence
   by running the ordinary constructor with those three values), so the
   name order is fixed by the launch that first created it, and continues
-  across launches.
+  across launches. A real `names` entry (2026-10-14, `save-format.md`) is
+  two lines of `seed:position:reshuffles`, for example `11240598:12:0` and
+  `11240599:8:0`: the second seed is the first plus one, as the code says.
+  By the code the first seed is the master seed of the launch that created
+  the entry, so that launch's master seed can be read from the file; this
+  was not tested (the reference was not run with that seed against
+  anything).
 
 ## Consequences
 
@@ -156,12 +164,20 @@ each launch needs your go-ahead.
 ## Not studied
 
 - The rest of `Game.applyScreenChange` (new game versus load, endless mode).
-- `StoryState.load` and the save format.
+  (Its `ADVANCE_TO_NEXTDAY` branch, which is where the story is saved, was
+  read on 2026-10-14, `save-format.md`.)
+- (Studied 2026-10-14: `StoryState.load` and the save format,
+  `save-format.md`.)
 - (Studied since, in `comparing-with-the-game.md`: the test automation's
   plan and what an automated game does, where `Trace`'s output ends up, and
   what sets `showVerbose`. The rest of `test.auto.*` is not studied.)
 - Compared with the running game: the seed chain, including which story
   seed a new game uses, for master seed 12345
   (`comparing-with-the-game.md`). Not compared: the tick-count master seed
-  of a normal launch, the saved name position, the command-line words other
-  than `savedir`.
+  of a normal launch, the command-line words other than `savedir`. The
+  saved name position's file was seen in a real save folder (above). That
+  folder came from two launches of one story, and its positions add up to
+  the names of both (20, against 8 travelers processed in the second
+  launch alone), so a later launch does continue from the saved position.
+  A third launch added 10 more to the same two lines, with the seeds
+  unchanged (`save-format.md`).

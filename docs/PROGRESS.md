@@ -1,8 +1,8 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-14, in the
-sixth session (after part 4 of the border scene: the view, the cameras and
-the endless scoreboard; the border scene is now finished).
+seventh session (after saves, part 1: where a save lives and what is in
+it, confirmed on a real save folder).
 `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
@@ -24,13 +24,17 @@ endings, text, sounds, seals, bodies, endless mode, fonts, the border
 scene's paths and pictures, how its figures follow a path, how the
 waiting line works, and what runs the scene (its states, the 36 path events,
 the four attack scenes, shooting and its six endings, how the day ends
-there, the view, the endless scoreboard), credits, languages. The desktop
+there, the view, the endless scoreboard), credits, languages, and the save
+files (the encrypted store, the tree of saves, what one save holds; a real
+save folder decrypts and matches). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
 game**: the game's own test player was run with a fixed seed, and for the 36
 travelers of days 1 to 4 the reference gives the same entry, nationality,
-purpose, papers and errors as the game's log. No Rust code exists yet.
+purpose, papers and errors as the game's log. The night model also
+reproduces four hand-played nights exactly, from the facts in real saves.
+No Rust code exists yet.
 
 ## How far along
 
@@ -42,9 +46,9 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard). Not done: saves, the screens (title, night, ending, endless, language chooser), drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves part 1 (the store, the save tree, one save's content, settings and statistics files). Not done: saves part 2 (the suspend snapshot and the rest of `Game.applyScreenChange`), the screens (title, night, ending, endless, language chooser), drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
-| 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match (see "Verification") |
+| 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
 
@@ -83,6 +87,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `newspaper-picture.md` | The newspaper picture: the six layout pictures, which article goes in which rectangle, what is drawn, its random draws; the news screen. Text fitting not modelled |
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
+| `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder |
 | `ends-xml-format.md` | `Ends.xml` and `Intro.xml`: the 20 endings and the intro slides |
 | `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring |
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
@@ -116,7 +121,8 @@ with the game (end of `comparing-with-the-game.md`).
 remaining data file; the night's rules; the method for comparing with the
 running game and the first two runs; finding and fixing why the reference's
 error picks left the game's. Done in the fifth: the newspaper picture. Done
-in the sixth: the whole border scene, parts 1 to 4.)
+in the sixth: the whole border scene, parts 1 to 4. Done in the seventh:
+saves, part 1.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -132,8 +138,17 @@ in the sixth: the whole border scene, parts 1 to 4.)
    `border-scene.md`, `border-shooting.md`, `border-view.md`). All 314
    functions are in `decompiled/border.clean.c`; a condensed copy of
    `Border` is in `decompiled/border.short.c`.
-3. **Saves, next** (`play.EncryptedStore`, `play.save`, `StoryState.load`),
-   and the rest of `Game.applyScreenChange` (new game versus load).
+3. **Saves.** Part 1 is **done** (`save-format.md`): `play.EncryptedStore`,
+   `play.save`, `StoryState`, checked on a real save folder. **Part 2,
+   next**: the rest of `Game.applyScreenChange` (new game versus load,
+   endless mode, the stash transitions) and the stash itself
+   (`play.stash.*`, 12 classes; `Game.stashSave`, `restoreFromStash`; the
+   `stash` entry is written with Haxe's general serializer). The functions
+   are already in `decompiled/gameall.clean.c`; the stash classes are not
+   decompiled yet. One observation to start from: the user's last quit, 20
+   seconds into a day on desktop, left no `stash` file. A question for it:
+   when a story is continued after a quit in the middle of a day, is the
+   save loaded or a stash restored?
 4. **The screens**: title, the night screen, the ending player (slide
    timing), the endless-mode screens, the language chooser, who shows and
    scrolls the credits. (The news screen is done except its magnifier,
@@ -182,6 +197,39 @@ Small jobs that fit anywhere:
 ## Open questions and unconfirmed items
 
 Collected from the docs, so they are not lost:
+
+**From the seventh session** (`save-format.md`)
+
+- **The first night 3 of the hand-played game: probably explained, not
+  confirmed.** Its save says nothing was bought (savings 60, the son
+  dead); the user remembered buying everything. The user then replayed
+  that day from the day-3 save and did tick everything: that save has
+  savings 25 and nobody dead, and the night model follows it exactly. So
+  the rules are not in doubt. The user's explanation for the first time:
+  they probably unticked everything by mistake. To confirm when the night
+  screen is read (the screens step): does a line start ticked, and what
+  does a click do (`night.md`, "Not studied").
+- The save format is confirmed on one folder: four saves, one branch,
+  three launches, one certain load. Not exercised: deleting, the `stash`
+  and `platover` entries. Whether the second sitting resumed by loading
+  the save or from a stash is not known (part 2).
+- Who calls delete and "read the tree", who writes the settings, who reads
+  and writes `platover`: the title and load screens (step 4).
+- Whether anything saves the story outside `ADVANCE_TO_NEXTDAY`.
+- When "the saved day is not later than the parent's day" (the save then
+  hangs under the root) applies in play.
+- Who sets `Game/Stat/Day`.
+- By the code, the first number in `names.sav` is the master seed of the
+  launch that created the file (here 11240598). Not tested. If true, a
+  hand-played game's first travelers could be predicted from it; how far
+  that holds once the player's page turns add draws
+  (`desk-drawing-draws.md`) is unknown.
+- `play.AlltimeStats` beyond its local file talks to the platform's
+  achievements and leaderboards service. Not read: out of scope (rule 4).
+  The port needs only local statistics, if any.
+- Characters above 255 would be damaged by the save encryption (the code
+  does not cut character codes to 8 bits). Nothing above 127 was seen in a
+  real English save; other languages were not looked at.
 
 **From the sixth session** (`border-figures.md`, `border-scene.md`,
 `border-shooting.md`, `border-view.md`)
@@ -256,7 +304,8 @@ Collected from the docs, so they are not lost:
 - The news entry `DIPLOMAT_FIRST` is named by nothing found; who sets
   `Day.whenAddNews`; whether endless mode has news.
 - Other callers of `Array.sort` (an unstable quicksort) have not been
-  listed. Known users: the news list and the night's budget.
+  listed. Known users: the news list, the night's budget and the children
+  of a save in the save tree.
 - A wrong `Purpose` for an Arstotzkan never ends in the reference
   (`fact-values.md`); the data never asks for it.
 - Face sheet `M6` has artwork for one face only (piece 24); face `F1:0` has
@@ -286,11 +335,12 @@ Collected from the docs, so they are not lost:
 - What the day's token list (filled by `Token...` papers) and
   `Bulletin/PageMask` are used for; which classes outside `BoothEnv` call
   `addPaper`.
-- Where the saved date-format setting is loaded.
 - The night: the screen itself, and anything the night does that is not in
-  `night.md`'s list. The night's numbers were not compared with the game
-  (route 1 ended in debt after day 1 as the rules predict, which is weak
-  evidence).
+  `night.md`'s list. The night's numbers were compared with the game on
+  2026-10-14 for four nights of one hand-played game: three with nothing
+  bought and one, a replay, with food, heat and three medicines bought
+  (`night.md`, "Not studied"). Penalties, bribes, attacks, the scheduled
+  events and the endings were not exercised.
 - Data slips recorded (not questions): `ask-forgery-asylumgrant` reads a
   fact that does not exist (`speech.md`); `=!` in `EZIC_DIPLO` makes a group
   that never runs (`responses-and-events.md`); the 4th recording of a sound
@@ -338,8 +388,24 @@ checked with numbers and logs.
 - **Checks against the data files**: one script per data file in
   `scripts/checks/` (arguments in its `README.md`). These compare the files
   with what the code reads; they are not comparisons with the running game.
-- **Save files**: the story seed is not saved, so saves give day facts but
-  not the randomness. Not investigated further.
+- **A real save folder (works, the second method).** Start the game with
+  `savedir` pointing at an empty folder in the project and play by hand;
+  the folder then holds the saves, settings, statistics and name position
+  as encrypted text files (`save-format.md`). The folder from 2026-10-14 is
+  `extracted/saverun/` (gitignored).
+
+      python -I scripts\reference\savefile.py extracted\saverun dumps\il2cppdumper\stringliteral.json
+      python -I scripts\checks\save_check.py scripts\reference extracted\saverun dumps\il2cppdumper\stringliteral.json
+      python -I scripts\checks\save_night_check.py scripts\reference extracted\art\assets\data extracted\saverun dumps\il2cppdumper\stringliteral.json
+
+  Result so far: all 8 files decrypt and re-encrypt to the same text; the
+  save tree (four saves, one branch) and each save agree with the code
+  reading (`0 problems`); the night model reproduces the night before each
+  of the four saves with exactly one of 24, 56, 288 and 352 possibilities,
+  three with nothing bought and one with everything bought. What a save can show: the story facts after
+  each night (family, money, statistics, staying papers, script flags). What
+  it cannot: the story seed is not saved, so it gives no randomness, and
+  it does not record what the player did.
 
 ## Things that exist only on this machine
 
@@ -354,6 +420,8 @@ All gitignored. Nothing below is in git.
 | `extracted/checks/` | small | Test face pictures, the overview of all faces, the face height survey | `faces.py` (`show`, `overview`, `survey`) |
 | `extracted/Art.dat` | 3 MB | Archive cut from `sharedassets0.assets` by hand | Offsets in `art-dat-format.md` |
 | `extracted/art/` | 9 MB | The 614 unpacked files | `art-dat-format.md` commands |
+| `extracted/saverun/` | small | A real save folder: the user's hand-played game of 2026-10-14 (four saves with one branch, settings, statistics, name position) | Play again with `savedir` pointing at an empty folder (`save-format.md`); the same game cannot be recreated |
+| `decompiled/saves*.c` | small | The save, store, story-state, settings, statistics, fact-set and `MapUtil` functions read for `save-format.md` | Step 4 of `ghidra-workflow.md` with the selectors in the `MODLOG.md` entry |
 | `extracted/autorun/` | 2 MB | The test player's folder: `auto.plan`, `auto.log`, copies of three `Player.log` runs, and scratch scripts from the fourth session (`show.sh` prints one decompiled function with the noise removed; `rand_uses2.py` lists functions matching a pattern; `log_step.py`; several experiments) | The logs: run the game as above (needs the go-ahead). The scratch scripts are conveniences, not needed |
 
 Outside the project: `C:\tools\Il2CppDumper-6.7.46`, `C:\tools\ghidra_12.1.4_PUBLIC`,
@@ -369,5 +437,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | Ghidra scripts (names, types, decompile, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py` |
-| `scripts/checks/` | Checks against the real data files, and `compare_with_log.py` against the running game's log; see its `README.md` for each script's arguments |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt) |
+| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, and `save_check.py` and `save_night_check.py` against a real save folder; see its `README.md` for each script's arguments |

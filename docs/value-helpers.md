@@ -147,8 +147,10 @@ count from 0.
 | 2 | `%m.%d.%y` | `%m.%d.%Y` | `1-23-1982` |
 
 The index is the player's setting `dateFormatIndex`; an index out of range
-uses 0. A new `Settings` starts at 0; loading the saved setting is not
-studied. Day 1 in format 0 is `82.11.23` (short) and `1982.11.23` (long).
+uses 0. A new `Settings` starts at 0; its constructor then reads the saved
+value from the `settings` entry of the save folder, if there is one
+(`save-format.md`; a real settings file held `dateFormatIndex` 0). Day 1 in
+format 0 is `82.11.23` (short) and `1982.11.23` (long).
 
 ## Upper case (`Uppercaser`)
 
@@ -202,5 +204,7 @@ rather than an error, which matters for one- and two-letter words.
 ## Not studied
 
 - (`SpeechLib.applyGenderSwitches` is in `speech.md`.)
-- Where the saved date-format setting is loaded.
+- (Answered 2026-10-14: the saved date-format setting is loaded by the
+  `Settings` constructor, `save-format.md`. Which screen changes it is not
+  studied.)
 - Nothing here has been compared with the running game.

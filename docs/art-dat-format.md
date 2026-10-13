@@ -49,7 +49,9 @@ single block of 32-bit little-endian words.
   it from `dumps/il2cppdumper/stringliteral.json`.
 
 The same cipher class has `decryptString`, used by `play.EncryptedStore.get`.
-What that protects (probably saves) has not been looked at.
+That store holds the saves, the settings, the statistics and the name
+order's position, each as a `.sav` file of hexadecimal text with a
+different key string (studied 2026-10-14, `save-format.md`).
 
 ## Archive layout after decryption
 

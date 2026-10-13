@@ -194,7 +194,13 @@ A man given a woman's face always gets the first one tried; a woman given a
 man's face needed up to five tries over 40 master seeds.
 
 It models a fresh name cycler; a saved position (the `names` entry of the
-encrypted store) is not modelled. Two cases where a draw of exactly 1.0
+encrypted store) is not modelled. (A real `names` entry was read on
+2026-10-14, `save-format.md`: two lines of `seed:position:reshuffles`. It
+showed 12 + 8 = 20 names taken over two launches of one story in which 19
+travelers were processed. So the position did carry over from the first
+launch to the second; which traveler took the 20th name is not known. A
+third launch, replaying one day, added exactly 10 names for 10 travelers
+processed. Two counts, so modest evidence for "one name per traveler".) Two cases where a draw of exactly 1.0
 reads past the end of an array follow Haxe's documented behaviour and are
 marked in the script; they were not checked in this build. The output
 (names, faces, numbers) has not been compared with the running game, whose
