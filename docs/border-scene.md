@@ -427,8 +427,10 @@ states or the generator.
 `restoreFromStash(s)`: free both pools and refill the rifles; state
 `ready-to-call` at once; hide the call bubble; put each guard on duty at the
 end of its `-enter` path; restore the pan. So after a restore the scene is
-rebuilt in its plain "waiting" form. (When a stash is made and restored is
-on the screen side; not followed.)
+rebuilt in its plain "waiting" form. A stash is only ever made when the
+booth is empty between two travelers, and on desktop it is written but
+never restored in normal play (`save-format.md`, part 2, read on
+2026-10-14).
 
 ## What `Border` asks of the booth and the day
 
@@ -507,7 +509,9 @@ All from the day's border generator (part 1).
   touches it.
 - Who sends the scene to `waiting-to-fade-to-night` on a day that ends by
   the clock.
-- When the scene is stashed and restored.
+- (Answered 2026-10-14, `save-format.md` part 2: the scene is stashed
+  with the day screen each time the booth becomes empty, and restored
+  only at start-up on phone and tablet, or by the test player.)
 - (Answered in part 3: the delayed calls, including the attack delay, run on
   the game's clock, not on the scene's slowed one. See "Slow motion" in
   `border-shooting.md`.)

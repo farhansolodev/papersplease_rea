@@ -11,8 +11,9 @@ constructor (`0x180585270`), `Main.main`, the `play.Bootstrap` constructor
 constructors; Haxe's `Math` static setup and `Math.random`;
 `System.Random`'s parameterless constructor; `app.CommandLine.fromArgs`;
 `Trace` (`init`, `info`, `verbose`, `customPrint`, static setup). The
-`LOAD_TO_SCREEN` branch of `Game.applyScreenChange` was read; the rest of
-that function was not. The seed-scaling constant was read from the raw
+`LOAD_TO_SCREEN` branch of `Game.applyScreenChange` was read here; the rest
+of that function was read on 2026-10-14 (`save-format.md`, part 2). The
+seed-scaling constant was read from the raw
 instructions.
 
 Everything here is confirmed in the code unless marked otherwise.
@@ -163,9 +164,11 @@ each launch needs your go-ahead.
 
 ## Not studied
 
-- The rest of `Game.applyScreenChange` (new game versus load, endless mode).
-  (Its `ADVANCE_TO_NEXTDAY` branch, which is where the story is saved, was
-  read on 2026-10-14, `save-format.md`.)
+- (Answered 2026-10-14, `save-format.md` part 2: the rest of
+  `Game.applyScreenChange`. For seeds: a new game is a load of `NEW` and
+  both draw a new story seed; going on to the next day saves and draws
+  none; an endless day draws one number from the endless seed generator; a
+  stash restore draws no story seed and puts no generator back.)
 - (Studied 2026-10-14: `StoryState.load` and the save format,
   `save-format.md`.)
 - (Studied since, in `comparing-with-the-game.md`: the test automation's

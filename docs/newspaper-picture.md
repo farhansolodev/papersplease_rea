@@ -251,8 +251,12 @@ dropped, and it does not compute the stamp's position.
   like at half scale with the two colours.
 - `Image.transformed` in full, and so the stamp's real angle.
 - `Layout.getFitScale` and `NewsScreenMagnifier`.
-- Whether the news screen is shown (and `make` run) on every day and after
-  loading a save, and whether endless mode has one.
+- (Answered 2026-10-14, `save-format.md` part 2, from the code: the news
+  screen is built when the game goes on to the next day and when a save is
+  loaded; a new game goes to the intro screen first. Whether `make` runs
+  each time the screen is built was not re-checked.) Whether endless mode
+  has a news screen: its day is queued as the screen `day` directly, so by
+  the code no; not seen in the game.
 - The phone layout: the rectangle (54, 0, 253 x 52) was read from the code,
   but the method that cuts it out of `News.png` was not identified
   (**inferred** to be a crop), and nothing else about the phone was looked

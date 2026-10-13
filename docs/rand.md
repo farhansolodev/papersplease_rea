@@ -61,7 +61,10 @@ from the original at that point, or crash.
 `getState()` copies the four numbers into an `app.RandState` object;
 `setState()` copies them back; `fromState()` makes a new generator from a
 saved state. So a generator can be frozen and resumed mid-sequence. Where
-this is used (probably the mid-day "stash") is not studied.
+this is used is not known. (Corrected 2026-10-14: this said "probably the
+mid-day stash". The stash was read, `save-format.md` part 2, and it holds
+no generator state at all. No use of `RandState` appears in any file
+decompiled so far.)
 
 ## Is this the only source of randomness?
 

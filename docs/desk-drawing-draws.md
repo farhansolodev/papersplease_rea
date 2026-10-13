@@ -92,7 +92,8 @@ spoken lines are needed.
 
 - **Pages drawn again.** `setPage` runs again when a page is turned, a link
   is followed or a stash is restored, and each time the page's draws are
-  made again. For the first four days this did not matter (the pages the
+  made again. (A stash is not restored in normal desktop play:
+  `save-format.md`, part 2.) For the first four days this did not matter (the pages the
   test player turned have no random marks). The bulletin's criminals page
   (three photos) would draw on every visit. Not modelled, not tested.
 - The fingerprint, thumbprint and contraband pictures receive the generator

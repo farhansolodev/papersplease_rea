@@ -255,5 +255,8 @@ Not part of normal play; listed so they are not mistaken for it.
 - The rifle buttons' slide positions and the bullet pictures (drawing).
 - (`app.Clock` was read in part 4, `border-view.md`: it follows real time,
   capped at 0.1 s a frame; it has a global speed factor, 1.0 unless changed,
-  and a "pause for one frame" function. Who uses those two was not
-  searched.)
+  and a "pause for one frame" function. Two users of "pause for one
+  frame" are now known (`save-format.md`, part 2): the game's `paused`
+  state calls it every frame, and so does the resume overlay shown after
+  a stash restore. Other users, and who changes the speed factor, were
+  not searched.)

@@ -75,7 +75,7 @@ An indented tree (`tab-tree-format.md`). Lines the code looks for:
 | `audits` with children | Extra checks: `face`, `ending`, `news`, `night`, `paper <pattern>` |
 | `facts` with children | `name value` pairs (story facts to set, inferred) |
 | `capture <n>` | Capture every n-th frame (inferred from the name) |
-| `stash`, `slow` | Test the suspend feature; run slowly |
+| `stash`, `slow` | `stash`: each time the game writes a stash, restore from it and click the resume button (`save-format.md`, part 2; read 2026-10-14, not run). `slow`: run slowly |
 | `off` | Makes the plan invalid (the normal game starts) |
 
 The plan is valid when it has routes (or `all`) and no `off` line.

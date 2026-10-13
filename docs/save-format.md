@@ -1,10 +1,12 @@
 # Saves: where they live and what is in them
 
-Studied on 2026-10-14 (saves, part 1). Part 2, not done yet, is the rest of
-`Game.applyScreenChange` and the "stash" (the snapshot the game takes to
-resume in the middle of a day).
+Studied on 2026-10-14 in two parts. Part 1 is the save folder, the
+encryption, the tree of saves and what one save holds. Part 2, further
+down under "Part 2", is how the game moves between screens (the rest of
+`Game.applyScreenChange`) and the "stash": a snapshot of the point the
+player has reached, meant for resuming after the game was closed.
 
-Functions read in full: `play.EncryptedStore` (all), `app.XXTea`
+Part 1, functions read in full: `play.EncryptedStore` (all), `app.XXTea`
 (`encryptString`, `decryptString`, `btea_encode`, `btea_decode`,
 `toKeyArray`), `HostUnity.UnityPlatformDisk` (all six),
 `play.save.SaveHeader`, `SaveNode` and `SaveManager` (all), `play.StoryState`
@@ -87,7 +89,7 @@ repo; `savefile.py` reads it from `dumps/il2cppdumper/stringliteral.json`.
 | `settings` | `Settings` | The player's settings as XML |
 | `stats` | `AlltimeStats` | All-time statistics as XML |
 | `names` | `NameCycler` | Where the name order has got to (`traveler-build.md`) |
-| `stash` | `SaveManager` | The suspend snapshot (part 2) |
+| `stash` | `SaveManager` | The resume snapshot: at most one, written and deleted as the game moves between screens ("The stash" below). Seen and read in a real folder on 2026-10-14 |
 | `platover` | `Settings` | `tablet` or `phone`: a forced layout. **Not encrypted**; written straight to the disk |
 
 The test player's `auto.plan` and `auto.log` live in the same folder but
@@ -287,25 +289,406 @@ written when it runs out. The rest of `AlltimeStats` (achievements,
 leaderboards) was not read: out of scope.
 
 **Forced layout.** `platover.sav` holds `tablet` or `phone`, unencrypted,
-and makes the game use that layout. Who reads and writes it was not
-followed.
+and makes the game use that layout. It is written when a
+`REQUEST_PLATFORM_CHANGE` request arrives ("Requests" below). One caller
+was found, `SettingsMenu.platformChangeConfirm_onDone`. The settings
+screen is told at creation whether the change is allowed, and the launch
+code allows it only on Android or an iPad (what the screen does with that
+was not read). Who reads the file was not followed.
 
 ## When the game saves and loads
 
-From the code read so far (the callers found in the files already
-decompiled; the title and load screens are not decompiled yet):
+From the code (part 2 read the rest of `Game.applyScreenChange`; of the
+screens only the call sites named here were read):
 
 - At start-up `play.Bootstrap` creates the store, the settings (which load
   themselves), the save manager, the statistics, and a `NORMAL` story state.
 - **Load**: `Game.applyScreenChange`, transition `LOAD_TO_SCREEN`. The story
   state loads the given id, then a new story seed is drawn. Starting a new
-  game is a load of `NEW` (`run-and-seeds.md`).
+  game is a load of `NEW` (`run-and-seeds.md`). Two callers were found,
+  both in the load screen. `LoadScreen.loadButton_onClick`: when the
+  clicked entry's header is the new one (`isNew`), it asks for that header
+  and the screen `intro`; otherwise it shows a summary box, and the box's
+  "continue" (`confirm_onClick`) asks for the save and the screen `news`.
 - **Save**: `Game.applyScreenChange`, transition `ADVANCE_TO_NEXTDAY`:
   `Game/Day` goes up by one, **then** the story state is saved. This is the
-  only story save found. So a save is taken after a night, and holds the
-  state at the start of the following day.
-- Delete and "read the tree" are not called from anything decompiled so
-  far; inferred: the load screen (not read).
+  only story save in `Game`, and `Game` is the only caller of
+  `StoryState.save` found in the decompiled files (the booth classes, the
+  border, the screens, the test player). So a save is taken after a night,
+  and holds the state at the start of the following day. One caller of the
+  request was found: `NightScreen.onClickSleep`.
+- **Delete**: `LoadScreen.confirm_onClick`, on the answer `delete`, calls
+  the save manager's delete with the save's id. "Read the tree" and the
+  rest of the load screen are not read yet.
+- **Closing the game in the middle of a day, on desktop, loses that day.**
+  The story goes on from the save taken after the last night. The game
+  does write a snapshot during the day (the stash, below), but the desktop
+  build never reads it back.
+
+# Part 2: moving between screens, and the stash
+
+Studied on 2026-10-14. Read in full: from `Game`: `applyScreenChange`,
+`applyTransition`, `queueScreenChange`, `boot`, `getDaySafe`,
+`fadeToTitle`, `createStater` and its callbacks, `restoreFromStash`,
+`stashSaveDay`, `stashSaveNight`, `stashSaveEnd`, `stashSave`; all of
+`play.GameTransition`; the four stash functions of `SaveManager`;
+`StoryState.restoreFromStash`; all 12 classes of `play.stash`; from `Day`:
+`get_canStash`, `makeStash`, `restoreFromStash`,
+`getFirstTravelerIsSecretPolice`; `makeStash` and `restoreFromStash` of
+`DayScreen`, `Booth`, `BoothEngine`, `BoothEnv`, `Paper`, `DeskItem`,
+`Border` and `BorderPan`; `restoreFromStash` of `NightScreen` and
+`EndScreen`; `play.screen.UnstashOverlay`;
+`Booth.applyMountedPaperIdsOrder`; the part of the test player that
+exercises the stash.
+
+Two things were read from the machine instructions instead: which booth
+state the stash callback belongs to (the decompiler gives up on the
+`Booth` constructor), and the start-up option that allows resuming (in
+`HostUnity.CreateGame`). All 471 functions of `play.screen` were
+decompiled and **searched** for callers; they were not read.
+
+Part 2 was written from the code alone. The same day one test was run in
+the real game ("The stash test in the running game" below): it confirmed
+that the desktop game writes a day stash once the first traveler has
+gone, starts at the title with the stash present and untouched, and
+deletes it when another screen is asked for; and the stash file matched
+the description of its content. Everything else in part 2 is from the
+code only: the night and ending stashes, the blocker, restoring, the
+screen changes other than these.
+
+## Requests
+
+Any part of the game asks for a change of screen, a save or a stash
+through one shared object, `play.GameTransition`. It does nothing itself:
+each of its functions builds a request and hands it to
+`Game.applyTransition`. There are 19 kinds of request:
+
+| Request | What `Game` does with it |
+|---|---|
+| `NONE` | Nothing |
+| `FADE_TO_SCREEN(name, instant)` | Queues the screen `name` |
+| `LOAD_TO_SCREEN(save, screen)` | Queues `screen`; the save is loaded when the screen is built |
+| `FADE_TO_ENDLESS_DAY(endless id)` | Queues `day` |
+| `FADE_TO_ENDLESS_RESULT(result)` | Queues `endless` |
+| `FADE_TO_END(ending id)` | Queues `end` |
+| `SKIP_TO_DAY(day)`, `SKIP_TO_TRAVELER(id, day)` | Queue `day` without a fade. The debug jumps (`comparing-with-the-game.md`) |
+| `ADVANCE_TO_NEXTDAY` | Queues `news` |
+| `FLASH_TO_TITLE(duration)` | Starts a screen flash; when it is over, the title is queued |
+| `OPEN_EXTERNAL_LINK(address)` | Leaves full screen and opens the address. Ignored with the command-line word `expo` |
+| `SET_PAUSE(yes or no)` | Game state `paused` or `on` |
+| `MAKE_STASH_DAY` | Writes a day stash, if allowed (below) |
+| `MAKE_STASH_END(ending id)` | Writes an ending stash |
+| `STASH_RESTORE` | Restores from the stash; if that fails, goes to the title |
+| `START_AUTO_SOAK` | Stops all sound and sets a flag for the test player |
+| `REQUEST_PLATFORM_CHANGE(layout)` | If the layout differs from the current one: writes `platover` and queues the `wait` screen |
+| `SHOW_RATING_SCREEN(function)` | Queues `rating` |
+| `QUIT` | Asks the system to close the game |
+
+## Queueing a screen (`Game.queueScreenChange`)
+
+In this order:
+
+1. **`news`**: if the day library has no day with the number in `Game/Day`,
+   the game goes to the title instead and nothing else happens.
+2. **`title`**, asked while the day screen shows an endless-mode day: the
+   endless run is told to end (`Endless.end`) and nothing is queued here.
+3. **The stash.** If the screen is `night`, a night stash is written. If it
+   is `end`, a day stash is attempted. **For every other screen the stash
+   is deleted.**
+4. The game's own state goes to `off` (or `off-instant`), and the request
+   is kept as the pending screen change.
+
+`Game` has five states of its own (a small state machine,
+`createStater`):
+
+| State | What it does |
+|---|---|
+| `on` | Normal running. On entry the fade cover (`screenFlash`) fades out |
+| `off` | On entry two flags of the current screen are cleared (4 and 16) and the fade cover fades in. After 1 second the pending screen change is applied and the state goes back to `on` |
+| `off-instant` | The same with no fade and no wait |
+| `flashing-to-title` | The same two flags are cleared, and the screen flash runs; when it is over, "title" becomes the pending change and the state is left (for which state: the decompiler dropped the argument) |
+| `paused` | On entry: all sound paused, the pause screen created, the current screen hidden, the sound `button-drop`. Every frame it tells the clock to pause for one frame. On exit: sound resumed, pause screen removed, screen shown again, the sound `hover-up` |
+
+What the two flags mean was not read from the code that uses them.
+Inferred from where they are cleared (here, and under the resume overlay
+below): the screen is no longer updated and gets no input.
+
+The fade is 0.125 s each way (half of 0.25). With the debug switch
+`skipSlowStuff` it is 0.005 s and the 1-second wait is 0. These numbers
+were read from the decompiler and the constants in the file; which
+argument is the wait and which the fade was not checked in the
+instructions.
+
+`paused` is entered by `SET_PAUSE`, or in `Game.update` when key number 5
+is pressed, the state is `on` and the current screen says it can be paused.
+Which key number 5 is was not looked up.
+
+## Building the screen (`Game.applyScreenChange`)
+
+1. All sound is stopped and the flash is cleared.
+2. The current screen is removed.
+3. Depending on the request that came with the screen change:
+
+   | Request | Story state | The `Day` object |
+   |---|---|---|
+   | `LOAD_TO_SCREEN` | Loads the save; then a new story seed is drawn | Dropped |
+   | `ADVANCE_TO_NEXTDAY` | `Game/Day` plus one, then saved | Dropped |
+   | `FADE_TO_ENDLESS_DAY` | Replaced by a new `FORENDLESS` one | A new one for the course's day, with a new `Endless` object seeded from the endless seed generator |
+   | `SKIP_TO_DAY` | Replaced by a new `SKIPTODAY` one; both log switches and `skipSlowStuff` are turned on | Dropped |
+   | `SKIP_TO_TRAVELER` | The same; the day is looked up from the traveler id when none is given | A new one, told to make that traveler |
+   | any other | Untouched | Kept |
+
+4. The screen is built from its name: `intro`, `news`, `settings`, `end`,
+   `endless`, `wait`, `title`, `day`, `load`, `night`, `credit`, `rating`.
+   Any other name raises the error "Screen not found". `title` also
+   drops the `Day` object. `news`, `day` and `night` are given the `Day`
+   object through `getDaySafe`: the existing one, or, if there is none, a
+   new one for the day number in `Game/Day`.
+5. The screen's music is started and the screen is shown.
+
+What follows from this:
+
+- **In normal play there is one `Day` object per played day.** It is made
+  when the news screen is built and the day and night screens reuse it. It
+  is dropped by a load, by going on to the next day, by the title, and it
+  is built again by a stash restore. This answers an old open question;
+  the evidence is the code only.
+- **The news screen is built at the start of every day and after a load**
+  (a load asks for the screen `news`). A new game goes to `intro` first.
+
+## The stash
+
+The stash is one store entry, `stash` (the file `stash.sav`). It holds
+enough to put the player back at the point reached: the story facts, the
+day's counters, and either the desk as it was with the booth empty, or
+"at the night screen", or "at this ending". There is never more than one.
+
+### When it is written
+
+Nothing in the writing path looks at the platform, so by the code this
+happens on desktop too. The first row was seen on desktop in the test;
+the other three were not tried.
+
+| Moment | What is written |
+|---|---|
+| The booth enters its `empty` state. The callback is the first one registered on that state, for "on entry" (read from the instructions). Inferred, the booth's states not being fully read: once after the day's opening and again each time a traveler has gone | A day stash, if allowed (next list) |
+| The screen `night` is queued | A night stash (only if a `Day` object exists) |
+| The screen `end` is queued | A day stash, if allowed |
+| The ending screen is built (end of the `EndScreen` constructor) | An ending stash |
+
+A day stash is allowed only when all of these hold:
+
+- The current screen is the day screen.
+- The day is not an endless-mode day and its number is 1 to 31.
+- At least one traveler has been made that day. On three kinds of day it
+  takes two: when the day's first traveler id starts with `SECRET_POLICE`,
+  when the friendly guard is in his `CHAT` state, or when the day has the
+  boss (`days-csv-format.md` has `hasBoss` and `friendlyGuard`).
+- The booth engine's stash blocker is at zero. The blocker is a counter,
+  `preventStashCount`. It is set when the leaving direction is decided
+  (`BoothEngine.getLeaveDir`): to 10000 when a traveler with a bomb leaves
+  to the right or a poisoned traveler leaves either way, which in effect
+  means no more day stashes that day; and to 2 when the traveler's own
+  special exit
+  is used (a `customLeaveDir` starting `left-` or `right-` that matches the
+  stamp), which skips the stash at the next empty booth only. It goes down
+  by one each time the booth becomes empty.
+
+So a day stash is always a picture of an **empty booth between two
+travelers**. A traveler in the booth is never stashed.
+
+### When it is deleted
+
+Whenever any screen other than `night` or `end` is queued: the news screen
+of the next day, the day screen, the title, the load and settings screens
+and so on. Restoring from a stash does not delete it. (Corrected
+2026-10-14: part 1 guessed that "a stash is deleted once used".) Seen in
+the test for one case: the file was still there at the title screen and
+gone after the click on "Story".
+
+Put together, in a story game the stash exists from the moment the first
+traveler has gone (it is rewritten at each empty booth), through the
+night, until the player goes to sleep or leaves for the title.
+
+### When it is read
+
+- **At start-up** (`Game.boot`), only when the start-up option
+  `restoreFromStashIfPossible` is on. `HostUnity.CreateGame` sets that
+  option to "the layout is not desktop" (checked in the instructions:
+  the value passed is the result of comparing the platform kind with
+  `DESKTOP`). The test player turns it off as well. So **the desktop game
+  always starts at the title and never reads the stash**; the phone and
+  tablet layouts resume from it. The desktop half was seen in the test:
+  with a valid day stash in the folder the game opened on the title
+  screen, with no resume button, and left the file as it was.
+- **On a `STASH_RESTORE` request.** The only caller found is the test
+  player. Searched: `Game`, the 1,433 booth-class functions, the border,
+  all of `play.screen`, the save classes, the test player. Not searched:
+  `play.ui` and `app`. The developer-menu hook `Game.setupDevMenu` is an
+  empty function in this build.
+
+The test player's part: with the word `stash` in `auto.plan` it watches a
+counter that goes up with every stash written. When it changes, it drops
+what it was doing, asks for a restore, waits for the button `stash-resume`
+and clicks it. That is the developer's way of testing the feature, and it
+would exercise it on desktop. Not run here.
+
+### When a stash is refused
+
+A stash is valid when its stash version is 7, its game version text equals
+the running game's, it has story facts, and it has what its kind needs (a
+day stash: the day and the day screen; a night stash: the day; an ending
+stash: the ending id). An invalid stash is not written. Reading one that
+is invalid raises an error (who handles it was not followed). A stash made
+under another layout (desktop, tablet, phone) is not restored, and neither
+is a day stash whose day number is not 1 to 31. When a restore fails the
+game goes to the title.
+
+### What it holds
+
+| Part | Content |
+|---|---|
+| `StashedGame` | Stash version, game version, the kind (`DAY`, `NIGHT`, `END`), the layout, **a copy of all story facts**, the day, the day screen, the ending id |
+| `StashedDay` | The day number, a copy of the day's own facts, and the day's counters: detained, travelers processed with and without pay, travelers made, bribe money, the attack result, "had a bomber", "had a poisoning"; and four lists: token ids, night event ids, citations, confiscated papers |
+| `StashedDayScreen` | The booth and the border |
+| `StashedBooth` | The engine, one entry per desk paper, shutter open or closed, criminal poster pinned or not, the booth clock's time |
+| `StashedBoothEngine` | The number of travelers so far, and the booth environment |
+| `StashedBoothEnv` | The facts of every document that stays for the day or the game (`facts-xml-format.md`, `stay`), except `Transcript`; and the ids of the day-staying papers the booth has at that moment |
+| `StashedBoothPaperState` | For one desk paper: document id, position in whole pixels, open page, the tilt of its closed picture, its desk state and where it lies (`OUTER`, `INNER`, `FILER`, `MOUNT`). Only papers whose desk state is `REVEALING`, `NORMAL` or `RETURNINGTODOCK` are included |
+| `StashedBorder` | One number, the view's pan position (`border-scene.md`, `border-view.md`) |
+
+**Not in a stash:** any random generator's state or seed, the figures of
+the border scene and the waiting line, speech, and a traveler (there is
+none in an empty booth).
+
+The entry's text is produced by Haxe's general serializer
+(`haxe.Serializer`, a standard text encoding of objects), then stored like
+every other entry: `PPSAVE1` in front, encrypted. The serializer's code
+was not studied; the port does not need to read the original's stash. Its
+text was read from the real stash instead, with a small reader written
+from the format's public description (`scripts/reference/hxserial.py`).
+What that stash shows: each object is written with its class name and
+its field names, enum values are written by name, a text that occurs
+again is written as a number pointing back to its first use, and the
+whole 9,040-character text is one `StashedGame` object with nothing after
+it.
+
+### Restoring (`Game.restoreFromStash`)
+
+1. No stash, or a stash from another layout: stop, "failed".
+2. The story facts are replaced by a copy of the stash's, and `Game/Device`
+   is set again.
+3. If the stash has a day, **a new `Day` object is built** for that day
+   number, as at the start of a day, and then its facts, counters and lists
+   are overwritten from the stash. (Inferred, not followed: building it
+   draws from the random generators again, for example for the three
+   criminal faces, and nothing puts the generators back where they were.
+   So the travelers after a restore need not be the ones that would have
+   come.)
+4. The screen `day`, `night` or `end` is built at once, without a fade.
+5. The screen restores itself:
+   - **Day**: the booth, then the border, then a running tutorial is
+     stopped.
+   - **Night**: the budget's reveal animation is skipped.
+   - **Ending**: the opening flip is finished at once.
+   - Any other screen answers "failed".
+6. A resume overlay (`UnstashOverlay`) is put over the screen. Every frame
+   it tells the clock to pause for one frame, so the game stands still.
+   After 10 frames it darkens the screen, shows an icon and a button with
+   the text `menu_resume`, and clears the screen's flags 4 and 16 (the
+   same two the fade-out clears). A click on the button sets them again
+   and removes the overlay.
+
+The booth's part (`Booth.restoreFromStash`):
+
+- The engine gets its traveler count back. The environment adds each
+  stashed day paper to the desk again and replaces its facts with the
+  stash's.
+- Each stashed paper entry is matched to the desk paper with the same
+  document id. That paper is turned to the stashed page (which draws the
+  page again, with its random draws: `desk-drawing-draws.md`), its closed
+  picture is made again at the stashed tilt, and it is put back: a
+  `NORMAL` paper goes to its stashed position and placement; a `REVEALING`
+  or `RETURNINGTODOCK` one starts its reveal animation again.
+- The shutter is set as it was. The booth clock is set to the stashed time
+  minus 2.0 (`StashedBooth.kGraceTime` is 2; that the code's 2.0 is that
+  constant is inferred). The traveler counter on the console is set. The
+  criminal poster is shown if it was pinned.
+- `applyMountedPaperIdsOrder` goes through the ids in the story fact
+  `Game/MountedPapers` (separated by `;`) and makes one call on each paper
+  that is mounted. What the call does was not looked up; inferred from the
+  function's name: it puts the mounted papers back in their order.
+- The booth's state is set to `empty`.
+
+The border's part is in `border-scene.md` ("Saving and restoring"): the
+scene is rebuilt in its plain waiting form and only the pan comes back.
+
+### The stash and the real folder
+
+The user's three quits (part 1, "Compared with a real save") each left no
+`stash.sav`. By the code that is what should happen: each quit came early
+in a day, and a day stash is first written when the first traveler of the
+day has gone. The `names` file shows no name taken on day 4 in either of
+the last two quits, so no traveler had even been made. For the first quit,
+about 20 seconds into day 3, the counts do not rule out one traveler having
+been called in; none had been processed.
+
+That agrees with the code but is not a test of it. The test is next.
+
+It also settles a question from part 1: the second sitting can only have
+continued by **loading the save**, because the desktop game does not read
+a stash at start-up.
+
+### The stash test in the running game (2026-10-14)
+
+The user ran the desktop game twice with `savedir` pointing at a new empty
+folder, `extracted/stashrun`. The folder was looked at three times.
+
+1. **First launch.** A new story; day 1 was played until the first
+   traveler had been dealt with and had walked away; then the window was
+   closed with Alt+F4 (not through the menu).
+   **Seen:** `stash.sav` in the folder, last written at 10:49:34, with
+   18,096 characters of hex text. No `headers` and no save, as expected
+   before the first night.
+2. **Second launch**, stopped at the first screen.
+   **Seen** by the user: the title screen with "story" and "endless" and
+   no resume button. In the folder: `stash.sav` still there, same time.
+3. **A click on "Story".**
+   **Seen:** `stash.sav` gone. Nothing else in the folder changed.
+
+All three are what the code reading said. A copy of the folder as it was
+after step 1 is kept in `extracted/stash_sample` (gitignored).
+
+`scripts/checks/stash_check.py` reads that stash and compares it with this
+doc. Its result: `0 problems`.
+
+- The whole text is one `StashedGame`: kind `DAY`, layout `DESKTOP`, stash
+  version 7, game version `1.4.11.124`.
+- Every object has exactly the fields its class declares in the code (the
+  ones summarised under "What it holds"), for all 8 stash classes.
+- 7 story facts: `Game/Device`, `Game/StayingPapers`, and five statistics
+  (one traveler processed, one approved, play time 56 s).
+- The day: number 1, one traveler made, one processed with pay, three day
+  facts (`Day/Id`, `Day/Rules`, `Day/Features`), one night event id.
+- The booth: clock 46.717, shutter open, poster not pinned, traveler count
+  1. Three desk papers, `Transcript`, `Rules` and `Bulletin`, all `NORMAL`,
+  all at whole-pixel positions.
+- The booth's facts: 51 of `Rules` and 20 of `Bulletin`, none of
+  `Transcript`. The day papers are those same three documents, and
+  `Facts.xml` gives all three `stay="day"`.
+- The border: pan 0.
+- No object of a random-generator class anywhere in it.
+
+How strong this is: one stash, of one kind (`DAY`), from day 1 of a new
+story, with one traveler processed. It confirms the writing moment, the
+content of a day stash, that desktop start-up ignores the stash, and one
+deletion. **Not tested:** a night or an ending stash; the blocker after a
+bomb, poison or a special exit; the days that need two travelers; a
+restore (it cannot happen in normal desktop play); the stash being
+rewritten at each later empty booth (only one traveler was processed
+here).
+
+# Both parts: the real folder, notes for the port, open points
 
 ## Compared with a real save
 
@@ -323,11 +706,12 @@ while the clock moved 521 s; the settings file (changed "the second time")
 was written 2 minutes 16 seconds after the day-3 save; and the all-time
 play time is 41 s more than the last save's. So the first sitting ended
 about 20 seconds into day 3, and the second went on with day 3 and ended
-about 20 seconds into day 4. By the code read so far, continuing a story
-loads the newest save, so **loading was probably exercised once**. Not
-certain: if the first quit left a stash, the second sitting may have
-resumed from that instead, and a stash is deleted once used. Part 2 will
-say whether desktop does that.
+about 20 seconds into day 4. The second sitting continued by **loading
+the save**, so loading was exercised here too. (Part 1 left this open: a
+stash might have been used instead. Part 2 answered it from the code: the
+desktop game never reads a stash at start-up. Part 1 also said "a stash is
+deleted once used"; that was a guess and is wrong, see "When it is
+deleted".)
 
 `scripts/checks/save_check.py` on that folder:
 
@@ -381,12 +765,15 @@ files reproduced):
   1328: the day-3 save's 905 plus the 423 seconds of the replay. The
   all-time statistic kept counting from where it was (1374 to 1873).
 - **The other day-4 save was not touched**: same file time as before.
-- Again no `stash` after quitting in the middle of a day.
+- Again no `stash` after quitting in the middle of a day (expected by the
+  code: "The stash and the real folder").
 
 How strong this is: the format is confirmed for one folder from one story:
-four saves, one branch, three launches, one certain load. **Not
-exercised**: deleting, a save whose day is not later than its parent's, an
-orphan, the `stash` and `platover` entries, text with characters above 127.
+four saves, one branch, three launches, two loads (one seen in the save's
+parent link, one known from the code). **Not exercised**: deleting, a save
+whose day is not later than its parent's, an orphan, the `platover` entry,
+text with characters above 127. (The `stash` entry was exercised later
+the same day in a separate folder: "The stash test in the running game".)
 
 Three side results from the same folder:
 
@@ -401,9 +788,9 @@ Three side results from the same folder:
   user's memory disagrees with the save (the user remembers buying
   everything then too); see `night.md`.
 - **The last quit, about 20 seconds into day 4 on desktop, left no
-  `stash`.** One observation. The first quit says nothing either way: a
-  stash written then could have been used and deleted by the second
-  sitting. How the stash is triggered is part 2.
+  `stash`.** Part 2 explains it: a day stash is first written when the
+  day's first traveler has gone, and none had. So this is not evidence
+  that desktop writes no stash; by the code it does.
 - **`names` shows 12 + 8 = 20 names taken, over both sittings.** The second
   launch therefore continued the saved name position, as the code says: had
   it started afresh, the file would count only the second sitting's names
@@ -431,6 +818,17 @@ Three side results from the same folder:
   all of them (`traveler-build.md`).
 - Loading draws a new story seed, so replaying a day from a save gives
   different random travelers (`run-and-seeds.md`).
+- **The stash can be left out of a desktop port.** The desktop original
+  writes it but never reads it in normal play, so the behaviour to match
+  is: closing the game during a day or a night loses that day, and the
+  story continues from the save taken after the previous night.
+- If a resume in the middle of a day is wanted later (a browser tab is
+  closed more easily than a game), the original's design is the model:
+  take the snapshot only when the booth is empty, and keep facts, counters
+  and the desk, not the random generators.
+- Screen changes are a small fixed set of requests handled in one place,
+  with a fade out, the change, and a fade in. The save happens inside the
+  change to the next day's news screen, not in the night screen.
 
 ## Reference script and checks
 
@@ -439,22 +837,40 @@ python -I scripts/reference/savefile.py extracted/saverun dumps/il2cppdumper/str
 python -I scripts/reference/savefile.py extracted/saverun dumps/il2cppdumper/stringliteral.json --dump headers
 python -I scripts/checks/save_check.py scripts/reference extracted/saverun dumps/il2cppdumper/stringliteral.json
 python -I scripts/checks/save_night_check.py scripts/reference extracted/art/assets/data extracted/saverun dumps/il2cppdumper/stringliteral.json
+python -I scripts/checks/stash_check.py scripts/reference extracted/stash_sample dumps/il2cppdumper/stringliteral.json extracted/art/assets/data
 ```
 
 The first prints every entry in plain text, the second one entry's whole
 text. `savefile.py` can also encrypt (`store_set`), which the check uses.
-The save folder is gitignored: it is the user's own play data.
+The last one reads a real stash with `scripts/reference/hxserial.py` and
+compares it with part 2. The save folders are gitignored: they are the
+user's own play data.
 
 ## Not studied
 
-- Part 2: the rest of `Game.applyScreenChange`, and the stash
-  (`play.stash.*`, `Game.stashSave`, `restoreFromStash`, the `stash` entry,
-  which is written with Haxe's general serializer).
-- Who calls delete and "read the tree", who asks for the settings to be
-  written, who reads and writes `platover`: the screens, not decompiled.
-- Whether anything saves the story outside `ADVANCE_TO_NEXTDAY`. Only the
-  files decompiled so far were searched, and calls through an object do not
-  show up in a reference search (`ghidra-workflow.md`).
+- (Done in part 2: the rest of `Game.applyScreenChange` and the stash.)
+- Of the stash, the running game has shown one day stash being written,
+  the start at the title with it present, and its deletion ("The stash
+  test in the running game"). Not seen: a night or ending stash, the
+  blocker, a restore. The serializer's code was not studied; its text was
+  read from the one real stash.
+- Who handles the error raised by an invalid stash at start-up (phone and
+  tablet only).
+- Whether anything in `play.ui` or `app` asks for a stash restore (not
+  searched).
+- What the screen flags 4 and 16 do, read from the code that uses them.
+- The booth's own states beyond `empty` being where the day stash is
+  taken; which key is number 5 (pause); the pause screen.
+- The load screen itself beyond the two functions named above ("read the
+  tree", its deleting mode), who asks for the settings to be written, who
+  reads `platover`: the
+  screens step. `Game.applySettings` calls `Settings.save`; who else does
+  was not searched.
+- (Answered in part 2: nothing saves the story outside
+  `ADVANCE_TO_NEXTDAY`, in the files decompiled so far, which now include
+  the booth classes, the border, the screens and the test player. Calls
+  through an object were searched by the function's slot name, as
+  `ghidra-workflow.md` advises.)
 - When "the day is not later than the parent's day" applies in play.
 - Who sets `Game/Stat/Day`. In the real folder the all-time `Day` is 4
   while the last save's `Game/Stat/Day` is 3.

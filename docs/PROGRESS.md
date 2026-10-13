@@ -1,8 +1,9 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-14, in the
-seventh session (after saves, part 1: where a save lives and what is in
-it, confirmed on a real save folder).
+eighth session (after saves, part 2: how the game moves between screens,
+and the stash; code reading, plus one test of the stash in the real
+game).
 `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
@@ -24,9 +25,12 @@ endings, text, sounds, seals, bodies, endless mode, fonts, the border
 scene's paths and pictures, how its figures follow a path, how the
 waiting line works, and what runs the scene (its states, the 36 path events,
 the four attack scenes, shooting and its six endings, how the day ends
-there, the view, the endless scoreboard), credits, languages, and the save
+there, the view, the endless scoreboard), credits, languages, the save
 files (the encrypted store, the tree of saves, what one save holds; a real
-save folder decrypts and matches). The desktop
+save folder decrypts and matches), and how the game moves between screens
+(19 kinds of request, one place that builds each screen, loads and saves),
+with the "stash", a resume snapshot that the desktop game writes but never
+reads back (seen in a test with the real game). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -46,7 +50,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves part 1 (the store, the save tree, one save's content, settings and statistics files). Not done: saves part 2 (the suspend snapshot and the rest of `Game.applyScreenChange`), the screens (title, night, ending, endless, language chooser), drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). Not done: the screens (title, night, ending, endless, language chooser, load, pause), drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -87,7 +91,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `newspaper-picture.md` | The newspaper picture: the six layout pictures, which article goes in which rectangle, what is drawn, its random draws; the news screen. Text fitting not modelled |
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
-| `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder |
+| `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder. **Part 2**: the 19 requests a part of the game can make (`GameTransition`), how a screen change is queued and built (`Game.queueScreenChange`, `applyScreenChange`), the game's own five states (fade, pause), and the stash: when it is written, deleted and read, what it holds, how it is restored |
 | `ends-xml-format.md` | `Ends.xml` and `Intro.xml`: the 20 endings and the intro slides |
 | `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring |
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
@@ -122,7 +126,7 @@ remaining data file; the night's rules; the method for comparing with the
 running game and the first two runs; finding and fixing why the reference's
 error picks left the game's. Done in the fifth: the newspaper picture. Done
 in the sixth: the whole border scene, parts 1 to 4. Done in the seventh:
-saves, part 1.)
+saves, part 1. Done in the eighth: saves, part 2.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -138,21 +142,22 @@ saves, part 1.)
    `border-scene.md`, `border-shooting.md`, `border-view.md`). All 314
    functions are in `decompiled/border.clean.c`; a condensed copy of
    `Border` is in `decompiled/border.short.c`.
-3. **Saves.** Part 1 is **done** (`save-format.md`): `play.EncryptedStore`,
-   `play.save`, `StoryState`, checked on a real save folder. **Part 2,
-   next**: the rest of `Game.applyScreenChange` (new game versus load,
-   endless mode, the stash transitions) and the stash itself
-   (`play.stash.*`, 12 classes; `Game.stashSave`, `restoreFromStash`; the
-   `stash` entry is written with Haxe's general serializer). The functions
-   are already in `decompiled/gameall.clean.c`; the stash classes are not
-   decompiled yet. One observation to start from: the user's last quit, 20
-   seconds into a day on desktop, left no `stash` file. A question for it:
-   when a story is continued after a quit in the middle of a day, is the
-   save loaded or a stash restored?
-4. **The screens**: title, the night screen, the ending player (slide
-   timing), the endless-mode screens, the language chooser, who shows and
-   scrolls the credits. (The news screen is done except its magnifier,
-   `newspaper-picture.md`.)
+3. **Saves**: **done**, in two parts (`save-format.md`). Part 2 was code
+   reading, and its main claim was then tested in the real game on
+   2026-10-14: after the first traveler of day 1 had left and the window
+   was closed, `stash.sav` was in the folder; the next launch showed the
+   title screen and left the file alone; a click on "Story" deleted it.
+   The stash's content matches the description (`stash_check.py`,
+   `0 problems`).
+4. **The screens, next**: title, the night screen, the ending player
+   (slide timing), the endless-mode screens, the language chooser, the
+   load screen, the pause screen, who shows and scrolls the credits. (The
+   news screen is done except its magnifier, `newspaper-picture.md`.) All
+   471 functions of `play.screen` are already decompiled in
+   `decompiled/screens.clean.c` (searched in part 2 of the saves, not
+   read). How a screen is asked for and built is in `save-format.md`,
+   part 2. Probably several parts; the night screen first would also
+   settle the "does a budget line start ticked" question below.
 5. **Drawing**: how text is placed (`app.vis.Text`; the newspaper's title
    and subtitle rules in `newspaper-picture.md` wait on this), how a document page is
    laid out (`PaperInnerVisuals`, read only for its random draws), the
@@ -198,6 +203,31 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
+**From the eighth session** (`save-format.md`, part 2)
+
+- **The stash was tested once in the running game** (`save-format.md`,
+  "The stash test in the running game"). Seen on desktop: a day stash
+  written after the day's first traveler had left; the title screen at
+  the next start with the file untouched; the file deleted by a click on
+  "Story"; a content that matches the description. Still from the code
+  only: the night and ending stashes, the blocker (bomb, poison, special
+  exit), the days that need two travelers, the rewrite at each later
+  empty booth, and a restore. The serializer's code was not studied; its
+  text is read by `hxserial.py`, which covers only what a stash uses.
+- A design point for the port: the desktop original loses the current day
+  when the game is closed. Whether the browser port should do better (a
+  tab is closed easily) is the user's decision.
+- What the screen flags 4 and 16 do (cleared during a fade-out and under
+  the resume overlay; inferred: no update, no input).
+- Which key is number 5 (it pauses the game).
+- The fade (0.125 s each way) and the 1-second wait of a screen change
+  were read from the decompiler, not checked in the instructions.
+- Who handles the error an invalid stash raises at start-up (phone and
+  tablet only). Whether anything in `play.ui` or `app` asks for a restore.
+- After a stash restore a new `Day` is built and no random generator is
+  put back, so the rest of the day would differ (inferred, not followed;
+  does not arise on desktop).
+
 **From the seventh session** (`save-format.md`)
 
 - **The first night 3 of the hand-played game: probably explained, not
@@ -210,12 +240,15 @@ Collected from the docs, so they are not lost:
   screen is read (the screens step): does a line start ticked, and what
   does a click do (`night.md`, "Not studied").
 - The save format is confirmed on one folder: four saves, one branch,
-  three launches, one certain load. Not exercised: deleting, the `stash`
-  and `platover` entries. Whether the second sitting resumed by loading
-  the save or from a stash is not known (part 2).
-- Who calls delete and "read the tree", who writes the settings, who reads
-  and writes `platover`: the title and load screens (step 4).
-- Whether anything saves the story outside `ADVANCE_TO_NEXTDAY`.
+  three launches, two loads. Not exercised: deleting, the `stash` and
+  `platover` entries. (Answered in the eighth session: the second sitting
+  resumed by loading the save; desktop never reads a stash at start-up.)
+- Who calls "read the tree", who else writes the settings, who reads
+  `platover`: the load and settings screens (step 4). (Known since the
+  eighth session: delete is `LoadScreen.confirm_onClick`; `platover` is
+  written on a `REQUEST_PLATFORM_CHANGE` request from the settings menu.)
+- (Answered in the eighth session: nothing saves the story outside
+  `ADVANCE_TO_NEXTDAY`, in everything decompiled so far.)
 - When "the saved day is not later than the parent's day" (the save then
   hangs under the root) applies in play.
 - Who sets `Game/Stat/Day`.
@@ -248,15 +281,20 @@ Collected from the docs, so they are not lost:
   first attack).
 - The tablet and phone layout values were not looked up (not needed for a
   desktop port).
-- Who changes the clock's global speed, who forces a frame's `dt`, and who
-  uses "pause for one frame" (`app.Clock`).
+- Who changes the clock's global speed and who forces a frame's `dt`
+  (`app.Clock`). ("Pause for one frame" has two known users since the
+  eighth session: the game's `paused` state and the stash resume overlay.)
 - What the rifle key paper does after unlocking, and whether an unlocked
   rifle stays unlocked on later days.
 - Who sends the scene to `waiting-to-fade-to-night` on a day that ends by
-  the clock, and when the scene is stashed and restored.
+  the clock. (When the scene is stashed and restored: answered in the
+  eighth session, `save-format.md` part 2.)
 - The booth's own state machine (`empty`, `entering`, `intro`,
   `busy-with-border`, `detaining`...) is only known where `Border` touches
-  it.
+  it, plus: the day stash is taken on entering `empty`. The decompiler
+  times out on the `Booth` constructor, where the states are set up; its
+  instructions are in `decompiled/booth_ctor_asm.txt` and list the state
+  names and their callbacks in order.
 - `trucke1-decide`: by the code, the truck's second attacker skips his
   throwing animation in one of three ways of reaching it
   (`border-scene.md`, "One oddity"). Not watched in the game.
@@ -292,17 +330,22 @@ Collected from the docs, so they are not lost:
 
 **Older**
 
-- Whether a `Day` object is constructed more than once per day. Each
-  construction makes three criminal faces (using the face cycler and the
-  traveler generator) and a `DayNews`.
+- (Answered in the eighth session, from the code: in normal play one
+  `Day` object is made per played day, when the news screen is built, and
+  the day and night screens reuse it. A load, the title and going on to
+  the next day drop it; a stash restore builds another. `save-format.md`,
+  part 2.)
 - The newspaper (`newspaper-picture.md`): nothing in it has been compared
   with the running game; which headlines fall back to the regular font or
   lose their subtitle is not known until `app.vis.Text` is read; the
   stamp's angle (the number appears to be used as radians); whether a stamp
-  needs a title; whether anything else uses the news generator; whether the
-  news screen is built on every day and after loading.
+  needs a title; whether anything else uses the news generator. (The news
+  screen is built on going to the next day and after a load:
+  `save-format.md`, part 2.)
 - The news entry `DIPLOMAT_FIRST` is named by nothing found; who sets
-  `Day.whenAddNews`; whether endless mode has news.
+  `Day.whenAddNews`; whether endless mode has news (by the code an
+  endless day is queued straight as the day screen, with no news screen;
+  its bulletin was not checked).
 - Other callers of `Array.sort` (an unstable quicksort) have not been
   listed. Known users: the news list, the night's budget and the children
   of a save in the save tree.
@@ -402,7 +445,12 @@ checked with numbers and logs.
   save tree (four saves, one branch) and each save agree with the code
   reading (`0 problems`); the night model reproduces the night before each
   of the four saves with exactly one of 24, 56, 288 and 352 possibilities,
-  three with nothing bought and one with everything bought. What a save can show: the story facts after
+  three with nothing bought and one with everything bought. A stash from a second folder (`extracted/stash_sample`, a day-1 stash
+  after one traveler) is read and compared with the description by
+
+      python -I scripts\checks\stash_check.py scripts\reference extracted\stash_sample dumps\il2cppdumper\stringliteral.json extracted\art\assets\data
+
+  (`0 problems`). What a save can show: the story facts after
   each night (family, money, statistics, staying papers, script flags). What
   it cannot: the story seed is not saved, so it gives no randomness, and
   it does not record what the player did.
@@ -421,7 +469,9 @@ All gitignored. Nothing below is in git.
 | `extracted/Art.dat` | 3 MB | Archive cut from `sharedassets0.assets` by hand | Offsets in `art-dat-format.md` |
 | `extracted/art/` | 9 MB | The 614 unpacked files | `art-dat-format.md` commands |
 | `extracted/saverun/` | small | A real save folder: the user's hand-played game of 2026-10-14 (four saves with one branch, settings, statistics, name position) | Play again with `savedir` pointing at an empty folder (`save-format.md`); the same game cannot be recreated |
+| `extracted/stashrun/`, `extracted/stash_sample/` | small | The stash test of 2026-10-14: the test's save folder as it ended (no stash, it was deleted by the click on "Story"), and a copy taken after the first launch that still has `stash.sav` | Play again as described in `save-format.md` ("The stash test in the running game"); the same stash cannot be recreated |
 | `decompiled/saves*.c` | small | The save, store, story-state, settings, statistics, fact-set and `MapUtil` functions read for `save-format.md` | Step 4 of `ghidra-workflow.md` with the selectors in the `MODLOG.md` entry |
+| `decompiled/stash*.c`, `screens*.c`, `booth_ctor_asm.txt`, `game_stater.short.c`, `loadscreen_btn.short.c` | about 5 MB | Read for part 2 of `save-format.md`: the stash classes, `GameTransition`, the resume overlay; all 471 `play.screen` functions (`screens`, a few minutes; searched, not read); the instructions of the `Booth` constructor and of `HostUnity.CreateGame`; condensed views | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.stash." "play.GameTransition" "play.screen.UnstashOverlay"`, and with `"play.screen."`; `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `extracted/autorun/` | 2 MB | The test player's folder: `auto.plan`, `auto.log`, copies of three `Player.log` runs, and scratch scripts from the fourth session (`show.sh` prints one decompiled function with the noise removed; `rand_uses2.py` lists functions matching a pattern; `log_step.py`; several experiments) | The logs: run the game as above (needs the go-ahead). The scratch scripts are conveniences, not needed |
 
 Outside the project: `C:\tools\Il2CppDumper-6.7.46`, `C:\tools\ghidra_12.1.4_PUBLIC`,
@@ -437,5 +487,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | Ghidra scripts (names, types, decompile, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt) |
-| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, and `save_check.py` and `save_night_check.py` against a real save folder; see its `README.md` for each script's arguments |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs) |
+| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, and `stash_check.py` against a real stash; see its `README.md` for each script's arguments |
