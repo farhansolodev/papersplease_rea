@@ -41,7 +41,9 @@ class Launch:
         self.story_seed = self.story_seed_gen.next_int()
 
     def load_save(self) -> int:
-        """Loading a save draws a new story seed (advanceStorySeed)."""
+        """Loading a save draws a new story seed (advanceStorySeed). Starting
+        a NEW game goes through the same step, so a fresh game plays with the
+        second seed drawn (confirmed against the game's log, 2026-10-13)."""
         self.story_seed = self.story_seed_gen.next_int()
         return self.story_seed
 

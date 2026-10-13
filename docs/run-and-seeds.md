@@ -62,6 +62,11 @@ the language is changed) loads the language's data and creates:
 - **Every time a save is loaded** (`LOAD_TO_SCREEN`), the story state is
   loaded from the save and then a **new story seed is drawn**
   (`advanceStorySeed`: `storySeed = storySeedGenRand.nextInt()`).
+- **Starting a new game counts as a load** (the log of a real run shows
+  `LOAD_TO_SCREEN(NEW;...)`), so a fresh game plays with the **second**
+  story seed drawn, not the first. Confirmed against the running game on
+  2026-10-13 (`comparing-with-the-game.md`): the first seed gives the wrong
+  travelers, the second gives exactly the game's.
 - Each day's generators come from it: `day * 50 + storySeed`, then `+ 0x1000`
   and so on (`days-csv-format.md`, `rand.md`).
 

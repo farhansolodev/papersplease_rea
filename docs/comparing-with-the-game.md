@@ -89,15 +89,113 @@ Because the automation also performs the player's actions, whole days could
 be compared, not only the first traveler, provided the reference replays the
 same actions.
 
-## Not known yet (to read before any launch)
+## What the automated game does (second reading step, 2026-10-13)
 
-- **What the automation does**: the routes in `Auto.txt`, how `AutoGame`
-  plays a day, what it writes to `auto.log`, and whether it does anything
-  beyond playing (it has leaderboard and stash test steps; anything online
-  must be ruled out first).
-- Exactly what the detailed log lines contain, and whether the story seed
-  and day seeds are logged.
-- Whether `autoReapplyRandomSeed` changes the seed chain compared with a
-  normal launch (`run-and-seeds.md`).
-- Where `Player.log` really lands and whether `-logFile` works.
+Also read: the rest of the `AutoGame` constructor, `AutoGame.log`,
+`advanceToNextPlaythrough` (in part), `Bootstrap.autoReapplyRandomSeed`,
+`Traveler.getDescription`, and `PlatformDiskMemWrapper` (`setPersistentString`,
+`getPersistentString`, `clear`).
+
+- **Saves stay in memory.** The automated game wraps the disk in a
+  "memory" version whose save and load only use a table in memory. So it
+  neither reads nor writes real save files, and the name order starts fresh
+  from the seed (no saved position).
+- **The online part is replaced by a blank one.** It installs a plain
+  `PlatformSocial` object (the do-nothing base class) in place of whatever
+  the platform set up, so leaderboards and achievements go nowhere.
+- **Seed.** The plan's seed becomes the game's master seed. Before each
+  route, `autoReapplyRandomSeed` rebuilds the two seed generators (master +
+  26 and + 73), the face cycler and the name cycler from it and draws the
+  story seed: the same chain as `seeds.py`, first story seed.
+- **Routes** (`Auto.txt`): `story 1` to `20` each play to one ending
+  (`1` is `in-debt`, ... `20` is `ignore-ezic`), `story 40` collects all
+  tokens, `endless 100` to `111` play the endless styles and courses. The
+  rest of the file says what to do with particular travelers on each route.
+- **Its own log**: `auto.log` in the save folder, appended to. It starts
+  with a line of dashes, then the date, the game version, the platform kind
+  and `#<seed>`; later "Finished in ..." and one line per route (not read
+  in detail).
+- **The traveler line** (through `Trace`, so in Unity's log): `New
+  Traveler:` followed by the entry id, the nationality, the duration with
+  `months`, the purpose, then `PAPERS:` the starting papers, `ERRORS:` the
+  error id or `-`, and `RESPONSE:` the traveler's response lines. A second
+  error is logged as `Additional error: ...`.
+
+So the log gives, per traveler: **who (script entry), nationality, purpose,
+duration, papers and errors**. It does not print the name, face, id number
+or document values. That is still a real test: the nationality, purpose and
+papers come from the script reading and its random draws, and each error
+choice depends on every booth draw made before it, so a day of matching
+errors confirms the draw counts of the whole pipeline indirectly.
+
+## Prepared for the first run (not run)
+
+- `extracted/autorun/auto.plan` (gitignored), containing route 1, seed
+  12345 and `trace`.
+- The reference's prediction for that seed, day 1, from `booth.py`:
+  `FINALLY_RETURN_HOME` (Arstotzka, native, passport, no error), then
+  `SMALL_CHECKPOINT` (Impor, immigrate, passport), then `WAITED_FOREVER`
+  (Republia, visit, 2 months, passport).
+
+## First run: 2026-10-13, route 1, seed 12345 (run with the user's go-ahead)
+
+Command, using the project's copy of the game:
+
+    game\PapersPlease.exe savedir C:\Users\farha\dev\papersplease_rea\extracted\autorun
+
+What happened:
+
+- The test player started and played by itself: title, new game, intro,
+  newspaper, day 1 (8 travelers), the night, the `in-debt` ending, back to
+  the title. `auto.log` reports `in-debt (ending #1) -> 01:27s 80MB OK`.
+  The game was then closed.
+- Unity's log was written to
+  `%USERPROFILE%\AppData\LocalLow\3909\PapersPlease\Player.log` (outside the
+  project; a copy is kept in the gitignored
+  `extracted/autorun/Player.route1.seed12345.log`). It holds the game's own
+  lines: `[Game]`, `[BoothEnv] New Traveler:`, `[ErrorLib]`, `[BoothEngine]`
+  responses, every operation applied, and the test player's steps.
+- The game's own files stayed in `extracted/autorun` (`auto.log`); no save
+  file was written.
+
+Comparison (`scripts/checks/compare_with_log.py`): **all 8 travelers match
+the reference on every logged field**: script entry, nationality, duration,
+purpose, starting papers, error, always-errors and additional error.
+
+One thing the reference had wrong, found by this run: **which story seed a
+new game uses.** With the first story seed only 4 of 8 travelers matched
+(and those by chance: fixed scripts and likely outcomes). With the second
+seed all 8 match; the third and fourth give 3 and 4. So starting a new game
+draws a new story seed, exactly as loading a save does (`run-and-seeds.md`
+now says so). Before finding this, a search over 20,160 variations of the
+draw rules was tried and explained nothing, which was the hint that the
+rules were right and the seed was wrong.
+
+What this run confirms, against the real game:
+
+- the seed chain from the master seed to the day's traveler generator
+  (`rand.py`, `seeds.py`, the `+ 0x4000` day generator);
+- reading a traveler script: weighted choices, the purpose, job, district,
+  duration, city and gender draws and their order, the automatic papers
+  (`travspec.py`), over 8 travelers and about 55 draws;
+- the three criminal draws at day set-up (they come first on the same
+  generator);
+- the always-error for foreigners on day 1.
+
+What it does **not** yet test: random errors (day 1 has none), anything
+drawn from the booth's generator (name, face, id number, document values,
+error choice), later days, the night's numbers.
+
+## Still not known
+
+- How long a route takes on screen, and what the fast-forward settings do
+  when the plan has no `ffw` line.
+- Whether the game's command-line reader minds Unity's own `-logFile`
+  option, and where `Player.log` lands without it.
+- What the automation's actions at the booth draw from the booth's random
+  numbers (this decides how far into a day the reference can follow).
+- What Unity itself does outside the project when the game starts (its own
+  log folder, window settings in the registry, any network use of its own).
+  This is the same as for any launch of the game and is not something the
+  game's code decides.
 - Running the game needs the user's go-ahead (`CLAUDE.md`).

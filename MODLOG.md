@@ -15,6 +15,24 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 First comparison with the running game: day 1 matches
+
+**Changed:** added `scripts/checks/compare_with_log.py`; recorded the run in `docs/comparing-with-the-game.md`; corrected `docs/run-and-seeds.md` and a comment in `scripts/reference/seeds.py` (a new game plays with the second story seed).
+**Why:** first test of the reference against the real game instead of against the data files.
+**Tested how:** with the user's go-ahead, ran the project's copy of the game once with `savedir extracted\\autorun` and an `auto.plan` of route 1, seed 12345, `trace`; copied Unity's `Player.log` into the gitignored `extracted/autorun/`; ran `compare_with_log.py` on it.
+**Result:** the test player works in the released build and finished route 1 in 1 minute 27 seconds (`in-debt`, 8 travelers on day 1). All 8 travelers match the reference on entry, nationality, duration, purpose, papers and errors. Failure on the way: the first comparison matched only 4 of 8; a search over 20,160 variations of the draw rules explained nothing; the cause was the story seed (a new game draws a fresh one, so play uses the second), after which 8 of 8 match.
+**Still broken / not tested:** random errors, the booth generator's draws (names, faces, id numbers, document values) and later days are not yet compared: day 1 has no random errors and the log does not print names or values. `booth.py` and `news.py` still take the first story seed when run as scripts; only the comparison script uses the second.
+**Next:** a longer route (for example route 20, all 31 days) to compare error choices day by day; make the reference scripts' own demonstrations use the new-game story seed.
+
+## 2026-10-13 What the game's test player does, and a prepared first run (no launch)
+
+**Changed:** extended `docs/comparing-with-the-game.md`; created the gitignored `extracted/autorun/auto.plan` (route 1, seed 12345, trace).
+**Why:** to be sure a test-player run is safe and to know what its log will contain before asking to launch.
+**Tested how:** read `Auto.txt`; decompiled and read the rest of the `AutoGame` constructor, `AutoGame.log`, `autoReapplyRandomSeed`, `Traveler.getDescription` and the in-memory disk's save and load. The game was not run.
+**Result:** the automated game keeps saves in memory only, replaces the online part with a blank object, and seeds itself exactly like `seeds.py` (first story seed). The log line per traveler gives entry id, nationality, purpose, duration, papers and error id; not name, face, id number or document values. `booth.py` predicts for seed 12345, day 1: `FINALLY_RETURN_HOME`, `SMALL_CHECKPOINT` (Impor, immigrate), `WAITED_FOREVER` (Republia, visit, 2 months).
+**Still broken / not tested:** nothing run. Unknown: how long a route takes, where Unity's log lands, whether `-logFile` is accepted, how the automation's booth actions use the booth's random numbers, and what Unity itself touches outside the project at start-up.
+**Next:** with the user's go-ahead, one launch of the project's copy of the game with `savedir extracted\\autorun`; then compare the log with the prediction.
+
 ## 2026-10-13 How to compare with the running game: reading step (no launch)
 
 **Changed:** added `docs/comparing-with-the-game.md` and `scripts/ghidra/FindStaticWrites.java` (lists the memory writes that follow each use of a class record, to find who changes a class's static values); updated the debug-log section of `docs/run-and-seeds.md`.
