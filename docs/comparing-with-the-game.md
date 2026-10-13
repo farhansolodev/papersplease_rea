@@ -217,8 +217,21 @@ once from the booth's generator, on every day. But replaying the game's
 spoken lines in the reference (`scripts/reference/speech.py`,
 `compare_with_log.py --speech`) does **not** make the errors match: it makes
 days 2 and 3 worse and leaves day 4 different. Two attempts failed to
-explain the difference; the open problem, the evidence and the ideas not
-tried are in `STATUS.md`.
+explain the difference at the time (record in `STATUS.md`).
+
+## Solved, 2026-10-14: the desk's drawing also draws
+
+Reading all the booth code showed that giving a paper its picture on the
+desk uses the booth's generator too (`desk-drawing-draws.md`). With those
+draws and the spoken lines both replayed, `compare_with_log.py` matches the
+game on **every logged field for all 36 travelers** of this run, including
+the day-4 picks among 14 candidates, and all 8 of the first run. No new run
+of the game was needed. Leaving out either part gives 30 or 32 of 36.
+
+So the booth's draw counts are now confirmed for days 1 to 4 of one seed:
+the person, the document values, the error choice, the additional error,
+the desk draws and the spoken lines, since one miscounted draw anywhere
+would change the later picks. Later days' documents are not yet tested.
 
 ## Still not known
 
@@ -226,8 +239,9 @@ tried are in `STATUS.md`.
   when the plan has no `ffw` line.
 - Whether the game's command-line reader minds Unity's own `-logFile`
   option, and where `Player.log` lands without it.
-- What the automation's actions at the booth draw from the booth's random
-  numbers (this decides how far into a day the reference can follow).
+- What the automation's actions draw from the booth's random numbers beyond
+  what is now modelled: turning to a page with random marks draws again
+  (`desk-drawing-draws.md`); not seen in days 1 to 4.
 - What Unity itself does outside the project when the game starts (its own
   log folder, window settings in the registry, any network use of its own).
   This is the same as for any launch of the game and is not something the

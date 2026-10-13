@@ -178,6 +178,14 @@ staying papers; anything the player does after the traveler arrives.
 Travelers are made one after another with no player action in between, and
 with an empty saved story unless one is passed in.
 
+**This matters for matching the game.** Between two travelers the game draws
+from the same generator when papers are drawn on the desk
+(`desk-drawing-draws.md`, `desk.py`) and when stock lines are spoken
+(`speech.md`, `speech.py`). `booth.py` alone therefore gives the game's
+travelers only up to the first error pick of a day; with both replayed
+(`scripts/checks/compare_with_log.py`) it matches the game for days 1 to 4
+of the tested seed.
+
 ## Not studied
 
 These are the large pieces this sequence calls:

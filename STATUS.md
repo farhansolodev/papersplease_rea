@@ -1,11 +1,35 @@
 # STATUS
 
-Two entries. The first is open; the second (older) is resolved and kept so
-the dead end is not repeated.
+Two entries, both resolved. They are kept so the dead ends are not
+repeated. Nothing is open.
 
 ---
 
-# Open, 2026-10-13: the booth's random numbers fall out of step with the game
+# Resolved, 2026-10-14: the booth's random numbers fell out of step with the game
+
+## Outcome
+
+**Solved by reading the code (attempt 5).** Drawing a paper's picture on the
+desk uses the booth's own generator: one draw for each paper's tilt, one for
+a passport photo, two for a mark with a position range, three for a seal.
+The reference did not count any of these. With them in
+(`scripts/reference/desk.py`, `docs/desk-drawing-draws.md`) **and** the
+spoken lines replayed (attempt 1's `speech.py`, which was right all along
+but could not work alone), `compare_with_log.py` matches the game on every
+logged field for all 36 travelers of the route-20 run and all 8 of the
+route-1 run. Leaving either part out breaks it (30 and 32 of 36).
+
+How it was found: all 1,433 functions of the booth classes were decompiled
+and searched for any use of a generator. That listed three places not seen
+before (`booth.Paper`'s constructor, `BoothEnv.getImage`,
+`PaperInnerVisuals`). The lesson: attempt 2 searched for a *fixed* number of
+missing draws per traveler, but the real number depends on which papers the
+traveler has (2, 3 or 4 each), so no fixed offset could fit.
+
+What is still not tested is listed at the end of
+`docs/desk-drawing-draws.md` (pages drawn again when turned, fingerprint
+pictures). The rest of this entry is the record as written while the
+problem was open.
 
 ## Goal
 
@@ -98,7 +122,7 @@ depends directly on the booth's generator** (no name, id number, face or
 document value), and error picks carry only a little information each. So
 the position in the generator can only be inferred indirectly.
 
-## Ideas not tried yet
+## Ideas listed while it was open (the first one solved it)
 
 - **Reason from the code instead of the log:** read, in order, everything
   between two `makeNewTraveler` calls that touches `BoothEnv.rand` (the

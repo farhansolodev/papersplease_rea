@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 Booth random numbers now match the game: drawing papers on the desk draws too
+
+**Changed:** added `scripts/reference/desk.py` (the draws made when a paper gets its picture: tilt, photo, position ranges, seals) and `docs/desk-drawing-draws.md`; `scripts/checks/compare_with_log.py` now replays desk draws and spoken lines by default (`--no-desk`, `--no-speech` to leave one out) and applies the log's add-paper, remove-paper and validate lines; `STATUS.md` entry marked resolved; `docs/comparing-with-the-game.md`, `docs/emblems-and-bodies.md`, `docs/traveler-creation.md`, `scripts/checks/README.md` updated.
+**Why:** the reference's error picks differed from the game's from day 4 (open problem in `STATUS.md`).
+**Tested how:** decompiled all 1,433 booth-class functions and listed every use of a generator; read the paper constructor, the page-drawing code and `getImage`; then ran `compare_with_log.py` on both saved logs (no new game run), with each part left out as a control, and with 0 to 5 start-of-day draws in an experiment script.
+**Result:** route 20, days 1 to 4: 36 of 36 travelers match on every field including errors (was 34); route 1: 8 of 8. Without desk draws 30 of 36, without speech 32 of 36; only 3 start-of-day draws (as the code says) gives 36.
+**Still broken / not tested:** pages drawn again when turned (the bulletin's criminal photos would draw each visit); fingerprint, thumbprint and contraband pictures; the identity record; a hidden paper shown later; the invalid seal. `booth_check.py` was not re-run (it does not use `desk.py`, and `booth.py` was not changed). Evidence is one seed, days 1 to 4.
+**Next:** the user's choice: a longer run (later days, another seed) to test the untested parts, or go back to the remaining data files.
+
 ## 2026-10-13 The test player's capture setting: ruled out by reading
 
 **Changed:** `STATUS.md` (attempt 4 recorded).

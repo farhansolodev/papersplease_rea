@@ -1,6 +1,11 @@
 """Compares the game's own log of a test-player run with the Python reference.
 
 Usage: python -I compare_with_log.py <reference dir> <assets dir> <Player.log> <master seed>
+           [--no-desk] [--no-speech]
+
+The booth's generator is also used when papers are drawn on the desk
+(desk.py) and when a stock line is spoken (speech.py), so both are replayed
+from the log. --no-desk and --no-speech leave one out, to show it is needed.
 
 <Player.log> is Unity's log of a run started with an auto.plan that has
 `trace` and `seed <master seed>` (docs/comparing-with-the-game.md). The log
@@ -13,6 +18,7 @@ import sys
 sys.path.insert(0, sys.argv[1])
 import booth as B
 import speech as S
+from desk import Desk
 from cyclers import FaceCycler, NameCycler
 from rand import Rand
 
@@ -33,7 +39,7 @@ while i < len(lines):
             "entry": head[0], "nation": head[1], "duration": head[2].replace("months", ""), "purpose": head[3],
             "papers": [p for p in papers.split(", ") if p],
             "error": lines[i + 3].split("ERRORS:", 1)[1].strip(),
-            "always": [], "additional": None, "said": [],
+            "always": [], "additional": None, "events": [],
         }
         j = i + 4
         while j < len(lines) and not lines[j].startswith("[ErrorLib] Always Errors"):
@@ -47,7 +53,13 @@ while i < len(lines):
         days[-1].append(traveler)
     elif line.startswith("[BoothEnv] SAY ") and days and days[-1]:
         # a line actually spoken (the dumps of an error's lines are indented)
-        days[-1][-1]["said"].append(line[len("[BoothEnv] SAY "):])
+        days[-1][-1]["events"].append(("say", line[len("[BoothEnv] SAY "):]))
+    elif line.startswith("[BoothEnv] ADDPAPER ") and days and days[-1]:
+        days[-1][-1]["events"].append(("add", line[len("[BoothEnv] ADDPAPER "):].strip()))
+    elif line.startswith("[BoothEnv] REMOVEPAPER ") and days and days[-1]:
+        days[-1][-1]["events"].append(("remove", line[len("[BoothEnv] REMOVEPAPER "):].strip()))
+    elif line.startswith("[BoothEnv] VALIDATEFACT ") and days and days[-1]:
+        days[-1][-1]["events"].append(("validate", line[len("[BoothEnv] VALIDATEFACT "):].strip()))
     elif line.startswith("[BoothEnv] Additional error: ") and days and days[-1]:
         days[-1][-1]["additional"] = line.split("Additional error: ", 1)[1].strip()
     i += 1
@@ -62,7 +74,9 @@ story_seed = generator.next_int()
 print("master seed %d -> story seed in play %d (the second one drawn)" % (master, story_seed))
 env = B.Env(sys.argv[2])
 speeches = S.SpeechLib(open(sys.argv[2] + "/data/Speeches.txt", encoding="utf-8", newline="").read())
-REPLAY_SPEECH = "--speech" in sys.argv        # experimental, see STATUS.md
+REPLAY_SPEECH = "--no-speech" not in sys.argv
+REPLAY_DESK = "--no-desk" not in sys.argv
+papers_xml = open(sys.argv[2] + "/data/Papers.xml", encoding="utf-8").read()
 face_cycler = FaceCycler(master)
 name_cycler = NameCycler(env.names_m, env.names_f, master)
 
@@ -71,6 +85,7 @@ total = {f: [0, 0] for f in FIELDS}
 first_miss = None
 for day_number, logged in enumerate(days, start=1):
     booth = B.Booth(env, day_number, story_seed, face_cycler, name_cycler)
+    desk = Desk(papers_xml, booth) if REPLAY_DESK else None
     print("\nday %d" % day_number)
     for index, seen in enumerate(logged):
         person = booth.make_new_traveler()
@@ -86,11 +101,21 @@ for day_number, logged in enumerate(days, start=1):
         for f in FIELDS:
             total[f][0] += mine[f] == seen[f]
             total[f][1] += 1
-        if REPLAY_SPEECH:
-            # Replay what the game said to this traveler: each stock line
-            # draws from the booth's generator.
-            for said in seen["said"]:
-                S.get_speech(speeches, booth.rand, booth.value_text, said)
+        # What happens before the next traveler also draws from the booth's
+        # generator: the papers are drawn, lines are spoken, papers are added.
+        if desk:
+            desk.new_traveler()
+        for kind, what in seen["events"]:
+            if kind == "say" and REPLAY_SPEECH:
+                S.get_speech(speeches, booth.rand, booth.value_text, what)
+            elif kind == "add":
+                booth.add_paper(what)
+            elif kind == "remove":
+                booth.remove_paper(what)
+            elif kind == "validate":
+                booth.set_fact_valid(what)
+            if desk and kind != "say":
+                desk.show_new_papers()
         if wrong and first_miss is None:
             first_miss = (day_number, index + 1)
         print("  %2d %-22s %-10s %-9s %-4s %-28s %s" % (

@@ -49,9 +49,10 @@ width.
 emblems of a set in two columns on a coloured background (for the rulebook,
 inferred from the name and layout; its exact spacing was not worked out).
 
-Which random generator is passed in, and when the pick happens, is in the
-document-drawing code, which is not studied. The fact value only says
-`VALID`, `INVALID` or `NONE` (`fact-values.md`).
+The generator passed in is the booth's own, and the pick happens when the
+paper's page is drawn on the desk, followed by two more draws for the seal's
+position (`desk-drawing-draws.md`). The fact value only says `VALID`,
+`INVALID` or `NONE` (`fact-values.md`).
 
 ## Bodies.xml
 
