@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 Fonts.xml and the font files studied
+
+**Changed:** added `docs/fonts.md`, `scripts/reference/fonts.py` (loads the fonts, measures and breaks text), `scripts/checks/fonts_check.py`; `docs/data-files.md` and the checks README updated.
+**Why:** next unstudied data file; the port needs the font measurements to lay out documents.
+**Tested how:** read `data.FontLib`, `data.FontDef` and `app.vis.Font`; ran `fonts_check.py` on the extracted files.
+**Result:** 16 fonts over 12 font files, all present, one sheet each; the game files letters by the `letter` attribute, ignores the file's own line height and has no kerning; with this data `letter` and `id` agree everywhere. Check prints `problems: none`.
+**Still broken / not tested:** nothing compared with the running game. The order of steps in line breaking was reconstructed from scrambled decompiler output; edge cases not tested. Drawing text and language-pack fonts not studied.
+**Next:** `Paths.xml`.
+
 ## 2026-10-14 Booth random numbers now match the game: drawing papers on the desk draws too
 
 **Changed:** added `scripts/reference/desk.py` (the draws made when a paper gets its picture: tilt, photo, position ranges, seals) and `docs/desk-drawing-draws.md`; `scripts/checks/compare_with_log.py` now replays desk draws and spoken lines by default (`--no-desk`, `--no-speech` to leave one out) and applies the log's add-paper, remove-paper and validate lines; `STATUS.md` entry marked resolved; `docs/comparing-with-the-game.md`, `docs/emblems-and-bodies.md`, `docs/traveler-creation.md`, `scripts/checks/README.md` updated.
