@@ -61,8 +61,9 @@ Addresses in `script.json` are RVAs (offsets from the image base). Add
 - 22,855 of them (90.5%) are exactly a function start listed in the DLL's
   `.pdata` exception table. The other 9.5% are probably small functions that
   need no `.pdata` entry; this is not verified.
-- Not yet checked: a named function's decompiled body matching what its name
-  says.
+- A named function's decompiled body matching what its name says: checked
+  since for two functions (`ghidra-workflow.md`, "Check that the names match
+  the code").
 
 ## Findings about the game
 

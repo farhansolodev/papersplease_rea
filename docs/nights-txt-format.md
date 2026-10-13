@@ -4,8 +4,8 @@ Studied on 2026-10-13. `Nights.txt` holds the events of the end-of-day
 screen: the messages, the extra budget lines with their tick boxes, and what
 happens when a line is paid or not. This doc covers the file, the calendar of
 scheduled events, and how one event's lines are run. **The family's health,
-the standard budget lines and balancing the budget are not covered** (see
-"Not studied").
+the standard budget lines and balancing the budget are not covered here**;
+they are in `night.md`.
 
 Functions read in full: the `data.NightLib` constructor, `findEvent`,
 `hasEvent`; the `data.NightEvent` constructor; `play.night.Calendar`
@@ -116,8 +116,8 @@ and the saved facts `End/FamilyEscapeIntro` and `End/FamilyEscapeFinal`
 
 A list of (day, event id) pairs, saved in one story fact as
 `day:event;day:event` (the fact is `Night/Calendar`: the name is among the
-code's strings; that the calendar uses it is in the `Family` constructor,
-not read yet). A piece that does not have exactly two parts is skipped.
+code's strings; the `Family` constructor reads the calendar from the saved
+facts, `night.md`). A piece that does not have exactly two parts is skipped.
 `+ days EVENT` appends (ended day + days, event). `getEvents(day)` returns
 that day's events in the order they were added.
 
@@ -125,8 +125,9 @@ that day's events in the order they were added.
 
 `applyRentAndHeatAffectingEvents(ids)` goes through the given events and
 runs only their **top-level** set-fact lines for `Night/Rent` and
-`Night/Heat`. With the data that is `APARTMENT_RENT` (rent becomes 25). When
-it is called is in the `Family` constructor, not read yet.
+`Night/Heat`. With the data that is `APARTMENT_RENT` (rent becomes 25). It
+is the first thing the `Family` constructor does, so a rent rise shows in
+the same night's budget (`night.md`).
 
 ## Check against the data files
 
@@ -153,8 +154,8 @@ script `scripts/reference/nights.py`:
   `FRIENDLY_GUARD_PAYOUT`, `HANGINGS_PENALTY`, `SELL_WATCH`), 11 scheduled,
   6 included, and 7 whose id is among the code's strings (`AFTER_6PM`,
   `ATTACK_DIDNOTHING`, `ATTACK_FIREDGUN`, `ATTACK_SOLVED`, `EASY_MODE`,
-  `FINAL`, `POISONING`; where the code uses them is not read yet, and
-  `POISONING` is also a news id).
+  `FINAL`, `POISONING`; where the code runs each of them is in `night.md`,
+  and `POISONING` is also a news id).
 - Commented out in the file: `SISTER_LOAN`, `STOLE_TOO_MANY_PASSPORTS`, and
   a `+ 1 SISTER_LOAN` line in `EZIC_CLEARED`.
 - Behaviour of the reference: the apartment offer, move and timer; the

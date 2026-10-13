@@ -118,10 +118,14 @@ python -I scripts\reference\rand.py 20 0 1 4146 -1 2147483647 -2147483648 123456
 
 Limits of this check:
 
-- It was not compared against the running game. The emulator executes the
-  same instructions the game does, but both the emulator and the decompiler
-  are parts of Ghidra, so a mistake in Ghidra's model of an instruction would
-  not be caught. These are common instructions, so that is unlikely.
+- This check itself does not involve the running game. The emulator
+  executes the same instructions the game does, but both the emulator and
+  the decompiler are parts of Ghidra, so a mistake in Ghidra's model of an
+  instruction would not be caught. These are common instructions, so that is
+  unlikely. (Since then the reference built on `rand.py` has matched the
+  running game's log for days 1 to 4 of one seed,
+  `comparing-with-the-game.md`, which it could not do with a wrong
+  generator.)
 - The division in `nextFloat` was not emulated. The divisor was read
   directly from the DLL's data.
 - That `random()` forwards to `nextFloat()` comes from the method slot

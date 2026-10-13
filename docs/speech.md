@@ -124,8 +124,14 @@ Script: `scripts/checks/speech_check.py`.
 
 ## Not studied
 
-- `testExpression` and how responses run (next step).
+- (Studied since: `testExpression` and how responses run, in
+  `responses-and-events.md`.)
 - What a speech's fact path is used for after the Say operation records it
   (inferred: comparing what was said with the documents, for example
   `Speech/Purpose`).
-- Nothing here has been compared with the running game.
+- Compared with the running game since, indirectly
+  (`comparing-with-the-game.md`): replaying the spoken lines the game
+  logged, with one draw per stock line as described here, is needed for the
+  reference's error picks to match the game (36 of 36 travelers with it, 32
+  without; seed 12345, days 1 to 4). Which wording is chosen for a line was
+  not compared.

@@ -198,4 +198,8 @@ Studied since, in their own docs: the error system (`errors-txt-format.md`),
 (`papers-on-desk.md`), and the `Traveler` constructor with the face and
 name cyclers (`traveler-build.md`).
 
-Nothing here has been checked against the running game.
+Checked against the running game since: the sequence as a whole, through
+the reference, for days 1 to 4 of one seed (above and
+`comparing-with-the-game.md`). The log shows who comes, their papers and
+their errors; names, faces and document values are confirmed only through
+the number of random draws.

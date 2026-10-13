@@ -3,7 +3,7 @@
 Studied on 2026-10-12. `Errors.txt` defines everything that can be wrong
 with a traveler. This document covers the file and the code that picks an
 error. What an error then does to the documents (running its operations) is
-not studied yet.
+in `operations-and-fact-validity.md`.
 
 Functions read in full: `data.ErrorLib` (constructor, `findError`,
 `getMatchingErrors`, `getErrorsForContext`), `data.ErrorMaker` (constructor,
@@ -218,11 +218,12 @@ with the running game and match (`comparing-with-the-game.md`).
 
 ## Not studied
 
-- How the replacement value for an invalidated fact is generated
-  (`makeFactValue`). What invalidating does is in
-  `operations-and-fact-validity.md`.
-- How the `Interrogate` response is run. (How speech ids become text is in
-  `speech.md`.)
+- (Studied since, in their own docs: how the replacement value for an
+  invalidated fact is generated, `makeFactValue`, in `fact-values.md`; what
+  invalidating does in `operations-and-fact-validity.md`; how the
+  `Interrogate` response is run in `player-actions.md`; how speech ids
+  become text in `speech.md`.)
 - `Error.validate` and `ErrorLib.validateAll` (checks run by the
   developers' tooling, by their names).
-- Nothing here has been compared with the running game.
+- Against the running game, only which error gets picked has been compared
+  (above). Nothing else here has.

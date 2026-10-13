@@ -205,8 +205,10 @@ Limits: the saved story's facts and the facts scripts set during the day
 empty by default; the error-pattern filter on random purposes is left out
 because it excludes nothing with the game's data (`facts-xml-format.md`);
 responses and custom errors are recorded by name only. A weighted pick
-whose draw is exactly 1.0 returns nothing, as in the game. Nothing has been
-compared with the running game.
+whose draw is exactly 1.0 returns nothing, as in the game. Compared with the
+running game since (`comparing-with-the-game.md`): for seed 12345, days 1
+to 4, the script entry, nationality, duration, purpose and starting papers
+match the game's log for all 36 travelers. Later days were not compared.
 
 ## DEFAULT
 
@@ -218,11 +220,11 @@ is created. It is read by `BoothEnv.findDefaultRunOpNode`
 
 ## Not studied
 
-- How the player's actions trigger responses (part 2 of
-  `responses-and-events.md`). Events, default responses, conditions and
-  button commands are in part 1.
-- How a specification becomes an actual traveler with documents:
-  `BoothEnv.makeNewTraveler`.
+- (Studied since, in their own docs: events, default responses, conditions
+  and button commands in `responses-and-events.md`; how the player's
+  actions trigger responses in `player-actions.md`; how a specification
+  becomes an actual traveler with documents, `BoothEnv.makeNewTraveler`, in
+  `traveler-creation.md`.)
 - What names like `TWO_PASSPORTS/...` refer to on the left of a response
   condition. (Response conditions in general: `responses-and-events.md`.)
 - The custom error and custom fact group classes beyond how they are built.

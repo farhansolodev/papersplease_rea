@@ -196,8 +196,10 @@ man's face needed up to five tries over 40 master seeds.
 It models a fresh name cycler; a saved position (the `names` entry of the
 encrypted store) is not modelled. Two cases where a draw of exactly 1.0
 reads past the end of an array follow Haxe's documented behaviour and are
-marked in the script; they were not checked in this build. The output has
-not been compared with the running game.
+marked in the script; they were not checked in this build. The output
+(names, faces, numbers) has not been compared with the running game, whose
+log does not print it; the number of random draws has, indirectly (see
+"Not studied").
 
 ### Face metadata (`FaceLib.getMetadata`)
 
@@ -307,7 +309,7 @@ marks the criminal as used (`traveler-creation.md`, step 7).
 | Enters from the right? | `special` is set and does not contain `left` |
 | Has a bomb? | the contraband types contain `bomb` |
 | Can give paper `X`? | Only if there is at least one wanted pattern: false if any reject pattern matches `X`, true if any wanted pattern matches, otherwise false. With no wanted patterns the answer is always false |
-| Responses for an event | taken from the wrapped response lines (`OpHelper.getRunOps`, not studied) |
+| Responses for an event | taken from the wrapped response lines (`OpHelper.getRunOps`, described in `travelers-txt-format.md`) |
 
 ## Check against the data files
 
@@ -342,4 +344,9 @@ Script: `scripts/checks/traveler_build_check.py`.
   name methods, `FaceSpec.getInvalid`, `FingerprintCode.makeInvalid`.
 - What `canDetain`, `forceDeny`, `slow`, `leaveDir` and `special` do in
   play.
-- Nothing here has been compared with the running game.
+- Compared with the running game since, indirectly
+  (`comparing-with-the-game.md`): for seed 12345, days 1 to 4, the
+  reference picks the same errors as the game for all 36 travelers, which
+  it could not do if the number of random draws made while building a
+  person were off. The results themselves (name, face, id number, height,
+  weight, fingerprints) are not in the game's log and were not compared.

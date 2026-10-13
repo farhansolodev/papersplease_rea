@@ -86,8 +86,10 @@ Run on the real `Travelers.txt`:
 Run on the real `Errors.txt` with template expansion: 768 nodes become 981,
 all 82 template uses are replaced, and no `$` reference is left.
 
-The reference reader has not been compared with the game's own output,
-because the tree only exists inside the running game.
+The reference reader has not been compared directly with the game's own
+output, because the tree only exists inside the running game. Indirectly it
+has: the travelers the reference builds from this tree match the game's log
+for days 1 to 4 of one seed (`comparing-with-the-game.md`).
 
 ```powershell
 python -I scripts\reference\tabtree.py extracted\art\assets\data\Travelers.txt

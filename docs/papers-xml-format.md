@@ -196,7 +196,8 @@ to be found and are not reported as errors.
 - `MogrifierPhone` and `MogrifierTablet` (platform-specific rewrites).
 - How marks are laid out and drawn (`Page.getInnerImageAndMarkPositions`),
   including what `flow`, `side`, `link` and `pos2` do.
-- The fact system that supplies `$` values, and `Facts.xml`. Note:
+- (Studied since: the fact system that supplies `$` values, and
+  `Facts.xml`, in `facts-xml-format.md` and `fact-values.md`.) Note:
   `Facts.xml` is **not well-formed XML**; a strict parser stops at line 96,
   so the port will need a lenient reader or a clean-up step.
 - How the language packs override text (`data.loc.Extractors` also reads

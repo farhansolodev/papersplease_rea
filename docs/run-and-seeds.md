@@ -39,13 +39,14 @@ Windows build ever uses `Main.main` is not checked (inferred: no, Unity uses
 `HostUnity.CreateGame` also asks the test automation for a plan
 (`test.auto.AutoPlan.make`, from the disk and the command line). If the plan
 is valid, an automated game (`AutoGame`) is started instead of the normal
-one. Not studied further.
+one. The plan file and what the automated game does are in
+`comparing-with-the-game.md`.
 
 ## What `play.Bootstrap` derives from it
 
 | Generator | Seed | Used for |
 |---|---|---|
-| `endlessSeedGenRand` | master + 26 | endless mode (not studied) |
+| `endlessSeedGenRand` | master + 26 | endless mode (how a run's seed is taken from it is not studied; the mode's rules are in `endless-mode.md`) |
 | `storySeedGenRand` | master + 73 | story seeds (below) |
 | face cycler | master (its parts use master + 1 to + 5, `traveler-build.md`) | random faces, for the whole launch |
 | name cycler | master and master + 1, **only if no saved position exists** | names |
@@ -99,8 +100,9 @@ differ fits how the game plays; the mechanism is what is confirmed here.)
   `docs/DESIGN.md` (for tests it should be settable).
 - `autoReapplyRandomSeed` (used by the automation) recreates the two seed
   generators, both cyclers and the story seed from the master seed, which
-  is how the automation can replay deterministically. (Inferred from what
-  it does; its callers are not studied.)
+  is how the automation can replay deterministically. (The automation calls
+  it before each route, `comparing-with-the-game.md`; other callers were
+  not searched for.)
 
 ## Reference script
 
@@ -114,8 +116,9 @@ day 1: day=697711131 news=697715227 border=697719323 night=697723419 traveler=69
 ```
 
 The story seeds equal the first three outputs of `rand.py` for seed 73, as
-they should. This checks the script against the description above, not
-against the running game.
+they should. This checks the script against the description above. The
+chain itself was confirmed against the running game later, for master seed
+12345 (`comparing-with-the-game.md`).
 
 ## Command-line words
 
@@ -125,7 +128,7 @@ exact words, without dashes:
 | Word | Effect (where known) |
 |---|---|
 | `trace` | turns on the game's debug log (`Trace.enabled`) |
-| `soak <name>` | names an automated soak test (automation; not studied) |
+| `soak <name>` | names an automated soak test; `soak auto` starts the test automation with a default plan (`comparing-with-the-game.md`) |
 | `savedir <path>` | where saves go (quotes are removed) |
 | `expo` | shows a pause button (exhibition mode) |
 | `nosync`, `fps`, `stretch`, `720p`, `1080p` | display options (not studied) |
@@ -140,16 +143,24 @@ only when **both** are on. A full search of writes (2026-10-13,
 `comparing-with-the-game.md`) found that `showVerbose` is turned on only by
 the test automation: its two debug jumps and an automated game whose plan
 has `trace`. Messages go to the platform's log function, which is Unity's
-`Debug.Log`; where that file lands on this machine is **not checked**.
+`Debug.Log`. On this machine that file is
+`%USERPROFILE%\AppData\LocalLow\3909\PapersPlease\Player.log` (seen in the
+runs recorded in `comparing-with-the-game.md`).
 
 So `trace` alone gives only the less detailed messages. The detailed ones
 need the automation and its `auto.plan` file, which can also set the master
-seed. Running the original game has not been done and needs your go-ahead.
+seed. The game has since been run that way (`comparing-with-the-game.md`);
+each launch needs your go-ahead.
 
 ## Not studied
 
 - The rest of `Game.applyScreenChange` (new game versus load, endless mode).
 - `StoryState.load` and the save format.
-- The test automation (`AutoPlan`, `AutoGame`, `test.auto.*`).
-- Where `Trace`'s output ends up, and whether anything sets `showVerbose`.
-- Nothing here has been compared with the running game.
+- (Studied since, in `comparing-with-the-game.md`: the test automation's
+  plan and what an automated game does, where `Trace`'s output ends up, and
+  what sets `showVerbose`. The rest of `test.auto.*` is not studied.)
+- Compared with the running game: the seed chain, including which story
+  seed a new game uses, for master seed 12345
+  (`comparing-with-the-game.md`). Not compared: the tick-count master seed
+  of a normal launch, the saved name position, the command-line words other
+  than `savedir`.

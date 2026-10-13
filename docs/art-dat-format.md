@@ -83,8 +83,9 @@ Folders: `assets/` (155 files), `assets/papers/` (225), `assets/faces/` (60),
 `assets/data/` holds the game definitions: `Days.csv`, `Papers.xml`,
 `Facts.xml`, `Travelers.txt`, `TravelerGraph.txt`, `Paths.xml`, `Faces.xml`,
 `Bodies.xml`, `Ends.xml`, `Nights.txt`, `News.txt`, `Speeches.txt`,
-`Errors.txt`, `Sounds.xml`, `Text.xml`, `Fonts.xml` and others. Their formats
-have not been studied yet.
+`Errors.txt`, `Sounds.xml`, `Text.xml`, `Fonts.xml` and others. All 31 files
+there have been studied since; `data-files.md` lists each one with its
+write-up.
 
 There is no audio in `Art.dat`. `Sounds.xml` exists, so the audio is
 elsewhere, most likely `sharedassets0.resource` (12 MB). Not verified.
@@ -104,4 +105,5 @@ the offsets above; there is no script for that step yet.
 - Each `StreamingAssets/loc/<lang>.zip` holds localized replacements (130
   PNGs, a CSV, an XML and two text files for English). They are plain zips;
   how `Res.loadLanguage` merges them is not studied.
-- `Res.toAsset` (how bytes become images, fonts and so on) is not studied.
+- `Res.toAsset` was read in full for the text files (`tab-tree-format.md`),
+  but how it turns bytes into images and fonts is not written up anywhere.

@@ -59,5 +59,7 @@ use the same list of available codes for their `have-lang-` lines
 
 - The chooser screen itself and language loading (see above).
 - Whether the port offers other languages at all is a design decision not
-  yet made; the language packs have not been opened.
+  yet made. Of the language packs only the list of files inside has been
+  looked at (`art-dat-format.md`, "Not done"); their contents have not been
+  studied.
 - Nothing here was compared with the running game.

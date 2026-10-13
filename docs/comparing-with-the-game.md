@@ -36,10 +36,12 @@ switched on**; it needs the test automation.
 
 Where the lines go: `Trace` hands each line to the platform's log function,
 which on this build is Unity's `Debug.Log`. Unity writes that to its
-`Player.log` (normally under the user's `AppData\LocalLow`; **not checked on
-this machine**, and Unity's standard `-logFile <path>` option should redirect
-it; also not checked). The automation additionally uses a file named
-`auto.log` in the save folder (how, not read).
+`Player.log`. (Written before any run. The first run, below, showed where
+it lands on this machine:
+`%USERPROFILE%\AppData\LocalLow\3909\PapersPlease\Player.log`. Unity's
+standard `-logFile <path>` option should redirect it; that is still not
+checked.) The automation additionally uses a file named `auto.log` in the
+save folder (what it writes there is under "What the automated game does").
 
 ## The test automation and its plan file
 
@@ -242,7 +244,8 @@ would change the later picks. Later days' documents are not yet tested.
 - How long a route takes on screen, and what the fast-forward settings do
   when the plan has no `ffw` line.
 - Whether the game's command-line reader minds Unity's own `-logFile`
-  option, and where `Player.log` lands without it.
+  option. (Where `Player.log` lands without it is known: see the first
+  run.)
 - What the automation's actions draw from the booth's random numbers beyond
   what is now modelled: turning to a page with random marks draws again
   (`desk-drawing-draws.md`); not seen in days 1 to 4.

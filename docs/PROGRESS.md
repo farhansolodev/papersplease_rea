@@ -160,14 +160,13 @@ Small jobs that fit anywhere:
   owns all three would be tidier.
 - `scripts/checks/booth_check.py` was not re-run after `desk.py` was added
   (`booth.py` itself was not changed).
-- **Out-of-date "not studied" notes in older docs** (found 2026-10-14, not
-  fixed): roughly 28 statements that a later doc has since answered, in
-  `il2cpp-name-recovery.md`, `art-dat-format.md`, `data-files.md`,
-  `errors-txt-format.md`, `run-and-seeds.md`, `comparing-with-the-game.md`,
-  `nights-txt-format.md`, `traveler-build.md`, `traveler-creation.md`,
-  `days-csv-format.md`, `travelers-txt-format.md`, `papers-xml-format.md`
-  and `languages-list.md`. Where a doc and a later doc disagree about
-  whether something is known, the later one is right.
+- **Out-of-date "not studied" notes** were swept on 2026-10-14 (36 fixes in
+  18 docs, `MODLOG.md`). Left as they are because the records do not say
+  which parts the comparison runs exercised: the line "Nothing here has
+  been compared with the running game" in `papers-on-desk.md`,
+  `operations-and-fact-validity.md`, `value-helpers.md` and `haxe-maps.md`.
+  The sweep only looked for "not known" notes answered later; the docs were
+  not re-read in full.
 
 ## Open questions and unconfirmed items
 

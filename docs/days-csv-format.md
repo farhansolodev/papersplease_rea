@@ -147,7 +147,8 @@ Values in the file: `DistrictAltan`, `Native`.
   `touchtut` is inserted after `correlatetut`. With the `CRIMINALS` feature,
   `criminals` is appended.
 
-Where the templates live (probably `Text.xml`) is inferred.
+The three templates are texts in `Text.xml` with named placeholders
+(`text-xml-format.md`).
 
 ### NEWS, NIGHTEVENTS
 
@@ -198,9 +199,11 @@ data.
 
 ## Not studied
 
-- `app.Rand`, the random number generator. The port must reproduce it
-  exactly for days to play out the same.
-- `DayNews`, `FaceSpec`, `FaceCycler` and the text template system.
+- (Studied since, in their own docs: `app.Rand`, the random number
+  generator, in `rand.md`, which the port must reproduce exactly for days
+  to play out the same; `DayNews` in `news-txt-format.md`; `FaceSpec` and
+  `FaceCycler` in `traveler-build.md`; the text templates in
+  `text-xml-format.md`.)
 - What each feature, rule and guard flag does in play.
 - No reader has been written for the port, so none of this is tested end to
   end.

@@ -14,6 +14,14 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-14 Doc sweep: out-of-date "not studied" notes corrected
+
+**Changed:** 36 small text fixes in 18 docs: `il2cpp-name-recovery.md`, `art-dat-format.md`, `data-files.md`, `errors-txt-format.md`, `run-and-seeds.md`, `comparing-with-the-game.md`, `nights-txt-format.md`, `traveler-build.md`, `traveler-creation.md`, `days-csv-format.md`, `travelers-txt-format.md`, `papers-xml-format.md`, `languages-list.md`, `borderanim-xml-format.md`, `rand.md`, `speech.md`, `fact-values.md`, `tab-tree-format.md`. Each replaces a "not studied / not checked / not compared" note with what is now known and the doc that holds it. The small-jobs bullet in `docs/PROGRESS.md` now says what was left alone. No findings were added; no code or script changed.
+**Why:** the user asked for it after the XXTEA line (entry below) showed older docs were not being revisited.
+**Tested how:** before each fix, read the passage and the later doc that answers it (for example `night.md` for the `Family` constructor, `comparing-with-the-game.md` for what the runs confirm). Afterwards searched `docs/` for the phrases that had been targeted and listed the changed files with `git diff --stat`.
+**Result:** the targeted phrases are gone except one that is still true (`run-and-seeds.md`: the display options are not studied). 20 files changed including this one, all documentation.
+**Still broken / not tested:** "compared with the running game" was only changed where `comparing-with-the-game.md` names the topic (seed chain, script reading, the person, document values, error picks, spoken lines), and the new wording says the evidence is indirect: one seed, days 1 to 4, through draw counts. The same line was left in `papers-on-desk.md`, `operations-and-fact-validity.md`, `value-helpers.md` and `haxe-maps.md` because the records do not say which parts the runs exercised. The docs were not re-read in full, so a confident statement that is wrong would not have been found.
+
 ## 2026-10-14 Out-of-date XXTEA line corrected in il2cpp-name-recovery.md
 
 **Changed:** one bullet in `docs/il2cpp-name-recovery.md` ("Findings about the game"): it said where XXTEA is used was unknown. It now names the two known uses and says a search for other callers has not been run. One bullet added to "Small jobs" in `docs/PROGRESS.md` listing the other docs where out-of-date statements were found.

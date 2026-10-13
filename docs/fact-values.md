@@ -168,7 +168,12 @@ When this function is called for a newly added paper, and with which
 `valid`, is in `papers-on-desk.md`: only for facts with no written value,
 and in hash order within the paper.
 
-Nothing here has been compared with the running game.
+Compared with the running game since, indirectly
+(`comparing-with-the-game.md`): for seed 12345, days 1 to 4, the reference
+picks the same errors as the game for all 36 travelers, which it could not
+do if the number of random draws made for the document values on those days
+were off. The values themselves are not in the game's log and were not
+compared, and documents that first appear after day 4 were not exercised.
 
 Reference implementation: `Booth.make_fact_value` in
 `scripts/reference/booth.py`, checked by `scripts/checks/booth_check.py`
