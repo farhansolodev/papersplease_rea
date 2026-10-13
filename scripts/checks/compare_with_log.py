@@ -12,6 +12,7 @@ import sys
 
 sys.path.insert(0, sys.argv[1])
 import booth as B
+import speech as S
 from cyclers import FaceCycler, NameCycler
 from rand import Rand
 
@@ -32,7 +33,7 @@ while i < len(lines):
             "entry": head[0], "nation": head[1], "duration": head[2].replace("months", ""), "purpose": head[3],
             "papers": [p for p in papers.split(", ") if p],
             "error": lines[i + 3].split("ERRORS:", 1)[1].strip(),
-            "always": [], "additional": None,
+            "always": [], "additional": None, "said": [],
         }
         j = i + 4
         while j < len(lines) and not lines[j].startswith("[ErrorLib] Always Errors"):
@@ -44,6 +45,9 @@ while i < len(lines):
                 traveler["always"].append(name)
             j += 1
         days[-1].append(traveler)
+    elif line.startswith("[BoothEnv] SAY ") and days and days[-1]:
+        # a line actually spoken (the dumps of an error's lines are indented)
+        days[-1][-1]["said"].append(line[len("[BoothEnv] SAY "):])
     elif line.startswith("[BoothEnv] Additional error: ") and days and days[-1]:
         days[-1][-1]["additional"] = line.split("Additional error: ", 1)[1].strip()
     i += 1
@@ -57,6 +61,8 @@ generator.next_int()
 story_seed = generator.next_int()
 print("master seed %d -> story seed in play %d (the second one drawn)" % (master, story_seed))
 env = B.Env(sys.argv[2])
+speeches = S.SpeechLib(open(sys.argv[2] + "/data/Speeches.txt", encoding="utf-8", newline="").read())
+REPLAY_SPEECH = "--speech" in sys.argv        # experimental, see STATUS.md
 face_cycler = FaceCycler(master)
 name_cycler = NameCycler(env.names_m, env.names_f, master)
 
@@ -80,6 +86,11 @@ for day_number, logged in enumerate(days, start=1):
         for f in FIELDS:
             total[f][0] += mine[f] == seen[f]
             total[f][1] += 1
+        if REPLAY_SPEECH:
+            # Replay what the game said to this traveler: each stock line
+            # draws from the booth's generator.
+            for said in seen["said"]:
+                S.get_speech(speeches, booth.rand, booth.value_text, said)
         if wrong and first_miss is None:
             first_miss = (day_number, index + 1)
         print("  %2d %-22s %-10s %-9s %-4s %-28s %s" % (

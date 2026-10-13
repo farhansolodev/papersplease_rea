@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Booth random numbers out of step with the game: two attempts failed, STATUS.md written
+
+**Changed:** added `scripts/reference/speech.py` (stock-line lookup with its draws); `compare_with_log.py` gained `--speech` (replay the lines the game spoke); wrote the open problem into `STATUS.md`; corrected `docs/comparing-with-the-game.md`.
+**Why:** to explain why the error picked on day 4 differs from the game's.
+**Tested how:** compared the reference's error candidates with the game's for day 4; re-read `getSpeech` and its random pick; replayed the game's spoken lines; searched simple offsets and single dropped draws; counted how many candidates each logged pick had.
+**Result:** the candidate lists match the game's exactly, so the reference is at a different position in the booth's generator. Spoken stock lines do draw from that generator (confirmed in the code), but replaying them does not fix the picks, and no simple offset does. **Correction:** the earlier statement that days 2 and 3 confirm the booth's draw counts was wrong; those picks had one or two real options each, so matching them is weak evidence. Who comes, with which papers and always-errors, still matches for all 36 travelers.
+**Still broken / not tested:** the booth generator's position relative to the game is unexplained. The log prints no value that depends on it directly. `--speech` is experimental and off by default.
+**Next:** see "Ideas not tried yet" in `STATUS.md`; the most promising is getting faces or document pictures out of the test player's audits.
+
 ## 2026-10-13 Second comparison run: days 1 to 3 match fully, day 4 shows the first difference
 
 **Changed:** recorded the run in `docs/comparing-with-the-game.md`.

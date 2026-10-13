@@ -195,11 +195,12 @@ day; it was closed by hand during day 4, with 35 travelers logged (copy in
 Comparison (`compare_with_log.py`):
 
 - **Entry, nationality, duration, purpose and papers: 35 of 35.**
-- **Days 1 to 3 (29 travelers): everything matches, including every random
-  error** chosen on days 2 and 3. Those error choices come from the booth's
-  generator, after the draws that build each person and their document
-  values, so this confirms the number of booth draws per traveler on those
-  days.
+- Days 1 to 3 (29 travelers): every logged field matches, including the
+  errors chosen on days 2 and 3. **This is weaker evidence than it looks**
+  (corrected the same day): those picks were among 3 candidates and the
+  "recently used groups" rule left one or two real options, so matching
+  them is worth about a coin-flip or two. It does not confirm the booth's
+  draw counts.
 - **Day 4: the first error difference, at the second traveler** (game
   `EntryPermit-WrongPurpose<speech>`, reference
   `Passport-WrongFaceError...`), and again at the sixth. The other four
@@ -211,10 +212,13 @@ response with the stock lines `$ask-purpose` and `$state-purpose` (day 4
 introduces the entry permit, so the inspector asks the purpose). The
 reference does not model speech or the player's actions at all
 (`traveler-creation.md`), so any random draw those make from the booth's
-generator is missing from it. **That is the likely cause, not yet
-confirmed**; the stock lines used on days 1 to 3 (`$ask-approved`,
-`$ask-nativesonly`) evidently did not shift the generator, which needs
-explaining too.
+generator is missing from it. The code confirms that every stock line looked up draws
+once from the booth's generator, on every day. But replaying the game's
+spoken lines in the reference (`scripts/reference/speech.py`,
+`compare_with_log.py --speech`) does **not** make the errors match: it makes
+days 2 and 3 worse and leaves day 4 different. Two attempts failed to
+explain the difference; the open problem, the evidence and the ideas not
+tried are in `STATUS.md`.
 
 ## Still not known
 
