@@ -35,6 +35,7 @@ Run from the project root with `python -I`. Paths below assume
 | `news_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `news-txt-format.md` (the reference script `news.py`) |
 | `nights_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `nights-txt-format.md` (the reference script `nights.py`) |
 | `night_check.py` | `scripts\reference D` | `night.md` (the `Family` class in `nights.py`) |
+| `ends_check.py` | `scripts\reference <assets> dumps\il2cppdumper\stringliteral.json` (`<assets>` = `extracted\art\assets`) | `ends-xml-format.md` |
 | `speech_check.py` | `scripts\reference D\Speeches.txt D\Travelers.txt D\Errors.txt D\Facts.xml` | `speech.md` (also reads `dumps\il2cppdumper\stringliteral.json` if present) |
 | `traveler_build_check.py` | `scripts\reference D\Travelers.txt D\Errors.txt D\NamesM.txt D\NamesF.txt D\Bodies.xml D\Faces.xml` | `traveler-build.md` |
 

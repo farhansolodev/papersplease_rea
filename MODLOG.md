@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Ends.xml and Intro.xml (remaining data files, third)
+
+**Changed:** added `docs/ends-xml-format.md`, `scripts/checks/ends_check.py` and `scripts/ghidra/read_doubles.py` (reads a numeric constant from the DLL; replaces a scratch copy that was lost); updated `docs/data-files.md` and the checks README.
+**Why:** next of the remaining data files; the night's endings point into it.
+**Tested how:** read both files with their comments; decompiled and read `EndLib`, the page-showing closures of `play.screen.Intro`, and the parts of the `EndScreen` constructor that read the ending's attributes; read the sound delay (2.0) from the DLL; ran `ends_check.py`.
+**Result:** `problems: none`. 20 endings, 149 pages; every attribute in the files is read by the code; all pictures exist; the facts and the condition the escape ending uses are the ones the `Escape` command sets; every ending is asked for by something. Finding: `Ends.xml` is not strict XML (comments made of dashes), so the port needs a lenient reader.
+**Still broken / not tested:** not compared with the running game. Not read: the slide player's timing and input, the rest of the ending screen, how the endings seen are recorded, where the six shooting endings are asked for, where songs are defined.
+**Next:** the next data file (`Paths.xml`, `Sounds.xml`, `Text.xml`, ...).
+
 ## 2026-10-13 The night: family, budget and going to sleep
 
 **Changed:** added `docs/night.md` and `scripts/checks/night_check.py`; extended `scripts/reference/nights.py` with the whole night (`Member`, `Summary`, `Family`, and `Budget` total / profit / balance / will-pay); updated `docs/nights-txt-format.md` and the checks README.

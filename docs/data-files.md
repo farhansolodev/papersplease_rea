@@ -16,7 +16,7 @@ cross-checked, with a write-up in `docs/`.
 | `Speeches.txt` | `data.SpeechLib` | Studied: `speech.md` |
 | `News.txt` | `data.NewsArticleLib` | Studied: `news-txt-format.md` (the file and which headlines a day gets; drawing the newspaper not studied) |
 | `Nights.txt` | `data.NightLib` | Studied: `nights-txt-format.md` (the file, the calendar, running an event; the family and the budget itself not studied) |
-| `Ends.xml`, `Intro.xml` | `data.EndLib` | Not studied |
+| `Ends.xml`, `Intro.xml` | `data.EndLib` | Studied: `ends-xml-format.md` (the files and what each attribute does; the slide player's timing not studied) |
 | `Endlesses.xml` | `data.EndlessLib` | Not studied |
 | `Faces.xml` | `data.FaceLib` | Studied: `faces.md` (the loader and how a face picture is built); how the metadata of four pieces is combined in `traveler-build.md` |
 | `Bodies.xml` | `data.BodyLib` | Partly: the contraband types in `traveler-build.md`; the rest not studied |
