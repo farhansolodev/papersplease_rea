@@ -38,6 +38,7 @@ Run from the project root with `python -I`. Paths below assume
 | `ends_check.py` | `scripts\reference <assets> dumps\il2cppdumper\stringliteral.json` (`<assets>` = `extracted\art\assets`) | `ends-xml-format.md` |
 | `text_check.py` | `D dumps\il2cppdumper\stringliteral.json` | `text-xml-format.md` |
 | `sounds_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `sounds-xml-format.md` |
+| `emblems_bodies_check.py` | `scripts\reference <assets> dumps\il2cppdumper\stringliteral.json` (`<assets>` = `extracted\art\assets`; needs Pillow) | `emblems-and-bodies.md` |
 | `speech_check.py` | `scripts\reference D\Speeches.txt D\Travelers.txt D\Errors.txt D\Facts.xml` | `speech.md` (also reads `dumps\il2cppdumper\stringliteral.json` if present) |
 | `traveler_build_check.py` | `scripts\reference D\Travelers.txt D\Errors.txt D\NamesM.txt D\NamesF.txt D\Bodies.xml D\Faces.xml` | `traveler-build.md` |
 

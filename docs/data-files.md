@@ -19,8 +19,8 @@ cross-checked, with a write-up in `docs/`.
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Studied: `ends-xml-format.md` (the files and what each attribute does; the slide player's timing not studied) |
 | `Endlesses.xml` | `data.EndlessLib` | Not studied |
 | `Faces.xml` | `data.FaceLib` | Studied: `faces.md` (the loader and how a face picture is built); how the metadata of four pieces is combined in `traveler-build.md` |
-| `Bodies.xml` | `data.BodyLib` | Partly: the contraband types in `traveler-build.md`; the rest not studied |
-| `Emblems.xml` | `data.EmblemLib` | Not studied |
+| `Bodies.xml` | `data.BodyLib` | Studied: `emblems-and-bodies.md` (drawing the search photo not studied) |
+| `Emblems.xml` | `data.EmblemLib` | Studied: `emblems-and-bodies.md` (stamping emblems on documents not studied) |
 | `Fonts.xml` | `data.FontLib` | Not studied |
 | `Paths.xml` | `data.PathLib` | Not studied |
 | `Sounds.xml` | `data.SoundDefLib` | Studied: `sounds-xml-format.md` (the file, which recording plays, how songs are named; the audio files are not extracted yet) |

@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Emblems.xml and Bodies.xml (remaining data files, sixth)
+
+**Changed:** added `docs/emblems-and-bodies.md` and `scripts/checks/emblems_bodies_check.py`; updated `docs/data-files.md` and the checks README.
+**Why:** next of the remaining data files; both feed the documents and the body search.
+**Tested how:** read both files; decompiled and read `EmblemLib` (constructor, `getEmblemImage`, its helpers) and `BodyLib` (all six functions); ran `emblems_bodies_check.py`, which measures the pictures and models the emblem pick and the contraband cut-out.
+**Result:** `problems: none`. Findings: an emblem sheet's first `valid` cells are the genuine ones and the rest wrong ones, picked with one draw; `canrotate` in `Emblems.xml` is not read; a `contrabandTypes` value starting with `$` names a picture file (`$Gun0` is `Contra-Gun0.png`), which settles an open question; body `M1` has no offsets and uses `0 0`; all sheets divide evenly and no contraband cut-out leaves its picture.
+**Still broken / not tested:** not compared with the running game. Not studied: composing the search photo, stamping emblems on documents, which generator those picks use, `getValidImage` in detail.
+**Next:** the next data file (`Paths.xml`, `Fonts.xml`, `BorderAnim.xml`, the endless-mode files).
+
 ## 2026-10-13 Sounds.xml (remaining data files, fifth)
 
 **Changed:** added `docs/sounds-xml-format.md` and `scripts/checks/sounds_check.py`; updated `docs/data-files.md` and the checks README.

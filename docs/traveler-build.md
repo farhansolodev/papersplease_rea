@@ -315,8 +315,8 @@ Script: `scripts/checks/traveler_build_check.py`.
 
 - All 18 variables the constructor reads were listed with their values.
   `canDetain` and `genderForced` are never set in `Travelers.txt`.
-  `contrabandTypes` has one value written `$Gun0`; what a `$` does there is
-  not studied.
+  `contrabandTypes` has one value written `$Gun0`: a `$` makes it name a
+  contraband picture file instead of a type (`emblems-and-bodies.md`).
 - All 31 `name` values have exactly two parts.
 - `Errors.txt` has `Traveler-ConfusingGender<generic>`,
   `Traveler-Criminal<generic>` and `Bulletin-Criminal0` to `2`, matching
