@@ -29,7 +29,7 @@ cross-checked, with a write-up in `docs/`.
 | `UpperCase.txt` | `data.Uppercaser` | Studied: `value-helpers.md` |
 | `NamesF.txt`, `NamesM.txt` | `data.NameLib`, `data.NameCycler` | Studied: `traveler-build.md` |
 | `Credits.txt` | `play.screen.CreditList` | Studied: `credits-txt-format.md` (the file and the layout of the list; who shows and scrolls it not studied) |
-| `Languages.txt`, `Languages.png` | `play.screen.LangChooser` | Not studied |
+| `Languages.txt`, `Languages.png` | `play.screen.LangChooser` | Studied: `languages-list.md` (the two files; the chooser screen and loading a language pack not studied) |
 | `TestScenarios.xml` | `data.TestScenarioLib` | Test tooling; not studied |
 | `Auto.txt` | `test.auto.AutoRouteSet` | Test tooling; not studied |
 | `Threads.txt` | nothing asks for it by name | Not read by the game as far as the name search shows |

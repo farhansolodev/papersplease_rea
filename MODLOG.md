@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 Languages.txt and Languages.png studied
+
+**Changed:** added `docs/languages-list.md` and `scripts/checks/languages_check.py`; `docs/data-files.md` and the checks README updated.
+**Why:** next unstudied data files.
+**Tested how:** read the parts of `play.screen.LangChooser` that use the files; ran `languages_check.py` (it also lists the names of the language packs in the project's copy of the game; nothing was opened or changed there).
+**Result:** 16 codes, one per line, split at line feeds and not trimmed; the picture is 16 rows of 110x20, one name per code in the same order; the 16 language packs match the codes exactly. Check prints `problems: none`.
+**Still broken / not tested:** the chooser screen, where user-added languages come from, and loading a language pack are not studied. Nothing compared with the running game.
+**Next:** the test tooling files (`TestScenarios.xml`, `Auto.txt`), then the three files nothing asks for by name.
+
 ## 2026-10-14 Credits.txt studied
 
 **Changed:** added `docs/credits-txt-format.md` and `scripts/checks/credits_check.py`; `docs/data-files.md` and the checks README updated.
