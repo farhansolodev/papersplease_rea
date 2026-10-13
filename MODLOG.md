@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 Credits.txt studied
+
+**Changed:** added `docs/credits-txt-format.md` and `scripts/checks/credits_check.py`; `docs/data-files.md` and the checks README updated.
+**Why:** next unstudied data file.
+**Tested how:** read `play.screen.CreditList` in full; ran `credits_check.py`.
+**Result:** an indented tree; the first word of a line picks its kind (`+` role, `/` team, `-` small, `$` finale, `[SPACE]`, `[OFFSCREEN]`, `[IMAGE] file`, `? have-lang-xx` condition, otherwise a name); 113 lines with all languages, 109 with English only; all three pictures exist. Check prints `problems: none`.
+**Still broken / not tested:** who shows and scrolls the list; the exact code test for dropping a marker word was scrambled (the result is clear). Nothing compared with the running game.
+**Next:** `Languages.txt` and `Languages.png`.
+
 ## 2026-10-14 BorderAnim.xml studied
 
 **Changed:** added `docs/borderanim-xml-format.md` and `scripts/checks/borderanim_check.py`; `docs/data-files.md` and the checks README updated.
