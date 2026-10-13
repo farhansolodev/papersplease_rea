@@ -92,10 +92,13 @@ generator with its error maker (`traveler-creation.md`). `FaceCycler` and
 overlapping; the name cycler's position is saved with the game
 (`traveler-build.md`). `play.Bootstrap` makes the story-seed and
 endless-seed generators and gives the face and name cyclers the master
-seed; the whole chain is in `run-and-seeds.md`. **What seed each of the
-remaining sites uses** (`CriminalPoster`, `TakeBursts`, `BorderCam`,
-`ScreenShake`, `PullChain`, `LoadScreen`, `SoundDefLib`) **is not
-studied.**
+seed; the whole chain is in `run-and-seeds.md`. `BorderCam` is created
+twice per day, with the day seed + 1 (left camera) and + 2 (right), by
+`Booth.attachBorderCamsToBorder`. The rest of the border scene makes no
+generator of its own: it uses the day's border generator
+(`border-figures.md`). **What seed each of the remaining sites uses**
+(`CriminalPoster`, `TakeBursts`, `ScreenShake`, `PullChain`, `LoadScreen`,
+`SoundDefLib`) **is not studied.**
 
 ## How it was verified
 

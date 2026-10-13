@@ -11,11 +11,12 @@ Reference script: `scripts/reference/paths.py`. Check:
 Functions read in full: `data.PathLib` (constructor, `createPath`,
 `hasPath`), the `data.Path` constructor and its `_getOnPath`, `getOnPath`,
 `fillFromOnPath`, `getDistForStop`, `get_firstPoint`, `get_hasPoints`; the
-`data.Anim` constructor; `app.XmlUtil.getNextSibling`. **Not studied:** the
-code that uses them (`play.day.border.Border`, `Person`, `WaitingLine`): how
-a figure follows a path over time, what each event does, how `hold`, `delay`,
-`warp`, `snap` and `face` are applied. Their meanings below are from the
-names and the data, marked as inferred.
+`data.Anim` constructor; `app.XmlUtil.getNextSibling`.
+
+How a figure follows a path over time, and what `hold`, `delay`, `warp`,
+`snap`, `face` and the three event attributes do, is in
+**`border-figures.md`** (read from `Person` and `WaitingLine`). **Not
+studied:** what each event text makes `Border` do.
 
 ## The file
 
@@ -48,14 +49,18 @@ the data refers to those names; unnamed paths are only reached through
 |---|---|---|
 | `id` | automatic | name |
 | `next` | none | the path to continue with. The word **`NEXT`** means the next `<path>` element in the file; if there is none, the word stays as it is |
-| `speed` | 10 | movement speed |
+| `speed` | 10 | movement speed, units per second |
 | `anim` | `walk` | animation id; an unknown one is an error |
-| `start`, `end`, `die` | none | event names sent at those moments (inferred: start of the path, its end, the figure's death) |
-| `snap` | false | `true` requires at least one point (an error otherwise). Inferred: jump to the first point instead of walking there |
-| `delay`, `hold` | 0 | waiting times (inferred: before starting, and after arriving) |
-| `sound` | none | a sound id |
-| `warp` | false | (meaning not studied) |
-| `face` | none | `left` or `right` in the data (inferred: which way the figure looks) |
+| `start`, `end`, `die` | none | event texts: sent when the path is set, when it ends, and when the figure is killed while on it |
+| `snap` | false | `true` requires at least one point (an error otherwise). The figure is put on the first point and not moved |
+| `delay` | 0 | seconds before the figure starts moving |
+| `hold` | 0 | seconds after which the path ends, wherever the figure is (not "after arriving", as first guessed) |
+| `sound` | none | a sound id, played when the path is set |
+| `warp` | false | jump to the start of the path instead of walking to it |
+| `face` | none | `left` or `right` in the data: a fixed facing for the whole path |
+
+The exact behaviour of each is in `border-figures.md`, "What the path
+attributes turn out to mean".
 
 Children `<p>`: the points, in order.
 
@@ -66,9 +71,8 @@ Children `<p>`: the points, in order.
 
 The random generator is handed in by whoever creates the path. A path is
 built afresh each time it is asked for, so a randomized path differs each
-time. Which generator the border scene uses was not followed up here; it is
-**not** the booth's own generator unless the border passes that one in
-(`desk-drawing-draws.md` lists who uses the booth's).
+time. The border scene passes in the day's border generator
+(`border-figures.md`).
 
 ## What a path object offers
 
@@ -76,8 +80,10 @@ time. Which generator the border scene uses was not followed up here; it is
 - **Point at a distance** (`getOnPath(dist)`): walk along the segments; past
   the end it is the last point.
 - **Number of stops** is always set to 1 here, and `getDistForStop(stop)` is
-  `min(1, stop / stops) * length`. (Something else may change the number of
-  stops later, for the waiting line; not followed up.)
+  `min(1, stop / stops) * length`. (`Person.setPath` then sets the real
+  number; only the waiting line asks for more than 1.)
+- A distance below 0 gives a point **before** the first point, on the line
+  of the first segment (the figure code uses this to find a direction).
 - First point, and whether it has points at all. **A path may have no
   points**: 151 of the 309 do. Those only play an animation, wait, or send
   an event.
@@ -108,5 +114,7 @@ time. Which generator the border scene uses was not followed up here; it is
 
 ## Not known / not tested
 
-- Everything about following a path over time (see the top).
+- What each of the 36 event texts makes `Border` do, and how path names are
+  built from parts (the waiting line's are in `border-figures.md`; the rest
+  are in `Border`).
 - Nothing here was compared with the running game.

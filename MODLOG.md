@@ -14,6 +14,14 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-14 The border scene, part 1: figures and the waiting line
+
+**Changed:** new `docs/border-figures.md`; new check `scripts/checks/border_figures_check.py` (listed in `scripts/checks/README.md`); `docs/paths-xml-format.md` (the attribute meanings that were guesses are replaced by what the code does, with a pointer to the new doc); `docs/rand.md` (the cameras' seeds); one line of `docs/data-files.md`; `docs/PROGRESS.md` (the comparison run marked as postponed by the user, the border scene split into four parts, open questions). Decompiled output (gitignored): `decompiled/border*.c`, `border_callers*.c`, `border_misc*.c`, `border_waitingline_asm.txt`, `border_misc_log.txt`.
+**Why:** the user postponed the longer comparison run, so the next step is the border scene. Part 1 answers how a figure follows a path over time and which random generator the scene uses.
+**Tested how:** decompiled all 314 `play.day.border` functions and listed every generator use in them; read `Person`, `WaitingLine` and `CustomTile` in full, plus the callers needed (`Border.update`, `addPerson`, the `DayScreen` constructor); read the machine instructions of five `WaitingLine` functions and `CustomTile.stepAnim` where the decompiler dropped values; read 20 number constants from the DLL; ran the new check and re-ran `paths_check.py`.
+**Result:** the scene uses the day's `borderRand` (day seed + 0x2000), one shared generator for `Border`, the line and every figure; the two cameras have their own (day seed + 1 and + 2). `hold` is a timer from the moment the path is set, not a wait after arriving (the earlier guess was wrong); `warp`, `snap`, `delay`, `face` and the `die` event are now read from the code. The queue is a ring of the same figures; building a line of 100 costs 1,500 draws. `border_figures_check.py` prints `problems: none`; `paths_check.py` still prints `problems: none`.
+**Still broken / not tested:** nothing was compared with the running game. No reference script models the frame-by-frame movement. `Border` itself (events, guards, attacks), sniping and the cameras are not read. Open items are listed at the end of `border-figures.md`.
+
 ## 2026-10-14 "Next:" line removed from the MODLOG template
 
 **Changed:** the entry template at the top of `MODLOG.md` no longer has a `**Next:**` line. Older entries keep theirs.

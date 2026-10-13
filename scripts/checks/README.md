@@ -45,6 +45,7 @@ Run from the project root with `python -I`. Paths below assume
 eference <assets> <Player.log> <master seed> [--no-desk] [--no-speech]` (needs Pillow; the log comes from a test-player run of the real game) | `comparing-with-the-game.md`, `desk-drawing-draws.md` (the reference against the running game) |
 | `fonts_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `fonts.md` (the reference script `fonts.py`) |
 | `paths_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `paths-xml-format.md` (the reference script `paths.py`) |
+| `border_figures_check.py` | `scripts\reference D` | `border-figures.md` (uses the reference scripts `paths.py` and `travspec.py`) |
 | `borderanim_check.py` | `<assets>` (`<assets>` = `extracted\art\assets`; needs Pillow) | `borderanim-xml-format.md` |
 | `credits_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `credits-txt-format.md` |
 | `languages_check.py` | `<assets> game\PapersPlease_Data\StreamingAssets\loc` (`<assets>` = `extracted\art\assets`; needs Pillow) | `languages-list.md` |

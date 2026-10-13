@@ -1,7 +1,8 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-14, in the
-fifth session (after the newspaper picture). `MODLOG.md` has the step-by-step history; this file is
+sixth session (after part 1 of the border scene: the figures and the waiting
+line). `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
 here.
@@ -19,7 +20,8 @@ deliberately wrong values; how errors are chosen and applied; speech; the
 booth's events, the player's actions and how mistakes are judged; faces;
 the day's headlines and the newspaper picture; the night (family, budget, endings by debt or death);
 endings, text, sounds, seals, bodies, endless mode, fonts, the border
-scene's paths and pictures, credits, languages. A Python reference builds
+scene's paths and pictures, how its figures follow a path and how the
+waiting line works, credits, languages. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
 game**: the game's own test player was run with a fixed seed, and for the 36
 travelers of days 1 to 4 the reference gives the same entry, nationality,
@@ -35,7 +37,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 75%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules. Not done: the border scene, saves, the screens (title, night, ending, endless, language chooser), drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 75%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, part 1 of 4 of the border scene (figures and the waiting line). Not done: the rest of the border scene, saves, the screens (title, night, ending, endless, language chooser), drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match (see "Verification") |
 
@@ -83,6 +85,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `fonts.md` | `Fonts.xml` and the `.fnt` files: measurements, text width, line breaking |
 | `paths-xml-format.md` | `Paths.xml`: paths and animations of the figures in the top view |
 | `borderanim-xml-format.md` | `BorderAnim.xml`: the picture atlas and how an animation finds its frames |
+| `border-figures.md` | **The border scene, part 1**: which random generator it uses, how a figure follows a path frame by frame (what `hold`, `delay`, `snap`, `warp`, `face` and the event attributes do), the waiting line (building, moving up, the ring of reused figures, dispersing, panic) and its random draws |
 | `credits-txt-format.md` | `Credits.txt` and the layout of the credits list |
 | `languages-list.md` | `Languages.txt`, `Languages.png` |
 | `test-tooling-files.md` | `TestScenarios.xml`, `Auto.txt` (a recipe for reaching every ending) |
@@ -104,21 +107,32 @@ with the game (end of `comparing-with-the-game.md`).
 (Done in the fourth session: the booth layer of the reference; every
 remaining data file; the night's rules; the method for comparing with the
 running game and the first two runs; finding and fixing why the reference's
-error picks left the game's. Done in the fifth: the newspaper picture.)
+error picks left the game's. Done in the fifth: the newspaper picture. Done
+in the sixth: part 1 of the border scene.)
 
-1. **A longer comparison run of the game** (needs the user's go-ahead for
-   each launch): later days and a second seed, to test what days 1 to 4
-   never exercised. The list is at the end of `desk-drawing-draws.md`: pages
+1. **A longer comparison run of the game**: **postponed by the user on
+   2026-10-14** ("skip for now"). Do not start it without being asked; it
+   also needs the go-ahead for each launch. What it would test: later days
+   and a second seed, for what days 1 to 4 never exercised. The list is at
+   the end of `desk-drawing-draws.md`: pages
    drawn again when turned, the fingerprint / thumbprint / contraband
    pictures, the identity record, a hidden paper shown later, invalid seals,
    criminal photos on the bulletin. It would also test documents that only
    appear later (work pass, id card, access permit, vaccine certificate...).
    A full route takes about 40 seconds per day.
-2. **The border scene** (`play.day.border.*`: `Border`, `Person`,
-   `WaitingLine`, `BorderCam`): the largest piece of game logic still
-   unread. How a figure follows a path over time, what the 36 path events
-   do, the attacks, the sniping. It has its own random generator; where its
-   seed comes from is not known.
+2. **The border scene** (`play.day.border.*`, 314 functions, all decompiled
+   into `decompiled/border.clean.c`), in four parts:
+   - Part 1, **done**: `Person` and `WaitingLine` (`border-figures.md`).
+   - **Part 2, next**: `Border` itself. Who is created and where, the state
+     machine, what each of the 36 path events does
+     (`Border.person_onEvent`), guards, the attacks, explosions, how path
+     names are built from parts, `Border`'s own random draws, saving and
+     restoring the scene (`makeStash`).
+   - Part 3: sniping (`RifleButton`, `AutoSnipeTarget`, `Grenade`,
+     `Border.snipe` and `checkSniped`).
+   - Part 4: the cameras and panning (`BorderCam`, `BorderCamRenderer`,
+     `BorderCamVisual`, `BorderPan`) and the endless scoreboard
+     (`EndlessScoreboard`, `FlashingScore`).
 3. **Saves** (`play.EncryptedStore`, `play.save`, `StoryState.load`), and
    the rest of `Game.applyScreenChange` (new game versus load).
 4. **The screens**: title, the night screen, the ending player (slide
@@ -151,6 +165,22 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
+**From the sixth session** (`border-figures.md`)
+
+- The border generator's draws follow real time after the scene is built
+  (standing figures draw every 2 to 4 seconds). So the original does not
+  play the border scene the same way twice. Whether anything that matters to
+  play draws from it later is a part 2 question; how closely the port copies
+  it is a design decision.
+- Whether the game's frame time (`dt`) varies; `app.Clock` was not read.
+- `Person.endPath` uses the `next` of whatever path the figure has **after**
+  its end event was handled. Whether any `Border` handler runs into this.
+- Whether anything outside the border classes uses `Day.borderRand`.
+- `Endless.csv` leaves `LINE` blank in four columns; the line length that
+  gives was not followed.
+- Whether the game's log has anything about the border scene that could be
+  compared.
+
 **From the fourth session**
 
 - Drawing a page again repeats its random draws (`desk-drawing-draws.md`).
@@ -160,8 +190,6 @@ Collected from the docs, so they are not lost:
   not read.
 - The evidence that the reference matches the game is one seed, days 1 to 4
   (36 travelers), plus day 1 of a second route.
-- Which random generator the border scene uses. (The newspaper picture uses
-  the day's news generator, `newspaper-picture.md`.)
 - `Paths.xml`: the number in automatic path names (`auto-<number>`) was not
   recovered; nothing refers to those names.
 - `BorderAnim.xml`: five animation prefixes also collect another group's
@@ -211,7 +239,7 @@ Collected from the docs, so they are not lost:
 - `DURATION_SLOW` applies when the platform is `PHONE`; fine for a desktop
   port.
 - Who uses `TabParser.expandParams` besides `ErrorLib`.
-- The seeds of 7 minor generators (`rand.md`).
+- The seeds of 6 minor generators (`rand.md`; `BorderCam`'s is now known).
 - 20 traveler entries nothing refers to (`travelers-txt-format.md`).
 - Six speech responses named nowhere found (`speech.md`). `[m]`/`[f]` gender
   switches are unused in English; the language packs were not checked.
@@ -284,7 +312,7 @@ All gitignored. Nothing below is in git.
 | `game/` | 90 MB | Copy of the GOG install | Copy `C:\GOG Games\PapersPlease` |
 | `dumps/il2cppdumper/` | 31 MB | Names, layouts, string table | `il2cpp-name-recovery.md` |
 | `decompiled/ghidra/` | about 480 MB | Analysed Ghidra project with names and types | `ghidra-workflow.md` steps 1 to 3 (about 20 minutes) |
-| `decompiled/*.c`, `*.clean.c`, `*.txt` | tens of MB | Decompiled functions read in the sessions (about 80 cleaned files). The big ones: `boothall` (all 1,433 booth-class functions), `testauto` (the whole test player) | Step 4 of `ghidra-workflow.md`; `boothall` takes about 15 minutes |
+| `decompiled/*.c`, `*.clean.c`, `*.txt` | tens of MB | Decompiled functions read in the sessions (about 80 cleaned files). The big ones: `boothall` (all 1,433 booth-class functions), `testauto` (the whole test player), `border` (all 314 border-scene functions; takes about 3 minutes) | Step 4 of `ghidra-workflow.md`; `boothall` takes about 15 minutes |
 | `extracted/checks/` | small | Test face pictures, the overview of all faces, the face height survey | `faces.py` (`show`, `overview`, `survey`) |
 | `extracted/Art.dat` | 3 MB | Archive cut from `sharedassets0.assets` by hand | Offsets in `art-dat-format.md` |
 | `extracted/art/` | 9 MB | The 614 unpacked files | `art-dat-format.md` commands |
