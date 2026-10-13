@@ -145,7 +145,19 @@ in the sixth: the whole border scene, parts 1 to 4.)
 6. **Audio extraction** (probably `sharedassets0.resource`; not checked) and
    the language zips in `StreamingAssets/loc/`. Independent of the steps
    above; may need a Unity asset tool (ask before downloading).
-7. **Design and build the Rust port** (`docs/DESIGN.md` does not exist yet).
+7. **Sort the open questions** (added 2026-10-14 at the user's request),
+   before any design work. Go through every entry under "Open questions and
+   unconfirmed items" once and put it in one of five kinds:
+   answered by a step already done (then close it, in its doc too); needs
+   the game to run (collect these as the list for the comparison run or
+   for the user to watch); the user's decision (move to the list that
+   opens `docs/DESIGN.md`); will not matter for a desktop port (say why and
+   leave it); could bite during the build. Answer the last kind where it is
+   cheap, and for the rest write what the port should assume meanwhile.
+   Result: a shorter list in which every item says why it is still open.
+   Mostly sorting and doc work (Sonnet); a question that needs code reading
+   needs Opus.
+8. **Design and build the Rust port** (`docs/DESIGN.md` does not exist yet).
    `Auto.txt` can serve as a test plan: it lists what to do to reach each
    ending.
 
