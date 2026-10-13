@@ -2,8 +2,11 @@
 
 Started on 2026-10-13. Goal: make the original game print, for a **known
 seed**, the same facts the Python reference predicts (`booth.py`), so the two
-can be compared. This doc records what the code offers for that. **The game
-has not been run yet**; everything below comes from reading the code.
+can be compared. This doc records what the code offers for that, then the
+runs made so far (further down). **Current result: for seed 12345 the
+reference matches the game on every logged field for the 36 travelers of
+days 1 to 4.** The first sections were written from reading the code, before
+any run.
 
 Functions read in full: `Trace` (all ten functions);
 `test.auto.AutoPlan` (constructor, `make`, `makeDefault`, `makeSeedForDay`,

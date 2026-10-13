@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 PROGRESS.md brought up to date
+
+**Changed:** rewrote `docs/PROGRESS.md` for the end of the fourth session (state, doc list, next steps, open questions, verification method, machine-only files, working agreements); `docs/ghidra-workflow.md` gained the two newer helper scripts and two working habits; removed stale "not compared with the game" statements from `docs/comparing-with-the-game.md` and `docs/errors-txt-format.md`.
+**Why:** the user asked, before starting a new session.
+**Tested how:** checked the file against `MODLOG.md`, the list of docs and scripts on disk, and the data folder's file count (31).
+**Result:** documentation only; no code changed.
+**Still broken / not tested:** the percentage estimates are rough guesses.
+**Next:** the newspaper picture (step 1 of the list in `PROGRESS.md`).
+
 ## 2026-10-14 The three unread data files looked at (Threads.txt, TravelerGraph.txt, Version.txt)
 
 **Changed:** added `docs/unused-data-files.md` and `scripts/checks/notes_files_check.py`; `docs/data-files.md` and the checks README updated.

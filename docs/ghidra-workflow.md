@@ -106,6 +106,25 @@ To print a function's machine instructions, with numeric constants shown
 (for when the decompiler drops a calculation):
 `-readOnly -postScript DumpAssembly.java 0xFUNCTION`.
 
+To find every place that writes to a class's static values (for example
+"what turns this switch on?"):
+`-readOnly -postScript FindStaticWrites.java 0xTYPEINFO [window]`.
+
+To read number constants the decompiler shows only as `DAT_180a36c30`
+(no Ghidra needed; it reads the file directly):
+`python -I scripts\ghidra\read_doubles.py game\GameAssembly.dll 0x180a36c30 ...`.
+
+Two habits that paid off:
+
+- **Decompile a whole class family at once and search it**, when the
+  question is "who else uses this?". A name prefix selects many functions:
+  `DecompileFunctions.java out.c "play.day.booth." "play.day.BoothEnv"`.
+  About 1,400 functions take 15 minutes. Virtual calls do not show up in
+  `FindReferences`, so searching the decompiled text for the member's name
+  (for example `.rand` or `_27_random`) is the reliable way.
+- In PowerShell, a name containing `$$` sometimes selects nothing; use the
+  function's address or a prefix without `$$` instead.
+
 ## Running the game's code in the emulator
 
 Ghidra can execute a function's machine code without running the game. This

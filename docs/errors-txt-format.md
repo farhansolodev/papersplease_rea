@@ -213,7 +213,8 @@ pattern matcher must support that.
 The functions are separate (`first_error`, `additional_error`,
 `always_errors_for_context`) because in the game the person and the
 documents draw from the same generator between them; chaining them is the
-job of a later layer. Nothing has been compared with the running game.
+job of a later layer (`booth.py`). The error picks have since been compared
+with the running game and match (`comparing-with-the-game.md`).
 
 ## Not studied
 
