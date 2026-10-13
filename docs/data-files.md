@@ -24,7 +24,7 @@ cross-checked, with a write-up in `docs/`.
 | `Fonts.xml` | `data.FontLib` | Studied: `fonts.md` (the file, the `.fnt` files, measurements, line breaking; drawing text not studied) |
 | `Paths.xml` | `data.PathLib` | Studied: `paths-xml-format.md` (the file, building a path, points along it; how the border scene uses paths and events not studied) |
 | `Sounds.xml` | `data.SoundDefLib` | Studied: `sounds-xml-format.md` (the file, which recording plays, how songs are named; the audio files are not extracted yet) |
-| `BorderAnim.xml` | `play.day.border.Border` | Not studied |
+| `BorderAnim.xml` | `data.AtlasLib` (asked for by `play.day.border.Border`) | Studied: `borderanim-xml-format.md` (the atlas and how an animation finds its frames; the border scene itself not studied) |
 | `Text.xml` | `data.Lang` | Studied: `text-xml-format.md` (the loader, placeholders, the long date); aliases and typos in `value-helpers.md` |
 | `UpperCase.txt` | `data.Uppercaser` | Studied: `value-helpers.md` |
 | `NamesF.txt`, `NamesM.txt` | `data.NameLib`, `data.NameCycler` | Studied: `traveler-build.md` |

@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 BorderAnim.xml studied
+
+**Changed:** added `docs/borderanim-xml-format.md` and `scripts/checks/borderanim_check.py`; `docs/data-files.md` and the checks README updated.
+**Why:** next unstudied data file (the pictures of the figures in the top view).
+**Tested how:** read `AtlasLib.make`, `app.vis.Atlas`, `border.Person.setAnim` and part of `border.CustomTile`; ran `borderanim_check.py` against the file, its sheet and `Paths.xml`.
+**Result:** a picture atlas of 247 rectangles on a 512x732 sheet, none overlapping or outside; frames are grouped purely by "name starts with prefix, in file order"; all 37 animation suffixes of `Paths.xml` have pictures; five prefixes also collect another group's frames (for example `Guard0-Idle` and `Guard0-IdleB`). Check prints `problems: none`.
+**Still broken / not tested:** whether the five prefix clashes are visible in the game; the end of a non-looping animation; the border scene itself. Nothing compared with the running game.
+**Next:** `Credits.txt`.
+
 ## 2026-10-14 Paths.xml studied
 
 **Changed:** added `docs/paths-xml-format.md`, `scripts/reference/paths.py`, `scripts/checks/paths_check.py`; `docs/data-files.md` and the checks README updated.
