@@ -69,6 +69,20 @@ reference is at a different position in the booth's generator.
 
 Neither attempt explains the difference, so I stopped here.
 
+3. **Audit pictures from the test player (2026-10-13).** Read the audit
+   code: with `audits` / `face` in the plan the test player adds each
+   traveler's face picture to a grid, with `paper <pattern>` the inner
+   picture of matching papers, and saves the grid as
+   `<save folder>/audits/<route number>-<route name>.png` when a route
+   finishes (only if the `audits` folder already exists). Ran route 1 with
+   `face` and `paper Passport`. A file was written (1200x120, room for 8
+   faces), but **its contents are not pictures**: mostly transparent, with
+   thin vertical white lines and scattered coloured dots, and pixel values
+   that look like leftover memory. No passport pictures were added at all.
+   So in this released build the audit picture is unusable as it stands.
+   Not investigated: why (the pictures may live only on the graphics card
+   in this build), or whether `capture` (frame captures) fares better.
+
 ## Why it is hard to see
 
 The log prints who comes and which error is chosen, but **no value that
@@ -78,11 +92,6 @@ the position in the generator can only be inferred indirectly.
 
 ## Ideas not tried yet
 
-- **Get direct values out of the game.** The test player's plan accepts
-  `audits` with `face` and `paper <pattern>`, which look like they capture
-  pictures of faces and documents. A face or a passport picture for a known
-  seed would show at once whether the person and the document values match,
-  and at which traveler they stop matching. Needs reading `AutoAudit` first.
 - **Reason from the code instead of the log:** read, in order, everything
   between two `makeNewTraveler` calls that touches `BoothEnv.rand` (the
   engine's handling of each event, `getSpeech` callers, `addPaper` for

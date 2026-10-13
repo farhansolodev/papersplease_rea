@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Test player's audit pictures tried: unusable in this build
+
+**Changed:** `STATUS.md` (third attempt recorded, idea removed from the untried list).
+**Why:** to get faces and passport pictures for a known seed, as direct evidence of where the reference and the game part ways.
+**Tested how:** decompiled the whole test player (682 functions) and read where it adds face and paper pictures and where it saves them; ran route 1, seed 12345, with `audits` / `face` / `paper Passport` and an existing `audits` folder; examined the saved file's pixels.
+**Result:** a file `audits/1-in-debt.png` was written at the end of the route, sized for 8 faces, but it holds no pictures: mostly transparent, thin vertical lines and stray coloured dots. No passport pictures were added. Dead end as it stands.
+**Still broken / not tested:** the booth generator problem in `STATUS.md` is unchanged. Why the audit picture is empty was not investigated; the `capture` option was not tried.
+**Next:** the user's choice among the remaining ideas in `STATUS.md` (reason from the code; more runs; a debugger), or park the problem.
+
 ## 2026-10-13 Booth random numbers out of step with the game: two attempts failed, STATUS.md written
 
 **Changed:** added `scripts/reference/speech.py` (stock-line lookup with its draws); `compare_with_log.py` gained `--speech` (replay the lines the game spoke); wrote the open problem into `STATUS.md`; corrected `docs/comparing-with-the-game.md`.
