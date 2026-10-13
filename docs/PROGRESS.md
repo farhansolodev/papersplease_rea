@@ -160,6 +160,14 @@ Small jobs that fit anywhere:
   owns all three would be tidier.
 - `scripts/checks/booth_check.py` was not re-run after `desk.py` was added
   (`booth.py` itself was not changed).
+- **Out-of-date "not studied" notes in older docs** (found 2026-10-14, not
+  fixed): roughly 28 statements that a later doc has since answered, in
+  `il2cpp-name-recovery.md`, `art-dat-format.md`, `data-files.md`,
+  `errors-txt-format.md`, `run-and-seeds.md`, `comparing-with-the-game.md`,
+  `nights-txt-format.md`, `traveler-build.md`, `traveler-creation.md`,
+  `days-csv-format.md`, `travelers-txt-format.md`, `papers-xml-format.md`
+  and `languages-list.md`. Where a doc and a later doc disagree about
+  whether something is known, the later one is right.
 
 ## Open questions and unconfirmed items
 

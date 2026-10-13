@@ -14,6 +14,14 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-14 Out-of-date XXTEA line corrected in il2cpp-name-recovery.md
+
+**Changed:** one bullet in `docs/il2cpp-name-recovery.md` ("Findings about the game"): it said where XXTEA is used was unknown. It now names the two known uses and says a search for other callers has not been run. One bullet added to "Small jobs" in `docs/PROGRESS.md` listing the other docs where out-of-date statements were found.
+**Why:** the user asked where XXTEA is used; the line was written on 2026-10-12 before `Art.dat` was decrypted and never revisited.
+**Tested how:** read the bullet back; checked both uses against `docs/art-dat-format.md`. To look for more of the same, searched `docs/` for "not studied", "not checked", "unknown" and similar (about 200 hits) and cross-checked the ones a later doc might have answered.
+**Result:** the bullet matches `art-dat-format.md`. The search found roughly 28 more out-of-date statements in 12 other docs; none were changed in this step.
+**Still broken / not tested:** the other out-of-date statements are still there. The search only finds "not known" notes that were answered later; it cannot find a confident statement that is wrong. Not every doc was read in full. The earlier entry "PROGRESS.md brought up to date" says the stale "not compared with the game" statements were removed from `errors-txt-format.md`; one is still in its "Not studied" list.
+
 ## 2026-10-14 The border scene, part 1: figures and the waiting line
 
 **Changed:** new `docs/border-figures.md`; new check `scripts/checks/border_figures_check.py` (listed in `scripts/checks/README.md`); `docs/paths-xml-format.md` (the attribute meanings that were guesses are replaced by what the code does, with a pointer to the new doc); `docs/rand.md` (the cameras' seeds); one line of `docs/data-files.md`; `docs/PROGRESS.md` (the comparison run marked as postponed by the user, the border scene split into four parts, open questions). Decompiled output (gitignored): `decompiled/border*.c`, `border_callers*.c`, `border_misc*.c`, `border_waitingline_asm.txt`, `border_misc_log.txt`.

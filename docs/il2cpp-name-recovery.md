@@ -79,7 +79,12 @@ Addresses in `script.json` are RVAs (offsets from the image base). Add
   build, and `app.plat` has `PlatformSocial*` classes (achievements,
   leaderboards). This is the online layer. Per project rule 4 it is out of
   scope and will not be analysed or ported.
-- `app._XXTea` exists. XXTEA is an encryption algorithm; where it is used
-  (saves, assets or localisation) is unknown.
+- `app.XXTea` exists (with a helper class in `app._XXTea`). XXTEA is an
+  encryption algorithm. Corrected 2026-10-14; this line used to say its use
+  was unknown. Found since: it decrypts the content archive `Art.dat`
+  (confirmed by decrypting the real file, `art-dat-format.md`), and
+  `play.EncryptedStore.get` calls its `decryptString` (what that store holds
+  is not studied; saves are a later step). Whether anything else calls it
+  has not been searched.
 - `format.png` and `haxe.zip` are in the game code, so it likely reads PNG and
   ZIP data itself (the `StreamingAssets/loc/*.zip` files). Not verified.
