@@ -32,9 +32,9 @@ cross-checked, with a write-up in `docs/`.
 | `Languages.txt`, `Languages.png` | `play.screen.LangChooser` | Studied: `languages-list.md` (the two files; the chooser screen and loading a language pack not studied) |
 | `TestScenarios.xml` | `data.TestScenarioLib` | Test tooling. Studied: `test-tooling-files.md` (the file; what starts a scenario not studied) |
 | `Auto.txt` | `test.auto.AutoRouteSet` | Test tooling. Studied: `test-tooling-files.md` (the file's structure; how each action is carried out not studied) |
-| `Threads.txt` | nothing asks for it by name | Not read by the game as far as the name search shows |
-| `TravelerGraph.txt` | nothing asks for it by name | Same |
-| `Version.txt` | nothing asks for it by name | Same |
+| `Threads.txt` | nothing | Not read by the game: `unused-data-files.md` (a developer's outline of the story) |
+| `TravelerGraph.txt` | nothing | Not read by the game: `unused-data-files.md` |
+| `Version.txt` | nothing | Not read by the game: `unused-data-files.md` (holds `1.4.11.124`) |
 
 Two names the code asks for are not in the archive: `Loc.csv` and
 `LocVersion.txt`, requested by `data.loc.Pack.loadInternal`. Each language

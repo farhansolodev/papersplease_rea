@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 The three unread data files looked at (Threads.txt, TravelerGraph.txt, Version.txt)
+
+**Changed:** added `docs/unused-data-files.md` and `scripts/checks/notes_files_check.py`; `docs/data-files.md` and the checks README updated.
+**Why:** to close the list of data files: every file in the data folder now has a write-up.
+**Tested how:** searched the code's strings for the names and for any way to build a data file name from parts; counted how the files' contents match `Travelers.txt` and `News.txt`.
+**Result:** none of the three is loaded: data files are always asked for by one of 30 whole names, and these are not among them. `Version.txt` holds `1.4.11.124`; `Threads.txt` is an outline of the story (all 35 of its `@` names are news articles); `TravelerGraph.txt` describes response flows.
+**Still broken / not tested:** not tested by running the game without the files. The meaning of the marks in the two note files is inferred from their content.
+**Next:** all data files are written up. The user's choice of what follows.
+
 ## 2026-10-14 The test-tooling files studied (TestScenarios.xml, Auto.txt)
 
 **Changed:** added `docs/test-tooling-files.md` and `scripts/checks/testfiles_check.py`; `docs/data-files.md` and the checks README updated.
