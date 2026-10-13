@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Second comparison run: days 1 to 3 match fully, day 4 shows the first difference
+
+**Changed:** recorded the run in `docs/comparing-with-the-game.md`.
+**Why:** day 1 has no random errors; a longer route tests the booth's random numbers.
+**Tested how:** ran the project's copy of the game with the plan set to route 20, seed 12345, `trace`; stopped it by hand during day 4 at the user's suggestion; ran `compare_with_log.py` on the copied log.
+**Result:** 35 travelers. Entry, nationality, duration, purpose and papers match 35 of 35. On days 1 to 3 every field matches for all 29 travelers, including all random errors. On day 4 the error differs for 2 of 6 travelers, starting at the second, right after the game first used the stock intro lines `$ask-purpose` / `$state-purpose`.
+**Still broken / not tested:** the day-4 difference is not explained. Likely the speech lines or other booth actions draw from the booth's generator, which the reference does not model; not confirmed. Names, faces, id numbers and document values are still not compared.
+**Next:** find what draws from the booth's generator between travelers (speech first), add it to the reference, and re-run the comparison on the same log.
+
 ## 2026-10-13 First comparison with the running game: day 1 matches
 
 **Changed:** added `scripts/checks/compare_with_log.py`; recorded the run in `docs/comparing-with-the-game.md`; corrected `docs/run-and-seeds.md` and a comment in `scripts/reference/seeds.py` (a new game plays with the second story seed).

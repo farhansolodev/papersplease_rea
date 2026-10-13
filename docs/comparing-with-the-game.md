@@ -186,6 +186,36 @@ What it does **not** yet test: random errors (day 1 has none), anything
 drawn from the booth's generator (name, face, id number, document values,
 error choice), later days, the night's numbers.
 
+## Second run: 2026-10-13, route 20, seed 12345 (stopped during day 4)
+
+Same command, plan changed to route 20. The game played about 40 seconds per
+day; it was closed by hand during day 4, with 35 travelers logged (copy in
+`extracted/autorun/Player.route20.seed12345.log`).
+
+Comparison (`compare_with_log.py`):
+
+- **Entry, nationality, duration, purpose and papers: 35 of 35.**
+- **Days 1 to 3 (29 travelers): everything matches, including every random
+  error** chosen on days 2 and 3. Those error choices come from the booth's
+  generator, after the draws that build each person and their document
+  values, so this confirms the number of booth draws per traveler on those
+  days.
+- **Day 4: the first error difference, at the second traveler** (game
+  `EntryPermit-WrongPurpose<speech>`, reference
+  `Passport-WrongFaceError...`), and again at the sixth. The other four
+  travelers of day 4 match.
+
+Where the day-4 difference starts: between the first and second traveler of
+day 4 the game ran, for the first time in this run, the default "Intro"
+response with the stock lines `$ask-purpose` and `$state-purpose` (day 4
+introduces the entry permit, so the inspector asks the purpose). The
+reference does not model speech or the player's actions at all
+(`traveler-creation.md`), so any random draw those make from the booth's
+generator is missing from it. **That is the likely cause, not yet
+confirmed**; the stock lines used on days 1 to 3 (`$ask-approved`,
+`$ask-nativesonly`) evidently did not shift the generator, which needs
+explaining too.
+
 ## Still not known
 
 - How long a route takes on screen, and what the fast-forward settings do
