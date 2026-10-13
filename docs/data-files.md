@@ -23,7 +23,7 @@ cross-checked, with a write-up in `docs/`.
 | `Emblems.xml` | `data.EmblemLib` | Not studied |
 | `Fonts.xml` | `data.FontLib` | Not studied |
 | `Paths.xml` | `data.PathLib` | Not studied |
-| `Sounds.xml` | `data.SoundDefLib` | Not studied |
+| `Sounds.xml` | `data.SoundDefLib` | Studied: `sounds-xml-format.md` (the file, which recording plays, how songs are named; the audio files are not extracted yet) |
 | `BorderAnim.xml` | `play.day.border.Border` | Not studied |
 | `Text.xml` | `data.Lang` | Studied: `text-xml-format.md` (the loader, placeholders, the long date); aliases and typos in `value-helpers.md` |
 | `UpperCase.txt` | `data.Uppercaser` | Studied: `value-helpers.md` |

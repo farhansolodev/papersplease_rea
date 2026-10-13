@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Sounds.xml (remaining data files, fifth)
+
+**Changed:** added `docs/sounds-xml-format.md` and `scripts/checks/sounds_check.py`; updated `docs/data-files.md` and the checks README.
+**Why:** next of the remaining data files; two earlier steps left open where sounds and songs are defined.
+**Tested how:** read the file with its comments; decompiled and read `SoundDefLib`, `SoundDef`, `Speaker` (constructor, `play`, `music`) and `Music.play` / `playNow`; read three constants from the DLL (default volume 1, default fade 3, song volume 1); ran `sounds_check.py`, which models the choice of recording with the existing shuffled-sequence reference.
+**Result:** `problems: none`. 94 sounds, all asked for by the code or a data file. Findings: songs have no table, a song id is played as `<id>.ogg`; a sound with more than two recordings cycles through a shuffled order of exactly three, so the fourth recording of `text-reveal` and `chain-jingle` is never played; sound choice uses its own generator (seed 23). Failure on the way: the check first called a method name the shuffled-sequence reference does not have (fixed).
+**Still broken / not tested:** not compared with the running game. The audio files are not extracted, so their existence is not checked. The audio platform layer, fading, rooms, beat tracking and the full list of songs are not studied.
+**Next:** the next data file (`Paths.xml`, `Fonts.xml`, `Emblems.xml`, `Bodies.xml`, `BorderAnim.xml`, the endless-mode files).
+
 ## 2026-10-13 Text.xml (remaining data files, fourth)
 
 **Changed:** added `docs/text-xml-format.md` and `scripts/checks/text_check.py`; updated `docs/data-files.md` and the checks README.
