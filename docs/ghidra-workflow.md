@@ -165,6 +165,25 @@ string constants as their text. It prints how many of each it changed. On
 the Facts loaders it cut 1,506 lines to 1,005. A few cast checks with an
 unusual shape are left as they are.
 
+### A shorter view for long classes
+
+```powershell
+python -I scripts\ghidra\condense_decompile.py decompiled\in.clean.c decompiled\out.short.c 'name filter'
+```
+
+Works on a cleaned file. It joins statements that the decompiler split over
+several lines, drops variable declarations and null checks, and shortens
+field access (`this.rand`), calls through an object (`CALL setPath#28(obj, ...)`,
+where 28 is the slot) and object creation (`new Person`). The optional third
+argument is a pattern; only functions whose header line matches are written.
+Put it in **single** quotes in PowerShell, or `$$` gets mangled.
+
+On `Border` it cut 8,479 lines to 4,327. It is a reading aid only: when a
+line looks odd, go back to the `.clean.c` file. Two things to know: a
+dropped null check leaves a comment listing the fields it loaded
+(`//   v = x.field`), and a local variable that Ghidra named `__this` is
+shown as `this`, the same as the real one.
+
 ## Method for studying a data file
 
 1. Inventory the file: every tag, attribute and count. **Read the comments

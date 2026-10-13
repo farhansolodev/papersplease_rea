@@ -46,6 +46,7 @@ eference <assets> <Player.log> <master seed> [--no-desk] [--no-speech]` (needs P
 | `fonts_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `fonts.md` (the reference script `fonts.py`) |
 | `paths_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `paths-xml-format.md` (the reference script `paths.py`) |
 | `border_figures_check.py` | `scripts\reference D` | `border-figures.md` (uses the reference scripts `paths.py` and `travspec.py`) |
+| `border_events_check.py` | `scripts\reference D` | `border-scene.md` (the path names, events, texts and sounds `Border` uses) |
 | `borderanim_check.py` | `<assets>` (`<assets>` = `extracted\art\assets`; needs Pillow) | `borderanim-xml-format.md` |
 | `credits_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `credits-txt-format.md` |
 | `languages_check.py` | `<assets> game\PapersPlease_Data\StreamingAssets\loc` (`<assets>` = `extracted\art\assets`; needs Pillow) | `languages-list.md` |

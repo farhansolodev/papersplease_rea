@@ -12,8 +12,9 @@ Functions read in full: `data.AtlasLib.make`; `app.vis.Atlas` (constructor,
 `addSource`, `getSequence`, `getSourceRect`); `play.day.border.Person.setAnim`.
 Read in part: `play.day.border.CustomTile` (`init`, `get_currentFrame`,
 `restartAnim`, `stepAnim`). **Not studied here:** the rest of the border
-scene. Its figures and waiting line have been studied since
-(`border-figures.md`); `Border` itself, sniping and the cameras have not.
+scene. Its figures and waiting line (`border-figures.md`) and `Border`
+itself (`border-scene.md`) have been studied since; sniping and the cameras
+have not.
 
 ## The file
 

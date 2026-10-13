@@ -15,8 +15,9 @@ Functions read in full: `data.PathLib` (constructor, `createPath`,
 
 How a figure follows a path over time, and what `hold`, `delay`, `warp`,
 `snap`, `face` and the three event attributes do, is in
-**`border-figures.md`** (read from `Person` and `WaitingLine`). **Not
-studied:** what each event text makes `Border` do.
+**`border-figures.md`** (read from `Person` and `WaitingLine`). What each
+event text makes the scene do, and which paths the code starts, is in
+**`border-scene.md`**.
 
 ## The file
 
@@ -114,7 +115,9 @@ time. The border scene passes in the day's border generator
 
 ## Not known / not tested
 
-- What each of the 36 event texts makes `Border` do, and how path names are
-  built from parts (the waiting line's are in `border-figures.md`; the rest
-  are in `Border`).
+- The 112 path ids that are not whole strings in the code are reached
+  through `next`, through `tell <id> <path>` events, or are built from parts
+  (`disperse-<n>`, `traffic<n>-wait`, `guard<n>-enter`, the `jailor` twins);
+  see `border-figures.md` and `border-scene.md`. This was not counted path
+  by path.
 - Nothing here was compared with the running game.

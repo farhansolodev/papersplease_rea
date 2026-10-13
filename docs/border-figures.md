@@ -8,8 +8,8 @@ the queue, the guards, the vehicles. This doc covers two of its classes:
 - **`WaitingLine`**: the queue on the left, a list of `Person` figures.
 
 Not covered: `Border` itself (who is created, the 36 path events, guards,
-attacks, explosions), sniping, the camera, the scoreboard. Those are the
-later parts of this step.
+attacks, explosions), which is part 2, `border-scene.md`; sniping, the
+camera and the scoreboard, which are the later parts.
 
 Check script: `scripts/checks/border_figures_check.py`. There is no reference
 script for this part.
@@ -166,8 +166,8 @@ Nothing happens without a path. Otherwise, in this order:
 Step 3 looks at the figure's path **after** the event was handled. If the
 handler gave the figure a new path, that new path's `next` is what is used.
 (The waiting line's handler does give a new path, `waiting-line`, which has
-no `next`, so nothing follows.) Whether any `Border` handler runs into this
-is a part 2 question.
+no `next`, so nothing follows.) One `Border` handler does run into this:
+see "One oddity" in `border-scene.md`.
 
 A path with no `next` stays the figure's path. A figure that has arrived
 keeps "ending" every frame, but the end event is sent only once.
@@ -283,8 +283,8 @@ Does nothing once the line has dispersed. Otherwise:
    stop `i + 1` after `4 - 3 x i / (N - 1) + r` seconds. The back of the line
    starts moving last.
 
-`Border` calls this from one callback set up in its constructor (when: part
-2).
+`Border` calls this 1 second after its state `calling-next` is entered
+(`border-scene.md`).
 
 ### Arriving in the booth
 
@@ -340,8 +340,8 @@ figures are not in `Border`'s list.
 - The 1,500 or so draws that build the line happen in a fixed order, so the
   starting picture can match the original. After that the draws follow real
   time, so the original itself does not play the border scene the same way
-  twice. Whether anything that matters to play draws from this generator
-  later is a part 2 question.
+  twice. One thing the player can feel does draw from this generator later:
+  the delay before an attack starts (`border-scene.md`).
 - Figures move by `dt x speed` each frame and events fire when a threshold
   is crossed, so the scene's timing depends slightly on the frame rate.
 - One path (`guard1-waitforchat`) is a `warp` path whose two points are the
