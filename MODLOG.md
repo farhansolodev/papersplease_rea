@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 Rules gathered into CLAUDE.md; STATUS.md folded into the topic docs
+
+**Changed:** `CLAUDE.md` gained the rules that were spread elsewhere (plan first, the model note at session start, `PROGRESS.md` updated every step, correct over fast, thin evidence, go-ahead for each game launch, file tools over here-documents), a table of what each file is for, and a changed "two attempts" rule (stuck report goes in the step's doc, with a "Currently stuck" entry in `PROGRESS.md`). `docs/PROGRESS.md`: "Working agreements" removed, "Currently stuck" added, opening paragraph corrected. `STATUS.md` deleted: its REA record moved to the end of `docs/ghidra-workflow.md`, its booth random-number record to the end of `docs/comparing-with-the-game.md`. `docs/ghidra-workflow.md` gained two habits that were working agreements. Mentions of `STATUS.md` fixed in `docs/desk-drawing-draws.md` and the files above. Outside the repo: Claude's four memory notes for this project deleted and their index emptied.
+**Why:** the same rules were written in three places (`CLAUDE.md`, `PROGRESS.md`, memory notes) and already disagreed about when `PROGRESS.md` is updated; `STATUS.md` no longer matched its original template. Now each kind of information has one home.
+**Tested how:** compared every line of the committed `STATUS.md` records with the two topic docs by script; searched the project for remaining mentions of `STATUS.md`; checked each of the ten former working agreements has a home.
+**Result:** 106 and 24 lines checked, all found word for word except the two references changed on purpose. `STATUS.md` is now named only in older `MODLOG.md` entries, which are history and were left alone. Documentation only; no code changed.
+**Still broken / not tested:** whether a new session follows the new opening routine (model note, then a plan) can only be seen in a new session; not tested.
+**Next:** the newspaper picture (step 1 of the list in `PROGRESS.md`).
+
 ## 2026-10-14 PROGRESS.md brought up to date
 
 **Changed:** rewrote `docs/PROGRESS.md` for the end of the fourth session (state, doc list, next steps, open questions, verification method, machine-only files, working agreements); `docs/ghidra-workflow.md` gained the two newer helper scripts and two working habits; removed stale "not compared with the game" statements from `docs/comparing-with-the-game.md` and `docs/errors-txt-format.md`.

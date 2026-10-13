@@ -1,10 +1,10 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-10-14, at the end of
-the fourth long session. `MODLOG.md` has the step-by-step history; this file
-is the current state, what to do next and what is still open. It is updated
-only when the user asks (see "Working agreements"), so the newest
-`MODLOG.md` entries may be ahead of it.
+**Read this first in a new session.** Last updated 2026-10-14, after the
+fourth long session. `MODLOG.md` has the step-by-step history; this file is
+the current state, what to do next and what is still open. It is updated at
+the end of every step. The rules for how to work are in `CLAUDE.md`, not
+here.
 
 ## One-paragraph summary
 
@@ -89,9 +89,14 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | **Checking against the original** | |
 | `comparing-with-the-game.md` | The game's test player: the `auto.plan` file, how to run it with a fixed seed, the log it writes, and the results of the runs so far |
 
-`STATUS.md` holds two resolved problems, kept so their dead ends are not
-repeated (REA's Ghidra requests timing out; the booth's random numbers
-falling out of step with the game). Nothing is open there.
+## Currently stuck
+
+Nothing.
+
+Two earlier problems are solved. Their records are kept with their topics,
+so the dead ends are not repeated: REA's Ghidra requests timing out (end of
+`ghidra-workflow.md`), and the booth's random numbers falling out of step
+with the game (end of `comparing-with-the-game.md`).
 
 ## Next steps, in order
 
@@ -170,7 +175,7 @@ Collected from the docs, so they are not lost:
 - Where user-added languages come from; how a language pack is loaded.
 - The test player's audit pictures come out empty in this build, and its
   frame capture needs files that only existed on the developer's Mac
-  (`STATUS.md`). Neither is usable.
+  (`comparing-with-the-game.md`, "Dead ends"). Neither is usable.
 
 **Older**
 
@@ -283,9 +288,8 @@ All gitignored. Nothing below is in git.
 | `extracted/autorun/` | 2 MB | The test player's folder: `auto.plan`, `auto.log`, copies of three `Player.log` runs, and scratch scripts from the fourth session (`show.sh` prints one decompiled function with the noise removed; `rand_uses2.py` lists functions matching a pattern; `log_step.py`; several experiments) | The logs: run the game as above (needs the go-ahead). The scratch scripts are conveniences, not needed |
 
 Outside the project: `C:\tools\Il2CppDumper-6.7.46`, `C:\tools\ghidra_12.1.4_PUBLIC`,
-`C:\Users\farha\.claude\CLAUDE.md` (lists those tool paths for every
-project), and Claude's memory notes for this project in
-`C:\Users\farha\.claude\projects\C--Users-farha-dev-papersplease-rea\memory\`.
+and `C:\Users\farha\.claude\CLAUDE.md` (lists those tool paths for every
+project).
 Ghidra also keeps a small cache in `C:\Users\farha\AppData\Local\ghidra\`.
 Running the game writes Unity's `Player.log` under
 `%USERPROFILE%\AppData\LocalLow\3909\PapersPlease\`.
@@ -298,30 +302,3 @@ Running the game writes Unity's `Player.log` under
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
 | `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py` |
 | `scripts/checks/` | Checks against the real data files, and `compare_with_log.py` against the running game's log; see its `README.md` for each script's arguments |
-
-## Working agreements
-
-- **Correct over fast.** Read whole functions; never present a name match as
-  a finding; read data-file comments; search other files before calling
-  anything unused; do not explain "why" without evidence. The study method
-  is in `ghidra-workflow.md`.
-- When the decompiler drops something, check the raw instructions
-  (`DumpAssembly.java`) or the constants (`read_doubles.py`) instead of
-  guessing.
-- **When something does not match the game, look for every user of the
-  thing in question before guessing.** The booth's random-number problem
-  was solved by decompiling all the booth classes and listing every use of
-  a generator, after four narrower attempts failed (`STATUS.md`).
-- Do not call something confirmed on thin evidence: say how many real
-  alternatives each matching result had.
-- One step at a time, each with a doc, a `MODLOG.md` entry and its own
-  commit. Commits only when asked.
-- **`docs/PROGRESS.md` is updated only when the user asks** (usually before
-  the conversation fills up). Each step still gets its doc and a `MODLOG.md`
-  entry. (Also saved in Claude's memory notes.)
-- Before a step that needs a download (for example a Unity asset tool for
-  audio), say the tool's name, source and size and wait.
-- Running the original game needs the user's go-ahead, each time.
-- REA's Ghidra tools cannot be used on `GameAssembly.dll` (`STATUS.md`).
-- Practical: write docs and multi-line scripts with the file tools, not
-  shell here-documents (quotes in the text have broken those repeatedly).

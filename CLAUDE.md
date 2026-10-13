@@ -42,9 +42,16 @@ Port my own copy of Papers, Please to run in the browser:
 
 ## Start here in a new session
 
-Read `docs/PROGRESS.md` first: it has the current state, the ordered next
-steps, the open questions and the list of docs. Then `docs/ghidra-workflow.md`
-for the commands and how to read decompiled output.
+1. Read `docs/PROGRESS.md` first: it has the current state, the ordered next
+   steps, what is stuck, the open questions and the list of docs. Then
+   `docs/ghidra-workflow.md` for the commands and how to read decompiled
+   output.
+2. Before any work, tell me which model the step needs, so I can switch while
+   the session is still short (you cannot switch it yourself). Opus for
+   decompilation and reverse-engineering reasoning, or a step that mixes that
+   with routine work. Sonnet for doc updates, routine helper scripts and
+   checks. If unsure, say Opus.
+3. Give me the plan for the step and wait (see "Plan first" below).
 
 ## Tooling state
 
@@ -63,10 +70,10 @@ for the commands and how to read decompiled output.
 - Il2CppDumper 6.7.46 is installed at `C:\tools\Il2CppDumper-6.7.46`. Its
   output for this game is in `dumps/il2cppdumper/`; see
   `docs/il2cpp-name-recovery.md`.
-- REA's Ghidra requests time out on `GameAssembly.dll` (see `STATUS.md`), so
-  that DLL is analysed by running Ghidra's `analyzeHeadless` directly. The
-  analysed project is saved in `decompiled/ghidra/`; scripts are in
-  `scripts/ghidra/`.
+- REA's Ghidra requests time out on `GameAssembly.dll` (the record is at the
+  end of `docs/ghidra-workflow.md`), so that DLL is analysed by running
+  Ghidra's `analyzeHeadless` directly. The analysed project is saved in
+  `decompiled/ghidra/`; scripts are in `scripts/ghidra/`.
 - In Claude Code's PowerShell tool, `JAVA_HOME` resolves to
   `C:\Program Files\Eclipse Adoptium\jre-21.0.4.7-hotspot` (a JRE), not the
   JDK above. Ghidra runs fine regardless; call `javap` and `jar` by their
@@ -77,18 +84,36 @@ for the commands and how to read decompiled output.
 - Rust 1.99 and the `wasm32-unknown-unknown` target are installed (checked
   2026-10-12). `trunk`, `wasm-pack` and `wasm-bindgen` are not installed, and
   Bevy has not been set up or tried.
+- Write docs and multi-line scripts with the file tools, not shell
+  here-documents: quotes in the text have broken those repeatedly.
 - Setup references, only if a problem comes up:
   - https://github.com/morluto/rea/blob/main/docs/installation.md
   - https://github.com/morluto/rea/blob/main/docs/windows-ghidra-p0.md
 
 ## How to work
 
+- **Plan first.** Before doing a task, tell me what you are going to do, which
+  files will change and how I can check the result, then wait for my go-ahead.
+  Reading files to work out the plan is fine without asking. Editing or
+  creating files, running scripts or Ghidra, and any git command wait for the
+  go-ahead. A plain question gets a direct answer, with no plan step.
 - **Recover IL2CPP names first.** Raw `GameAssembly.dll` without the names from
   `global-metadata.dat` is not worth analysing.
 - **Reimplement from understanding.** Do not transliterate decompiler output
   into Rust.
+- **Correct over fast.** Read whole functions and confirm against the real
+  data file. Never present a name match as a finding. Read the comments in
+  data files (XML parsers drop them). Before calling anything unused or left
+  over, search the other data files and the code's strings. Say what was
+  observed and mark the rest as inferred; do not explain why something is the
+  way it is without evidence. (On 2026-10-12, three name-based guesses about
+  `Days.csv` and a "cut content" claim about the `journalist` purpose were
+  all wrong.) The study method is in `docs/ghidra-workflow.md`.
 - **One thing at a time.** Get one thing working, then write down how it works.
   Do not bundle unrelated changes; I want to be able to revert a single step.
+  Each step gets its doc, its `MODLOG.md` entry and, when I ask for a commit,
+  its own commit.
+- **Running the original game needs my go-ahead, each launch.**
 - **Ask before large refactors.** If you think the architecture is wrong, say
   so and explain, then wait for me.
 - **Verify with evidence.** For the original game you cannot see the screen, so
@@ -103,15 +128,30 @@ for the commands and how to read decompiled output.
 - If something is not tested, write "not tested". Never imply you verified
   something you didn't.
 - If you are not sure, say so. A confident wrong answer costs me hours.
+- Do not call something confirmed on thin evidence: say how many real
+  alternatives each matching result had.
 - Record failures alongside successes, so a dead end is not repeated.
-- If you cannot solve something after two real attempts, stop and write
-  `STATUS.md`: the goal, what works (tested), the current problem, the evidence,
-  what was tried, and ideas not tried yet.
+- If you cannot solve something after two real attempts, stop. Write the stuck
+  report in the step's doc under a "Dead ends" heading: the goal, what works
+  (tested), the current problem, the evidence, what was tried, and ideas not
+  tried yet. Add a short entry under "Currently stuck" in `docs/PROGRESS.md`
+  that points to it. When the problem is solved, remove that entry and keep
+  the report, marked resolved.
 
-## Files to keep updated
+## What each file is for
 
-- `MODLOG.md`: add an entry after every change, newest first, in the format at
-  the top of that file.
-- `docs/`: confirmed findings (formats, game rules, class layouts) and
-  `docs/DESIGN.md` for how the port works. Update when something is confirmed
-  or the architecture changes, not on every change.
+Each kind of information lives in one place. Do not repeat it in another.
+
+| File | Its only job | When to update |
+|---|---|---|
+| `CLAUDE.md` (this file) | The rules for how to work, plus the goal, the target and the tooling state | When I give a new standing rule, or the tooling changes |
+| `docs/PROGRESS.md` | Where the project stands: current state, next steps, what is stuck, open questions, the list of docs | At the end of every step, without being asked: the next session starts from it |
+| `MODLOG.md` | Diary: what was changed and how it was tested | After every change, newest first, in the format at the top of that file |
+| `docs/<topic>.md` | What was learned about one topic (a format, a game rule, a class layout), including its dead ends | When something is confirmed, not on every change |
+| `docs/DESIGN.md` | How the port works (not written yet) | When the architecture changes |
+
+- Rules live only in this file. When I give a new standing rule, propose the
+  edit here. Do not save it as a Claude memory note and do not copy it into
+  `docs/PROGRESS.md`.
+- `MODLOG.md` is long. Read its newest entries when needed, not the whole
+  file.

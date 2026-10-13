@@ -1,8 +1,9 @@
 # Random draws made when a paper is drawn on the desk
 
 Found on 2026-10-14 while solving the open problem "the booth's random
-numbers fall out of step with the game" (`STATUS.md`). **Drawing a paper's
-picture uses the booth's own random generator**: the same one that picks
+numbers fall out of step with the game" (the record is under "Dead ends" in
+`comparing-with-the-game.md`). **Drawing a paper's picture uses the booth's
+own random generator**: the same one that picks
 errors, builds the person and generates document values. So the pictures are
 part of the game's logic as far as random numbers go: leave them out and
 every later pick is different.

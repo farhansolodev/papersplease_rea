@@ -4,8 +4,9 @@ How to get decompiled, named code out of `GameAssembly.dll`. Confirmed on
 2026-10-12.
 
 REA is not used for this DLL: its Ghidra requests time out after 5.5 minutes
-and the full analysis takes about 16 (see `STATUS.md`). Ghidra's command-line
-mode, `analyzeHeadless`, is run directly instead.
+and the full analysis takes about 16 (the record is under "Dead end" at the
+end of this doc). Ghidra's command-line mode, `analyzeHeadless`, is run
+directly instead.
 
 ## 1. Analyse once (done; about 16 minutes)
 
@@ -114,8 +115,15 @@ To read number constants the decompiler shows only as `DAT_180a36c30`
 (no Ghidra needed; it reads the file directly):
 `python -I scripts\ghidra\read_doubles.py game\GameAssembly.dll 0x180a36c30 ...`.
 
-Two habits that paid off:
+Habits that paid off:
 
+- **When the decompiler drops something, do not guess.** Check the raw
+  instructions (`DumpAssembly.java`) or the constants (`read_doubles.py`).
+- **When something does not match the game, look for every user of the
+  thing in question before guessing.** The booth's random-number problem was
+  solved by decompiling all the booth classes and listing every use of a
+  generator, after four narrower attempts failed (the record is under "Dead
+  ends" in `comparing-with-the-game.md`).
 - **Decompile a whole class family at once and search it**, when the
   question is "who else uses this?". A name prefix selects many functions:
   `DecompileFunctions.java out.c "play.day.booth." "play.day.BoothEnv"`.
@@ -253,3 +261,43 @@ field. Both match their names. Only these two functions have been checked.
 After step 3, the same function reads
 `(__this->fields).env`, `(ppVar1->fields).traveler`, `get_hasBomb`,
 `(ppVar2->fields).special` and `(__this->fields).preventStashCount = 10000`.
+
+## Dead end: REA's Ghidra requests time out (resolved 2026-10-12)
+
+Moved here on 2026-10-14 from the former `STATUS.md`. Only the heading
+levels and one reference to this doc were changed.
+
+### Goal
+
+Milestone 1: get a readable view of the game's code: (a) recover the IL2CPP
+class and method names, and (b) read decompiled function bodies with those
+names attached.
+
+### Outcome
+
+Both parts work. See `docs/il2cpp-name-recovery.md` and
+this doc.
+
+### The dead end: REA cannot analyse GameAssembly.dll on this machine
+
+- `binary_overview` and `procedure_pseudo_code` both failed with
+  `provider_timeout` at 330,000 ms (5.5 minutes).
+- Cause, now measured: Ghidra's full analysis of this DLL takes 15.9 minutes.
+  REA only answers after the full analysis and discards its temporary
+  database on timeout, so retrying can never succeed.
+- REA also reports `set_addresses_names` as unavailable on Windows ("Windows
+  Ghidra P0 does not admit database mutation"), so it could not show the
+  recovered names even if it finished.
+
+Do not retry REA's Ghidra tools on this DLL unless REA gains a longer timeout
+or a persistent database on Windows.
+
+### What fixed it
+
+Running Ghidra's `analyzeHeadless` directly with a project saved in
+`decompiled/ghidra/`, plus two scripts in `scripts/ghidra/`.
+
+### Not tried (no longer needed)
+
+- A REA timeout or analyzer setting.
+- Cpp2IL.
