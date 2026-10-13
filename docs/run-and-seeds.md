@@ -131,14 +131,15 @@ exact words, without dashes:
 `Trace` has two switches: `enabled` and `showVerbose`. Both start off.
 `trace` on the command line sets `enabled`. Most of the game's detailed
 messages (for example "New Traveler:" and "Additional error:") are printed
-only when **both** are on. No code was found that turns `showVerbose` on,
-and the game has no text constant for it; a full search of writes to it has
-**not** been done. Messages go to the platform's log function; where that
-writes on Windows (probably Unity's `Player.log`) is **not checked**.
+only when **both** are on. A full search of writes (2026-10-13,
+`comparing-with-the-game.md`) found that `showVerbose` is turned on only by
+the test automation: its two debug jumps and an automated game whose plan
+has `trace`. Messages go to the platform's log function, which is Unity's
+`Debug.Log`; where that file lands on this machine is **not checked**.
 
-So `trace` alone probably gives only the less detailed messages. Whether it
-is useful for checking the port is untested. Running the original game with
-it has not been done and would need your go-ahead.
+So `trace` alone gives only the less detailed messages. The detailed ones
+need the automation and its `auto.plan` file, which can also set the master
+seed. Running the original game has not been done and needs your go-ahead.
 
 ## Not studied
 

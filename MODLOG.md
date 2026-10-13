@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 How to compare with the running game: reading step (no launch)
+
+**Changed:** added `docs/comparing-with-the-game.md` and `scripts/ghidra/FindStaticWrites.java` (lists the memory writes that follow each use of a class record, to find who changes a class's static values); updated the debug-log section of `docs/run-and-seeds.md`.
+**Why:** everything so far is checked only against the data files; this settles whether the game's own log can be used for a comparison.
+**Tested how:** decompiled and read `Trace`, `AutoPlan`, the Unity save-folder set-up and log function, and the relevant parts of `Game.applyScreenChange`, `HostUnity.CreateGame` and the `AutoGame` constructor; ran the new search over all 423 uses of the `Trace` class. The game was not run.
+**Result:** the detailed log (`showVerbose`) is turned on in exactly three places, all belonging to the test automation; the command-line word `trace` alone cannot do it. The automation starts when a valid `auto.plan` file exists in the save folder; the plan can set the master seed (`seed <n>`) and the log (`trace`); the save folder can be pointed anywhere with the command-line word `savedir`. Log lines go to Unity's `Debug.Log`. Failure on the way: one decompile request by name matched nothing (the name needed its address).
+**Still broken / not tested:** nothing was run, so none of this is tested. Not read: what the automation actually does (`Auto.txt`, `AutoGame`'s play, `auto.log`, its leaderboard and stash steps), what the detailed lines contain, where `Player.log` lands.
+**Next:** read the automation enough to be sure it is safe and offline, then ask for the go-ahead for one launch with `savedir` inside the project.
+
 ## 2026-10-13 Endless mode: Endlesses.xml and Endless.csv (remaining data files, seventh)
 
 **Changed:** added `docs/endless-mode.md` and `scripts/checks/endless_check.py`; updated `docs/data-files.md` and the checks README.
