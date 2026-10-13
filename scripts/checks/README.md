@@ -33,6 +33,7 @@ Run from the project root with `python -I`. Paths below assume
 | `errormaker_check.py` | `scripts\reference D` | `errors-txt-format.md` (the reference script `errormaker.py`) |
 | `booth_check.py` | `scripts\reference <assets> [master seeds]` (`<assets>` = `extracted\art\assets`; needs Pillow; about one minute per master seed, default 4; `0` runs only the short first part; progress lines go to the error stream) | `traveler-creation.md`, `fact-values.md`, `papers-on-desk.md` (the reference script `booth.py`, which chains all the layers) |
 | `news_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `news-txt-format.md` (the reference script `news.py`) |
+| `newsimage_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`; needs Pillow) | `newspaper-picture.md` (the reference script `newsimage.py`) |
 | `nights_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `nights-txt-format.md` (the reference script `nights.py`) |
 | `night_check.py` | `scripts\reference D` | `night.md` (the `Family` class in `nights.py`) |
 | `ends_check.py` | `scripts\reference <assets> dumps\il2cppdumper\stringliteral.json` (`<assets>` = `extracted\art\assets`) | `ends-xml-format.md` |

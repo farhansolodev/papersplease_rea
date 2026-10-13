@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 The newspaper picture
+
+**Changed:** new `docs/newspaper-picture.md`; new reference script `scripts/reference/newsimage.py` and check `scripts/checks/newsimage_check.py` (listed in `scripts/checks/README.md`); `docs/news-txt-format.md` now points to the new doc and states the main-headline answer; `docs/PROGRESS.md` updated. Decompiled output (gitignored): `decompiled/newsimage*.c`, `newsscreen*.c`, `imgtransformed*.c`, `asm_newsimage.txt`.
+**Why:** step 1 of the next-steps list: how the newspaper is drawn, whether the first article is the main headline, and which random generator it uses.
+**Tested how:** read `DayNewsImage.make`, `LayoutImage` and `NewsScreen` in full; read three dropped arguments from the raw instructions; read 15 number constants from the DLL; ran `newsimage_check.py` on the 12 layout pictures and on 200 master seeds x 31 days; re-ran `news_check.py`.
+**Result:** article `i` goes into layout rectangle `i` (red, green, blue, yellow, magenta) and red is the single largest in all 12 layouts, so the first article is the main headline. The picture uses `day.newsRand`, the same generator as the headline choice, and draws about 190 more times (179 to 204 word marks plus one, then 3 per stamp and 3 per face picture). Both checks print `problems: none`.
+**Still broken / not tested:** nothing compared with the running game. Text fitting is not modelled (needs `app.vis.Text`), so which titles fall back to the regular font is unknown. The stamp angle looks like `r * 60 - 30` used as radians; the two maths calls were not identified. `newsRand` users were searched only in the decompiled files on disk.
+**Next:** step 1 of `PROGRESS.md` (a longer comparison run, needs the go-ahead) or step 2 (the border scene).
+
 ## 2026-10-14 Rules gathered into CLAUDE.md; STATUS.md folded into the topic docs
 
 **Changed:** `CLAUDE.md` gained the rules that were spread elsewhere (plan first, the model note at session start, `PROGRESS.md` updated every step, correct over fast, thin evidence, go-ahead for each game launch, file tools over here-documents), a table of what each file is for, and a changed "two attempts" rule (stuck report goes in the step's doc, with a "Currently stuck" entry in `PROGRESS.md`). `docs/PROGRESS.md`: "Working agreements" removed, "Currently stuck" added, opening paragraph corrected. `STATUS.md` deleted: its REA record moved to the end of `docs/ghidra-workflow.md`, its booth random-number record to the end of `docs/comparing-with-the-game.md`. `docs/ghidra-workflow.md` gained two habits that were working agreements. Mentions of `STATUS.md` fixed in `docs/desk-drawing-draws.md` and the files above. Outside the repo: Claude's four memory notes for this project deleted and their index emptied.

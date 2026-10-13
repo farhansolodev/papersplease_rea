@@ -1,7 +1,7 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-10-14, after the
-fourth long session. `MODLOG.md` has the step-by-step history; this file is
+**Read this first in a new session.** Last updated 2026-10-14, in the
+fifth session (after the newspaper picture). `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
 here.
@@ -17,7 +17,7 @@ now has a write-up.** Traced from the code: the seed chain from launch to
 each day; how a traveler is chosen, built and given documents with right or
 deliberately wrong values; how errors are chosen and applied; speech; the
 booth's events, the player's actions and how mistakes are judged; faces;
-the day's headlines; the night (family, budget, endings by debt or death);
+the day's headlines and the newspaper picture; the night (family, budget, endings by debt or death);
 endings, text, sounds, seals, bodies, endless mode, fonts, the border
 scene's paths and pictures, credits, languages. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -35,7 +35,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 75%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, endless-mode rules. Not done: the border scene, the newspaper picture, saves, the screens (title, night, ending, endless, language chooser), drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 75%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules. Not done: the border scene, saves, the screens (title, night, ending, endless, language chooser), drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match (see "Verification") |
 
@@ -72,7 +72,8 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `faces.md` | `Faces.xml`, face sheets, how a face picture is composed |
 | `emblems-and-bodies.md` | `Emblems.xml` (seals) and `Bodies.xml` (body types, contraband) |
 | **Around the day** | |
-| `news-txt-format.md` | `News.txt`, which headlines a day gets and in what order (drawing the newspaper not studied) |
+| `news-txt-format.md` | `News.txt`, which headlines a day gets and in what order |
+| `newspaper-picture.md` | The newspaper picture: the six layout pictures, which article goes in which rectangle, what is drawn, its random draws; the news screen. Text fitting not modelled |
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
 | `ends-xml-format.md` | `Ends.xml` and `Intro.xml`: the 20 endings and the intro slides |
@@ -103,13 +104,9 @@ with the game (end of `comparing-with-the-game.md`).
 (Done in the fourth session: the booth layer of the reference; every
 remaining data file; the night's rules; the method for comparing with the
 running game and the first two runs; finding and fixing why the reference's
-error picks left the game's.)
+error picks left the game's. Done in the fifth: the newspaper picture.)
 
-1. **The newspaper picture**: `play.day.DayNewsImage.make` (about 9 KB; it
-   takes a random generator, so check which one), `play.day.LayoutImage`,
-   the `NewsLayout0` to `5` images. Settles whether the first article in the
-   list is the main headline (`news-txt-format.md`).
-2. **A longer comparison run of the game** (needs the user's go-ahead for
+1. **A longer comparison run of the game** (needs the user's go-ahead for
    each launch): later days and a second seed, to test what days 1 to 4
    never exercised. The list is at the end of `desk-drawing-draws.md`: pages
    drawn again when turned, the fingerprint / thumbprint / contraband
@@ -117,23 +114,25 @@ error picks left the game's.)
    criminal photos on the bulletin. It would also test documents that only
    appear later (work pass, id card, access permit, vaccine certificate...).
    A full route takes about 40 seconds per day.
-3. **The border scene** (`play.day.border.*`: `Border`, `Person`,
+2. **The border scene** (`play.day.border.*`: `Border`, `Person`,
    `WaitingLine`, `BorderCam`): the largest piece of game logic still
    unread. How a figure follows a path over time, what the 36 path events
    do, the attacks, the sniping. It has its own random generator; where its
    seed comes from is not known.
-4. **Saves** (`play.EncryptedStore`, `play.save`, `StoryState.load`), and
+3. **Saves** (`play.EncryptedStore`, `play.save`, `StoryState.load`), and
    the rest of `Game.applyScreenChange` (new game versus load).
-5. **The screens**: title, the night screen, the ending player (slide
+4. **The screens**: title, the night screen, the ending player (slide
    timing), the endless-mode screens, the language chooser, who shows and
-   scrolls the credits.
-6. **Drawing**: how text is placed (`app.vis.Text`), how a document page is
+   scrolls the credits. (The news screen is done except its magnifier,
+   `newspaper-picture.md`.)
+5. **Drawing**: how text is placed (`app.vis.Text`; the newspaper's title
+   and subtitle rules in `newspaper-picture.md` wait on this), how a document page is
    laid out (`PaperInnerVisuals`, read only for its random draws), the
    search photo, the rest of `app.vis` and `play.ui`; input handling.
-7. **Audio extraction** (probably `sharedassets0.resource`; not checked) and
+6. **Audio extraction** (probably `sharedassets0.resource`; not checked) and
    the language zips in `StreamingAssets/loc/`. Independent of the steps
    above; may need a Unity asset tool (ask before downloading).
-8. **Design and build the Rust port** (`docs/DESIGN.md` does not exist yet).
+7. **Design and build the Rust port** (`docs/DESIGN.md` does not exist yet).
    `Auto.txt` can serve as a test plan: it lists what to do to reach each
    ending.
 
@@ -161,7 +160,8 @@ Collected from the docs, so they are not lost:
   not read.
 - The evidence that the reference matches the game is one seed, days 1 to 4
   (36 travelers), plus day 1 of a second route.
-- Which random generator the border scene and the newspaper picture use.
+- Which random generator the border scene uses. (The newspaper picture uses
+  the day's news generator, `newspaper-picture.md`.)
 - `Paths.xml`: the number in automatic path names (`auto-<number>`) was not
   recovered; nothing refers to those names.
 - `BorderAnim.xml`: five animation prefixes also collect another group's
@@ -182,9 +182,12 @@ Collected from the docs, so they are not lost:
 - Whether a `Day` object is constructed more than once per day. Each
   construction makes three criminal faces (using the face cycler and the
   traveler generator) and a `DayNews`.
-- Whether the newspaper shows the first article of the day's list as the
-  main headline. The game's sort swaps equal articles, so on days 2, 3, 13
-  and 16 the list order is the reverse of `News.txt`.
+- The newspaper (`newspaper-picture.md`): nothing in it has been compared
+  with the running game; which headlines fall back to the regular font or
+  lose their subtitle is not known until `app.vis.Text` is read; the
+  stamp's angle (the number appears to be used as radians); whether a stamp
+  needs a title; whether anything else uses the news generator; whether the
+  news screen is built on every day and after loading.
 - The news entry `DIPLOMAT_FIRST` is named by nothing found; who sets
   `Day.whenAddNews`; whether endless mode has news.
 - Other callers of `Array.sort` (an unstable quicksort) have not been
@@ -300,5 +303,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | Ghidra scripts (names, types, decompile, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py` |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py` |
 | `scripts/checks/` | Checks against the real data files, and `compare_with_log.py` against the running game's log; see its `README.md` for each script's arguments |

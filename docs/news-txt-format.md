@@ -2,8 +2,8 @@
 
 Studied on 2026-10-13. `News.txt` holds every newspaper headline. This doc
 covers the file, which headlines a day gets, their order, and the names the
-booth's bulletin uses for them. **Drawing the newspaper is not covered** (see
-"Not studied").
+booth's bulletin uses for them. Drawing the newspaper is in
+`newspaper-picture.md`.
 
 Functions read in full: the `data.NewsArticleLib` constructor and
 `getArticles`; the `data.NewsArticle` constructor, `compare` and
@@ -109,8 +109,9 @@ their original order.** In particular two equal items are always swapped.
 Result with the data (`news_check.py`): on days 2, 3, 13 and 16 the day's
 entry has two articles with the same score, so they end up in the opposite
 order to the file. For example day 2's list is "Analysts Upbeat" and then
-"Grestin Checkpoint a Success!". Whether the newspaper then shows the first
-one as the main headline depends on the drawing code, which is not studied.
+"Grestin Checkpoint a Success!". The newspaper puts the first article of the
+list in its largest rectangle (`newspaper-picture.md`), so "Analysts Upbeat"
+is day 2's main headline.
 
 ## How the names are used
 
@@ -183,11 +184,7 @@ one as the main headline depends on the drawing code, which is not studied.
 
 ## Not studied
 
-- **Drawing the newspaper**: `play.day.DayNewsImage.make(db, rand, dayNews)`
-  (about 9 KB of code), `play.day.LayoutImage` and the images
-  `NewsLayout0.png` to `NewsLayout5.png`, `News.png`, `NewsTall.png`; the
-  `NewsScreen`. This decides where each article goes, how the `Face:`
-  picture and the stamp are drawn, and whether it draws more random numbers.
+- (Drawing the newspaper was studied on 2026-10-14: `newspaper-picture.md`.)
 - Who sets `Day.whenAddNews` and what it does.
 - Whether endless mode builds a `DayNews` from `Endless.csv` (the bulletin
   skips news there).
