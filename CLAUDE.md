@@ -113,6 +113,20 @@ Port my own copy of Papers, Please to run in the browser:
   Do not bundle unrelated changes; I want to be able to revert a single step.
   Each step gets its doc, its `MODLOG.md` entry and, when I ask for a commit,
   its own commit.
+- **Keep older docs true.** When a step shows that something written earlier
+  is out of date or wrong, fix that sentence in the same step. Two cases: a
+  note that something is not studied, not checked or unknown, which the step
+  has now answered; and an earlier finding, inference or guess that the step
+  shows was wrong. Change the sentence itself, saying what is now known and
+  which doc holds it; a note added at the end of the doc is not enough. For
+  a statement that was wrong, also say that it was corrected and when, and
+  check whether another doc, a reference script or a check was built on it:
+  fix those too, or list them as needing a fix. Before finishing a step,
+  search `docs/` for the step's main names (classes, functions, file names)
+  to find such sentences, and list the docs corrected in the step's
+  `MODLOG.md` entry. When a run of the game confirms something, do the same
+  for "not compared with the running game" lines, and say how strong the
+  evidence is.
 - **Running the original game needs my go-ahead, each launch.**
 - **Ask before large refactors.** If you think the architecture is wrong, say
   so and explain, then wait for me.
@@ -147,7 +161,7 @@ Each kind of information lives in one place. Do not repeat it in another.
 | `CLAUDE.md` (this file) | The rules for how to work, plus the goal, the target and the tooling state | When I give a new standing rule, or the tooling changes |
 | `docs/PROGRESS.md` | Where the project stands: current state, next steps, what is stuck, open questions, the list of docs | At the end of every step, without being asked: the next session starts from it |
 | `MODLOG.md` | Diary: what was changed and how it was tested | After every change, newest first, in the format at the top of that file |
-| `docs/<topic>.md` | What was learned about one topic (a format, a game rule, a class layout), including its dead ends | When something is confirmed, not on every change |
+| `docs/<topic>.md` | What was learned about one topic (a format, a game rule, a class layout), including its dead ends | When something is confirmed, not on every change; and when a later step answers one of its open notes or shows one of its statements was wrong |
 | `docs/DESIGN.md` | How the port works (not written yet) | When the architecture changes |
 
 - Rules live only in this file. When I give a new standing rule, propose the

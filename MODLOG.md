@@ -14,6 +14,14 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-14 New rule in CLAUDE.md: keep older docs true
+
+**Changed:** `CLAUDE.md` only. A new bullet under "How to work", after "One thing at a time": when a step answers an older "not studied / not checked / unknown" note, or shows an earlier finding, inference or guess was wrong, fix that sentence in the same step, mark a wrong statement as corrected with the date, and check what was built on it. The "When to update" cell for `docs/<topic>.md` in the file table says the same in short.
+**Why:** the doc sweep (entry below) found 36 out-of-date notes because older docs were not revisited. The user approved the rule and asked for it to cover earlier statements that turned out wrong as well.
+**Tested how:** read both edits back in place.
+**Result:** the bullet sits between "One thing at a time" and "Running the original game needs my go-ahead"; the table row is updated.
+**Still broken / not tested:** whether later steps follow the rule can only be seen in later steps; not tested. The sweep did not look for earlier statements that are wrong, only for notes answered later, so that half of the rule has not been applied to the existing docs.
+
 ## 2026-10-14 Doc sweep: out-of-date "not studied" notes corrected
 
 **Changed:** 36 small text fixes in 18 docs: `il2cpp-name-recovery.md`, `art-dat-format.md`, `data-files.md`, `errors-txt-format.md`, `run-and-seeds.md`, `comparing-with-the-game.md`, `nights-txt-format.md`, `traveler-build.md`, `traveler-creation.md`, `days-csv-format.md`, `travelers-txt-format.md`, `papers-xml-format.md`, `languages-list.md`, `borderanim-xml-format.md`, `rand.md`, `speech.md`, `fact-values.md`, `tab-tree-format.md`. Each replaces a "not studied / not checked / not compared" note with what is now known and the doc that holds it. The small-jobs bullet in `docs/PROGRESS.md` now says what was left alone. No findings were added; no code or script changed.
