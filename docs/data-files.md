@@ -22,7 +22,7 @@ cross-checked, with a write-up in `docs/`.
 | `Bodies.xml` | `data.BodyLib` | Studied: `emblems-and-bodies.md` (drawing the search photo not studied) |
 | `Emblems.xml` | `data.EmblemLib` | Studied: `emblems-and-bodies.md` (stamping emblems on documents not studied) |
 | `Fonts.xml` | `data.FontLib` | Studied: `fonts.md` (the file, the `.fnt` files, measurements, line breaking; drawing text not studied) |
-| `Paths.xml` | `data.PathLib` | Not studied |
+| `Paths.xml` | `data.PathLib` | Studied: `paths-xml-format.md` (the file, building a path, points along it; how the border scene uses paths and events not studied) |
 | `Sounds.xml` | `data.SoundDefLib` | Studied: `sounds-xml-format.md` (the file, which recording plays, how songs are named; the audio files are not extracted yet) |
 | `BorderAnim.xml` | `play.day.border.Border` | Not studied |
 | `Text.xml` | `data.Lang` | Studied: `text-xml-format.md` (the loader, placeholders, the long date); aliases and typos in `value-helpers.md` |

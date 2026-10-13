@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 Paths.xml studied
+
+**Changed:** added `docs/paths-xml-format.md`, `scripts/reference/paths.py`, `scripts/checks/paths_check.py`; `docs/data-files.md` and the checks README updated.
+**Why:** next unstudied data file (the movement of the figures in the top view).
+**Tested how:** read `data.PathLib`, `data.Path`, `data.Anim` and `XmlUtil.getNextSibling`; ran `paths_check.py`.
+**Result:** 39 animations and 309 paths (118 unnamed, reached through `next="NEXT"`); every attribute in the file is read by the code; all `next` targets, animation names and sound ids exist; a point's `randomize` costs two draws from whatever generator the caller passes. Check prints `problems: none`.
+**Still broken / not tested:** the number in the automatic `auto-<number>` ids was not recovered (nothing refers to them). How the border scene follows paths, and what the 36 events do, is not studied. Nothing compared with the running game.
+**Next:** `BorderAnim.xml`.
+
 ## 2026-10-14 Fonts.xml and the font files studied
 
 **Changed:** added `docs/fonts.md`, `scripts/reference/fonts.py` (loads the fonts, measures and breaks text), `scripts/checks/fonts_check.py`; `docs/data-files.md` and the checks README updated.
