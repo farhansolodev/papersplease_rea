@@ -132,6 +132,12 @@ Habits that paid off:
   (for example `.rand` or `_27_random`) is the reliable way.
 - In PowerShell, a name containing `$$` sometimes selects nothing; use the
   function's address or a prefix without `$$` instead.
+- **A function can be too big for the decompiler.** The `Layout` constructor
+  (`0x180496810`, about 5,400 instructions) fails with "process: timeout"
+  after the script's 120 s limit. Its values were read from
+  `DumpAssembly.java` output instead: find the object's register (there
+  `R13`), then search the listing for writes to the field offsets from
+  `dump.cs` (`[R13 + 0x90]` and so on). The record is in `border-view.md`.
 
 ## Running the game's code in the emulator
 

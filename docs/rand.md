@@ -94,7 +94,10 @@ overlapping; the name cycler's position is saved with the game
 endless-seed generators and gives the face and name cyclers the master
 seed; the whole chain is in `run-and-seeds.md`. `BorderCam` is created
 twice per day, with the day seed + 1 (left camera) and + 2 (right), by
-`Booth.attachBorderCamsToBorder`. The rest of the border scene makes no
+`Booth.attachBorderCamsToBorder`, but only when the layout has camera
+rectangles, which only the tablet layout does (corrected 2026-10-14; this
+said "twice per day" without the condition; `border-view.md`). On desktop
+these two generators are never created. The rest of the border scene makes no
 generator of its own: it uses the day's border generator
 (`border-figures.md`). **What seed each of the remaining sites uses**
 (`CriminalPoster`, `TakeBursts`, `ScreenShake`, `PullChain`, `LoadScreen`,

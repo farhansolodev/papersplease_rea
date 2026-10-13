@@ -235,4 +235,51 @@ try:
 except Exception as error:                                  # noqa: BLE001
     print("BulletHoles.png not checked:", error)
 
+# 9. The view, the cameras and the endless scoreboard (docs/border-view.md).
+def lerp_scale(value, in_min, in_max, out_min, out_max):    # app.Num.lerpScale
+    value = max(min(value, in_max), in_min)
+    return (value - in_min) / (in_max - in_min) * (out_max - out_min) + out_min
+
+# Desktop layout values, read from the Layout constructor's instructions.
+BORDER_W, BORDER_H, PIXEL_W, SCOREBOARD_W = 570, 103, 570, 180
+pan_max = max(0, BORDER_W - PIXEL_W)
+print("desktop: scene %d x %d, window %d wide, so the view can move by %d" % (BORDER_W, BORDER_H, PIXEL_W, pan_max))
+print("bounce off an edge at speed 0 / 200 / 400+: %s pixels over %s seconds" % (
+    [lerp_scale(v, 0, 400, 4, 10) for v in (0, 200, 400)], [round(lerp_scale(v, 0, 400, 0.2, 0.4), 2) for v in (0, 200, 400)]))
+print("runner scene, view offset at runner x = 185 / 250 / 320:",
+      [round(lerp_scale(x, 185, 320, 0, 50), 1) for x in (185, 250, 320)])
+shown, countdown = [], 2.0                                  # FlashingScore: 7 flashes in 2 seconds
+while countdown > 0:
+    countdown -= 1 / 60
+    if countdown > 0:
+        which = 1 if (countdown / 2.0 * 7 * 0.5) % 1.0 >= 0.5 else 0
+        if not shown or shown[-1] != which:
+            shown.append(which)
+print("a flash shows text", " ".join(str(w) for w in shown), "then the real value (%d stretches)" % len(shown))
+if len(shown) != 7 or shown[0] != 0 or shown[-1] != 0:
+    problems.append("the flash model does not give 7 stretches starting and ending on the flash text")
+assets = os.path.dirname(data)
+view_sounds = ["border-pan", "border-foghorn"]
+problems += ["sound %s missing" % s for s in view_sounds if s not in sounds]
+fonts = open(os.path.join(data, "Fonts.xml"), encoding="utf-8").read()
+if not re.search(r'<font id="fixed"', fonts):
+    problems.append("font 'fixed' (the scoreboard's) is not in Fonts.xml")
+endlesses = open(os.path.join(data, "Endlesses.xml"), encoding="utf-8").read()
+pictures = ["EndlessScore.png", "BorderCamNoise.png", "BorderCamPalette.png"] + sorted(set(re.findall(r'icon="([^"]+)"', endlesses)))
+missing = [name for name in pictures if not os.path.exists(os.path.join(assets, name))]
+print("pictures named by the scoreboard and cameras that are missing:", missing or "none")
+problems += ["picture %s missing" % name for name in missing]
+try:
+    from PIL import Image
+    sizes = {name: Image.open(os.path.join(assets, name)).size for name in pictures if name not in missing}
+    print("picture sizes:", sizes)
+    if sizes.get("EndlessScore.png", (SCOREBOARD_W, 0))[0] != SCOREBOARD_W:
+        problems.append("EndlessScore.png is not %d wide (Layout.kEndlessScoreboardWidth)" % SCOREBOARD_W)
+    if sizes.get("BorderCamPalette.png", (31, 1))[0] < 31:
+        problems.append("BorderCamPalette.png is narrower than 31 (the code reads pixels 0, 10, 20 and 30)")
+    palette = Image.open(os.path.join(assets, "BorderCamPalette.png")).convert("RGBA")
+    print("camera colours (pixels 0, 10, 20, 30 of the top row):", [palette.getpixel((x, 0))[:3] for x in (0, 10, 20, 30)])
+except Exception as error:                                  # noqa: BLE001
+    print("picture sizes not checked:", error)
+
 print("problems:", problems or "none")

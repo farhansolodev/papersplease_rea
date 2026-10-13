@@ -9,7 +9,8 @@ the queue, the guards, the vehicles. This doc covers two of its classes:
 
 Not covered: `Border` itself (who is created, the 36 path events, guards,
 attacks, explosions), which is part 2, `border-scene.md`; shooting, which is
-part 3, `border-shooting.md`; the cameras and the scoreboard, part 4.
+part 3, `border-shooting.md`; the cameras, panning and the scoreboard, which
+are part 4, `border-view.md`.
 
 Check script: `scripts/checks/border_figures_check.py`. There is no reference
 script for this part.
@@ -42,7 +43,10 @@ This was an open question. The answer:
   one generator, in the order they happen.
 - The two border cameras (`BorderCam`) are the exception: each makes its own
   generator, seeded **day seed + 1** (left) and **day seed + 2** (right).
-  They use it in one function (`tween_buttonPressed`, two draws; part 4).
+  They use it in one function (`tween_buttonPressed`, two draws per frame
+  for 0.5 s after a press). Part 4 (`border-view.md`) found that the cameras
+  are only created on the tablet layout: on desktop they and their
+  generators do not exist.
 - In all 314 border functions no other generator is created or used. (The
   bullet-hole order is a `ShuffledSequence` seeded by one draw from the
   border generator; part 2.)
@@ -242,7 +246,8 @@ the reading above (it does not prove it).
 - **Hit test** (`hitTestPoint`, used for shooting; `border-shooting.md`): a box of
   `Layout.borderPersonHitSize` centred on the picture position. A point
   counts as a hit if it is in the box now or in the box of the previous
-  frame's position. The size's value was not looked up.
+  frame's position. On the desktop layout the size is 8 wide and 18 high
+  (looked up in part 4, `border-view.md`).
 
 ## The waiting line
 
@@ -335,8 +340,10 @@ figures are not in `Border`'s list.
 
 ## What this means for the port
 
-- One generator for the whole border scene, seeded day seed + 0x2000, plus
-  one per camera.
+- One generator for the whole border scene, seeded day seed + 0x2000. (This
+  line used to add "plus one per camera"; corrected 2026-10-14: the cameras
+  exist only on the tablet layout, `border-view.md`, so a desktop port has
+  none.)
 - The 1,500 or so draws that build the line happen in a fixed order, so the
   starting picture can match the original. After that the draws follow real
   time, so the original itself does not play the border scene the same way
@@ -369,7 +376,9 @@ figures are not in `Border`'s list.
 
 - Nothing was compared with the running game. The game's log
   (`comparing-with-the-game.md`) was not checked for border lines.
-- Whether the game's `dt` varies from frame to frame (`app.Clock` not read).
+- (Answered in part 4, `border-view.md`: the game's `dt` does vary. It is
+  the real time since the previous frame, capped at 0.1 s; the test player
+  fixes it at 1/20 s.)
 - The rounding function used to place the picture (`Math.round`) was not
   read.
 - Which picture a queue figure shows in its first few frames: the idle start

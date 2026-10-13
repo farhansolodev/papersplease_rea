@@ -126,7 +126,9 @@ switched on.
 
 ## Not studied
 
-- The endless menu and result screens, the scoreboard display, and how an
+- (The scoreboard display is now studied: `border-view.md`, including the
+  three messages `Endless` sends it.)
+- The endless menu and result screens, and how an
   endless day differs from a story day in the booth (which events raise the
   three actions, how the random seed of a run is chosen).
 - How the unlock code is entered and checked.

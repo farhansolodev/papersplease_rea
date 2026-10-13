@@ -8,7 +8,8 @@ flight, the slow motion, and the helpers the game's test player uses to aim.
 It builds on part 1 (`border-figures.md`: figures, paths, the hit test) and
 part 2 (`border-scene.md`: the attack scenes, explosions, how the day ends).
 
-Not covered: the cameras, panning and the endless scoreboard (part 4).
+Not covered: the cameras, panning and the endless scoreboard (part 4,
+`border-view.md`).
 
 Check: section 8 of `scripts/checks/border_events_check.py`.
 
@@ -38,7 +39,8 @@ Three things are needed:
 2. **The attack scene has switched sniping on** (part 2: 3 s into `runner`
    and `bikerunner`, 5 s into `bikeattack`, 11 s into `truckwreck`). That
    moves the tranquilliser button from `OFF` to `LOCKED`, and the kill button
-   0.5 s later, and slows the scene (below).
+   0.5 s later, and sets the scene's time scale (below; on desktop that
+   changes nothing).
 3. **A rifle is unlocked with its key and selected.**
 
 ## The two rifle buttons
@@ -173,8 +175,12 @@ it differs a little.)
 ## Slow motion, and which clock runs what
 
 Switching sniping on sets the scene's time scale to the layout's
-`borderSnipingTimescale` (value not looked up). Nothing in the code read
-here sets it back to 1; a new day builds a new scene.
+`borderSnipingTimescale`. Looked up in part 4 (`border-view.md`): it is
+**1.0 on the desktop layout**, 0.9 on tablet and 0.8 on phone. So the
+desktop game has no slow motion; the scene's clock and the game's clock run
+at the same rate there, and the table below only matters for the portrait
+layouts. Nothing in the code read here sets it back to 1; a new day builds
+a new scene.
 
 | Runs on the scene's clock (slowed) | Runs on the game's clock (not slowed) |
 |---|---|
@@ -219,8 +225,10 @@ Not part of normal play; listed so they are not mistaken for it.
 - "Dead" is a property of the path's animation, not of the rifle.
 - The attack result is a single "worst so far" value; six endings hang off
   it.
-- Two clocks are needed during an attack: one that slows and one that does
-  not.
+- (Corrected 2026-10-14. This said "two clocks are needed during an attack:
+  one that slows and one that does not". That holds for the phone and
+  tablet layouts only. On desktop the sniping time scale is 1.0
+  (`border-view.md`), so a desktop port can use one clock.)
 
 ## Results of the check
 
@@ -237,12 +245,15 @@ Not part of normal play; listed so they are not mistaken for it.
 ## Not known / not tested
 
 - Nothing was compared with the running game.
-- The hit box size (`Layout.borderPersonHitSize`) and the slow-motion scale
-  (`Layout.borderSnipingTimescale`): the layout values were not looked up.
+- (Answered in part 4, `border-view.md`: on desktop the hit box,
+  `Layout.borderPersonHitSize`, is 8 wide and 18 high, and the slow-motion
+  scale, `Layout.borderSnipingTimescale`, is 1.0, meaning none.)
 - How a press becomes a point (`Input.getPointerJustDown`) and the scope
   cursor.
 - What the key paper does after unlocking, and whether an unlocked rifle
   stays unlocked on later days.
 - The rifle buttons' slide positions and the bullet pictures (drawing).
-- Whether the game's clock is itself ever scaled or paused (`app.Clock` not
-  read).
+- (`app.Clock` was read in part 4, `border-view.md`: it follows real time,
+  capped at 0.1 s a frame; it has a global speed factor, 1.0 unless changed,
+  and a "pause for one frame" function. Who uses those two was not
+  searched.)

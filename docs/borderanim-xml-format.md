@@ -14,7 +14,7 @@ Read in part: `play.day.border.CustomTile` (`init`, `get_currentFrame`,
 `restartAnim`, `stepAnim`). **Not studied here:** the rest of the border
 scene. Its figures and waiting line (`border-figures.md`) and `Border`
 itself (`border-scene.md`) and shooting (`border-shooting.md`) have been
-studied since; the cameras and panning have not.
+studied since, and so have the cameras and panning (`border-view.md`).
 
 ## The file
 
@@ -88,6 +88,7 @@ at the end of a non-looping animation was not read in full.)
 
 - (Answered since: which figures are created, with which prefixes and idle
   endings, is the table at the top of `border-scene.md`; the waiting line's
-  figures are in `border-figures.md`.) Still not studied: the cameras and
-  panning.
+  figures are in `border-figures.md`; the cameras and panning are in
+  `border-view.md`. The cameras draw from a recoloured half-size copy of
+  this atlas, on the tablet layout only.)
 - Nothing here was compared with the running game.

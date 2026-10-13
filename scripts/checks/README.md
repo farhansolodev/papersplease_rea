@@ -46,7 +46,7 @@ eference <assets> <Player.log> <master seed> [--no-desk] [--no-speech]` (needs P
 | `fonts_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `fonts.md` (the reference script `fonts.py`) |
 | `paths_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `paths-xml-format.md` (the reference script `paths.py`) |
 | `border_figures_check.py` | `scripts\reference D` | `border-figures.md` (uses the reference scripts `paths.py` and `travspec.py`) |
-| `border_events_check.py` | `scripts\reference D` | `border-scene.md` and `border-shooting.md` (the path names, events, texts and sounds `Border` uses; the shot paths, keys, endings and bullet holes; the last part needs Pillow) |
+| `border_events_check.py` | `scripts\reference D` | `border-scene.md`, `border-shooting.md` and `border-view.md` (the path names, events, texts and sounds `Border` uses; the shot paths, keys, endings and bullet holes; the view's desktop numbers, the flash rule, and the pictures, font and sound the scoreboard and cameras name; the picture sizes need Pillow) |
 | `borderanim_check.py` | `<assets>` (`<assets>` = `extracted\art\assets`; needs Pillow) | `borderanim-xml-format.md` |
 | `credits_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `credits-txt-format.md` |
 | `languages_check.py` | `<assets> game\PapersPlease_Data\StreamingAssets\loc` (`<assets>` = `extracted\art\assets`; needs Pillow) | `languages-list.md` |

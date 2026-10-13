@@ -11,7 +11,8 @@ strip, event).
 Not covered here: shooting (`snipe`, `checkSniped`, the rifle buttons, the
 grenade's flight, the test player's aiming helpers), which is part 3,
 `border-shooting.md`; the
-cameras, panning and the endless scoreboard, which are part 4.
+cameras, panning and the endless scoreboard, which are part 4,
+`border-view.md`.
 
 Check script: `scripts/checks/border_events_check.py`.
 
@@ -104,7 +105,9 @@ Only the steps that matter for logic and for the random draws:
 7. **One whole-number draw** seeds the bullet-hole order (a shuffled run of
    4; part 3).
 8. The endless scoreboard, in endless mode.
-9. The booth's two border cameras (part 4).
+9. The booth's two border cameras, only if the layout has rectangles for
+   them, which only the tablet layout does (part 4, `border-view.md`). On
+   desktop this step creates nothing.
 10. The state machine (below).
 11. Guards on duty. For each bit set in the day's guard flags, the guard gets
     `guard<n>-enter` and `moveToStop(1)`. Two exceptions: `guard1` gets
@@ -135,7 +138,8 @@ name and a list of functions, each with a time:
 A state can also have a duration and a follow-on state. `go(name)` runs the
 old state's `EXIT` functions, then the new state's `ENTER` functions. The
 time in a state is counted with the scene's own clock, which sniping slows
-down (`set_snipingEnabled`).
+down (`set_snipingEnabled`) on the phone and tablet layouts. On desktop the
+sniping time scale is 1.0, so nothing slows (part 4, `border-view.md`).
 
 `Border.update` steps the state machine every frame, before the figures.
 
@@ -355,7 +359,8 @@ chains of `Paths.xml` and the events below.
 - **Sniping on** (`set_snipingEnabled(true)`): does nothing unless the day
   has the `SNIPING` feature. Records the attack result "failed, did
   nothing" on the day (through a function named "set with priority", not
-  read), slows the scene's clock to the layout's sniping time scale, and
+  read), sets the scene's clock to the layout's sniping time scale (1.0 on
+  desktop, so no change there; 0.9 tablet, 0.8 phone; `border-view.md`), and
   moves the rifle buttons from their `OFF` state to `LOCKED`, the second one
   0.5 s after the first (part 3).
 
@@ -387,7 +392,7 @@ in the code waits for an event the data never sends (checked by the script).
 | `finish-boss` | The passing car is switched back on |
 | `park-bike` | An enemy figure (`bike0` if the sender is `enemy0`, else `bike1`) gets `bike-parked` and is put where the sender stands. (The data file's comment on that path says the same: "position is overriden in code") |
 | `call-elisa` | The figure "says" `border_elisa`, no sound |
-| `pan-right` | View to the right |
+| `pan-right` | View to the right. (On desktop the view cannot move, so this and the "view" halves of `bomber-alarm` and `watch-poisoning` do nothing; `border-view.md`) |
 | `spawn-explosion <x> <y>` | Explosion at the figure's position plus the offset; does not end the day. (One use: `bike-explode`, offset `5 -20`) |
 | `tell <id> <path>` | Every living figure in `Border`'s list with that id gets that path. 12 different ones in the data, all naming a real id and a real path |
 
@@ -493,8 +498,10 @@ All from the day's border generator (part 1).
 - Nothing was compared with the running game.
 - Shooting, the grenade's flight, how the attack result is set and the test
   player's aiming helpers are in part 3, `border-shooting.md`.
-- Part 4: `BorderPan`, the cameras, `panToPeople`'s offsets (two were
-  dropped by the decompiler in the bike scenes), the endless scoreboard.
+- (Answered in part 4, `border-view.md`: `BorderPan`, the cameras, the
+  endless scoreboard, and `panToPeople`'s offsets. The two the decompiler
+  dropped in the bike scenes are 50 for `bikeattack` and 40 for
+  `bikerunner`.)
 - The booth's own state machine (`empty`, `entering`, `intro`,
   `busy-with-border`, `detaining`...) is only described where `Border`
   touches it.
