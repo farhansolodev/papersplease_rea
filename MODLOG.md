@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-14 The test-tooling files studied (TestScenarios.xml, Auto.txt)
+
+**Changed:** added `docs/test-tooling-files.md` and `scripts/checks/testfiles_check.py`; `docs/data-files.md` and the checks README updated.
+**Why:** next unstudied data files. `Auto.txt` is a recipe for reaching every ending, useful later as a test plan for the port.
+**Tested how:** read the `TestScenarioLib` and `TestScenario` constructors in full and the route loaders in part; ran `testfiles_check.py`.
+**Result:** 12 test scenarios (start at a day, a night or a traveler, with saved facts set first); 33 test routes (21 story, 12 endless); every ending in `Ends.xml` has a route; all bases exist. Check prints `problems: none`. One scenario names a traveler `BOSS` that does not exist in `Travelers.txt`.
+**Still broken / not tested:** what starts a scenario; the order in which instruction blocks are consulted; how each action word is carried out. Only routes 1 and 20 have ever been run.
+**Next:** the three files nothing asks for by name (`Threads.txt`, `TravelerGraph.txt`, `Version.txt`).
+
 ## 2026-10-14 Languages.txt and Languages.png studied
 
 **Changed:** added `docs/languages-list.md` and `scripts/checks/languages_check.py`; `docs/data-files.md` and the checks README updated.
