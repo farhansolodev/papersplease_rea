@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 The night: family, budget and going to sleep
+
+**Changed:** added `docs/night.md` and `scripts/checks/night_check.py`; extended `scripts/reference/nights.py` with the whole night (`Member`, `Summary`, `Family`, and `Budget` total / profit / balance / will-pay); updated `docs/nights-txt-format.md` and the checks README.
+**Why:** finishes what the `Nights.txt` step started: which events run, the family's health, the standard budget lines, debt and death.
+**Tested how:** decompiled and read the `Family` constructor and `applyBudget`, `FamilyMember`, `Stat` and the `Budget` functions; recovered the dropped attack-event and sickness-message choices from the raw instructions and the string list; ran `night_check.py` and re-ran `nights_check.py`.
+**Result:** `problems: none` in both. Night 1 with 8 paid travelers leaves 20; a rent rise shows the same night; starving kills the son on night 3 and the rest on night 4 (`family-dead`); a negative total gives `in-debt`; all 31 days' night events run. Confirmed the three fact names that were inferred in the previous step. Failure on the way: two attempts to patch files through a shell here-document failed on quoting; used direct edits instead.
+**Still broken / not tested:** not compared with the running game. Not read: the night screen (when balancing is called, how the ending is acted on), `buildMessage` (inferred from the text entries), `getNightMessages`, the order of pairs in a saved family member, where the day fills in its summary.
+**Next:** the next data file (`Ends.xml` / `Intro.xml`), or the night screen.
+
 ## 2026-10-13 Nights.txt and how a night event is run (remaining data files, second)
 
 **Changed:** added `docs/nights-txt-format.md`, `scripts/reference/nights.py` (the event table, the calendar, running an event's lines, budget lines and their ordering, the YES / NO step, the commands) and `scripts/checks/nights_check.py`; updated `docs/data-files.md`, `days-csv-format.md` and the checks README.

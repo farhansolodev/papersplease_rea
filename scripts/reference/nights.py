@@ -2,10 +2,10 @@
 play.night.Calendar, and the parts of play.night.Family and
 play.night.Budget that run an event's lines (docs/nights-txt-format.md).
 
-Not covered here: the family members' health, the standard budget lines
-(salary, rent, food, heat, medicine) and balancing the budget. Those belong
-to the Family constructor and applyBudget, which are not studied yet. A
-caller supplies who is alive.
+`Night` runs single events (a caller supplies who is alive). `Family` is the
+whole night: the family members and their health, the standard budget lines,
+which events run and in what order, balancing and applying the budget
+(docs/night.md).
 
 Run as a script to list every event and what it does with empty saved facts:
 
@@ -139,6 +139,42 @@ class Budget:
         if len(self.lines) > 1:
             haxe_sort(self.lines, compare_lines)       # the game's sort; it reorders equal lines
 
+    def update_line_cost(self, name, cost):
+        for line in self.lines:
+            if line.name == name:
+                line.cost = cost
+
+    def will_pay(self, name):
+        """Is the first line with this name ticked? False when there is none."""
+        for line in self.lines:
+            if line.name == name:
+                return line.enabled
+        return False
+
+    @property
+    def total(self):
+        """What is left after every ticked line."""
+        return sum(line.cost for line in self.lines if line.enabled)
+
+    @property
+    def profit(self):
+        """Income plus the costs that cannot be avoided."""
+        return sum(line.cost for line in self.lines if line.cost > 0 or line.must_pay == MUST_PAY)
+
+    def balance(self):
+        """Untick optional lines from the bottom up until the total is not
+        negative. Returns the index of the last line unticked, or None."""
+        rejected = None
+        count = len(self.lines)
+        for i in range(count):
+            if self.total >= 0:
+                return rejected
+            line = self.lines[count - i - 1]
+            if line.must_pay != MUST_PAY and line.enabled:
+                line.enabled = False
+                rejected = count - i - 1
+        return rejected
+
 
 class Night:
     """The event-running side of play.night.Family for one night."""
@@ -156,6 +192,14 @@ class Night:
         self.son_mood = None
         self.achievements = []
         self.escape = None
+
+    savings_line_name = "SAVINGS"
+
+    def alive_ids(self):
+        return self.alive
+
+    def set_son_mood(self, mood):
+        self.son_mood = mood
 
     # facts in the saved story
     def text(self, path):
@@ -219,16 +263,17 @@ class Night:
 
     def _command(self, text):
         if text == "MakeSonSad" or text == "MakeSonHappy":
-            if "son" in self.alive:
-                self.son_mood = "SAD" if text == "MakeSonSad" else "HAPPY"
+            if "son" in self.alive_ids():
+                self.set_son_mood("SAD" if text == "MakeSonSad" else "HAPPY")
         elif text.startswith("Upgrade-") and text[len("Upgrade-"):] in UPGRADES:
             self.upgrades.append(text[len("Upgrade-"):])
         elif text == "AdoptNiece":
-            self.facts["Night/HaveNiece"] = "1"           # the fact name is set in the Family constructor (not read yet)
+            self.facts["Night/HaveNiece"] = "1"
         elif text == "RemoveSavings":
-            self.facts["Night/Savings"] = "0"             # also updates the savings budget line
+            self.facts["Night/Savings"] = "0"
+            self.budget.update_line_cost(self.savings_line_name, 0)
         elif text == "TakeFamilyPassports":
-            self.facts["Night/HaveFamilyPassports"] = "0"  # fact name as above: not read yet
+            self.facts["Night/HaveFamilyPassports"] = "0"
         elif text.startswith("GivePaper"):
             path = "Night/Papers%d" % self.day_id
             papers = self._list(path)
@@ -250,7 +295,7 @@ class Night:
             self.achievements.append(text[len("Achievement"):].strip())
         elif text.startswith("Escape"):
             count = T.parse_int(text[len("Escape"):].strip())
-            candidates = [m for m in ESCAPE_ORDER if m in self.alive]
+            candidates = [m for m in ESCAPE_ORDER if m in self.alive_ids()]
             taken, left = candidates[:max(0, count - 1)], candidates[max(0, count - 1):]
             self.escape = (taken, left)
             self.want_end_id = "flee" if left else "escape"
@@ -259,6 +304,237 @@ class Night:
             # End/FamilyEscapeIntro and End/FamilyEscapeFinal are built by
             # Family.buildMessage from the text entries (not studied).
         # anything else (for example RenameSleepButton) does nothing here
+
+
+# ---------------------------------------------------------------- the whole night
+
+MEMBERS = [  # id, most sick, most hungry, most cold, male
+    ("wife", 5, 2, 3, False), ("son", 4, 1, 3, True), ("mil", 4, 2, 4, False), ("uncle", 3, 3, 3, True)]
+NIECE = ("niece", 4, 2, 3, False)
+EMOTIONS = ["HAPPY", "OK", "SAD", "COLD", "SICK", "VERYSICK", "DEAD", "HUNGRY"]
+ATTACK_EVENTS = {"FAILED_DIDNOTHING": "ATTACK_DIDNOTHING", "FAILED_FIREDGUN": "ATTACK_FIREDGUN",
+                 "SOLVED": "ATTACK_SOLVED"}
+
+
+class Member:
+    def __init__(self, member_id, sick_max, hungry_max, cold_max, male):
+        self.id, self.male = member_id, male
+        self.value = {"sick": 0, "hungry": 0, "cold": 0}
+        self.most = {"sick": sick_max, "hungry": hungry_max, "cold": cold_max}
+        self.just_died = False
+        self.mood = None
+
+    @property
+    def alive(self):
+        return self.value["sick"] < self.most["sick"]
+
+    @property
+    def sick(self):
+        return self.value["sick"] > 0
+
+    @property
+    def very_sick(self):
+        return self.value["sick"] >= self.most["sick"] - 1
+
+    def adjust(self, stat, delta):
+        """One step up or down whatever the size of delta; nothing if dead."""
+        if not self.alive or stat not in self.value:
+            return
+        if delta < 1:
+            self.value[stat] = max(0, self.value[stat] - 1)
+        else:
+            self.value[stat] = min(self.most[stat], self.value[stat] + 1)
+
+    def update_sickness(self):
+        if not self.alive:
+            self.just_died = False
+            return
+        for stat in ("hungry", "cold"):
+            if self.value[stat] >= self.most[stat]:
+                self.value["sick"] = min(self.most["sick"], self.value["sick"] + 1)
+        self.mood = None
+        if not self.alive:
+            self.just_died = True
+
+    def emotions(self):
+        """FamilyMember.get_emotionFlags as a list of names."""
+        if not self.alive:
+            return ["DEAD"]
+        out = []
+        if self.value["hungry"] >= 1:
+            out.append("HUNGRY")
+        if self.value["cold"] >= 1:
+            out.append("COLD")
+        if self.very_sick:
+            out.append("VERYSICK")
+        elif self.sick:
+            out.append("SICK")
+        if self.mood:
+            out.append(self.mood)
+        return out or ["OK"]
+
+    def to_string(self):
+        """The saved form. The game writes the same pairs through a lookup
+        table, so their order in the real save may differ."""
+        pairs = [("hungry", self.value["hungry"]), ("cold", self.value["cold"]), ("sick", self.value["sick"]),
+                 ("justDied", str(self.just_died).lower()), ("alive", str(self.alive).lower())]
+        if self.mood:
+            pairs.append(("moodEmotion", self.mood))
+        return " ".join("%s=%s" % pair for pair in pairs)
+
+    def from_string(self, text):
+        pairs = dict(piece.split("=", 1) for piece in text.split(" ") if "=" in piece)
+        for stat in self.value:
+            if stat in pairs:
+                self.value[stat] = T.parse_int(pairs[stat])
+        if "justDied" in pairs:
+            self.just_died = pairs["justDied"] == "true"
+        self.mood = pairs.get("moodEmotion") if pairs.get("moodEmotion") in EMOTIONS else None
+
+
+class Summary:
+    """What the day hands to the night (play.day.Summary)."""
+
+    def __init__(self, day_id, paid=0, unpaid=0, penalties=0, penalty_cost=0, bribe_money=0,
+                 attack_result="NONE", had_attack=False, had_bomber=False, had_poisoning=False,
+                 token_ids=(), night_event_ids=(), escape_passports=0):
+        self.id, self.paid, self.unpaid = day_id, paid, unpaid
+        self.penalties, self.penalty_cost, self.bribe_money = penalties, penalty_cost, bribe_money
+        self.attack_result, self.had_attack, self.had_bomber = attack_result, had_attack, had_bomber
+        self.had_poisoning = had_poisoning
+        self.token_ids, self.night_event_ids = list(token_ids), list(night_event_ids)
+        self.escape_passports = escape_passports
+
+
+def fill(template, *values):
+    for index, value in enumerate(values):
+        template = template.replace("$%d" % index, str(value))
+    return template
+
+
+class Family(Night):
+    """play.night.Family: built when the day ends; apply_budget runs when the
+    player goes to sleep."""
+
+    def __init__(self, lib, story_facts, summary, texts, night_messages=(), num_days=31, easy_mode=False):
+        self.lib, self.facts, self.summary, self.texts = lib, story_facts, summary, texts
+        self.day_id, self.num_days = summary.id, num_days
+        self.want_end_id = None
+        self.upgrades, self.achievements, self.escape, self.son_mood = [], [], None, None
+        self.messages = []
+        self.budget = Budget()
+        self.calendar = Calendar(lib)             # not used by the first step; replaced below
+        self.members = []
+        self.apply_rent_and_heat_affecting_events(summary.night_event_ids)
+        self.calendar = Calendar(lib, self.text("Night/Calendar"))
+        definitions = MEMBERS + ([NIECE] if self.number_or("Night/HaveNiece", 0) != 0 else [])
+        self.members = [Member(*definition) for definition in definitions]
+        for member in self.members:
+            member.from_string(self.text("Night/" + member.id))
+        self.facts["Night/AttackResult"] = summary.attack_result
+
+        t = texts
+        self.savings_line_name = t["budget_savings"]
+        add = self.budget.add_line
+        add(t["budget_savings"], self.number_or("Night/Savings", 30))
+        add(fill(t["budget_salary"], summary.paid), summary.paid * 5)
+        if summary.penalties != 0:
+            add(fill(t["budget_penalties"], summary.penalties), -summary.penalty_cost, MUST_PAY)
+        if summary.bribe_money != 0:
+            add(t["budget_bribes"], summary.bribe_money)
+        add(t["budget_rent"], self.number_or("Night/Rent", -20), MUST_PAY)
+        add(t["budget_food"], len(self.alive_ids()) * -5)
+        add(t["budget_heat"], self.number_or("Night/Heat", -10))
+        for member in self.members:
+            if member.alive and member.sick:
+                add(self.medicine_name(member), -5)
+
+        if summary.attack_result == "NONE":
+            if summary.had_attack or summary.had_bomber:
+                self.apply_event_with_id("ATTACK_DIDNOTHING")
+        elif summary.attack_result in ATTACK_EVENTS:
+            self.apply_event_with_id(ATTACK_EVENTS[summary.attack_result])
+        if summary.had_poisoning:
+            self.apply_event_with_id("POISONING")
+        died = [m for m in self.members if m.just_died]
+        sick = [m for m in self.members if m.alive and m.sick]
+        very_sick = [m for m in self.members if m.alive and m.very_sick]
+        self.messages += list(night_messages)
+        if self.number_or("Night/Flags", 0) & 1 == 0 and summary.unpaid != 0:
+            self.apply_event_with_id("AFTER_6PM")
+        if died:
+            self.messages.append(self.build_message("family_died_", died))
+        if len(very_sick) == 1:
+            self.messages.append(fill(t["family_verysick_1"], self.message_name(very_sick[0])))
+        elif len(very_sick) > 1:
+            self.messages.append(t["family_verysick_many"])
+        elif len(sick) == 1:
+            self.messages.append(fill(t["family_sick_1"], self.message_name(sick[0])))
+        elif len(sick) > 1:
+            self.messages.append(t["family_sick_many"])
+        self.facts["Night/NumEscapePassports"] = str(int(min(
+            len(self.alive_ids()) + 1, summary.escape_passports + self.number_or("Night/NumEscapePassports", 0))))
+        self.facts["Night/Profit"] = str(self.budget.profit)
+        for event_id in summary.night_event_ids:
+            self.apply_event_with_id(event_id)
+        for event_id in self.calendar.get_events(summary.id):
+            self.apply_event_with_id(event_id)
+        if easy_mode:
+            self.apply_event_with_id("EASY_MODE")
+
+    def number_or(self, path, default):
+        return T.parse_int(self.facts[path]) if self.facts.get(path) else default
+
+    def alive_ids(self):
+        return [m.id for m in self.members if m.alive]
+
+    def set_son_mood(self, mood):
+        self.son_mood = mood
+        next(m for m in self.members if m.id == "son").mood = mood
+
+    def message_name(self, member):
+        return self.texts["family_%s_message" % member.id]
+
+    def medicine_name(self, member):
+        return fill(self.texts["budget_medicine"], self.texts["family_%s_budget" % member.id])
+
+    def build_message(self, prefix, members):
+        """Inferred from the text entries (prefix + count, $0.. the members'
+        names); Family.buildMessage itself was not read."""
+        return fill(self.texts[prefix + str(len(members))], *[self.message_name(m) for m in members])
+
+    def apply_budget(self):
+        tokens = self._list("Night/TokenIds")
+        for token in self.summary.token_ids:
+            if token not in tokens:
+                tokens.append(token)
+        self.facts["Night/TokenIds"] = ";".join(tokens)
+        if self.summary.unpaid != 0:
+            self.facts["Night/Flags"] = str(self.number_or("Night/Flags", 0) | 1)
+        self.facts["Night/Savings"] = str(self.budget.total)
+        heat = -1 if self.budget.will_pay(self.texts["budget_heat"]) else 1
+        food = -1 if self.budget.will_pay(self.texts["budget_food"]) else 1
+        for member in self.members:
+            member.adjust("cold", heat)
+        for member in self.members:
+            member.adjust("hungry", food)
+        for member in self.members:
+            if self.budget.will_pay(self.medicine_name(member)):
+                member.adjust("sick", -1)
+        self.apply_yes_no()
+        for member in self.members:
+            member.update_sickness()
+        self.facts["Night/Calendar"] = self.calendar.to_string()
+        self.facts["Night/FamilyAlive"] = str(len(self.alive_ids()))
+        for member in self.members:
+            self.facts["Night/" + member.id] = member.to_string()
+        if self.summary.id == self.num_days:
+            self.apply_event_with_id("FINAL")
+        if self.want_end_id is None:
+            if self.budget.total < 0:
+                self.want_end_id = "in-debt"
+            elif not self.alive_ids():
+                self.want_end_id = "family-dead"
 
 
 def describe(ops, depth=1):

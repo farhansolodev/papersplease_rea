@@ -173,13 +173,10 @@ script `scripts/reference/nights.py`:
 
 ## Not studied
 
-- The `Family` constructor: which events run on a night and in what order
-  (the day's `NIGHTEVENTS`, the calendar, events added by `Night` commands
-  and the seven named in the code), the family members and their facts
-  (`Night/wife`, ...), the standard budget lines, `Night/Profit`.
-- `Family.applyBudget` apart from the YES / NO step: hunger, cold, sickness,
-  death, debt, the `in-debt` and `family-dead` endings; `Budget.balance`,
-  `willPay`, `updateLineCost`.
+- (Studied since, in `night.md`: the `Family` constructor, the family
+  members, the standard budget lines, `applyBudget`, balancing. The fact
+  names behind `AdoptNiece`, `RemoveSavings` and `TakeFamilyPassports` are
+  confirmed there.)
 - `Family.buildMessage` (the escape sentences) and the night screen itself.
 - How a traveler script's `Night <id>` command reaches the night.
 - Nothing here has been compared with the running game.
