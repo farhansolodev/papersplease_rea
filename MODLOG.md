@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Text.xml (remaining data files, fourth)
+
+**Changed:** added `docs/text-xml-format.md` and `scripts/checks/text_check.py`; updated `docs/data-files.md` and the checks README.
+**Why:** next of the remaining data files; most other parts read their text from it.
+**Tested how:** inventoried the file; decompiled and read the `Lang` constructor and static setup, `loadFromXml`, `cleanHtml`, `formatVerboseDate`, `Repl` and `LangFixed`; read the dropped month adjustment (`+ 1`) from the raw instructions and resolved the function's strings; ran `text_check.py`.
+**Result:** `problems: none`. 192 entries, no repeats. The first entry loaded for an id wins; the English file needs none of the six text replacements the loader makes; the long date uses month entries numbered from 1 (`November 23rd, 1982`). 172 ids are asked for by the code or data; 20 have no reference found (listed in the doc).
+**Still broken / not tested:** not compared with the running game. Language packs and the other callers of `loadFromXml` not studied; the 20 unreferenced ids not pursued; `title_news` / `title_tall` assumed to be font names.
+**Next:** the next data file (`Sounds.xml`, `Paths.xml`, `Fonts.xml`, `Emblems.xml`, ...).
+
 ## 2026-10-13 Ends.xml and Intro.xml (remaining data files, third)
 
 **Changed:** added `docs/ends-xml-format.md`, `scripts/checks/ends_check.py` and `scripts/ghidra/read_doubles.py` (reads a numeric constant from the DLL; replaces a scratch copy that was lost); updated `docs/data-files.md` and the checks README.

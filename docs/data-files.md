@@ -25,7 +25,7 @@ cross-checked, with a write-up in `docs/`.
 | `Paths.xml` | `data.PathLib` | Not studied |
 | `Sounds.xml` | `data.SoundDefLib` | Not studied |
 | `BorderAnim.xml` | `play.day.border.Border` | Not studied |
-| `Text.xml` | `data.Lang` | Partly: `env_typochars` and a few keys in `value-helpers.md` and `responses-and-events.md`; the loader (`Lang.loadFromXml`) not read |
+| `Text.xml` | `data.Lang` | Studied: `text-xml-format.md` (the loader, placeholders, the long date); aliases and typos in `value-helpers.md` |
 | `UpperCase.txt` | `data.Uppercaser` | Studied: `value-helpers.md` |
 | `NamesF.txt`, `NamesM.txt` | `data.NameLib`, `data.NameCycler` | Studied: `traveler-build.md` |
 | `Credits.txt` | `play.screen.CreditList` | Not studied |
