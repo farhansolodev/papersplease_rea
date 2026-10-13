@@ -81,7 +81,15 @@ Neither attempt explains the difference, so I stopped here.
    that look like leftover memory. No passport pictures were added at all.
    So in this released build the audit picture is unusable as it stands.
    Not investigated: why (the pictures may live only on the graphics card
-   in this build), or whether `capture` (frame captures) fares better.
+   in this build).
+4. **The `capture` setting (2026-10-13): ruled out by reading, not run.**
+   It records a film, not pictures: `test.auto.CaptureWorker` draws each
+   frame with the same software renderer the audit uses and pipes it to the
+   program `/usr/local/bin/ffmpeg`, writing
+   `/Users/pope/Projects/Please/Temp/capture.mov`. Both are fixed paths from
+   the developer's Mac. Neither exists here; making them exist would mean
+   creating files and installing a program outside the project, and the
+   renderer already gave an empty picture in attempt 3.
 
 ## Why it is hard to see
 

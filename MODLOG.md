@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 The test player's capture setting: ruled out by reading
+
+**Changed:** `STATUS.md` (attempt 4 recorded).
+**Why:** to see whether frame capture could give pictures of documents where the audit could not.
+**Tested how:** read `test.auto.CaptureWorker` and decompiled `app.FrameRecorder`. The game was not run.
+**Result:** capture pipes frames to `/usr/local/bin/ffmpeg` and writes `/Users/pope/Projects/Please/Temp/capture.mov`, fixed paths from the developer's Mac, and uses the same software renderer that produced the empty audit picture. Not usable here without creating files and installing a program outside the project. Not run.
+**Still broken / not tested:** the booth generator problem in `STATUS.md` is unchanged.
+**Next:** the user's choice: reason from the code, a debugger, or park the problem.
+
 ## 2026-10-13 Test player's audit pictures tried: unusable in this build
 
 **Changed:** `STATUS.md` (third attempt recorded, idea removed from the untried list).
