@@ -15,6 +15,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Next:** what to do next
 ```
 
+## 2026-10-13 Endless mode: Endlesses.xml and Endless.csv (remaining data files, seventh)
+
+**Changed:** added `docs/endless-mode.md` and `scripts/checks/endless_check.py`; updated `docs/data-files.md` and the checks README.
+**Why:** next of the remaining data files; these are game rules rather than drawing.
+**Tested how:** read both files; decompiled and read `EndlessLib`, `EndlessCourse`, `EndlessStyle`, `Action`, `ScoreScale` and `play.day.Endless`; read the dropped sign of the clock change from the raw instructions; ran `endless_check.py`, which models the scoring.
+**Result:** `problems: none`. Three styles (timed, perfection, endurance) and four courses; the scoring model reproduces the styles' own descriptions (perfection 10 points falling to 1 over ten minutes; endurance citations costing 5, 10, 15, ...; timed losing 30 s per citation). `Endless.csv` uses the `Days.csv` format with four columns. Finding: the three style button pictures named in the file are not in the extracted assets.
+**Still broken / not tested:** not compared with the running game. Not read: the endless screens, which booth events raise the three actions, how a run's seed is chosen, the unlock code check; whether the missing pictures are ever asked for.
+**Next:** the last data files (`Paths.xml`, `Fonts.xml`, `BorderAnim.xml`), which are about what is drawn; or `PROGRESS.md` step 2 or 3.
+
 ## 2026-10-13 Emblems.xml and Bodies.xml (remaining data files, sixth)
 
 **Changed:** added `docs/emblems-and-bodies.md` and `scripts/checks/emblems_bodies_check.py`; updated `docs/data-files.md` and the checks README.

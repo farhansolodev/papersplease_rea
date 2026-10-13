@@ -8,7 +8,7 @@ cross-checked, with a write-up in `docs/`.
 | File | Loaded by | Status |
 |---|---|---|
 | `Days.csv` | `data.DayLib` (via `Db`) | Studied: `days-csv-format.md` |
-| `Endless.csv` | `data.DayLib` (via `Db`) | Same table format; content not studied |
+| `Endless.csv` | `data.DayLib` (via `Db`) | Studied: `endless-mode.md` |
 | `Papers.xml` | `data.PaperDefLib` | Studied: `papers-xml-format.md` |
 | `Facts.xml` | `data.FactLib` | Studied: `facts-xml-format.md` |
 | `Travelers.txt` | `data.TravelerLib` | Studied: `travelers-txt-format.md`; responses at the booth in `responses-and-events.md` and `player-actions.md` |
@@ -17,7 +17,7 @@ cross-checked, with a write-up in `docs/`.
 | `News.txt` | `data.NewsArticleLib` | Studied: `news-txt-format.md` (the file and which headlines a day gets; drawing the newspaper not studied) |
 | `Nights.txt` | `data.NightLib` | Studied: `nights-txt-format.md` (the file, the calendar, running an event; the family and the budget itself not studied) |
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Studied: `ends-xml-format.md` (the files and what each attribute does; the slide player's timing not studied) |
-| `Endlesses.xml` | `data.EndlessLib` | Not studied |
+| `Endlesses.xml` | `data.EndlessLib` | Studied: `endless-mode.md` (styles, courses, scoring; the endless screens not studied) |
 | `Faces.xml` | `data.FaceLib` | Studied: `faces.md` (the loader and how a face picture is built); how the metadata of four pieces is combined in `traveler-build.md` |
 | `Bodies.xml` | `data.BodyLib` | Studied: `emblems-and-bodies.md` (drawing the search photo not studied) |
 | `Emblems.xml` | `data.EmblemLib` | Studied: `emblems-and-bodies.md` (stamping emblems on documents not studied) |
