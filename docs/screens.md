@@ -17,9 +17,11 @@ rules behind a screen are in that topic's own doc (for the night:
 
 # Part 1: the base of a screen, and the night screen
 
-Studied on 2026-10-14. Code reading only: **nothing in this part was
-compared with the running game.** A list of things that can be watched in
-the game is at the end.
+Studied on 2026-10-14 by code reading. **One screenshot of the real night
+screen was compared afterwards, the same day** ("Compared with a
+screenshot" below): it confirms the order of the budget lines and several
+positions. Everything that moves or needs a click is still not watched;
+the list is at the end.
 
 ## What was read
 
@@ -185,6 +187,9 @@ This does not depend on the screen shape.
 
 ### Does a line start ticked? Yes
 
+(From the code; seen in the game on one night since, "Compared with a
+screenshot" below.)
+
 The screen does not decide this; it shows what the budget line says. A
 line's ticked state is set when the line is made (`Line` constructor):
 ticked if it must be paid or is "optional, default yes", not ticked if it
@@ -260,8 +265,9 @@ here is salary, savings, rent, medicine, food, heat:
 | Click food (15 short) | ticked | - | - | 5 | food |
 
 In the fourth step the player ticks medicine and it is heat that goes.
-This follows from the code and from the reference's line order; neither
-was watched in the game.
+This follows from the code and from the reference's line order. The line
+order was since confirmed for one other night ("Compared with a
+screenshot"); the unticking itself was not watched in the game.
 
 The port must do the same: flip the line, then run the same bottom-up loop.
 
@@ -381,14 +387,86 @@ later (lines start at its x, amounts are right-aligned at its width, the
 fit test uses the fourth as a height); the rectangle class itself was not
 read.
 
-From the decompiler only: a line's amount is right-aligned at the
-rectangle's width and the tick circle starts 10 pixels after it. The rest
-of the placement (header, texts, the split between messages and lines in
-`calcSplit`, the family pictures) is left for the drawing step.
+From the decompiler: a line's amount is right-aligned at the rectangle's
+width and the tick circle starts 10 pixels after it. Both, and the
+rectangle's x and width, agree with the screenshot to within a pixel or
+two (next section). The rest of the placement (header, texts, the split
+between messages and lines in `calcSplit`, the family pictures) is left
+for the drawing step.
 
 The width the messages wrap at (`Layout.nightMessageWidth`) is the screen
 width minus 50 in the desktop block: **520** (settled in part 2; part 1
 first left open which block is the desktop one).
+
+## Compared with a screenshot (2026-10-14)
+
+The user supplied one screenshot of the night screen of the real game. It
+is the night of day 3 of their replay of that morning (`save-format.md`,
+"The replay"): salary for 10 travelers, savings 40, three members sick.
+The user confirmed it is from that replay itself, taken before this part
+was written, and that **it shows the screen as it opened: no line had
+been clicked.** The picture is not kept in the project (the user's
+choice).
+
+**The order of the lines matches the reference exactly.** On screen, top
+to bottom: `SALARY (10)` 50, `SAVINGS` 40, `RENT` -20, `FOOD` -20,
+`MEDICINE (MIL)` -5, `MEDICINE (WIFE)` -5, `HEAT` -10, `MEDICINE (SON)`
+-5, total `$25`. The reference's budget for the same night gives the same
+eight lines in the same order and the same total.
+
+How strong this is: one night, eight lines. The comparison function alone
+(income first, then lines that must be paid) would allow 240 orders of
+these eight lines; the reference picks one of them through its copy of the
+game's sort, and that one is on the screen. An order that keeps the lines
+as they were added would have savings first and heat before the
+medicines. So the sort is confirmed for this case, including its odd
+effects (salary above savings, heat between the medicine lines). **Before
+this, the doc said the predicted order "looks odd enough to doubt": that
+doubt was wrong** (corrected 2026-10-14). Other line counts (the table at
+the end) and nights with penalties or bribes are not covered by one
+picture.
+
+Also seen in the picture, each matching the code reading:
+
+- Income lines white, cost lines red, the tick circles red with a filled
+  dot on all five optional lines. **The lines start ticked: seen.** The
+  user reports the screen opened like this, with nothing clicked. That is
+  one night, with enough money for everything, and it rests on the
+  picture plus the user's word for "nothing clicked".
+- **The whole row is the click area: supported by an observation.** The
+  user reports that the mouse cursor becomes a pointing hand anywhere on
+  an optional row, also between the name and the amount, not only on the
+  text or the circle. (In the picture the hand is on the HEAT row between
+  the two.) That fits `react` testing the line's whole rectangle. What
+  changes the cursor was not read, and a click there was not reported.
+- The fixed lines (salary, savings, rent) have no circle.
+- A dotted rule under the lines and the total with a `$`, right-aligned
+  with the amounts.
+- The header "END OF" and "DAY 3"; one message, "Your family needs
+  medicine." (three sick, none very sick: `night.md`).
+- No pause button anywhere (part 2: desktop has none).
+- SLEEP bottom right.
+
+Measured in the picture (pixels counted with a script; the picture's scale
+was taken from the header picture, 374 game pixels wide, which gives 1.63
+screenshot pixels per game pixel, and the header was assumed centred):
+
+| What | Code | Picture |
+|---|---|---|
+| Distance from line to line | 17 (tall lines) | 17.0 (27.8 screenshot pixels) |
+| Left edge of the line names | 185 | 185.1 |
+| Right edge of the amounts | 385 | 383.7 |
+| Right edge of the tick circles | 407 (385 + 10 + 12) | 407.0 |
+
+The amounts ending a good pixel short of 385 fits a letter's built-in
+spacing on its right; that was not checked in the font. Vertical positions were
+not compared (the window's title bar makes the top uncertain).
+
+What the picture shows of the parts **not read** (`FamilyVisuals`), noted
+for the part that will read them: on the right, one row per living member
+with round badges (COLD, SICK, HUNGRY) and the name under them; top right,
+the apartment class ("8 CLASS"); on the left, a column of seven dotted
+circles, a booklet picture marked "x5", and four dotted rectangles.
 
 ## Not studied
 
@@ -407,13 +485,19 @@ first left open which block is the desktop one).
 
 ## Things to watch in the game
 
-None of these has been watched. Any normal night will do for 1 to 4.
+Item 1 was checked against a screenshot for one case (three sick; see
+"Compared with a screenshot"), and item 2 was seen on the same night.
+Item 3 is half seen (the cursor, not a click). Items 4 to 6 have not been
+watched. None of this needs watching before the port is built: the code
+is the source, and watching only guards against a misreading. The
+cheapest time for it is when the port's night screen exists and can be
+put next to the game's.
 
-1. **The order of the lines. This is the one that matters most.** The
-   screen shows the budget's lines in the budget's own order. The
-   reference (`nights.py`) predicts an order that changes with the number
-   of lines, because the game's sort moves equal lines around
-   (`nights-txt-format.md`):
+1. **The order of the lines.** The screen shows the budget's lines in the
+   budget's own order. The reference (`nights.py`) predicts an order that
+   changes with the number of lines, because the game's sort moves equal
+   lines around (`nights-txt-format.md`). **The last row is confirmed by
+   the screenshot**; the other three are still predictions:
 
    | Sick members | Predicted order, top to bottom |
    |---|---|
@@ -423,17 +507,17 @@ None of these has been watched. Any normal night will do for 1 to 4.
    | 3 | salary, savings, rent, food, medicine, medicine, heat, medicine |
 
    (Standard lines only, no penalties or bribes, savings and salary above
-   0; the amounts themselves do not change the order.) This order has never
-   been compared with the screen, and it looks odd enough to doubt. If the
-   game shows a steady order (savings, salary, rent, food, heat,
-   medicine), then the sort in the reference is wrong for the budget, and
-   so is the order in which balancing unticks lines. The comparison
-   function was read again in this part and matches the reference; the
-   sort routine itself was not re-read.
+   0; the amounts themselves do not change the order. The medicine lines
+   are added in the order wife, son, mother-in-law, uncle, and in the last
+   row they end up as mother-in-law, wife, then heat, then son.) A night
+   with no one sick would be a good second case: heat above food.
 2. Food and heat show a **filled dot** when the screen has finished
-   appearing (with enough money).
+   appearing (with enough money). **Seen** on one night: food, heat and
+   three medicine lines all opened ticked.
 3. A click anywhere on such a line, not only on the circle, flips it, and
-   the line turns grey-green when unticked.
+   the line turns grey-green when unticked. (Seen so far: the cursor
+   turns into a hand anywhere on the row. The click and the colour were
+   not reported.)
 4. The appearing: about one second of nothing, the messages letter by
    letter, then one line every quarter second, then the circles blink.
 5. With too little money: the screen opens with lines already unticked,

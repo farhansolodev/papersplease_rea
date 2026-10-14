@@ -3,7 +3,9 @@
 **Read this first in a new session.** Last updated 2026-10-14, in the
 ninth session (after the screens, part 3: the load screen and the confirm
 box; parts 1 and 2, the same day, were the base of a screen, the night
-screen, the title screen and the menu helper; all code reading only).
+screen, the title screen and the menu helper; all code reading, plus one
+screenshot of the real night screen that confirmed the budget's line
+order).
 `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
@@ -175,10 +177,10 @@ screens, parts 1 to 3.)
    for its parts only, not its positions), most of `Confirm` and
    `GameScreen`. How a screen is asked for and built is in
    `save-format.md`, part 2.
-   **A look at one night screen in the game would be worth a launch**
-   (the user's decision): the list is at the end of `screens.md`, part 1,
-   and its first item, the order of the budget lines, tests the
-   reference's sort.
+   The user's screenshot of a night screen (2026-10-14) confirmed the
+   order of the budget lines for one night (`screens.md`, part 1). A
+   second look, at a night with no one sick, would test a different
+   line count; the other items of that list need a live screen.
 5. **Drawing**: how text is placed (`app.vis.Text`; the newspaper's title
    and subtitle rules in `newspaper-picture.md` wait on this), how a document page is
    laid out (`PaperInnerVisuals`, read only for its random draws), the
@@ -226,16 +228,29 @@ Collected from the docs, so they are not lost:
 
 **From the ninth session** (`screens.md`, part 1)
 
-- **Nothing about the night screen has been watched in the game.** The
-  list of things to watch is at the end of `screens.md`, part 1.
-- **The order of the budget lines on screen.** The screen shows the lines
-  in the budget's order, and the reference predicts an order that changes
-  with the number of lines (heat above food with no one sick; salary above
-  savings with one or three sick). That comes from the game's sort moving
-  equal lines around. It has never been compared with the screen and
-  looks doubtful. If the game shows a steady order, the reference's sort
-  is wrong for the budget, and with it the order in which balancing
-  unticks lines. One look at a night screen settles it.
+- **The night screen was compared with one screenshot of the real game**
+  (the user's, of night 3 of the replay; `screens.md`, part 1, "Compared
+  with a screenshot"). Nothing that moves or needs a click has been
+  watched; that list is at the end of `screens.md`, part 1.
+- **The order of the budget lines on screen: confirmed for one night.**
+  The reference predicted eight lines in an odd-looking order (salary
+  above savings, heat between the medicine lines) and the screenshot shows
+  exactly that order and the same total. This entry first said the
+  prediction "looks doubtful"; that doubt was wrong (corrected
+  2026-10-14). It is the first check of the game's sort against the
+  screen, and so also supports the order in which balancing unticks
+  lines. Still predictions: the orders for none, one and two sick members
+  (heat above food with no one sick), and nights with penalties or
+  bribes.
+- **The lines start ticked: seen on that night.** The user confirmed the
+  screenshot shows the screen as it opened, with nothing clicked: food,
+  heat and three medicine lines ticked. Also reported by the user: the
+  cursor turns into a hand anywhere on an optional row, which fits the
+  whole row being the click area (the click itself was not reported).
+- **Watching the rest is optional.** The user asked whether the animation
+  must be seen to rebuild it: no. The code is the source and the timings
+  are read from it; watching only guards against a misreading, and is
+  cheapest once the port's night screen can be put next to the game's.
 - By the code, ticking a line that cannot be afforded can untick a lower
   line and leave the clicked one ticked. Not watched.
 - By the code, nothing disables the sleep button while the screen is
@@ -425,7 +440,9 @@ Collected from the docs, so they are not lost:
   its bulletin was not checked).
 - Other callers of `Array.sort` (an unstable quicksort) have not been
   listed. Known users: the news list, the night's budget and the children
-  of a save in the save tree.
+  of a save in the save tree. (The reference's copy of this sort was
+  confirmed against the screen for one budget of eight lines on
+  2026-10-14: `screens.md`, part 1.)
 - A wrong `Purpose` for an Arstotzkan never ends in the reference
   (`fact-values.md`); the data never asks for it.
 - Face sheet `M6` has artwork for one face only (piece 24); face `F1:0` has
@@ -474,6 +491,13 @@ Collected from the docs, so they are not lost:
 
 The stated problem: the original's screen cannot be seen, so the port is
 checked with numbers and logs.
+
+- **A screenshot from the user (works, since 2026-10-14).** A picture the
+  user pastes into the session can be read and measured. One night-screen
+  picture confirmed the order of eight budget lines and four horizontal
+  positions to about a pixel (`screens.md`, part 1, "Compared with a
+  screenshot"). The scale was taken from a picture of known width in the
+  shot. Pictures are not kept in the project.
 
 - **The game's own test player (works, the main method).** The game ships
   with an automated player. A file `auto.plan` in the save folder switches

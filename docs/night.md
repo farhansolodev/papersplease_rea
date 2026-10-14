@@ -208,7 +208,10 @@ click can untick a different line).
 - **Buying was exercised too**, in a replay the same day: the user loaded
   the day-3 save, played the day again and ticked every line at night
   (confirmed by the user afterwards, so this night rests on the save and
-  on memory). The save
+  on memory). (Added 2026-10-14, later: the user's screenshot of this
+  night shows all five lines ticked, and the user says the screen opened
+  that way with nothing clicked. So "ticked every line" means every line
+  was ticked when they slept; they did not have to click for it.) The save
   then has savings 25 (40 + 10 x 5 - 20 rent - 20 food - 10 heat - 15 for
   three medicines), `Night/Profit` 70, everyone's cold and hungry one
   lower, and the son's, wife's and mother-in-law's sickness one lower.
@@ -241,6 +244,13 @@ click can untick a different line).
   the lines as shown. So a save with nothing bought needs one click on
   each of the five lines. That settles the rules; what was actually
   clicked cannot be read from a save.
+- **A screenshot of that replayed night** (supplied by the user on
+  2026-10-14) shows its eight budget lines in exactly the order the
+  reference gives, with the total 25 (`screens.md`, part 1, "Compared
+  with a screenshot"). That is the first check of the budget's line order
+  against the screen. It also shows the message "Your family needs
+  medicine." for three sick members, none very sick, as step 8 above
+  says.
 - The user saw no notice of the son's death before quitting 20 seconds
   into day 4. That fits the death message being built at the start of the
   **next** night from the saved "just died" mark (the `Family` constructor,

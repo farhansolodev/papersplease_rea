@@ -182,4 +182,11 @@ script `scripts/reference/nights.py`:
   `Family.buildMessage`, which makes the escape sentences, and the night
   screen.)
 - How a traveler script's `Night <id>` command reaches the night.
-- Nothing here has been compared with the running game.
+- Compared with the running game in one respect, on 2026-10-14: the order
+  the budget's sort leaves. A screenshot of a night with eight lines
+  shows exactly the order the reference gives, salary above savings and
+  heat between the medicine lines included (`screens.md`, part 1,
+  "Compared with a screenshot"; one night, one of 240 orders the
+  comparison function alone would allow). The night's amounts were
+  compared through saves (`night.md`). Nothing else here has been
+  compared with the running game: no event line was seen running.
