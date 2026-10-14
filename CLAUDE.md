@@ -99,6 +99,9 @@ Port my own copy of Papers, Please to run in the browser:
   go-ahead. A plain question gets a direct answer, with no plan step.
 - **Recover IL2CPP names first.** Raw `GameAssembly.dll` without the names from
   `global-metadata.dat` is not worth analysing.
+- **Search the whole decompile first.** All of the game's own code is
+  decompiled in `decompiled/all/`. Start every question with a search
+  there, and read whole classes rather than single functions.
 - **Reimplement from understanding.** Do not transliterate decompiler output
   into Rust.
 - **Correct over fast.** Read whole functions and confirm against the real
