@@ -654,7 +654,11 @@ folder, `extracted/stashrun`. The folder was looked at three times.
    **Seen** by the user: the title screen with "story" and "endless" and
    no resume button. In the folder: `stash.sav` still there, same time.
 3. **A click on "Story".**
-   **Seen:** `stash.sav` gone. Nothing else in the folder changed.
+   **Seen:** `stash.sav` gone. Nothing else in the folder changed. The
+   user saw only a new-game entry on the screen that opened, nothing to
+   continue: the day played in the first launch was lost, as the code
+   says for a quit in the middle of a day (here there was no save yet,
+   so the whole story).
 
 All three are what the code reading said. A copy of the folder as it was
 after step 1 is kept in `extracted/stash_sample` (gitignored).
@@ -681,8 +685,9 @@ doc. Its result: `0 problems`.
 
 How strong this is: one stash, of one kind (`DAY`), from day 1 of a new
 story, with one traveler processed. It confirms the writing moment, the
-content of a day stash, that desktop start-up ignores the stash, and one
-deletion. **Not tested:** a night or an ending stash; the blocker after a
+content of a day stash, that desktop start-up ignores the stash, one
+deletion, and that the unfinished day is not offered again. **Not
+tested:** a night or an ending stash; the blocker after a
 bomb, poison or a special exit; the days that need two travelers; a
 restore (it cannot happen in normal desktop play); the stash being
 rewritten at each later empty booth (only one traveler was processed

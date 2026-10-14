@@ -146,8 +146,9 @@ saves, part 1. Done in the eighth: saves, part 2.)
    reading, and its main claim was then tested in the real game on
    2026-10-14: after the first traveler of day 1 had left and the window
    was closed, `stash.sav` was in the folder; the next launch showed the
-   title screen and left the file alone; a click on "Story" deleted it.
-   The stash's content matches the description (`stash_check.py`,
+   title screen and left the file alone; a click on "Story" deleted it,
+   and the screen that opened offered only a new game (the unfinished day
+   was lost). The stash's content matches the description (`stash_check.py`,
    `0 problems`).
 4. **The screens, next**: title, the night screen, the ending player
    (slide timing), the endless-mode screens, the language chooser, the

@@ -14,6 +14,14 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-14 Saves, part 2: what the "Story" screen showed in the stash test
+
+**Changed:** `docs/save-format.md` (step 3 of "The stash test in the running game" and its "how strong" paragraph), `docs/PROGRESS.md` (next steps, item 3).
+**Why:** the entry below left one thing unrecorded; the user has now answered it.
+**Tested how:** the user's report of the screen after clicking "Story" in the second launch of the test.
+**Result:** only a new-game entry, nothing to continue. The day played in the first launch was lost, as the code says for a quit in the middle of a day. The folder agrees: no `headers` and no save file.
+**Still broken / not tested:** one observation, and with no earlier save in the folder. A quit in the middle of a later day, where the story should continue from the save after the previous night, was not tried in this test (the user's two-sitting game of part 1 is consistent with it).
+
 ## 2026-10-14 Saves, part 2: the stash test in the running game
 
 **Changed:** new `scripts/reference/hxserial.py` (a reader for the text Haxe's general serializer writes, limited to the codes a stash uses) and `scripts/checks/stash_check.py` with its row in `scripts/checks/README.md`; `docs/save-format.md` (new "The stash test in the running game", and the "not seen in the game" sentences of part 2 changed to say what was seen and what was not); `docs/PROGRESS.md`. New gitignored folders: `extracted/stashrun` (the test's save folder) and `extracted/stash_sample` (a copy taken after the first launch, with the stash).
