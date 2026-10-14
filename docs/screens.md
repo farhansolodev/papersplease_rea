@@ -10,8 +10,11 @@ rules behind a screen are in that topic's own doc (for the night:
 - **Part 2** (2026-10-14): the title screen and the menu helper (`Menu`).
 - **Part 3** (2026-10-14): the load screen and the confirm box
   (`Confirm`).
+- **Part 4** (2026-10-14): the pause screen, the settings screen and the
+  settings list they share; which key pauses; who writes the settings
+  file. It also corrects one layout value of part 2.
 - Not written yet: ending player, endless-mode screens, language chooser,
-  pause screen, settings, credits.
+  credits.
 
 ---
 
@@ -56,7 +59,8 @@ from the decompiler only.
 **Not read:** the `FamilyVisuals` constructor (1,930 lines: the family
 portraits, the apartment, the tokens, the passports) and
 `FamilyVisualsDim`; `play.ui.Button`, `play.ui.DiagramLine`,
-`app.vis.Text`; `GameScreen.addHeader`, `addMediaButtons`, `shake`.
+`app.vis.Text`; `GameScreen.shake`. (`GameScreen.addHeader` and
+`addMediaButtons` were on this list; they are read since, in part 4.)
 
 Numbers the decompiler showed only as addresses were read with
 `read_doubles.py`.
@@ -101,7 +105,7 @@ no input", was right.)
   **Desktop has no such button**: the `Layout` constructor sets
   `showPauseButton` in its two portrait blocks only (settled in part 2,
   "The desktop block of the layout"; part 1 first left this open). On
-  desktop the pause is on a key (`save-format.md`).
+  desktop the pause is on a key: Escape (part 4, "Which key pauses").
 - `makePushButton(parent, text, align, red)` builds the game's standard
   wide button from `PushButton.png` (129 x 38) or `PushButtonRed.png`,
   with text colour `0x556855`, or `0xcc2e2e` on the red one. The picture
@@ -505,8 +509,9 @@ circles, a booklet picture marked "x5", and four dotted rectangles.
 - `FamilyVisuals` and `FamilyVisualsDim`: every picture of the family, the
   apartment, the tokens and the passports. Proposed as its own part.
 - The exact placement of everything (see "Layout").
-- `play.ui.Button` (how a button reacts, its modes), `play.ui.DiagramLine`
-  (the rule), `app.vis.Text`. (The tween helper behind `flashCheck` was
+- `play.ui.Button`'s modes (how it reacts to the mouse and its shortcut
+  key is read since, part 4, "Escape on the pause screen"),
+  `play.ui.DiagramLine` (the rule), `app.vis.Text`. (The tween helper behind `flashCheck` was
   listed here at first; it is read since, "Timed changes" above. Its
   core, `Tween.step`, had in fact been read in an earlier session for
   `border-shooting.md`; this part missed that when it was written.)
@@ -516,7 +521,8 @@ circles, a booklet picture marked "x5", and four dotted rectangles.
   blend time, so it should not matter here (inferred).
 - Where the day fills in its summary, and how a script's `Night <id>`
   command adds to the night events (still open from `night.md`).
-- Which key pauses, and the pause screen.
+- (Answered in part 4: Escape pauses; the pause screen is described
+  there.)
 
 ## Things to watch in the game
 
@@ -593,8 +599,11 @@ class `SoakTapper`.
 The `Layout` constructor has three blocks, one per platform kind
 (`border-view.md`). `border-view.md` found that `borderShowSnipingSurround`
 is set in the two portrait blocks and not in the desktop one. The same two
-blocks, and only they, write `showPauseButton` and `menuItemPaddingY`, so
-the third block is the desktop one. Values for desktop, read from the
+blocks, and only they, write `showPauseButton`, so the third block is the
+desktop one; it is also the only block that writes `titleShowVersion`.
+(This sentence first named `menuItemPaddingY` as a second field written
+only in those two blocks. That was wrong and was corrected on 2026-10-14
+in part 4: all three blocks write it.) Values for desktop, read from the
 instructions:
 
 | Value | Desktop | Where it comes from |
@@ -606,11 +615,12 @@ instructions:
 | `titleLogoScale` | 1.0 | The start value; the desktop block does not change it |
 | `titleLogoTop` | 28 | The start value |
 | `titleMenuCenterY` | 260 | The start value |
-| `menuItemPaddingY` | 0 | No write found outside the portrait blocks (both set 20) |
+| `menuItemPaddingY` | **10** | Written in the desktop block (`0x18049d1ac`); the portrait blocks set 20. **Corrected 2026-10-14 (part 4):** this row said 0, "no write found outside the portrait blocks"; the write was there and was missed |
 
-"No write found" means no instruction that stores to that field through
-the register holding the layout; a store by another route would have been
-missed.
+"The start value" means no instruction in the desktop block stores to
+that field through the register holding the layout; a store by another
+route would have been missed. The other seven rows were checked against
+the listing again when the last row was corrected, and hold.
 
 ## What the title screen builds, in order
 
@@ -694,7 +704,8 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
 
 - `addPushButton(id, text)`: a standard button (`makePushButton`), centred
   horizontally and added to the **centre column**. An id of `back` or
-  `cancel` also makes it the back button (`setAsBackButton`, not read).
+  `cancel` also makes it the back button (`setAsBackButton`: Escape
+  presses it, read in part 4).
 - `addImageButton(id, picture, rows, font)`: a button from a picture whose
   upper `rows` rows are one state and the next `rows` rows the other (the
   whole picture if `rows` is 0). Not in the centre column; the caller
@@ -713,8 +724,9 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
 
 - `UnlockConfirm`: how the code is typed and checked.
 - The music's beat, so the rise's length in seconds and the bob's tempo.
-- `play.ui.Button`, including what "back button" means (inferred from the
-  name: the button a back key presses).
+- `play.ui.Button` beyond its key and mouse handling. (What a "back
+  button" is was listed here, inferred from the name to be the button a
+  back key presses. Read since, part 4: Escape presses it, on release.)
 - Whether a `newversion` button is made anywhere.
 - `Layout.notchHeight` on desktop (inferred 0: there is no notch).
 
@@ -932,8 +944,12 @@ Used here and by other screens. `show(callback, message, options)`:
   of the frame.
 
 The `continue` option carries a third value and the `delete` option the
-`dangerous` one. From the order of their names, the third value of
-`continue` is `freezeAfterClick`; that its value is "true" is inferred.
+`dangerous` one. That the third value of `continue` is `freezeAfterClick`
+was first inferred here from the order of the names; it is confirmed
+since (part 4, "How the option fields were identified": the field list
+of one option of `loadButton_onClick` is exactly `id`, `text`,
+`freezeAfterClick`, and of another exactly `id`, `dangerous`, `text`).
+That its value is "true" is still inferred.
 
 ## For the port
 
@@ -968,3 +984,630 @@ Best with the copy of a real save folder that has a branch
 4. The delete button changes every save's look; a click then asks before
    deleting, with a red DELETE button.
 5. A row of small marks for the endings near the heading.
+
+---
+
+# Part 4: the pause screen and the settings screen
+
+Studied on 2026-10-14. Code reading only: **nothing in this part was
+compared with the running game.**
+
+Two screens that show the same list of settings: the pause screen, which
+appears over a day, a night, the newspaper or the intro, and the settings
+screen, which the title's settings button opens. This part also answers
+three questions older parts left open: which key pauses, who writes the
+settings file, and who reads the forced-layout file `platover`.
+
+## What was read
+
+From `decompiled/screens.clean.c` (condensed copy `screens.short.c`),
+`gameall.clean.c`, `saves.clean.c` and three small files decompiled for
+this part (`keys`, `keys_ctor`, `hostunity_update`):
+
+| Class | Functions |
+|---|---|
+| `play.screen.PauseScreen` | constructor `0x1808035e0`, `menu_onClick` `0x1808046b0`, `showConfirm` `0x180804ab0` (all it has) |
+| `play.screen.SettingsScreen` | constructor `0x180715910`, `menu_onClick` `0x1807168f0` (all it has) |
+| `play.screen.SettingsMenu` | constructor `0x180710150`, `update` `0x1807154b0`, `updateDateFormatText`, all 13 click handlers, `width`, `height` |
+| `play.screen.SettingsMenuPurpose` | its two values, `Pause` and `Title` |
+| `play.screen.SettingRow` | constructor `0x1808685f0`, `addCheckboxButton`, `addPlusMinusButtons`, `addVolumeBar`, `addLanguageButton`, `addPlatformButton`, `addRatingButton`, `addVisual`, `makeModeImages`, `splitOntoTwoLinesIfNecessary`, `react`, `draw`, `width`, `height`, the two setters |
+| `play.screen.SettingDim` | constructor (the sizes) |
+| `play.screen.PlatformChangeConfirm` | `button_onClick` only |
+| `play.screen.GameScreen` | `addHeader` `0x18057cbb0`, `addMediaButtons` `0x18057d370` (part 1 had left both unread) |
+| `Game` | `update` `0x18058c9b0` (the pause key, the settings check, the screenshot key), `applySettings` `0x1805895e0`, `queueScreenChangeToSettings`, the `settings` branch of `applyScreenChange`, the three functions of the `paused` state |
+| `play.Settings` | the ten setters |
+| `app.ent.Key` | the class setup `0x18048b510` (the key numbers) |
+| `InputWrapper`, `HostUnity` | `InputWrapper` constructor `0x1804aa420` (which real key each number is), `GetKeyState`; in `HostUnity.Update` only the loop that reads the keys |
+| `play.screen.RatingScreen`, `LangChooser` | `isRequired`, `hasUserAddedLanguages` |
+
+Read afterwards, the same day, from the whole-game decompile in
+`decompiled/all/` (made for the Escape question): `play.ui.Button`
+(`react`, `setAsBackButton`, the constructor's defaults),
+`ButtonHelper.react`, `app.ent.Input` (`getKeyDown`, `getKeyJustDown`,
+`getKeyJustUp`, `maskKeyUntilRelease`, `update`), `Trunk.treeReact`,
+`SafeChildIter`, `Booth.react`, `StampDesk.react`, `TitleScreen.react`
+and `update` again, the back buttons of the endless, credits, unlock,
+device and language screens, and the stamp-bar choice in the `Booth`
+constructor's instructions.
+
+Checked beyond the decompiler: the strings of the `SettingsMenu`,
+`PauseScreen`, `addCheckboxButton` and `addPlatformButton` code in
+machine-code order (`ListStringUses.java`; this recovered the text id
+`language_author` and the mode names `off` and `phone`); the instructions
+of `SettingsMenu.musicButton_whenClick` (the decompiler dropped the value
+passed to the setter); the layout values in the existing
+`decompiled/layout_ctor_asm.txt`; 12 number constants with
+`read_doubles.py`. Two searches for callers with `FindReferences.java`
+(below).
+
+**Not read:** `play.ui.Button` beyond `react`, `setAsBackButton`, the
+constructor's defaults and `ButtonHelper.react` (read afterwards, for
+"Escape on the pause screen"), the `PlatformChangeConfirm` constructor
+and `show`, `RatingPopup`,
+`LangChooser` beyond the one function (it is its own screen),
+`Menu.applyCenterY` again (taken from part 2), the platform functions
+`canVibrate`, `getAvailableLanguageCodes`, `setFullscreen`,
+`getFullscreen`, `setCategoryVolume`, and `Bootstrap.setLanguage`.
+
+## Which key pauses: Escape
+
+Every frame `Game.update` asks, in this order: does the current screen say
+it can be paused, was key number 5 pressed this frame, is the game's own
+state `on` (`save-format.md`, part 2). If all three hold, the key is masked
+until it is released and the state goes to `paused`.
+
+The game's keys are numbers (`app.ent.Key`; the class setup writes them
+one by one, 0 to 10). The Unity side turns each into a real key
+(`InputWrapper`'s table), and `HostUnity.Update` reads all 11 every frame:
+
+| Number | Name in the code | Real key | Unity key code |
+|---|---|---|---|
+| 0 | `TAB` | Tab | 9 |
+| 1 | `SPACE` | Space | 32 |
+| 2 | `ENTER` | Enter | 13 |
+| 3 | `LEFT` | Left arrow | 276 |
+| 4 | `RIGHT` | Right arrow | 275 |
+| **5** | **`ESCAPE`** | **Escape** | 27 |
+| 6 | `T` | T | 116 |
+| 7 | `DEVMENU` | Unity's `Tilde` (~) | 126 |
+| 8 | `AUTOPLAY_ABORT` | L | 108 |
+| 9 | `AUTOPLAY_PAUSE` | P | 112 |
+| 10 | `SCREENSHOT` | O | 111 |
+
+The key codes are the numbers in the table; their names were looked up in
+Unity's own key list in `dumps/il2cppdumper/dump.cs`. What each key is
+used for: "Every key the game reads" below. (This sentence first said
+keys 0 to 4 and 6 to 9 were not followed; they were, later the same day.)
+
+**Key 10, read in passing:** in the same function, pressing O draws the
+whole screen into a picture and saves it as
+`Screenshot-<year>-<month>-<day>-<hour>-<minute>-<second>.png` in the
+platform's documents folder (`getDocumentsDirectory`, not read), and logs
+"Saving screenshot to: ...". No condition around it was seen in this
+function, such as a debug switch.
+
+**Which screens can be paused.** A screen can be paused if its constructor
+calls `enablePause` (part 1). A search of the 471 `play.screen` functions
+for that call finds four callers: the day screen, the night screen, the
+news screen and the intro screen. The title, load and settings
+constructors were read and do not call it; for the ending, endless and
+credits screens this rests on the search alone.
+
+## The pause screen (`PauseScreen`)
+
+It is made when the game enters `paused` and removed when it leaves
+(`save-format.md`, part 2: sound paused, the screen under it hidden, the
+sound `button-drop`; on leaving, `hover-up`). It is built on `GameScreen`
+like every screen. In order:
+
+1. The header with the text `menu_paused` ("PAUSED"); see "The header"
+   below.
+2. A `Menu` (part 2). On desktop, without the command-line word `expo`:
+   centred on y = screen height x 270 / 320 (270), with three standard
+   buttons:
+
+   | Id | Text | What a click does |
+   |---|---|---|
+   | `resume` | `menu_resume` ("RESUME") | `GameTransition.setPause(false)`: back to the game |
+   | `mainmenu` | `menu_mainmenu` ("MAIN MENU") | a confirm box (below) |
+   | `quit` | `menu_quit` ("QUIT") | a confirm box (below) |
+
+   On the other layouts, or with `expo`, there is no `quit` button, and
+   the two others are placed by hand: `mainmenu` at the layout's
+   `standardFooterButtonY`, `resume` above it.
+3. `resume` is made the back button (`setAsBackButton`): its shortcut key
+   is Escape ("Escape on the pause screen" below).
+4. The settings list (`SettingsMenu`, in its `Pause` form, below), centred
+   left to right, and up and down centred between the bottom of the header
+   and the top of the `resume` button.
+5. With `expo` only: the settings list is switched off (its "active"
+   switch is cleared, part 1), `resume` is centred on the screen and
+   `mainmenu` sits 20 below it.
+
+If the standard button is 19 high (part 3) and the gap is 10 (the layout
+table below), the three buttons take 77 pixels, so on desktop they run
+from about y 231 to 308. This sum was done by hand; `applyCenterY`'s own
+rounding was not re-read.
+
+**The confirm boxes.** `mainmenu` and `quit` each open the confirm box of
+part 3 with an empty message and two options: the action itself (id
+`confirm-mainmenu` or `confirm-quit`, with the same text as the button
+that opened it) and `confirm-cancel` (`confirm_cancel`, "CANCEL"). The
+action option is marked `dangerous` (a red button) and
+`freezeAfterClick` (the box stays on screen, frozen, after the click); the
+cancel option is marked `backButton`, so Escape presses it. All three
+values are true (visible in the code). Which fields the options have was
+read from the names of their field lists ("How the option fields were
+identified" below).
+
+| Option | What it does |
+|---|---|
+| `confirm-mainmenu` | `GameTransition.fadeToMainMenu()` |
+| `confirm-quit` | `GameTransition.quit()` |
+| `confirm-cancel` | Only forgets the box, so a new one is made next time |
+
+**What "main menu" costs the player** follows from `save-format.md`: the
+story is saved only on going to the next day, so leaving a day or a night
+through this button loses that day (on desktop the stash is not read
+back). Inferred from those rules, not followed through `fadeToMainMenu`.
+
+**One id with no button:** `menu_onClick` also handles the id `credit`
+(it opens the language's `url_twitter` address in the system's browser).
+The constructor makes no button with that id.
+
+## Escape on the pause screen: it resumes
+
+Read on 2026-10-14, after the first version of this part had left it
+open (`decompiled/all/play_ui.c` and `app_ent.c`, decompiled for this):
+
+- **A back button is a button whose shortcut key is Escape.**
+  `Button.setAsBackButton` sets the button's `shortcutKey` to 5; a new
+  button has -1 (none). (`Menu.addPushButton` does this for the ids
+  `back` and `cancel`, part 2; `Confirm` for those ids and for options
+  marked `backButton`, part 3.)
+- **A shortcut key clicks the button on release.** Each frame
+  (`ButtonHelper.react` `0x1806a3d60`), unless the button lies under a
+  blocked area of the screen: while the key is held the button shows
+  pressed and the sound `button-down` plays once; when the key is let go
+  the sound `button-up` plays and the button counts as clicked, exactly as
+  a mouse click. Under a blocked area only the mouse works.
+- **Masking.** When `Game.update` pauses on Escape it masks the key until
+  it is released (`Input.maskKeyUntilRelease`): from then until the key
+  goes up, the game sees Escape as not pressed (`Input.update`
+  `0x1804b1220`). So the press that paused does not also press RESUME.
+- **Who gets the key first.** Input goes to the newest parts of a screen
+  first (the tree walk for input runs through an entity's children from
+  last to first, `Trunk.treeReact` with `SafeChildIter.start(true)`; the
+  update and draw walks run first to last). A confirm box is made after
+  the buttons, so it gets input before them, and when it is shown it
+  blocks the whole screen area for the rest of the frame (part 3).
+
+Together, on the pause screen:
+
+1. **Escape, pressed and let go again: the game resumes.** RESUME goes
+   down while the key is held, with the `button-down` sound; on release
+   `button-up` plays and `GameTransition.setPause(false)` runs. The
+   game's own state then goes back to `on`, with the sound `hover-up`.
+2. **With the MAIN MENU or QUIT box open, Escape presses CANCEL**: the
+   box goes away and the game stays paused. RESUME, under the box, does
+   not see the key that frame.
+3. Holding Escape down does nothing more until it is let go.
+
+Not watched in the game: on the watch list.
+
+**How the option fields were identified.** A Haxe object written in the
+code (such as a confirm option) is made from a list of its fields' name
+numbers (hashes, sorted), which the decompiler shows only as the name of
+a data block (`Field_<PrivateImplementationDetails>_2F51E3F2...`). That
+name is the SHA-256 of the list's bytes. The name number of a field is
+computed from its name (each character: number x 223 + character code,
+kept to 31 bits; checked against five numbers the code shows, such as
+`id` = `0x5bdb` and `text` = `0x4cf9ccad`). Trying every combination of
+the five option fields gave exactly one match for each of the four lists
+in the screens code: the two options of the pause screen above, and the
+two of the load screen (part 3). So this is a match out of 31 possible
+combinations per list, by a hash, not a guess from the order of names.
+
+## Every key the game reads, and everything Escape does
+
+Searched on 2026-10-14 in the whole game, decompiled for this
+(`decompiled/all/`, 6,856 functions: every function of the game's own
+classes except the social service and Steam, `ghidra-workflow.md`). The
+search covered every call of the six key functions of `app.ent.Input`
+(by name, and through the slot-number helpers), every write of a
+button's `shortcutKey`, and every place Unity's own key input is read.
+What it found is complete for the code Ghidra decompiled; the two
+functions it could not (the `Booth` and `Layout` constructors) were
+checked in their instruction listings for button shortcut calls, and
+have none.
+
+**Keys tested by number** (the only places in the game):
+
+| Key | Where | What it does |
+|---|---|---|
+| Escape (5) | `Game.update` | Pauses (above) |
+| O (10) | `Game.update` | Saves a screenshot (above) |
+| Space (1) | `Booth.react` (the booth during a day) | Opens or closes inspect mode, **if the player has the upgrade `INSPECT_HOTKEY`** |
+| Tab (0) or Enter (2) | `Booth.react` | Opens or closes the stamp bar, **if the player has the upgrade `STAMPBAR_HOTKEY`** and inspect mode is not open |
+| Left (3), Right (4) | `Booth.react` | The paper in focus on the desk turns a page back or forward (`flipPageIfPossible`), no upgrade needed |
+| Tab (0) | `StampDesk.react` | Opens or closes that kind of stamp bar, with no upgrade test |
+| L (8), P (9) | the test player (`AutoPlayer.stepAndGetInput`) | Stop the test player, pause it. Only when the test player runs (`comparing-with-the-game.md`) |
+| T (6), the developer key (7) | nowhere | Read every frame, never tested |
+| any key | `TitleScreen.react` | Skips the rising title (part 2) |
+
+The upgrades are bought at night (`nights-txt-format.md`, the
+`Upgrade-...` commands). **Two stamp bars:** the booth makes a `StampBar`
+unless the screen shape is `PORTRAIT_THIN`, and replaces it with a
+`StampDesk` when it has a carousel (from the `Booth` constructor's
+instructions). When the booth has a carousel was not settled; from the
+names it is the phone layout (inferred). On desktop the Tab key would
+then go only through `Booth.react`, with the upgrade test.
+
+**Shortcut keys on buttons:** the only shortcut any button gets is
+Escape, through `setAsBackButton`. So everything Escape does besides
+pausing is a back button. All of them in the game:
+
+| Screen or box | Button | Escape does |
+|---|---|---|
+| Day, night, news, intro screens | none | Pauses (if the game is running) |
+| Pause screen | RESUME | Resumes |
+| Pause screen, MAIN MENU / QUIT box | CANCEL | Closes the box |
+| **Title screen** | the QUIT picture button | **Quits the game, with no question**, once the title has arrived (the button exists when the platform says the game can exit and without `expo`, part 2) |
+| Settings screen | DONE (`back`) | Back to the title |
+| Load screen | back (`back`) | Back to the title |
+| Load screen, continue / delete boxes | CANCEL (`cancel`) | Closes the box |
+| Load screen, "tracks full" box | none (its one option is `ok`) | Nothing |
+| Credits screen | back (`back`) | Back to the title |
+| Endless screen | back (`back`) | Back to the title |
+| Endless code box (`UnlockConfirm`) | CANCEL | Closes the box, no unlock |
+| Endless screen's hidden "clear achievements" box (20 quick taps in the top right corner; not studied, rule 4) | CANCEL | Closes the box |
+| Device box (`PlatformChangeConfirm`, not on desktop) | CANCEL | Closes the box |
+| Language chooser | none: its CANCEL is made without `setAsBackButton` | Nothing |
+| Ending screen | none | Nothing (it cannot be paused either) |
+
+Each back button clicks when Escape is let go, and only if no box is
+shown over it.
+
+**A trap on the first title screen (predicted from the code, not
+seen).** While the title rises, any key skips the rise
+(`TitleScreen.react`). The skip masks only the mouse
+(`maskAllPointersDownUntilRelease`), not the key. On the next frame
+`TitleScreen.update` ends the rise and switches the QUIT button on. If
+the key that skipped was Escape and it is still held on that frame
+(likely: a key press usually lasts several frames), QUIT sees Escape held
+and **the game quits when the key is let go**. Any other key only skips.
+This happens only on the first title screen of a run, the one that
+rises.
+
+For the port: with the user's decision of no quit option, Escape on the
+title does nothing, and the trap does not exist.
+
+## The header (`GameScreen.addHeader`)
+
+Called by the pause screen, the settings screen, the credits screen, the
+endless screen and the ending screen's statistics page (the last three
+found by searching for the call, not read). It adds:
+
+- the picture `ScreenHeader.png`, centred left to right, at the layout's
+  `gameScreenHeaderY` (13 on desktop: the start value, which the desktop
+  block does not change);
+- if a title is given: the title in the font `title_tall`, white on a
+  black background with 8 pixels of padding left and right, centred left
+  to right, and placed so that its middle is on the picture's bottom edge.
+
+It returns the y of the bottom of the title (of the picture, if there is
+no title). The two screens use that number to centre the settings list.
+
+## The settings screen (`SettingsScreen`)
+
+Built when the screen `settings` is asked for (`save-format.md`, part 2).
+`Game.applyScreenChange` gives it three things: the platform's version
+text, the list of language codes the platform found
+(`getAvailableLanguageCodes`), and the launch setting
+`allowPhoneTabletPlatformChange` (`save-format.md`: only on Android or an
+iPad). It does not call `enablePause`. In order:
+
+1. Song `Theme`.
+2. The header with `menu_settings` ("SETTINGS").
+3. A `Menu` centred on the layout's `standardFooterButtonY` (290 on
+   desktop), with one standard button, id `back`, text `menu_done`
+   ("DONE"). A click fades to the screen `title`.
+4. The settings list in its `Title` form, centred left to right, and up
+   and down centred between the bottom of the header and the top of the
+   DONE button.
+5. Only on layouts that do not show the version on the title (so not on
+   desktop): the version text, font `regular`, colour `0xff3b483b`, 10
+   pixels from the right and bottom edges.
+6. Two picture buttons (`addMediaButtons`): `web` (`WebpageButton.png`, 11
+   rows per state) 20 pixels from the left edge, and `twitter`
+   (`TwitterButton.png`, 11 rows per state) 20 pixels from the right edge,
+   both 10 below the notch (the top of the screen on desktop, where the
+   notch height is taken as 0, inferred as in part 2).
+
+**For the port (your decision, as with the title's `version` button):**
+`web` and `twitter` open the language's `url_homepage` and `url_twitter`
+in the system's browser. They are plain links, not online play or DRM, so
+I did not stop, and I did not study how a link is opened. Suggested:
+leave them out.
+
+## The settings list (`SettingsMenu`)
+
+One object that both screens create, told which of two forms to take. It
+holds a list of rows and stacks them top to bottom.
+
+| Row (text id, English) | Kind | `Pause` form | `Title` form | Made when |
+|---|---|---|---|---|
+| `menu_fullscreen` "Fullscreen" | tick box | yes | yes | the layout is the desktop one |
+| `menu_nudity` "Nudity" | tick box | yes | yes | always |
+| `menu_easy` "Easy Mode" | tick box | no | yes | always |
+| `menu_vibration` "Vibration" | tick box | yes | yes | the platform says it can vibrate (`canVibrate`, not read; a desktop PC presumably cannot: inferred) |
+| `menu_dateformat` "Date Format" | minus and plus | no | yes | always |
+| `menu_music` "Music" | bar, minus and plus | yes | yes | always |
+| `menu_sound` "Sound" | bar, minus and plus | yes | yes | always |
+| `menu_device` "Device" | phone / tablet button | no | yes | the change is allowed **and** the layout is not the desktop one |
+| `menu_language` "Language" | language button, or minus and plus | no | yes | always |
+| (no text) | rating picture button | yes | yes | the language code is `ko` (`RatingScreen.isRequired`) |
+
+The rows appear in this order. So on a desktop PC in English the pause
+screen shows **Fullscreen, Nudity, Music, Sound**, and the settings screen
+**Fullscreen, Nudity, Easy Mode, Date Format, Music, Sound, Language**
+(plus Vibration in both if `canVibrate` says yes).
+
+What each row does:
+
+| Row | A click |
+|---|---|
+| Fullscreen, Nudity, Easy Mode, Vibration | Flips the setting |
+| Easy Mode, when switched **on** | Also shows the tip `menu_easytip` ("+ 20 credits per day") for **3 seconds** (on desktop to the right of the row, 30 pixels right of the button column). Switching it off hides the tip at once |
+| Vibration, when switched on | Also vibrates once |
+| Date Format | Minus: the format index down by 1, not below 0. Plus: up by 1, not above the last (there are three, `value-helpers.md`). The row shows the chosen format's example text, right-aligned before the buttons |
+| Music, Sound: minus and plus | The volume is first rounded to the nearest tenth, then moved by 0.1, and kept within 0 to 1. So eleven steps |
+| Music, Sound: the bar | While the pointer is held down on the bar, the volume is the pointer's place along the bar (0 at its left end, 1 at its right), rounded to the nearest tenth and kept within 0 to 1. The pointer shows the hand over the bar |
+| Device | Opens a box with `phone`, `tablet` and cancel (`PlatformChangeConfirm`). A choice goes to `GameTransition.requestPlatformChange` (`save-format.md`, part 2). Never on desktop |
+| Language, the usual form | Opens the language chooser (`LangChooser`, a screen of its own, not read) |
+| Language, when the player has added languages | Minus and plus step through the available language codes, wrapping round at both ends, and set the language code |
+| Rating | Opens `RatingPopup` (not read) |
+
+"The player has added languages" means: the platform's list of language
+codes is not the same, entry for entry, as the lines of `Languages.txt`
+(`LangChooser.hasUserAddedLanguages`).
+
+The Language row also shows the language's own name (`language_name`,
+"ENGLISH") right-aligned before the button, and under it, in the small
+font `small_tight`, the text `language_author`, unless that text is empty,
+`Author` or `-`. In English it is `Author`, so nothing is shown.
+
+**The rows follow the settings, not the clicks.** A click only calls a
+setter. Every frame `SettingsMenu.update` compares the settings' change
+counter with the one it saw last; when it differs it sets every tick box,
+both bars, the device button and the date text from the settings again.
+So a change made elsewhere (the fullscreen key of the system, below)
+shows up in the list too.
+
+## Who writes the settings file
+
+**One place: `Game.update`, through `Game.applySettings`.** This answers
+the question `save-format.md` left open.
+
+- Each of the ten setters of `play.Settings` does the same two things when
+  the new value differs from the old: it stores the value and adds 1 to
+  the settings' change counter (`generation`). (`set_dateFormatIndex`
+  also keeps the index within the list.) None of them writes the file.
+- Every frame `Game.update` compares that counter with its own copy. If
+  they differ it calls `applySettings`, which:
+  1. if the language code differs from the loaded language: loads the new
+     language (`Bootstrap.setLanguage`), rebuilds the game's standing
+     objects, and asks for the settings screen to be built again (through
+     the rating screen first if that language needs one);
+  2. sets the music volume and the sound volume in the audio layer, each
+     as **the setting squared** (a setting of 0.5 plays at 0.25);
+  3. sets fullscreen;
+  4. calls `Settings.save` (which writes the `settings` entry if the
+     counter differs from its value at the last load, `save-format.md`);
+  5. takes the counter as its own copy.
+- If the counters are equal, `Game.update` instead compares the window's
+  real fullscreen state with the setting, and if they differ, **sets the
+  setting from the window**. That changes the counter, so the next frame
+  applies and saves. (So switching fullscreen by the system's own means
+  ends up in the settings file. Which means those are was not read.)
+
+So the file is written on the frame after any setting changes, whoever
+changed it. The callers of the setters found in the `play.screen` code:
+the handlers above, `TitleScreen.unlockConfirm_onDone`
+(`endlessUnlocked`), `EndlessScreen.set_endlessId` (`endlessIdStr`) and
+`LangChooser.update` (`languageCode`). A search of the decompiled files
+for other callers of `Settings.save` found only the settings' own
+call-by-name table; the files decompiled so far are not the whole
+program.
+
+This fits what was seen with the real save folder (`save-format.md`): the
+`settings` file appeared when the user changed a volume, not at start-up.
+
+## Who reads `platover`: nobody found
+
+`platover` is read by `Settings.getPlatformKindOverride` and written by
+`Settings.setPlatformKindOverride`. A search of the whole program for
+code that refers to each (`FindReferences.java`):
+
+| Function | Callers found |
+|---|---|
+| `setPlatformKindOverride` `0x180870b30` | 1: `Game.applyTransition` (the `REQUEST_PLATFORM_CHANGE` request) |
+| `getPlatformKindOverride` `0x18086faf0` | **none** |
+
+Both are plain (static) functions, which are called directly, so a caller
+would show up as it does for the first. **Observed: no code in this build
+calls the reader.** A call from code Ghidra did not turn into
+instructions would be missed. And on desktop the file is never written
+either: the Device row is not made there. For a desktop port the forced
+layout can be left out.
+
+## A row on screen (`SettingRow`, `SettingDim`)
+
+The sizes come from the layout (`SettingDim`). On desktop:
+
+| Value | Desktop | Rule |
+|---|---|---|
+| Button | 15 x 15 | the layout's `settingsButtonSize` |
+| Padding | 4 | `settingsPadding` |
+| Row height | 19 | padding + button height |
+| Button column x | 180 | `settingsButtonX` (the start value; the desktop block does not change it) |
+| Bar width | 50 | button width x 50 / 15 |
+| Font ascent | 16 | of the font `title_tall` (`fonts.md`) |
+
+A row is an entity with a list of pictures and texts, and buttons as its
+children. Positions inside a row, on desktop:
+
+- **The label**: font `title_tall`, white, at x 0. Its y is cap height
+  minus ascent (12 - 16 = -4), the same shift every text in a row gets.
+- **A button** (tick box, minus, language, device): at the button column,
+  x 180; y = floor(ascent / 2 - button height / 2) - 1, which is -1.
+- **Plus**: right of minus, at x 180 + minus's width + padding (199).
+- **The bar**: three filled rectangles, left of the buttons. A white one
+  50 x 16 at x 126 (button column - padding - bar width), y -1; a black
+  one 48 x 14 one pixel in; and the level, white, at most 46 x 12, two
+  pixels in. The level's width is 46 x the volume; under one pixel it is
+  not drawn.
+- **A text before the buttons** (date format, language name):
+  right-aligned so that it ends at x 176 (button column - padding).
+- **The rating button**: the given picture with a 2-pixel margin (white
+  when pressed), centred on x 109 (half of button column + 2 x (padding + button width)).
+
+**Button pictures (`makeModeImages`).** Each button has a normal and a
+pressed picture, made at run time from a small icon
+(`SettingButtonOn.png`, `SettingButtonOff.png`, `SettingButtonPlus.png`,
+`SettingButtonMinus.png`, `SettingButtonLanguage.png`,
+`SettingButtonPlatform.png`). The box is button-sized (the language and
+device buttons are two columns wide: 2 x 15 + 4 = 34), taller if the icon
+needs it, filled black, with a dotted white border (every second pixel).
+The pressed picture has its inside, 2 pixels in from each edge, filled
+white. The icon is then pasted in the middle of both, with the paste mode
+`BLEND`. (The picture functions used here are called by number and their
+names were not resolved; "copy", "fill a rectangle" and "paste" are read
+from their arguments.) The tick box has two looks, `off` and `on`, each with its own
+pair; the device button has `phone` and `tablet` (the upper and lower half
+of its picture).
+
+**A label that does not fit** (`splitOntoTwoLinesIfNecessary`, run on
+every row once all are made): if the label's right end reaches to within
+the padding of the leftmost other thing in the row, everything except the
+label moves down by one row height and the row becomes one row height
+taller. This is how a long translated label gets a line of its own.
+
+**Stacking.** The list puts the rows under each other, each at the sum of
+the heights before it. The list's height is that sum minus the padding;
+its width is the widest row (the rightmost end of anything in it). On
+desktop, if no label needs a second line, the pause form is 4 x 19 - 4 =
+72 high. The settings form has 7 rows; its height also depends on the
+language button, whose row grows if the button with its padding is taller
+than 19 (the icon's height was not looked up).
+
+## A correction to part 2: the gap between menu buttons
+
+Part 2 said the desktop block of the layout does not write
+`menuItemPaddingY`, so that it is 0 on desktop. **That was wrong
+(corrected 2026-10-14, in this part).** The listing has three writes to
+that field, one in each block: 20, 20 and, in the desktop block at
+`0x18049d1ac`, **10**. Part 2's table and the sentence before it are
+corrected. The identification of the desktop block does not depend on it:
+`showPauseButton` is written in two blocks only, and the third block is
+also the only one that writes `titleShowVersion`.
+
+Nothing else was built on the 0: no position in parts 2 or 3 was computed
+from it. The desktop values read for this part, from the same listing:
+
+| Value | Desktop | Where it comes from |
+|---|---|---|
+| `menuItemPaddingY` | **10** | written in the desktop block |
+| `settingsPadding` | 4 | written in the desktop block |
+| `settingsTipsOnTop` | false | written in the desktop block (from a register that holds 0 there) |
+| `settingsButtonX` | 180 | the start value; one portrait block changes it (to 152) |
+| `settingsButtonSize` | 15 x 15 | written in the desktop block |
+| `standardFooterButtonY` | 290 | screen height x 290 / 320, in the desktop block |
+| `gameScreenHeaderY` | 13 | the start value; one portrait block changes it |
+
+## For the port
+
+- Escape pauses, on the day, night, news and intro screens only.
+  Everywhere else it presses the screen's back button, on release (the
+  table in "Every key the game reads"); the port needs the same idea of
+  one back button per screen or box.
+- The pause list is four rows on desktop: Fullscreen, Nudity, Music,
+  Sound. Easy mode, date format and language can only be changed from the
+  title's settings screen.
+- Volume is stored in tenths from 0 to 1 and played **squared**.
+- A setting is applied and saved on the frame after it changes; nothing
+  needs an "apply" or "save" button.
+- Fullscreen follows the window both ways: the setting sets the window,
+  and a window changed from outside sets the setting. In a browser this
+  is the fullscreen request and the browser's own Escape/F11 handling;
+  how to map it is a design decision.
+- **Decided by the user (2026-10-14): the `web` and `twitter` buttons
+  are left out, and there is no quit option** (neither the pause screen's
+  QUIT, made on desktop without any check, nor the title's `quit`
+  button, part 2).
+- Escape is also the browser's own "leave fullscreen" key; in fullscreen
+  the browser may take the first press for itself. Not tested; for the
+  design.
+- Not needed for desktop: the Device row, `platover`, vibration, and
+  (unless Korean is offered) the rating row.
+
+## Not studied
+
+- `play.ui.Button`'s modes and pictures. (How it reacts and what a back
+  button does were listed here; they are read since, "Escape on the pause
+  screen".)
+- `LangChooser`, `RatingPopup`, `RatingScreen`, the
+  `PlatformChangeConfirm` box.
+- What `canVibrate` answers on desktop.
+- What "rebuilds the game's standing objects" covers after a language
+  change (`Game.createDefaultEnts`), and `Bootstrap.setLanguage`.
+- What the nudity setting changes: its readers were not looked up. (Easy
+  mode's effect is known: the night adds the event `EASY_MODE` when the
+  setting is on, `night.md`.)
+- The height of the icons, so the exact height of the language row and of
+  the settings list.
+- Where the documents folder for screenshots is. (What keys 0 to 4 and 6
+  to 9 do was listed here; answered the same day, "Every key the game
+  reads".)
+- When the booth has a carousel (so which stamp bar a desktop booth
+  has); inferred: only on the phone layout.
+- The portrait arrangements.
+
+## Things to watch in the game
+
+Each takes under a minute.
+
+1. During a day, **Escape** shows PAUSED with four rows (Fullscreen,
+   Nudity, Music, Sound) above RESUME, MAIN MENU, QUIT. On the title
+   screen Escape does not pause.
+2. Escape, pressed again, resumes, when the key is let go (RESUME looks
+   pressed while it is held).
+3. MAIN MENU and QUIT each ask first, with the same word on a red button
+   and CANCEL. With that box open, Escape closes the box and the game
+   stays paused.
+4. The title's settings button shows seven rows: Fullscreen, Nudity, Easy
+   Mode, Date Format, Music, Sound, Language, with DONE at the bottom and
+   two small picture buttons in the top corners. Whether a Vibration row
+   is there.
+5. Ticking Easy Mode shows "+ 20 credits per day" beside it for about 3
+   seconds.
+6. Minus and plus on Music move the bar in ten steps; holding the mouse
+   on the bar and moving sets it directly.
+7. With a save folder of the project (`savedir`, `save-format.md`): the
+   `settings.sav` file's time changes right after a click that changes a
+   setting, and not after a click that changes nothing (plus at full
+   volume).
+8. Pressing **O** writes a `Screenshot-...png` somewhere in the user's
+   documents (this is outside the project folder; say if you would rather
+   not try it).
+9. On the settings, load and credits screens, Escape goes back to the
+   title. In the language chooser it does nothing.
+10. On the title screen, once it has finished rising, Escape closes the
+    game at once.
+11. The trap: at the very first title screen after starting the game,
+    press Escape once while the title is still rising. Predicted: the
+    title jumps into place and the game closes when the key is let go. A
+    very quick tap might only skip.
+12. In a day with the upgrades bought: Space switches inspect mode, Tab
+    or Enter opens and closes the stamp bar; Left and Right turn the page
+    of the paper under the mouse, with or without upgrades.

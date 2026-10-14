@@ -279,9 +279,11 @@ default language, and nudity on only on desktop; its constructor then loads
 the `settings` entry if there is one, each value falling back to the
 current one when missing. This is where the saved date format comes from
 (`value-helpers.md`). `Settings.save` writes the entry only if the
-settings' change counter differs from its value at the last load; who calls
-it was not followed. (In the real folder the file appeared when the user
-changed a volume, not at start-up.)
+settings' change counter differs from its value at the last load. Who
+calls it is known since 2026-10-14 (`screens.md`, part 4, "Who writes the
+settings file"): `Game.applySettings`, which `Game.update` runs on the
+frame after any setter has changed a value. (That fits the real folder:
+the file appeared when the user changed a volume, not at start-up.)
 
 **Statistics.** `stats` is the all-time table: names to whole numbers. It
 is read at start-up. A change starts a one-second countdown and the file is
@@ -293,8 +295,12 @@ and makes the game use that layout. It is written when a
 `REQUEST_PLATFORM_CHANGE` request arrives ("Requests" below). One caller
 was found, `SettingsMenu.platformChangeConfirm_onDone`. The settings
 screen is told at creation whether the change is allowed, and the launch
-code allows it only on Android or an iPad (what the screen does with that
-was not read). Who reads the file was not followed.
+code allows it only on Android or an iPad. What the screen does with
+that, read on 2026-10-14 (`screens.md`, part 4): it shows a "Device" row
+only if the change is allowed and the layout is not the desktop one. Who
+reads the file: **no caller of the reader,
+`Settings.getPlatformKindOverride`, was found anywhere in this build**
+(same place, "Who reads `platover`").
 
 ## When the game saves and loads
 
@@ -425,7 +431,8 @@ instructions.
 
 `paused` is entered by `SET_PAUSE`, or in `Game.update` when key number 5
 is pressed, the state is `on` and the current screen says it can be paused.
-Which key number 5 is was not looked up.
+Key number 5 is Escape (looked up on 2026-10-14: `screens.md`, part 4,
+which also describes the pause screen).
 
 ## Building the screen (`Game.applyScreenChange`)
 
@@ -871,13 +878,14 @@ user's own play data.
 - (Answered on 2026-10-14 in `screens.md`, part 1: flag 4 lets a screen
   and its parts get input, flag 16 lets them be updated.)
 - The booth's own states beyond `empty` being where the day stash is
-  taken; which key is number 5 (pause); the pause screen.
+  taken. (Answered on 2026-10-14 in `screens.md`, part 4: key number 5 is
+  Escape, and the pause screen is described there.)
 - (Studied since, on 2026-10-14, in `screens.md`, part 3: the load screen,
-  who reads the tree, its deleting mode, the 5-track limit.) Still open:
-  who asks for the settings to be written, who
-  reads `platover`: the
-  screens step. `Game.applySettings` calls `Settings.save`; who else does
-  was not searched.
+  who reads the tree, its deleting mode, the 5-track limit. And in part
+  4: the settings are written by `Game.applySettings`, run by
+  `Game.update` on the frame after any setting changes, and no other
+  caller of `Settings.save` was found in the decompiled files; no code
+  that reads `platover` was found in the build.)
 - (Answered in part 2: nothing saves the story outside
   `ADVANCE_TO_NEXTDAY`, in the files decompiled so far, which now include
   the booth classes, the border, the screens and the test player. Calls

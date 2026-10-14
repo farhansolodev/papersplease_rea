@@ -1,11 +1,11 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-14, in the
-ninth session (after the screens, part 3: the load screen and the confirm
-box; parts 1 and 2, the same day, were the base of a screen, the night
-screen, the title screen and the menu helper; all code reading, plus one
-screenshot of the real night screen that confirmed the budget's line
-order).
+tenth session (after the screens, part 4: the pause screen and the
+settings screen; parts 1 to 3, the same day, were the base of a screen,
+the night screen, the title screen, the menu helper, the load screen and
+the confirm box; all code reading, plus one screenshot of the real night
+screen that confirmed the budget's line order).
 `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
@@ -15,7 +15,10 @@ here.
 
 The game is Haxe compiled to C# and then to native code by Unity IL2CPP.
 Names, data layouts and typed signatures are recovered and loaded into a
-saved Ghidra project, so any function can be decompiled by name. The
+saved Ghidra project, so any function can be decompiled by name, and
+since the tenth session **all of the game's own code is decompiled once**
+into `decompiled/all/` (6,856 functions), so any question can start with
+a search. The
 content archive (`Art.dat`) is decrypted and unpacked: 614 images, fonts and
 plain-text data files. The game is strongly data-driven. **Every data file
 now has a write-up.** Traced from the code: the seed chain from launch to
@@ -36,8 +39,11 @@ reads back (seen in a test with the real game), and the first of the
 screens: the night screen (lines start ticked, a click flips one, the
 budget is balanced after every click, the appearing animation, the sleep
 button), the title screen (its buttons, the title rising with the
-music) and the load screen (the save tree as a grid of at most 5 tracks,
-continuing, starting anew, deleting). The desktop
+music), the load screen (the save tree as a grid of at most 5 tracks,
+continuing, starting anew, deleting), and the pause and settings screens
+(Escape pauses; the list of settings they share; a changed setting is
+applied and saved on the next frame; every key the game reads, and every
+other use of Escape, which is always a screen's "back button"). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -57,7 +63,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 3: the base of a screen, the night screen, the title screen, the menu helper, the load screen and the confirm box (`screens.md`). Not done: the other screens (ending, endless, language chooser, pause, settings, credits), the family pictures of the night screen, drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 4: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen and the settings screen (`screens.md`). Not done: the other screens (ending, endless, language chooser, credits), the family pictures of the night screen, drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -99,7 +105,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
 | `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder. **Part 2**: the 19 requests a part of the game can make (`GameTransition`), how a screen change is queued and built (`Game.queueScreenChange`, `applyScreenChange`), the game's own five states (fade, pause), and the stash: when it is written, deleted and read, what it holds, how it is restored |
-| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). **Part 2**: the title screen (its buttons and what each does, the title rising in 20 steps with the music, the logo bobbing), the menu helper `Menu`, and the desktop values of eight layout fields. **Part 3**: the load screen (the grid of save buttons, how saves are put on up to 5 tracks, what a click does, the summary box, deleting) and the confirm box `Confirm`. Each part ends with a list of things to watch in the game |
+| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). **Part 2**: the title screen (its buttons and what each does, the title rising in 20 steps with the music, the logo bobbing), the menu helper `Menu`, and the desktop values of eight layout fields. **Part 3**: the load screen (the grid of save buttons, how saves are put on up to 5 tracks, what a click does, the summary box, deleting) and the confirm box `Confirm`. **Part 4**: which key pauses (Escape) and the game's 11 key numbers, the pause screen, the settings screen, the settings list both share (its rows in each form, what each click does, how a row is laid out), who writes the settings file (`Game.applySettings`), that nothing in the build reads `platover`, the header helper, and seven more desktop layout values (one of them corrects part 2). Each part ends with a list of things to watch in the game |
 | `ends-xml-format.md` | `Ends.xml` and `Intro.xml`: the 20 endings and the intro slides |
 | `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring |
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
@@ -135,7 +141,7 @@ running game and the first two runs; finding and fixing why the reference's
 error picks left the game's. Done in the fifth: the newspaper picture. Done
 in the sixth: the whole border scene, parts 1 to 4. Done in the seventh:
 saves, part 1. Done in the eighth: saves, part 2. Done in the ninth: the
-screens, parts 1 to 3.)
+screens, parts 1 to 3. Done in the tenth: the screens, part 4.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -159,24 +165,27 @@ screens, parts 1 to 3.)
    and the screen that opened offered only a new game (the unfinished day
    was lost). The stash's content matches the description (`stash_check.py`,
    `0 problems`).
-4. **The screens, in progress.** Parts 1 to 3 are done (`screens.md`):
+4. **The screens, in progress.** Parts 1 to 4 are done (`screens.md`):
    the base of a screen (`GameScreen`, the entity switches), the night
-   screen, the title screen, the menu helper `Menu`, the load screen and
-   the confirm box `Confirm`.
-   **Next, part 4** (suggested: the pause screen and the settings screen
-   with its menu and rows; they answer "who writes the settings" and
-   "which key pauses"). Still to do after that: the ending player (slide
-   timing) and the intro, the endless-mode screens, the language chooser,
-   who shows and scrolls the credits, `UnlockConfirm` (the endless code
-   box), and the family pictures of the night screen (`FamilyVisuals`, a
-   1,930-line constructor, proposed as its own part). (The news screen is
-   done except its magnifier, `newspaper-picture.md`.) All 471 functions
-   of `play.screen` are decompiled in `decompiled/screens.clean.c`, with
-   a condensed copy `screens.short.c`; read so far: `NightScreen`,
-   `TitleScreen`, `Menu`, `LoadScreen` and its helpers (the constructor
-   for its parts only, not its positions), most of `Confirm` and
-   `GameScreen`. How a screen is asked for and built is in
-   `save-format.md`, part 2.
+   screen, the title screen, the menu helper `Menu`, the load screen, the
+   confirm box `Confirm`, the pause screen, the settings screen and the
+   settings list they share.
+   **Next, part 5** (suggested: the ending player with its slide timing,
+   and the intro; their data files `Ends.xml` and `Intro.xml` are already
+   written up in `ends-xml-format.md`). Still to do after that: the endless-mode
+   screens, the language chooser, who shows and scrolls the credits,
+   `UnlockConfirm` (the endless code box), `play.ui.Button` (it would
+   settle what a "back button" does, so whether Escape closes the pause
+   screen), and the family pictures of the night screen
+   (`FamilyVisuals`, a 1,930-line constructor, proposed as its own
+   part). (The news screen is done except its magnifier,
+   `newspaper-picture.md`.) All 471 functions of `play.screen` are
+   decompiled in `decompiled/screens.clean.c`, with a condensed copy
+   `screens.short.c`; read so far: `NightScreen`, `TitleScreen`, `Menu`,
+   `LoadScreen` and its helpers (the constructor for its parts only, not
+   its positions), most of `Confirm` and `GameScreen`, `PauseScreen`,
+   `SettingsScreen`, `SettingsMenu`, `SettingRow`, `SettingDim`. How a
+   screen is asked for and built is in `save-format.md`, part 2.
    The user's screenshot of a night screen (2026-10-14) confirmed the
    order of the budget lines for one night (`screens.md`, part 1). A
    second look, at a night with no one sick, would test a different
@@ -225,6 +234,49 @@ Small jobs that fit anywhere:
 ## Open questions and unconfirmed items
 
 Collected from the docs, so they are not lost:
+
+**From the tenth session** (`screens.md`, part 4)
+
+- **The pause and settings screens have not been watched.** The list is
+  at the end of `screens.md`, part 4; each item takes under a minute.
+- (Answered later the same session, `screens.md` part 4, "Escape on the
+  pause screen": Escape pressed again resumes, on release, because RESUME
+  is a back button and a back button's shortcut key is Escape; with a
+  confirm box open, Escape presses its CANCEL. Not watched in the game.)
+- **No code that reads `platover` was found in this build** (a search of
+  the whole program for callers of the reader found none; the same
+  search finds the writer's one caller). On desktop it is not written
+  either. Suggested for the port: leave the forced layout out.
+- **Decided by the user on 2026-10-14** (for the list that will open
+  `docs/DESIGN.md`): the settings screen's `web` and `twitter` buttons
+  are left out, and there is **no quit option** (neither the pause
+  screen's QUIT nor the title's quit button). Still open: the title's
+  `version` button (suggested: leave out), and how "fullscreen follows
+  the window both ways" maps to a browser, where Escape is also the
+  browser's own key for leaving fullscreen.
+- Key O saves a screenshot to the platform's documents folder, with no
+  condition seen around it. Where that folder is was not read. (What the
+  other keys do is answered the same session from a search of the whole
+  game: `screens.md` part 4, "Every key the game reads". In short: Space,
+  Tab/Enter and the arrows work in the booth, two of them only with an
+  upgrade; T and the developer key are never tested; every other use of
+  Escape is a "back button".)
+- **Predicted from the code, worth one look in the game**: on the first
+  title screen of a run, pressing Escape to skip the rising title should
+  also quit the game when the key is let go (the skip masks the mouse,
+  not the key). Escape on the finished title quits at once in any case.
+  Irrelevant to the port (no quit option), but it tests the reading.
+- Which stamp bar a desktop booth has: a `StampBar` unless the booth has
+  a carousel; when it has one was not settled (inferred: phone only).
+- Whether a desktop PC shows a Vibration row (`canVibrate`, not read).
+- What the nudity setting changes: its readers were not looked up.
+- **A mistake of the ninth session, found and corrected**: `screens.md`
+  part 2 said the gap between menu buttons (`menuItemPaddingY`) is 0 on
+  desktop. It is 10; the write was in the listing and was missed. No
+  position had been computed from it. The other seven layout values of
+  that table were checked again and hold.
+- The pause screen's click handler knows an id `credit` (it would open
+  the Twitter address) for which no button is made.
 
 **From the ninth session** (`screens.md`, part 1)
 
@@ -308,7 +360,8 @@ Collected from the docs, so they are not lost:
 - (Answered in the ninth session, from the code: without flag 4 a screen
   and everything in it get no input, without 16 they are not updated;
   they are still drawn. `screens.md`, part 1.)
-- Which key is number 5 (it pauses the game).
+- (Answered in the tenth session: key number 5 is Escape. `screens.md`,
+  part 4.)
 - The fade (0.125 s each way) and the 1-second wait of a screen change
   were read from the decompiler, not checked in the instructions.
 - Who handles the error an invalid stash raises at start-up (phone and
@@ -335,8 +388,10 @@ Collected from the docs, so they are not lost:
   three launches, two loads. Not exercised: deleting, the `stash` and
   `platover` entries. (Answered in the eighth session: the second sitting
   resumed by loading the save; desktop never reads a stash at start-up.)
-- Who else writes the settings, who reads `platover`: the settings screen
-  (step 4). ("Read the tree" is answered since the ninth session: the
+- (Answered in the tenth session, `screens.md`, part 4: the settings
+  file is written by `Game.applySettings`, which `Game.update` runs on
+  the frame after any setting changes; no code that reads `platover` was
+  found.) ("Read the tree" is answered since the ninth session: the
   load screen calls it each time it makes its buttons, `screens.md`,
   part 3.) (Known since the
   eighth session: delete is `LoadScreen.confirm_onClick`; `platover` is
@@ -577,6 +632,8 @@ All gitignored. Nothing below is in git.
 | `decompiled/saves*.c` | small | The save, store, story-state, settings, statistics, fact-set and `MapUtil` functions read for `save-format.md` | Step 4 of `ghidra-workflow.md` with the selectors in the `MODLOG.md` entry |
 | `decompiled/stash*.c`, `screens*.c`, `booth_ctor_asm.txt`, `game_stater.short.c`, `loadscreen_btn.short.c` | about 5 MB | Read for part 2 of `save-format.md`: the stash classes, `GameTransition`, the resume overlay; all 471 `play.screen` functions (`screens`, a few minutes; searched, not read); the instructions of the `Booth` constructor and of `HostUnity.CreateGame`; condensed views | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.stash." "play.GameTransition" "play.screen.UnstashOverlay"`, and with `"play.screen."`; `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `decompiled/screens.short.c`, `titlescreen_update_asm.txt`, `loadscreen_strings.txt` | about 1 MB | For `screens.md`, parts 2 and 3: a condensed copy of all `play.screen` functions, the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `condense_decompile.py` on `screens.clean.c`; `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
+| `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
+| `decompiled/keys*.c`, `hostunity_update*.c`, `settingsmenu_music_asm.txt`, `part4_run1.txt` to `part4_run3.txt` | under 1 MB | For `screens.md`, part 4: the key numbers (`app.ent.Key` setup), the `InputWrapper` functions and its key table, `HostUnity.Update`, the instructions of `SettingsMenu.musicButton_whenClick`, and the Ghidra output of three runs (string lists of four functions in machine-code order, three caller searches) | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `0x18048B510 0x1804AA120 0x1804AA390 0x1804AA180`, with `0x1804AA420`, and with `0x1809e8e80`; `DumpAssembly.java 0x180714b30`; `ListStringUses.java` with `0x180710150`, `0x180869f50`, `0x18086a9b0`, `0x1808035e0`; `FindReferences.java` with `0x18086FAF0`, `0x180870B30`, `0x1804AA120`, `0x180870210` |
 | `decompiled/night_screen*.c`, `revealtext*.c`, `gamescreen.short.c`, `budgetent_ctor_asm.txt`, `budgetent_ctor_strings.txt`, `asm_family_buildmessage.txt` | about 3 MB | Read for `screens.md`, part 1: all 228 `play.night` functions plus `DayLib.getNightMessages`; the 32 `play.ui.RevealTextEnt` functions; a condensed `GameScreen`; the instructions of the `BudgetEnt` constructor and of `Family.buildMessage`; the `BudgetEnt` constructor's strings in machine-code order | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.night." "0x180447cf0"` (under a minute), and with `"play.ui.RevealTextEnt"`; `condense_decompile.py` on `screens.clean.c` with a filter for `GameScreen`; `DumpAssembly.java 0x1806c2a70` and `0x180757930`; `ListStringUses.java 0x1806c2a70` |
 | `extracted/autorun/` | 2 MB | The test player's folder: `auto.plan`, `auto.log`, copies of three `Player.log` runs, and scratch scripts from the fourth session (`show.sh` prints one decompiled function with the noise removed; `rand_uses2.py` lists functions matching a pattern; `log_step.py`; several experiments) | The logs: run the game as above (needs the go-ahead). The scratch scripts are conveniences, not needed |
 
@@ -591,7 +648,7 @@ Running the game writes Unity's `Player.log` under
 
 | Folder | What |
 |---|---|
-| `scripts/ghidra/` | Ghidra scripts (names, types, decompile, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
+| `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
 | `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs) |
 | `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, and `stash_check.py` against a real stash; see its `README.md` for each script's arguments |
