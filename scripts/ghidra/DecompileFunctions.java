@@ -5,10 +5,16 @@
 //   analyzeHeadless <project dir> <project name> -process GameAssembly.dll
 //     -noanalysis -readOnly -scriptPath scripts\ghidra
 //     -postScript DecompileFunctions.java <output file> <prefix or 0xADDRESS>...
+//
+// A selector of the form @<file> reads selectors from that file, one per line
+// (blank lines and lines starting with # are skipped). Use it for long lists
+// of addresses: see game_function_lists.py.
 //@category IL2CPP
 
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +32,26 @@ public class DecompileFunctions extends GhidraScript {
 		String[] args = getScriptArgs();
 		if (args.length < 2) {
 			throw new IllegalArgumentException(
-				"usage: DecompileFunctions.java <output file> <prefix or 0xADDRESS>...");
+				"usage: DecompileFunctions.java <output file> <prefix, 0xADDRESS or @file>...");
+		}
+
+		List<String> selectors = new ArrayList<>();
+		for (int i = 1; i < args.length; i++) {
+			if (!args[i].startsWith("@")) {
+				selectors.add(args[i]);
+				continue;
+			}
+			for (String line : Files.readAllLines(Paths.get(args[i].substring(1)),
+				StandardCharsets.UTF_8)) {
+				line = line.trim();
+				if (!line.isEmpty() && !line.startsWith("#")) {
+					selectors.add(line);
+				}
+			}
 		}
 
 		List<Function> selected = new ArrayList<>();
-		for (int i = 1; i < args.length; i++) {
-			String selector = args[i];
+		for (String selector : selectors) {
 			if (selector.startsWith("0x")) {
 				Function function = getFunctionAt(toAddr(selector));
 				if (function != null) {

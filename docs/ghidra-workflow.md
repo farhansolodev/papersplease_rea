@@ -68,7 +68,43 @@ C:\tools\ghidra_12.1.4_PUBLIC\support\analyzeHeadless.bat decompiled\ghidra Pape
 ```
 
 Each selector after the output file is either a name prefix or a `0x`
-address. Names look like `namespace.Class$$method`.
+address. Names look like `namespace.Class$$method`. A selector `@<file>`
+reads selectors from a text file, one per line (added 2026-10-14; it
+avoids the `$$` trouble below and the limit on command-line length).
+
+### The whole game, decompiled once (2026-10-14)
+
+`decompiled/all/` holds every function of the game's own classes, one
+file per part of the game (`play_day_booth.c`, `play_screen.c`,
+`app_vis.c`, `data.c`, `top.c` for the classes without a namespace, and so
+on), so a question like "who else does this?" can be answered by
+searching one folder. The address lists come from
+
+```powershell
+python -I scripts\ghidra\game_function_lists.py dumps\il2cppdumper\script.json decompiled\all\lists
+```
+
+which lists the namespaces `play`, `app`, `data`, `test` and the game's
+classes without a namespace: 6,858 addresses in 15 lists. It leaves out
+the Haxe and .NET runtime, Unity, Steamworks, and on purpose the
+platform's social service (achievements, leaderboards) and the Steam
+wrappers, 209 functions (rule 4). Then one Ghidra run per list file:
+
+```powershell
+analyzeHeadless.bat ... -postScript DecompileFunctions.java decompiled\all\play_ui.c "@decompiled\all\lists\play_ui.txt"
+```
+
+Several `-postScript` pairs can go in one run. The two first lists (454
+functions) took 67 seconds; the other 13 lists, in one run, 1,051 seconds
+(17.5 minutes). Result: 6,856 of 6,858 decompiled. The two that time out
+are the ones known to be too big, the `Booth` and `Layout` constructors;
+their instruction listings are `decompiled/booth_ctor_asm.txt` and
+`layout_ctor_asm.txt`. Each `.c` file has a cleaned `.clean.c` copy
+(`clean_decompile.py`); `play_ui`, `app_ent` and `play_screen` also have
+a condensed `.short.c`. A function whose address is shared with an
+earlier list is written only there, so search the whole folder, not one
+file. The older files in `decompiled/` stay; they overlap with this
+folder.
 
 ## How to read the output
 
@@ -260,6 +296,29 @@ Slots worth knowing:
 | `app.Rand` | 25 `nextInt`, 26 `nextFloat`, 27 `random` |
 | `data.FactSet` | 25 `get`, 26 `set`, 28 `getValue`, 29 `getValueText` |
 | `data.Node` | 25 `findNode`, 26 `expandParams`, 27 `getExpanded`, 28 `consume` |
+
+### Objects written in the code, and their field names
+
+A Haxe object written as `{id: ..., text: ...}` is built from a list of
+its fields' name numbers and a list of values. The decompiler shows the
+first list only as `RuntimeHelpers.InitializeArray(arr,
+Field_<PrivateImplementationDetails>_<64 hex digits>)`. Two facts make it
+readable (found 2026-10-14, `screens.md` part 4):
+
+- The 64 hex digits are the **SHA-256 of the list's bytes** (the numbers
+  as 4-byte little-endian integers, in ascending order).
+- A field's name number is computed from its name: start at 0, for each
+  character take number x 223 + character code, keeping 32 bits; at the
+  end keep the low 31 bits. Checked: `id` = `0x5bdb`, `text` =
+  `0x4cf9ccad`, `dangerous` = `0x128cfd8a`, `backButton` = `0x186a4779`,
+  `menu_onClick` = `0x76eaf0c9`, all as the code shows them.
+
+So: take the candidate field names (from the code that reads the object,
+which uses `getField` with the name and number), compute their numbers,
+try each combination, and compare the SHA-256 with the block's name. A
+match identifies the fields exactly. The values are in the second list,
+in the same order; booleans are often visible as `local = 1` before
+`il2cpp_value_box`.
 
 ### Static data and enum values
 
