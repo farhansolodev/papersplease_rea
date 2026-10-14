@@ -318,8 +318,10 @@ screens only the call sites named here were read):
   and holds the state at the start of the following day. One caller of the
   request was found: `NightScreen.onClickSleep`.
 - **Delete**: `LoadScreen.confirm_onClick`, on the answer `delete`, calls
-  the save manager's delete with the save's id. "Read the tree" and the
-  rest of the load screen are not read yet.
+  the save manager's delete with the save's id. "Read the tree"
+  (`SaveManager.getRoot`) is called by `LoadScreen.createLoadButtons`,
+  each time the load screen makes its buttons; the load screen is
+  described in `screens.md`, part 3 (read on 2026-10-14).
 - **Closing the game in the middle of a day, on desktop, loses that day.**
   The story goes on from the save taken after the last night. The game
   does write a snapshot during the day (the stash, below), but the desktop
@@ -870,8 +872,9 @@ user's own play data.
   and its parts get input, flag 16 lets them be updated.)
 - The booth's own states beyond `empty` being where the day stash is
   taken; which key is number 5 (pause); the pause screen.
-- The load screen itself beyond the two functions named above ("read the
-  tree", its deleting mode), who asks for the settings to be written, who
+- (Studied since, on 2026-10-14, in `screens.md`, part 3: the load screen,
+  who reads the tree, its deleting mode, the 5-track limit.) Still open:
+  who asks for the settings to be written, who
   reads `platover`: the
   screens step. `Game.applySettings` calls `Settings.save`; who else does
   was not searched.

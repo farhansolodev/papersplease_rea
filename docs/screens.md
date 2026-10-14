@@ -8,8 +8,10 @@ rules behind a screen are in that topic's own doc (for the night:
 - **Part 1** (2026-10-14): what every screen is built on (`GameScreen`, and
   the switches every on-screen object carries), and the night screen.
 - **Part 2** (2026-10-14): the title screen and the menu helper (`Menu`).
-- Not written yet: load screen, ending player, endless-mode screens,
-  language chooser, pause screen, settings, credits.
+- **Part 3** (2026-10-14): the load screen and the confirm box
+  (`Confirm`).
+- Not written yet: ending player, endless-mode screens, language chooser,
+  pause screen, settings, credits.
 
 ---
 
@@ -336,10 +338,11 @@ and 2 do anything. The reference script's `build_message` does steps 1 and
   reader returns for a name that is not there was not read; inferred: no
   messages. The reference passes none.
 - `Family.getSummary(story facts)` returns four values without building a
-  family: `Night/FamilyAlive` (4 if not set), `Night/Savings` (30 if not
-  set), the number of entries in `Night/TokenIds`, and `Night/Apartment`
-  (`C8` if not set). Its one caller is `LoadScreen.loadButton_onClick`
-  (the load screen, a later part).
+  family: `numFamily` = `Night/FamilyAlive` (4 if not set), `savings` =
+  `Night/Savings` (30 if not set), `numTokens` = the number of entries in
+  `Night/TokenIds`, and `apartment` = `Night/Apartment` (`C8` if not set).
+  Its one caller is `LoadScreen.loadButton_onClick`, which shows them in
+  the box before continuing a save (part 3; the names were read there).
 
 ## Random draws: none found
 
@@ -605,3 +608,243 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
 3. The logo moves down and up by a few pixels in time with the music.
 4. Bottom right shows the version; bottom left the settings button; the
    quit button appears top right only once the title has arrived.
+
+---
+
+# Part 3: the load screen
+
+Studied on 2026-10-14. Code reading only: **nothing in this part was
+compared with the running game.** The user has used this screen (the
+replay of `save-format.md` was started from it), but what it looked like
+was not recorded.
+
+This is the screen "Story" on the title leads to. It shows the tree of
+saves (`save-format.md`, part 1) as a grid of buttons, starts a new story,
+continues from any save, and deletes saves.
+
+## What was read
+
+From `decompiled/screens.clean.c` (condensed copy `screens.short.c`):
+
+| Class | Functions |
+|---|---|
+| `play.screen.LoadScreen` | `loadButton_onClick` `0x1806f4810`, `confirm_onClick` `0x1806f3780`, `createLoadButtons` `0x1806f3c20` and its two helper functions, `addLoadButton` `0x1806f32b0`, `deleteButton_onClick`, `menu_onClick`, `set_mode`, `react`, `update`, `applyScroll`, `set_scrollX`, `set_scrollY`, `get_scrollMaxX`, `get_scrollMaxY`, `getLoadButtonsHolderX`, the constants. The constructor `0x1806ee2e0`: see the note below |
+| `play.screen.LoadButton` | constructor `0x1806ea750`, `button_onClick`, `setMode`, `getMatches`, `lerpFrom`, `lerpPos`, `draw` |
+| `play.screen.LoadScreenDim` | constructor (the sizes) |
+| `play.screen.LoadTabTemplate` | constructor (the pictures) |
+| `play.screen.LoadMode` | the two modes |
+| `play.screen.Confirm` | `show` `0x18093d4f0`, `button_onClick`, `react`, the constants |
+
+The text ids and one picture name the decompiler dropped were recovered
+from the strings in machine-code order (`ListStringUses.java`,
+`decompiled/loadscreen_strings.txt`).
+
+**The `LoadScreen` constructor (800 condensed lines) was read for its
+order of work and its parts, not for positions.** Most of its numbers are
+passed through boxed values the decompiler dropped; none was looked up in
+the instructions. What is said below about where things sit comes from
+`LoadScreenDim` and `LoadButton`, which are plain.
+
+**Not read:** `LoadButton.drawConnectingLine` (229 lines: the line from a
+save to the save it continues), the `Confirm` constructor (its frame),
+`play.ui.KineticScroll` (dragging with momentum), the two "passthrough"
+helper classes, `play.ui.Button`.
+
+## The sizes (`LoadScreenDim`)
+
+Computed from the layout. On desktop (570 x 320; the notch height is
+taken as 0, inferred):
+
+| Value | Desktop | Rule |
+|---|---|---|
+| `horizontal` | true | The layout's aspect is `LANDSCAPE` |
+| Button | 59 x 29 | fixed |
+| Cell | 70 x 40 | 70 x 40 in landscape, 66 x 36 in portrait |
+| Grid start | x 8, y 34 | landscape: 8 and (day header height 9 + 25) |
+| Top and bottom margin of the scrolling area | 42 and 42 | screen height x 42 / 320 (the top one plus the notch) |
+| Height of the scrolling area | 235 | what is left, minus 1 |
+| Delete button margins | 14 and 10 | 14 fixed; screen height x 10 / 320 |
+| Most tracks | **5** | `kMaxTracks` |
+| Day headers made | **31** | `kMaxDays` |
+| Faded colour | `0xff546754` | used for the connecting lines and the day numbers |
+
+In landscape, "which of the two numbers `landOrPort` returns" is inferred
+from its name and from the result making sense (a 59-wide button in a
+70-wide cell).
+
+## What the screen is made of
+
+Song `Theme`. No `enablePause`: the screen cannot be paused. In the order
+the constructor builds them:
+
+1. A scrolling group, and in front of it a fixed group with two bands
+   that cover the scrolling area's top and bottom.
+2. A menu with one button, `back` (`menu_back`), which fades to `title`.
+3. The heading `load_title` ("Select day to continue or start a new
+   game"), font `title_tall`, white, centred in the top band.
+4. **A row of small marks for the endings**, driven by the all-time
+   statistic `EndBits`: one mark per ending, in the faded colour when that
+   ending's bit is not set. (Sizes, places and the other colour were not
+   recovered. The number of marks is taken from the endings list:
+   inferred.)
+5. A day header for each of 31 days: the picture `LoadDay.png` and the day
+   number. Only the headers up to the highest saved day are shown.
+6. Two or three copies of the picture `LoadDrag.png` (three in landscape).
+   Each is shown only while some save button lies beyond it: inferred to
+   be the hint that the grid can be dragged further.
+7. The delete button (`LoadDelete.png`, with a second look for the
+   deleting mode), bottom right.
+8. The save buttons (next section).
+9. The view is scrolled so that **the newest save's button** is in the
+   middle (`SaveNode.getLatestHeader`), as far as the scroll limits allow.
+10. The confirm box, hidden. Then the mode is set to normal.
+
+Scrolling: pressing on the grid and dragging scrolls it, with momentum
+(`KineticScroll`, not read). In landscape only sideways: the vertical
+limit is 0. The sideways limit is the width of the days in use plus the
+margins, minus the screen width.
+
+## The save buttons
+
+`createLoadButtons` asks the save manager for the tree
+(`SaveManager.getRoot`: this is the "read the tree" of `save-format.md`,
+and this function is its only caller outside the save manager) and walks
+it (`addLoadButton`):
+
+- Every node gets one button. In landscape its place is
+  x = 8 + 70 x (day - 1), y = 34 + 40 x track. So **days run left to
+  right and tracks top to bottom**. (In portrait the two are swapped.)
+- **Tracks**: the root is on track 0. A node's **first** child stays on
+  the same track. Every further child goes on a new track: one below the
+  lowest track used so far by the children before it. The number of
+  tracks is the lowest track used, plus 1.
+- Each button has a line object in the faded colour and knows its
+  parent's button; from the names (`drawConnectingLine`, not read) the
+  line joins the two.
+
+What a button shows:
+
+| Node | Picture | Text |
+|---|---|---|
+| The root (the header that `isNew`; button id `new-root`) | `LoadButtonNew.png` | none |
+| The newest save | `LoadButtonLatest.png` | date and money |
+| Any other save | `LoadButtonSet.png` | date and money |
+
+The text is two centred lines in the font `regular`, white: the save's
+date as month/day hour:minute (`%m/%d %H:%M`), and the header's money
+followed by `C`. In the deleting mode a save's button also shows
+`LoadButtonDel.png` over it. The root's button is given no deleting
+look.
+
+When the buttons are made again (after a delete), a button whose save was
+there before slides from its old place to the new one (a tween given 0.5,
+inferred seconds, eased), and the whole grid slides if the number of
+tracks changed.
+
+## Clicking a button, normal mode (`loadButton_onClick`)
+
+1. **If the node already has a child and there are 5 tracks**: a box with
+   `load_confirm_full` ("Save tracks full. Continue from a right-most save
+   or delete a save branch to free up a track.") and one button, `ok`.
+   Nothing else happens. This applies to the root as well.
+2. Otherwise, **the root**: `GameTransition.loadToScreen(root header,
+   "intro")`. A new story starts with the intro (`save-format.md`: a load
+   of `NEW`).
+3. Otherwise, **a save**: its facts are loaded and a box is shown with the
+   text `load_summary`:
+
+   | Placeholder | Value |
+   |---|---|
+   | `$day` | the header's day |
+   | `$news` | the first headline of that day's newspaper, cut to 27 characters and `...` if longer than 30 |
+   | `$savings` | `Night/Savings` |
+   | `$family` | `Night/FamilyAlive` |
+   | `$tokens` | the number of entries in `Night/TokenIds` |
+   | `$apt` | `Night/Apartment` |
+
+   (The last four come from `Family.getSummary`, part 1, whose value names
+   are now known: `savings`, `numFamily`, `numTokens`, `apartment`.)
+   Buttons: `continue` (`load_continue`) and `cancel` (`confirm_cancel`).
+   **Continue**: `GameTransition.loadToScreen(header, "news")`.
+
+For the headline the screen builds that day's news with a **new generator
+seeded 0** of its own. It does not touch the game's generators, and the
+headline shown need not be the one the day will have (which headlines
+need a draw: `news-txt-format.md`).
+
+Rule 1 is what keeps the tree at 5 tracks: continuing from a save that
+has no child yet extends its track, continuing from one that has makes a
+new track.
+
+## Deleting
+
+The delete button switches between the normal and the deleting mode
+(`deleteButton_onClick`); every save button changes its look.
+
+In the deleting mode a click on a save (the root ignores it):
+
+1. A box asks, with `load_confirm_delete_single` ("Delete this day $0
+   save?") when the save's day is the deepest day below it, and with
+   `load_confirm_delete_multi` ("Delete this save branch from day $0 to
+   day $1?") otherwise. Buttons: `delete` (`load_delete`, marked
+   dangerous: the red button) and `cancel`. (That $0 and $1 are the save's
+   day and the deepest day is inferred from the text and from the two
+   values passed; the values themselves were dropped by the decompiler.)
+2. On `delete` (`confirm_onClick`): the save manager deletes that id
+   (what goes with it: `save-format.md`, part 1), the buttons are made
+   again, and the mode goes back to normal.
+
+## The confirm box (`Confirm`)
+
+Used here and by other screens. `show(callback, message, options)`:
+
+- An option has an `id` and a `text`, and may have `dangerous` (a red
+  button), `backButton` and `freezeAfterClick`.
+- One standard button per option, stacked 10 apart (button height 19),
+  centred in a frame that is centred on the screen; the message above
+  them.
+- An option with the id `back` or `cancel`, or with `backButton`, becomes
+  the back button.
+- A click: the box hides, or, with `freezeAfterClick`, stays on screen but
+  stops taking input (its switch 4 is cleared, part 1). Then the callback
+  gets the option's id.
+- While shown, the box blocks input to whatever is under it for the rest
+  of the frame.
+
+The `continue` option carries a third value and the `delete` option the
+`dangerous` one. From the order of their names, the third value of
+`continue` is `freezeAfterClick`; that its value is "true" is inferred.
+
+## For the port
+
+- The tree, the 5-track limit and the track rule must match, or saves
+  made in a different order would land elsewhere.
+- The summary box needs the news of the day built once, with a generator
+  of its own seeded 0.
+- The date on a button is the save's real date and time
+  (`save-format.md`), so a browser port needs a clock for it.
+
+## Not studied
+
+- Positions in the constructor (heading, ending marks, day headers, drag
+  hints, the bands), and the ending marks' second colour.
+- `drawConnectingLine`: the shape of the line between a save and its
+  parent.
+- `KineticScroll`, the passthrough helpers, the `Confirm` constructor.
+- The portrait arrangement beyond what `LoadScreenDim` says.
+- Whether the root's header day is 1 (its place in the grid assumes it).
+
+## Things to watch in the game
+
+Best with the copy of a real save folder that has a branch
+(`extracted/saverun`: four saves, two of them on day 4).
+
+1. Days run left to right; the second day-4 save sits one row below the
+   first, with a line back to day 3.
+2. The newest save has a different look, and the screen opens scrolled to
+   it.
+3. A click on a save shows day, a headline, credits, family, tokens and
+   apartment, with CONTINUE and a cancel button.
+4. The delete button changes every save's look; a click then asks before
+   deleting, with a red DELETE button.
+5. A row of small marks for the endings near the heading.
