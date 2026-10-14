@@ -601,7 +601,11 @@ it.
    - **Day**: the booth, then the border, then a running tutorial is
      stopped.
    - **Night**: the budget's reveal animation is skipped.
-   - **Ending**: the opening flip is finished at once.
+   - **Ending**: the opening flip is finished at once. (Since
+     `screens.md` part 5: the ending screen is built by its normal
+     constructor, so the ending starts again from its first page, and
+     the achievement, the `EndBits` bit and a new ending stash are
+     written again.)
    - Any other screen answers "failed".
 6. A resume overlay (`UnstashOverlay`) is put over the screen. Every frame
    it tells the clock to pause for one frame, so the game stands still.

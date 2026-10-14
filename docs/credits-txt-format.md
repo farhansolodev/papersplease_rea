@@ -8,8 +8,10 @@ Check: `scripts/checks/credits_check.py`.
 
 Functions read in full: `play.screen.CreditList` (constructor, `addNode`,
 `addText`, `addImage`, `draw`, its static values). **Not studied:** who
-creates the list and scrolls it (the title or ending screen), so the speed
-and when it appears are unknown.
+creates the list and scrolls it, so the speed and when it appears are
+unknown. (This sentence first guessed "the title or ending screen". Since
+`screens.md` part 5, 2026-10-14: the ending screen does not make it; its
+CREDITS button fades to the separate credits screen `credit`.)
 
 ## A line
 

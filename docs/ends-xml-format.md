@@ -62,9 +62,14 @@ the song, builds the closing statistics text (`stats_text` filled with play
 time and the counts under `Game/Stat/...`, plus the ending's `num` and the
 total number of endings), and plays the pages through the same page player as
 the intro, with skipping not allowed. It also awards the achievement,
-records the ending number in the all-time record (`EndBits`, not read in
-detail) and has the button described above. (The exact moment each of
-these happens was not worked out.)
+records the ending number in the all-time record (`EndBits`) and has the
+button described above. (This paragraph first said `EndBits` was not
+read in detail and the moment of each step was not worked out. Answered
+on 2026-10-14 in `screens.md`, part 5, "The ending screen": everything
+is done in the constructor, in this order: song, button (switched off),
+statistics text (hidden), page player, achievement, `EndBits` gets bit
+`num` - 1, ending stash. The statistics and the button appear after the
+last page, a 2-second fade to black and 2 seconds of black.)
 
 ## Check against the data files
 
@@ -94,7 +99,10 @@ these happens was not worked out.)
 - **Who asks for each ending**: 6 from `Nights.txt` (`End` commands), 4 from
   `Travelers.txt`, and 10 whose id is among the code's strings (`in-debt`,
   `family-dead`, `flee`, `escape`, and the six `killed-` / `tranqed-`
-  endings; where the code asks for the last six is not read).
+  endings; the last six are asked for by the border scene's shooting
+  results, `border-scene.md` and `border-shooting.md`. This line first
+  said where was not read; that was already answered by the border-scene
+  step and is corrected here on 2026-10-14).
 
 ## Notes for the port
 
@@ -105,10 +113,11 @@ these happens was not worked out.)
 
 ## Not studied
 
-- The page player's timing and input (`play.screen.Intro`: text reveal, the
-  flip between pictures, the next button), and whether the intro can be
-  skipped.
-- The rest of the `EndScreen` constructor (layout, the statistics text
-  position, fading) and how `EndBits` stores the endings seen.
-- Where the six shooting endings are asked for, and where songs are defined.
+- (Answered 2026-10-14 in `screens.md`, part 5: the page player's
+  timing and input, whether the intro can be skipped (a page can be
+  hurried from page 2 on; the intro as a whole cannot be skipped), the
+  rest of the `EndScreen` constructor, and how `EndBits` stores the
+  endings seen. Where the six shooting endings are asked for was
+  answered by the border-scene step, `border-shooting.md`.)
+- Where songs are defined.
 - Nothing here has been compared with the running game.

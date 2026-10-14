@@ -88,8 +88,10 @@ and leaderboards are outside the port's scope (offline, single player).
   be reached in a way these searches do not see; that was not pursued.
 - Three code strings look like text ids but are not in the file:
   `endless_code` (a `LangFixed` field), `title_news` and `title_tall`
-  (font names, from how the ending screen uses `title_tall`; not checked
-  further).
+  (font names. For `title_tall` this is confirmed since `screens.md`
+  part 5, 2026-10-14: the page player and the ending screen look it up in
+  the font list, with the error "Font not found:"; it was first written
+  as "not checked further". `title_news` is still taken from its name).
 
 ## Notes for the port
 

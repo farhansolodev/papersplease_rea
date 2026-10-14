@@ -13,8 +13,10 @@ rules behind a screen are in that topic's own doc (for the night:
 - **Part 4** (2026-10-14): the pause screen, the settings screen and the
   settings list they share; which key pauses; who writes the settings
   file. It also corrects one layout value of part 2.
-- Not written yet: ending player, endless-mode screens, language chooser,
-  credits.
+- **Part 5** (2026-10-14): the page player that shows the intro and every
+  ending (`Intro`), the intro screen, the ending screen, and how the
+  endings seen are recorded (`EndBits`).
+- Not written yet: endless-mode screens, language chooser, credits.
 
 ---
 
@@ -815,9 +817,12 @@ the constructor builds them:
    game"), font `title_tall`, white, centred in the top band.
 4. **A row of small marks for the endings**, driven by the all-time
    statistic `EndBits`: one mark per ending, in the faded colour when that
-   ending's bit is not set. (Sizes, places and the other colour were not
-   recovered. The number of marks is taken from the endings list:
-   inferred.)
+   ending's bit is not set. (This note first said the sizes, places and
+   other colour were not recovered and the number of marks was inferred.
+   Answered in part 5, "What the load screen does with `EndBits`": the
+   row is made only when `EndBits` is not 0; one 3 x 3 mark per ending id
+   (20, read from the code, no longer inferred), 4 pixels apart; white
+   when reached. The row's place is still not followed.)
 5. A day header for each of 31 days: the picture `LoadDay.png` and the day
    number. Only the headers up to the highest saved day are shown.
 6. Two or three copies of the picture `LoadDrag.png` (three in landscape).
@@ -962,8 +967,9 @@ That its value is "true" is still inferred.
 
 ## Not studied
 
-- Positions in the constructor (heading, ending marks, day headers, drag
-  hints, the bands), and the ending marks' second colour.
+- Positions in the constructor (heading, the row of ending marks, day
+  headers, drag hints, the bands). (The ending marks' colours, size and
+  spacing are read since part 5.)
 - `drawConnectingLine`: the shape of the line between a save and its
   parent.
 - `KineticScroll`, the passthrough helpers, the `Confirm` constructor.
@@ -1090,8 +1096,9 @@ function, such as a debug switch.
 calls `enablePause` (part 1). A search of the 471 `play.screen` functions
 for that call finds four callers: the day screen, the night screen, the
 news screen and the intro screen. The title, load and settings
-constructors were read and do not call it; for the ending, endless and
-credits screens this rests on the search alone.
+constructors were read and do not call it; so was the ending screen's,
+in part 5 (it does not call it). For the endless and credits screens
+this rests on the search alone.
 
 ## The pause screen (`PauseScreen`)
 
@@ -1285,8 +1292,9 @@ title does nothing, and the trap does not exist.
 ## The header (`GameScreen.addHeader`)
 
 Called by the pause screen, the settings screen, the credits screen, the
-endless screen and the ending screen's statistics page (the last three
-found by searching for the call, not read). It adds:
+endless screen and the ending screen's statistics page (the credits and
+endless calls found by searching for the call, not read; the ending
+screen's call is read since part 5: title `menu_stats`). It adds:
 
 - the picture `ScreenHeader.png`, centred left to right, at the layout's
   `gameScreenHeaderY` (13 on desktop: the start value, which the desktop
@@ -1611,3 +1619,285 @@ Each takes under a minute.
 12. In a day with the upgrades bought: Space switches inspect mode, Tab
     or Enter opens and closes the stamp bar; Left and Right turn the page
     of the paper under the mouse, with or without upgrades.
+
+---
+
+# Part 5: the intro, the endings and the page player
+
+Studied on 2026-10-14. Code reading only: **nothing in this part was
+compared with the running game.**
+
+The intro (the five pages before day 1) and every ending (`Ends.xml`) are
+shown by the same object, the page player `play.screen.Intro`: a picture,
+a caption under it, and a NEXT button. The intro screen and the ending
+screen each wrap one page player. What the pages hold (`image`, `text`,
+`color`, `sound`, `when`) is in `ends-xml-format.md`; this part is how
+they are shown.
+
+## What was read
+
+From `decompiled/screens.clean.c` (condensed copy `screens.short.c`) and
+the whole-game decompile in `decompiled/all/`:
+
+| Class | Functions |
+|---|---|
+| `play.screen.Intro` | constructor `0x1808fae90`, its three state functions (show a page `Intro_85` `0x180483eb0`, the wipe `Intro_132` `0x1804837c0`, end of the wipe `Intro_146` `0x180483c50`), the condition helper `Intro_94`, the sound helper `Intro_106`, `update`, `draw`, `react` `0x1808fcde0`, `endFlipNow`, `nexButton_onClick`, the class setup (all it has) |
+| `play.screen.IntroScreen` | constructor `0x180482d70`, `draw`, `intro_onDone` (all it has) |
+| `play.screen.EndScreen` | constructor `0x1807b9800`, its state function `EndScreen_81` `0x1807b96a0`, `intro_onDone`, `menu_onClick`, `update`, `restoreFromStash`, `get_statsText`, the class setup (all it has) |
+| `app.Stater`, `app.State` | `go`, `step`, `get_stateTime`, `State.enter`, `State.step`, `State.apply` (the state machine of `border-scene.md`, now read for how a state's in-between time works) |
+| `app.Interp`, `app.Num` | the `Interp` constructor, `get`, `lerp`; `Num.lerpScale` |
+| `play.ui.RevealTextEnt` | `set_text`, `stepReveal`, `revealAll` (from `decompiled/revealtext.clean.c`) |
+| others | `GameScreen.enablePause`, `Layout.getFitScale`, `Ent.worldRect`, the shared `width`/`height` of full-screen entities, `app.vis.Sprite.width`, `play.AlltimeStats.awardAchievement`, the start of `AlltimeStats.or`, and the `EndBits` lines of the `LoadScreen` constructor |
+
+Checked beyond the decompiler (one read-only Ghidra run, output in
+`decompiled/part5_run1.txt`): the instructions of the `EndScreen`
+constructor (the decompiler dropped the times of its states and the
+true/false values it stores), and the strings of the `Intro` and
+`EndScreen` constructors in machine-code order (this recovered the NEXT
+button's text id `menu_next`). Ten number constants were read with
+`read_doubles.py`. The desktop value of `introTextWidth` was read from
+`decompiled/layout_ctor_asm.txt`, and the texts from `Text.xml`.
+
+## The page player (`Intro`)
+
+It is made with the story's facts, a list of pages, and one switch:
+whether the player may hurry a page (`allowSkip`). It covers the whole
+screen. It holds two picture holders, the **current** one and the
+**next** one, a caption (a typing text, `RevealTextEnt`, font
+`title_tall`, white, several lines, a fixed width) and the NEXT button
+(text `menu_next`, "NEXT"). It runs a small state machine with two states:
+
+| State | What happens |
+|---|---|
+| `flipping` | On entering: show the page (below). For the first 1 second: the wipe. After that, every frame: type the caption on. When the last letter is out: go to `idle`. On leaving: the new picture becomes the current one, and the whole caption is shown. The NEXT button is hidden throughout |
+| `idle` | Nothing moves. The NEXT button is shown |
+
+The player starts in `flipping` on page 1.
+
+**Showing a page (entering `flipping`):**
+
+1. Pages whose `when` condition is false are passed over (the page number
+   moves on). If no page is left, nothing else happens (see "An extra
+   click" below).
+2. The caption is emptied, given its colour (`color`, else white), then
+   given its text (`text`; `$fact` reads a story fact; `&quote;` becomes
+   `"`). It is centred left to right on the screen and up and down on a
+   fixed line (below). The letters start hidden.
+3. If the page has a `sound`, it is set to play **2 seconds** later.
+4. The picture (`assets/intro/` + `image`, or the file a `$fact` names)
+   is put into the **next** holder and centred left to right. If a
+   `$fact` is not set, the next holder keeps what it had: the picture
+   already on screen.
+
+**The wipe (the first second of `flipping`):** a line moves across the
+current picture from its right edge to its left edge, at a steady speed,
+in 1 second. Left of the line the old picture shows; right of it, the
+new one. So the new page is uncovered from the right, sweeping left.
+(The line's place is rounded to whole pixels each frame. That the cut
+is in screen positions, not in the picture's own, is inferred: in the
+picture's own positions the numbers would not line up with the
+picture.)
+
+**The caption** starts typing only after the wipe, at the speed of every
+typing text (part 1, "Timed changes"): 0.05 s before the first letter,
+then 0.04 s per letter, 0.25 s after a comma, 0.5 s after a full stop,
+and the sound `text-reveal` at every third letter.
+
+**NEXT** (`nexButton_onClick`) moves to the following page and goes back
+to `flipping`. After the last page it calls the player's "when done"
+function instead, which the screen around it supplies.
+
+**Hurrying a page** (`react`, `endFlipNow`): only when hurrying is
+allowed (the intro, not the endings) and only **from the second page
+on**. Pressing the mouse anywhere on the screen while a page is in
+`flipping` goes straight to `idle`: the new picture is shown whole, the
+whole caption appears, and NEXT appears. In `idle` such a press does
+nothing. (The NEXT button is asked before the page player, but it is
+hidden while `flipping`, so the press reaches the player.) `revealAll`
+plays `text-reveal` once if the typing had not finished, by the name of
+the field it tests; that field (`revealCount`) was not followed.
+
+**The first page:** the current holder has no picture yet. If an empty
+holder counts as 0 wide, the wipe line stays at the left edge and the
+first picture appears at once. `Sprite.width` gives the width of the
+holder's drawing rectangle, and what that is for an empty holder was not
+followed, so this is **inferred**. The caption still waits the 1 second.
+
+**An extra click (by the code; does not happen with the present data):**
+if every page after the one on screen is passed over by its condition,
+NEXT starts a `flipping` that shows nothing new. The same page stays up,
+NEXT comes back after about 1 second, and a second click ends the pages.
+No ending's last page has a condition (`escape`'s last page, also used
+by `flee`, has none), so this never happens with the game's files.
+
+**Its clock:** the state machine is stepped every frame with the frame
+time of the game's clock (`update`), so a pause stops it.
+
+### Layout (desktop, 570 x 320)
+
+| What | Value | How |
+|---|---|---|
+| Picture size | 240 x 160, scale 1 | The class's `kImageW`, `kImageH`; all 29 pictures in `assets/intro/` are 240 x 160 (checked). `getFitScale` gives 1 when 240 fits the width and 160 fits the room left (below); otherwise 2/3 |
+| Picture top | y = 32 | Room = footer y - 40 - (320 - footer y) = 290 - 40 - 30 = 220. The block of picture (160), gap (35, that is 35/320 of the height) and one caption line (20) is centred in it: floor(220/2 + 30 - (160 + 35 + 20)/2) = 32. The 20 is `title_tall`'s line height from `fonts.md`'s reference script, not from the game |
+| Picture left | x = 165 | Centred: floor(285 - 240/2) |
+| Caption centre line | y = 227 | 32 + 160 + 35 |
+| Caption | 380 wide; its top at floor(227 - height/2) | `introTextWidth`, 380 on desktop (`0x18049d310`, the third of its three writes, in the same block as the desktop write of `menuItemPaddingY`). Its left edge is floor(285 - width/2); what `width` answers for a fixed-width text is in `app.vis.Text`, not read |
+| NEXT | top at y = 290, centred left to right | y = `standardFooterButtonY` itself. A `Menu` would centre its button on 290 instead; this one is placed by hand, so it sits about 10 pixels lower than the ending screen's button (the button is 19 rows high, part 1) |
+
+## The intro screen (`IntroScreen`)
+
+Built when a new game starts (`save-format.md`, part 2: a new game goes
+to `intro` first).
+
+1. Song `Theme`.
+2. A black rectangle over the whole screen.
+3. A page player with the five pages of `Intro.xml`, **hurrying allowed**.
+4. `enablePause`: the intro can be paused (Escape, part 4).
+5. When the pages are done: a fade to the screen `news`, the newspaper of
+   day 1.
+
+## The ending screen (`EndScreen`)
+
+Built from the ending's id, the all-time record and the story's facts.
+Its constructor, in order:
+
+1. Looks up the ending (`getEndNode`). Song = its `music`.
+2. A `Menu` centred on y = 290 with **one** button: `credits`
+   (`menu_credits`, "CREDITS") when `gocredits` is exactly `true`,
+   otherwise `mainmenu` (`menu_mainmenu`, "MAIN MENU"). The button is
+   switched off (switch 1: not drawn, no input) for now.
+3. The statistics text: font `title_tall`, white, lines aligned left, no
+   wrapping. Its text is `stats_text` from `Text.xml` with its fill-ins:
+
+   | Fill-in | Value |
+   |---|---|
+   | `$time` | `Game/Stat/PlayTime` (whole seconds) as `MM:SS`, or `HH:MM:SS` (`StringUtil.formatTime`, `border-view.md`) |
+   | `$processed`, `$approved`, `$denied`, `$detained`, `$citations`, `$stamps` | `Game/Stat/NumProcessed`, `NumApproved`, `NumDenied`, `NumDetained`, `NumCitations`, `NumStamps` (`0` when unset) |
+   | `$endnum` | the ending's `num` |
+   | `$endtotal` | the number of endings, 20 |
+
+   In English: "Played for $time / $processed travelers processed /
+   $approved approved / $denied denied / $detained detained / $citations
+   citations earned / $stamps stamps applied / Ending $endnum of
+   $endtotal". The block is centred left to right; its top is at y = 95
+   (95/320 of the height). Hidden for now.
+4. A page player with the ending's pages (`getEndPages`, so `flee` gets
+   `escape`'s), **hurrying not allowed**.
+5. A black rectangle over the whole screen, drawn on layer 100, hidden.
+6. Its own state machine, three states (times read from the
+   instructions):
+
+   | State | What happens |
+   |---|---|
+   | `intro` | The pages play. The black rectangle is hidden |
+   | `transition` | Entered when the pages are done. The black rectangle shows at once and fades in from clear to black over **2 seconds**, then stays black for **2 more seconds**. On leaving: the page player is switched off (switch 1), the header "STATS" is added (`menu_stats`, `GameScreen.addHeader`, part 4), the statistics text is shown and the button is switched on |
+   | `stats` | The black fades out over **2 seconds**; the rectangle is hidden at the end of the fade |
+
+   So from the last NEXT click: 2 s to black, 2 s of black, and 2 s of
+   fading in on the statistics page. (How the two waits add up: while a
+   state is fading in, its own clock does not run, `Stater.step`; the
+   2-second length of `transition` is counted after its fade.)
+7. Starts in `intro`, at once (no fade).
+8. If the ending has `achieve`: awards it (`AlltimeStats.awardAchievement`:
+   added to the record's list `_Achievements`, a save of the record is
+   queued, and the platform's service is told; out of scope, rule 4).
+9. **Records the ending as seen**: `EndBits` in the all-time record gets
+   the bit for this ending, 1 shifted left by (`num` - 1). So ending 1 is
+   bit 0 and ending 20 is bit 19. (`AlltimeStats.or` was read as far as:
+   an unset statistic is set to the value; a set one is read back as a
+   number. That it is then combined with "or" and saved is from the
+   function's name: inferred.)
+10. Writes an ending stash (`GameTransition.makeEndStash`, the
+    `MAKE_STASH_END` of `save-format.md`).
+
+The ending screen does not call `enablePause`, so it **cannot be
+paused**, and it has no back button: Escape does nothing there (part 4).
+
+**The button:** `mainmenu` fades to the title; `credits` fades to the
+credits screen (`credit`). The click handler also knows an id `quit`
+(close the game), but this screen makes no button with that id.
+
+**What the load screen does with `EndBits`** (read for this part from
+the `LoadScreen` constructor; part 3 had left it open): the row of marks
+is made only when `EndBits` is not 0, so a player with no ending sees no
+row. There is one mark per ending id (`getEndIds`, 20). Mark i (from 0)
+is white when bit i is set, so it stands for ending number i + 1, and in
+the load screen's faded colour (`kColorFaded`, `0xff546754`) when not.
+Each mark is a 3 x 3 square, each 4 pixels right of the one before
+(mark 0, ending 1, is leftmost). The row's place is
+worked out from other values of that constructor, which were not
+followed.
+
+**Restoring an ending stash** (`restoreFromStash`): the screen is built
+again by the same constructor, so the ending starts again from its first
+page, and steps 8 to 10 run again (the bit and the achievement are
+already there; a new ending stash is written). Then the first page's
+wipe and typing are finished at once (`endFlipNow`). The stash keeps only
+the ending's id, not the page (`save-format.md`).
+
+### A second click after the last page (predicted from the code, not seen)
+
+After the last NEXT, the page player stays in `idle` with its NEXT button
+on, under the black rectangle, until `transition` ends 4 seconds later. A
+second click on that spot in those 4 seconds would call "pages done"
+again, so the screen would enter `transition` again. Leaving
+`transition` runs its end step, so the statistics, the button and the
+header would be put up at once under the black. Then the fade and the
+wait would start over, and at their end a second "STATS" header would be
+added over the first. Whether the black rectangle (layer 100) is drawn
+over the NEXT button, and so whether the button can still be seen, was
+not followed. The intro screen has no such problem: its "pages done"
+starts a fade, and a fade stops the screen's input (part 1).
+
+## For the port
+
+- One page player for the intro and the endings; a flag for hurrying.
+- Per page: 1 s wipe from the right, then the caption types on, then NEXT.
+  The page's sound plays 2 s after the page starts, whether or not the
+  page was hurried.
+- The ending's 2 + 2 + 2 seconds to the statistics page, with the button
+  switched on only when the statistics appear.
+- `EndBits` as a 20-bit number, bit (num - 1) per ending.
+- The class setup's `kTextWidth` = 250 of the ending screen: no reader
+  was found in the decompiled screens code (the only use is the setup
+  that writes it). Not needed.
+- Decide whether to copy the second-click behaviour above, after seeing
+  it in the game. A port can simply ignore clicks once the pages are done.
+
+## Not studied
+
+- What `Sprite.width` answers for an empty holder, so whether the first
+  page wipes or appears at once.
+- `app.vis.Text`'s width for a fixed-width text, so the caption's exact
+  left edge.
+- In which positions a clip rectangle is applied (`app.vis`), taken to be
+  screen positions.
+- `RevealTextEnt.revealCount`.
+- Draw order between the page player and the ending's black rectangle.
+- `AlltimeStats.or` after the read-back, and how the all-time record is
+  saved.
+- Where the songs `Theme`, `Death` and `Victory` are defined.
+
+## Things to watch in the game
+
+Each takes under a minute; a new game shows the intro.
+
+1. The first intro page: does its picture appear at once, or wipe in?
+   The caption should start about 1 second after the page appears.
+2. Pages 2 to 5: the new picture is uncovered from the right edge,
+   sweeping left over 1 second; then the caption types on; then NEXT.
+3. On pages 2 to 5, a click during the wipe or the typing shows the page
+   whole at once. On page 1 a click does nothing until NEXT appears.
+4. Escape during the intro pauses.
+5. After the fifth page's NEXT: a fade to the newspaper of day 1.
+6. An ending (any): clicks during a page do not hurry it. After the last
+   NEXT: black over 2 s, black for 2 s, then STATS fades in over 2 s with
+   the statistics and one button. Escape does nothing.
+7. The statistics' last line reads "Ending n of 20", with the ending's
+   number from `Ends.xml`.
+8. On the next visit to the load screen, a row of 20 small marks with
+   one white mark: the ending's number, counted from the left (by the
+   code each mark is 4 pixels right of the one before, so ending 1 is
+   leftmost).
+9. The second click (above): click NEXT's spot twice quickly on an
+   ending's last page.
