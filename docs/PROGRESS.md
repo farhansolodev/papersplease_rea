@@ -284,8 +284,10 @@ Collected from the docs, so they are not lost:
 - `Days.csv` has no `NIGHTMSG`, which `DayLib.getNightMessages` asks for;
   what the table reader returns for a missing name was not read.
 - Not read: `FamilyVisuals` (the family pictures), `play.ui.Button`,
-  `DiagramLine`, the tween helper behind the blinking tick circles, what
-  the "instant" option of `Stater.go` changes.
+  `DiagramLine`, what the "instant" option of `Stater.go` changes.
+  (The tween helper was on this list; it is read since: a timed change
+  lasts its number in seconds, so the tick circles blink for 2 seconds.
+  `screens.md`, part 1, "Timed changes".)
 - Entity switches 8 ("the parts inside get input") and 16 have no name in
   the code seen; switch 2 is tested nowhere in the three tree walks.
 
@@ -575,7 +577,6 @@ All gitignored. Nothing below is in git.
 | `decompiled/saves*.c` | small | The save, store, story-state, settings, statistics, fact-set and `MapUtil` functions read for `save-format.md` | Step 4 of `ghidra-workflow.md` with the selectors in the `MODLOG.md` entry |
 | `decompiled/stash*.c`, `screens*.c`, `booth_ctor_asm.txt`, `game_stater.short.c`, `loadscreen_btn.short.c` | about 5 MB | Read for part 2 of `save-format.md`: the stash classes, `GameTransition`, the resume overlay; all 471 `play.screen` functions (`screens`, a few minutes; searched, not read); the instructions of the `Booth` constructor and of `HostUnity.CreateGame`; condensed views | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.stash." "play.GameTransition" "play.screen.UnstashOverlay"`, and with `"play.screen."`; `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `decompiled/screens.short.c`, `titlescreen_update_asm.txt`, `loadscreen_strings.txt` | about 1 MB | For `screens.md`, parts 2 and 3: a condensed copy of all `play.screen` functions, the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `condense_decompile.py` on `screens.clean.c`; `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
-| `extracted/nightlook/` | empty until used | An empty save folder made for the user's look at a night screen (`screens.md`, part 1, "Things to watch") | Make an empty folder |
 | `decompiled/night_screen*.c`, `revealtext*.c`, `gamescreen.short.c`, `budgetent_ctor_asm.txt`, `budgetent_ctor_strings.txt`, `asm_family_buildmessage.txt` | about 3 MB | Read for `screens.md`, part 1: all 228 `play.night` functions plus `DayLib.getNightMessages`; the 32 `play.ui.RevealTextEnt` functions; a condensed `GameScreen`; the instructions of the `BudgetEnt` constructor and of `Family.buildMessage`; the `BudgetEnt` constructor's strings in machine-code order | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.night." "0x180447cf0"` (under a minute), and with `"play.ui.RevealTextEnt"`; `condense_decompile.py` on `screens.clean.c` with a filter for `GameScreen`; `DumpAssembly.java 0x1806c2a70` and `0x180757930`; `ListStringUses.java 0x1806c2a70` |
 | `extracted/autorun/` | 2 MB | The test player's folder: `auto.plan`, `auto.log`, copies of three `Player.log` runs, and scratch scripts from the fourth session (`show.sh` prints one decompiled function with the noise removed; `rand_uses2.py` lists functions matching a pattern; `log_step.py`; several experiments) | The logs: run the game as above (needs the go-ahead). The scratch scripts are conveniences, not needed |
 

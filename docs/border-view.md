@@ -204,8 +204,9 @@ For the record, what they do where they exist:
   shows `BorderCamNoise.png` instead, at a new random position every frame
   (two draws per frame from the camera's own generator). While the noise
   shows, presses are ignored. (0.5 is the number handed to the game's
-  "tweener" with the function to call; it is taken to be the duration in
-  seconds, as for the delayed calls in part 3.)
+  "tweener" with the function to call. It is the duration in seconds:
+  `Tweener.tween` was read on 2026-10-14, `screens.md`, part 1, "Timed
+  changes". Before that this was an inference.)
 
 ## The endless scoreboard (`EndlessScoreboard`)
 

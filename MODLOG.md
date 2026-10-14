@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-14 The tween helper read: how long a timed change lasts
+
+**Changed:** `docs/screens.md` (part 1: the blink of the tick circles written out, a new short section "Timed changes" on `Tweener` and `Tween`, the "Not studied" entry; part 3: the load screen's slides are 0.5 seconds), `docs/border-view.md` (the camera noise's 0.5 was "taken to be" seconds), `docs/PROGRESS.md`. Removed the unused empty folder `extracted/nightlook` at the user's request.
+**Why:** the user asked for the one gap in the night screen's animation to be closed by reading, after asking whether the animation has to be watched (it does not).
+**Tested how:** code reading, no Ghidra run: `Tweener.tween`, `add`, `stepAll`, the `Tween` constructor and `Tween.step` were already in `decompiled/shoot_misc.clean.c` from the border step.
+**Result:** `tween(function, duration)` calls the function every frame with t from 0 to 1 over `duration` seconds (t grows by frame time / duration), with a last call at exactly 1. So the tick circles blink for 2.0 seconds: hidden 0.38 s, then shown and hidden for 0.4 s each, shown from 1.98 s on.
+**Corrected in older docs:** `screens.md` part 1 said the helper was not read and the 2.0 was inferred; part 3 said "0.5, inferred seconds"; `border-view.md` said its 0.5 was "taken to be" seconds. All three now state seconds. **A miss of mine:** part 1 listed the tween helper as unread, but its core (`Tween.step`, with `Tweener.timer`) had been read in an earlier session and is named in `border-shooting.md`; I had not searched the docs for it. `screens.md` now says so.
+**Still broken / not tested:** not watched in the game. That the frame time used is the same clock as the rest of the screen was not followed beyond `Tween.step` asking the clock for `dt`.
+
 ## 2026-10-14 The night screen compared with a screenshot of the real game
 
 **Changed:** `docs/screens.md` part 1 (new section "Compared with a screenshot"; the opening line, the layout paragraph and the watch list now say what one picture confirmed), `docs/nights-txt-format.md` and `docs/night.md` (their "not compared with the running game" notes), `docs/PROGRESS.md`. No script changed.

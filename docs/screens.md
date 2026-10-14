@@ -280,10 +280,42 @@ described in `border-scene.md`), stepped every frame with the frame's time.
 |---|---|
 | `off` | On entry: every message hidden, every budget line switched inactive, the rule and the total hidden. After **1.0 second**: `revealText` |
 | `revealText` | Every frame, going through the messages in order: show the message and advance its letters; stop at the first message that is still appearing. When none is: `revealBudget` |
-| `revealBudget` | Every frame: n = the whole part of (seconds in this state x 4). The first n lines are active (visible and clickable). When n changes and is not above the number of lines + 1, the sound `text-reveal` plays. The rule shows once n reaches the number of lines, the total once n reaches that + 1, and at + 2 the state becomes `on`. On leaving: every optional line's tick circle blinks (`flashCheck`: hidden and shown in turn, six steps, ending shown, if the tween helper counts from 0 to 1 as its use suggests; inferred: over 2.0 seconds, from the `2.0` passed to it. The helper was not read) |
+| `revealBudget` | Every frame: n = the whole part of (seconds in this state x 4). The first n lines are active (visible and clickable). When n changes and is not above the number of lines + 1, the sound `text-reveal` plays. The rule shows once n reaches the number of lines, the total once n reaches that + 1, and at + 2 the state becomes `on`. On leaving: every optional line's tick circle blinks for **2 seconds** (`flashCheck`, next paragraph) |
 | `on` | On entry: every message shown in full, every line active, rule and total shown |
 
 So the lines appear one per quarter of a second.
+
+The blink of the tick circles (`flashCheck`, `tween_flashCheck`), now read
+to the end: a timed change of 2.0 seconds ("Timed changes" below) calls
+`tween_flashCheck(t)` every frame with t going from 0 to 1. The circle is
+shown when the whole part of (t + 0.01) x 5 is odd. So: hidden for the
+first 0.38 s, shown 0.4 s, hidden 0.4 s, shown 0.4 s, hidden 0.4 s, and
+shown from 1.98 s on. "Shown" means the ticked or the empty circle,
+whichever the line's state is; "hidden" means neither.
+
+### Timed changes (`Tweener`, `Tween`)
+
+Every entity can have a `Tweener`: a list of timed changes that the tree
+walk steps each frame, just before the entity's own update
+(`Trunk.treeUpdate`). Read on 2026-10-14: `Tweener.tween` `0x180680610`,
+`add`, `stepAll`, the `Tween` constructor and `Tween.step` `0x18067f7c0`
+(`Tween.step` and `Tweener.timer` had already been read for
+`border-shooting.md`).
+
+- `tween(function, duration)` first stops any running change that uses
+  the same function, then starts a new one: t = 0, lasting `duration`
+  **seconds** (never less than 0).
+- Each frame the function is called with t (at most 1). Then, if t has
+  reached 1, the change ends (and a "when done" function runs, if one was
+  given); otherwise t grows by the frame's time divided by the duration.
+  With a duration of 0, t jumps to 1.
+- So the function is called once with 0, then every frame, and a last
+  time with exactly 1.
+
+This settles three values that earlier text had to call "taken to be
+seconds": the 2.0 of the blinking circles here, the 0.5 of the load
+screen's sliding buttons (part 3), and the 0.5 of the camera noise in
+`border-view.md`.
 
 How a message appears (`RevealTextEnt.stepReveal`): a countdown starts at
 0.05 seconds; each time it runs out the next letter is shown and the
@@ -474,7 +506,10 @@ circles, a booklet picture marked "x5", and four dotted rectangles.
   apartment, the tokens and the passports. Proposed as its own part.
 - The exact placement of everything (see "Layout").
 - `play.ui.Button` (how a button reacts, its modes), `play.ui.DiagramLine`
-  (the rule), `app.vis.Text`, the tween helper behind `flashCheck`.
+  (the rule), `app.vis.Text`. (The tween helper behind `flashCheck` was
+  listed here at first; it is read since, "Timed changes" above. Its
+  core, `Tween.step`, had in fact been read in an earlier session for
+  `border-shooting.md`; this part missed that when it was written.)
 - What `revealAll` does with its sound (its condition uses a counter whose
   writer was not looked up).
 - What the "instant" option of `Stater.go` changes. This screen sets no
@@ -821,9 +856,10 @@ followed by `C`. In the deleting mode a save's button also shows
 look.
 
 When the buttons are made again (after a delete), a button whose save was
-there before slides from its old place to the new one (a tween given 0.5,
-inferred seconds, eased), and the whole grid slides if the number of
-tracks changed.
+there before slides from its old place to the new one over **0.5
+seconds**, eased (a timed change, part 1, "Timed changes"; a button that
+moved less than a pixel does not slide), and the whole grid slides over
+the same 0.5 seconds if the number of tracks changed.
 
 ## Clicking a button, normal mode (`loadButton_onClick`)
 
