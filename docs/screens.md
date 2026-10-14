@@ -7,8 +7,9 @@ rules behind a screen are in that topic's own doc (for the night:
 
 - **Part 1** (2026-10-14): what every screen is built on (`GameScreen`, and
   the switches every on-screen object carries), and the night screen.
-- Not written yet: title, ending player, endless-mode screens, language
-  chooser, load screen, pause screen, settings, credits.
+- **Part 2** (2026-10-14): the title screen and the menu helper (`Menu`).
+- Not written yet: load screen, ending player, endless-mode screens,
+  language chooser, pause screen, settings, credits.
 
 ---
 
@@ -93,10 +94,10 @@ no input", was right.)
   pause button in the top right corner (4 pixels from the top), white, or
   black when `black` is true. The button is added to the screen on the
   first `update`. A click calls `GameTransition.setPause(true)`.
-  By the instructions of the `Layout` constructor, `showPauseButton` is
-  set in two of its three layout branches; which branch is the desktop
-  one was not established here, so whether desktop has the button is
-  **not known** (the pause itself is on a key: `save-format.md`).
+  **Desktop has no such button**: the `Layout` constructor sets
+  `showPauseButton` in its two portrait blocks only (settled in part 2,
+  "The desktop block of the layout"; part 1 first left this open). On
+  desktop the pause is on a key (`save-format.md`).
 - `makePushButton(parent, text, align, red)` builds the game's standard
   wide button from `PushButton.png` (129 x 38) or `PushButtonRed.png`,
   with text colour `0x556855`, or `0xcc2e2e` on the red one. The picture
@@ -383,8 +384,8 @@ of the placement (header, texts, the split between messages and lines in
 `calcSplit`, the family pictures) is left for the drawing step.
 
 The width the messages wrap at (`Layout.nightMessageWidth`) is the screen
-width minus 20 in one layout branch and minus 50 in the other two; which
-is the desktop one was not established.
+width minus 50 in the desktop block: **520** (settled in part 2; part 1
+first left open which block is the desktop one).
 
 ## Not studied
 
@@ -436,3 +437,171 @@ None of these has been watched. Any normal night will do for 1 to 4.
    and ticking one you cannot afford makes the total blink for about two
    seconds with a small mark on a line.
 6. Whether SLEEP can be clicked before the lines have appeared.
+
+---
+
+# Part 2: the title screen and the menu helper
+
+Studied on 2026-10-14. Code reading only: **nothing in this part was
+compared with the running game**, although the user saw the title screen
+in the stash test of the same day (`save-format.md`): "story" and
+"endless", which agrees with the two buttons below.
+
+## What was read
+
+From `decompiled/screens.clean.c` (condensed copy `screens.short.c`):
+
+| Class | Functions |
+|---|---|
+| `play.screen.TitleScreen` | constructor `0x180673be0`, `menu_onClick` `0x1806764f0`, `update` `0x180676bc0`, `react` `0x1806769f0`, `unlockConfirm_onDone` `0x180676b10`, `downloadUrl` `0x1806762d0`, `draw`. `confirm_onClick` is the shared empty function: it does nothing |
+| `play.screen.Menu` | all of it: constructor, `addButton`, `addImageButton`, `addPushButton`, `applyCenterY`, `button_onClick`, `getButton`, `getCenterButtonsBounds`, `manageButton`, `setAllButtonsActive` |
+
+Checked in the instructions: the two arguments the decompiler dropped in
+`update` (`decompiled/titlescreen_update_asm.txt`), and the layout values
+(`decompiled/layout_ctor_asm.txt`). Seven number constants read with
+`read_doubles.py`.
+
+**Not read:** `UnlockConfirm` (the box that asks for the endless code),
+`play.ui.Button`, `app.aud.Music` (what a "beat" is), the platform
+functions `canExit`, `osName` and `decoratedVersion`, the test tooling
+class `SoakTapper`.
+
+## The desktop block of the layout
+
+The `Layout` constructor has three blocks, one per platform kind
+(`border-view.md`). `border-view.md` found that `borderShowSnipingSurround`
+is set in the two portrait blocks and not in the desktop one. The same two
+blocks, and only they, write `showPauseButton` and `menuItemPaddingY`, so
+the third block is the desktop one. Values for desktop, read from the
+instructions:
+
+| Value | Desktop | Where it comes from |
+|---|---|---|
+| `showPauseButton` | false | Written only in the portrait blocks |
+| `nightMessageWidth` | 520 | Screen width - 50, in the desktop block |
+| `titleShowVersion` | **true** | Written only in the desktop block |
+| `titleStackFooter` | false | The start value; only one portrait block sets it |
+| `titleLogoScale` | 1.0 | The start value; the desktop block does not change it |
+| `titleLogoTop` | 28 | The start value |
+| `titleMenuCenterY` | 260 | The start value |
+| `menuItemPaddingY` | 0 | No write found outside the portrait blocks (both set 20) |
+
+"No write found" means no instruction that stores to that field through
+the register holding the layout; a store by another route would have been
+missed.
+
+## What the title screen builds, in order
+
+1. Song `Theme`. `enablePause` is **not** called: the title screen cannot
+   be paused.
+2. `rising` is set to true if this is the first title screen made since
+   the game was started (a counter kept for the whole run), and the
+   counter goes up.
+3. A black background the size of the screen.
+4. A container entity, placed one screen height down (off screen). The
+   logo and the buttons are inside it, so they move with it.
+5. The logo `Title.png`, centred, at `titleLogoTop` inside the container.
+6. A `Menu` on the container, centred at `titleMenuCenterY`, with these
+   buttons:
+
+   | Id | Kind | Text or picture | Made when | Where |
+   |---|---|---|---|---|
+   | `story` | standard button | `menu_story` | always | centre column |
+   | `endless` | standard button | `menu_endless` | not with the command-line word `expo` | centre column |
+   | `quit` | picture | `QuitButton.png` (17 rows per state) | the platform says the game can exit, and not `expo` | top right, 10 from the edges. Inactive at first |
+   | `settings` | picture | `SettingsButton.png` (29 rows per state) | always; inactive with `expo` | bottom left, 10 from the edges |
+   | `credit` | text on a 140 x 12 bar | `created_by`, font `regular`, colour `0xff556855` | always | bottom centre |
+   | `version` | picture with text | `VersionButton.png` (12 rows), the platform's version text, colour `0x3b483b` | `titleShowVersion` (desktop) | bottom right |
+
+7. A helper for the test tooling (`SoakTapper`, given 13 numbers).
+
+On the portrait shape that sets `titleStackFooter`, the credit and
+settings buttons are stacked in the middle instead.
+
+## What each button does (`menu_onClick`)
+
+| Id | What happens |
+|---|---|
+| `story` | Fade to the screen `load` (the load screen, where a new story is also started) |
+| `endless` | If the setting `endlessUnlocked` is on: fade to the screen `endless`. If not: a box asking for a code is shown (`UnlockConfirm`, with the text `endless_unlock` and the code `endless_code` from the language's fixed values). When the box reports success: the setting is turned on and the game fades to `endless` |
+| `quit` | `GameTransition.quit()` |
+| `credit` | Fade to the screen `credit` |
+| `settings` | Fade to the screen `settings` |
+| `version`, `newversion` | Opens a web address in the system's browser: the language's `url_check_updates`, followed by the game version and the system's name |
+
+No button with the id `newversion` is made in the functions read.
+
+**For the port (your decision, noted here because of rule 4):** the
+`version` button is the only thing on this screen that reaches outside the
+game. It opens the developer's "check for updates" page. It is not online
+play, anti-cheat or DRM, so I did not stop, and I did not study how the
+link is opened. A browser port has no use for it; I suggest leaving the
+button out, or showing the version as plain text.
+
+## The rising title (`update`)
+
+Every frame, from the music that was handed to the screen:
+
+- **If the music is not playing**: everything is put in its final place at
+  once (container at the top, logo at `titleLogoTop`, quit button active).
+- Otherwise b = the music's beat x 0.5 + 0.035.
+  - **Rising**, while this is the first title screen of the run, the
+    player has not skipped, and b is below 20: the container moves up in
+    **20 steps**, one per whole number of b. Its distance from the final
+    place is (screen height - `titleLogoTop`) x (1 - p), rounded, where
+    p = (the whole part of b + a quick ease over the first fifth of each
+    step) / 20, and at most 1. On desktop that is 292 pixels, 14.6 a step.
+  - **After that**: the container is at the top, the quit button is
+    active, and the logo bobs with the music: with x = the fraction part
+    of b x 0.5, the logo sits 5 pixels lower from x = 0.1 to x = 0.5 and
+    eases in and out over a tenth on each side.
+- While rising, the screen's switch 8 is cleared, so **the buttons cannot
+  be clicked until the title has arrived** (part 1, "The switches").
+
+`react`: while rising, any click or any key sets `skipped`, which ends the
+rise on the next frame. (Separately, taps in the top left 50 x 50 pixels
+are counted by the test tooling's `SoakTapper`; the right rhythm starts
+the soak test, `save-format.md`.)
+
+What a "beat" of the music is, and so how long the rise takes in seconds,
+was not read.
+
+## The menu helper (`Menu`)
+
+A `Menu` belongs to one entity (the host) and keeps its buttons by id.
+
+- `addPushButton(id, text)`: a standard button (`makePushButton`), centred
+  horizontally and added to the **centre column**. An id of `back` or
+  `cancel` also makes it the back button (`setAsBackButton`, not read).
+- `addImageButton(id, picture, rows, font)`: a button from a picture whose
+  upper `rows` rows are one state and the next `rows` rows the other (the
+  whole picture if `rows` is 0). Not in the centre column; the caller
+  places it.
+- `manageButton(button, inColumn)`: takes over a button made elsewhere.
+- Every button's click calls the menu's one `whenClick` with the
+  button's id.
+- `applyCenterY`, run after each `addPushButton`: the column is centred on
+  `centerY`. Its height is the buttons' heights plus `menuItemPaddingY`
+  between them, but at most the screen height minus the notch height
+  minus 40; the buttons are then spread evenly over that height.
+- `setAllButtonsActive(on)` switches every button of the menu on or off;
+  `getCenterButtonsBounds` gives the rectangle around the column.
+
+## Not studied
+
+- `UnlockConfirm`: how the code is typed and checked.
+- The music's beat, so the rise's length in seconds and the bob's tempo.
+- `play.ui.Button`, including what "back button" means (inferred from the
+  name: the button a back key presses).
+- Whether a `newversion` button is made anywhere.
+- `Layout.notchHeight` on desktop (inferred 0: there is no notch).
+
+## Things to watch in the game
+
+1. At the first start the title rises in visible steps with the music;
+   a click or key makes it jump to its place. After going to another
+   screen and back, it does not rise again.
+2. The buttons do not react until the title has arrived.
+3. The logo moves down and up by a few pixels in time with the music.
+4. Bottom right shows the version; bottom left the settings button; the
+   quit button appears top right only once the title has arrived.

@@ -140,7 +140,7 @@ exact words, without dashes:
 | `trace` | turns on the game's debug log (`Trace.enabled`) |
 | `soak <name>` | names an automated soak test; `soak auto` starts the test automation with a default plan (`comparing-with-the-game.md`) |
 | `savedir <path>` | where saves go (quotes are removed) |
-| `expo` | shows a pause button (exhibition mode) |
+| `expo` | shows a pause button (exhibition mode). On the title screen it also leaves out the endless and quit buttons and switches the settings button off (`screens.md`, part 2) |
 | `nosync`, `fps`, `stretch`, `720p`, `1080p` | display options (not studied) |
 | `nosteam` | Steam-related; **out of scope** (online platform) |
 
