@@ -302,7 +302,7 @@ class Night:
             self.facts["End/FamilyPassportsImage"] = "Passport%d.png" % (len(taken) + 1)
             self.facts["End/FamilyTakeCount"] = str(len(taken))
             # End/FamilyEscapeIntro and End/FamilyEscapeFinal are built by
-            # Family.buildMessage from the text entries (not studied).
+            # Family.buildMessage from the text entries (see build_message).
         # anything else (for example RenameSleepButton) does nothing here
 
 
@@ -499,8 +499,10 @@ class Family(Night):
         return fill(self.texts["budget_medicine"], self.texts["family_%s_budget" % member.id])
 
     def build_message(self, prefix, members):
-        """Inferred from the text entries (prefix + count, $0.. the members'
-        names); Family.buildMessage itself was not read."""
+        """Family.buildMessage (read on 2026-10-14, docs/screens.md part 1):
+        the text prefix + count, $0.. the members' message names. Left out:
+        the [m0]..[/m0] and [f0]..[/f0] tags and the gender switches, which
+        the English texts do not use, and a missing text giving ""."""
         return fill(self.texts[prefix + str(len(members))], *[self.message_name(m) for m in members])
 
     def apply_budget(self):

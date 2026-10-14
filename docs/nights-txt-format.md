@@ -178,6 +178,8 @@ script `scripts/reference/nights.py`:
   members, the standard budget lines, `applyBudget`, balancing. The fact
   names behind `AdoptNiece`, `RemoveSavings` and `TakeFamilyPassports` are
   confirmed there.)
-- `Family.buildMessage` (the escape sentences) and the night screen itself.
+- (Studied since, on 2026-10-14, in `screens.md`, part 1:
+  `Family.buildMessage`, which makes the escape sentences, and the night
+  screen.)
 - How a traveler script's `Night <id>` command reaches the night.
 - Nothing here has been compared with the running game.

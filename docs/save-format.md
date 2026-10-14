@@ -409,7 +409,9 @@ In this order:
 | `flashing-to-title` | The same two flags are cleared, and the screen flash runs; when it is over, "title" becomes the pending change and the state is left (for which state: the decompiler dropped the argument) |
 | `paused` | On entry: all sound paused, the pause screen created, the current screen hidden, the sound `button-drop`. Every frame it tells the clock to pause for one frame. On exit: sound resumed, pause screen removed, screen shown again, the sound `hover-up` |
 
-What the two flags mean was not read from the code that uses them.
+What the two flags mean was read on 2026-10-14 (`screens.md`, part 1):
+without 4 the screen and everything in it get no input, without 16 they
+are not updated. They are still drawn.
 Inferred from where they are cleared (here, and under the resume overlay
 below): the screen is no longer updated and gets no input.
 
@@ -596,7 +598,8 @@ it.
    it tells the clock to pause for one frame, so the game stands still.
    After 10 frames it darkens the screen, shows an icon and a button with
    the text `menu_resume`, and clears the screen's flags 4 and 16 (the
-   same two the fade-out clears). A click on the button sets them again
+   same two the fade-out clears: no input and no updates, `screens.md`,
+   part 1). A click on the button sets them again
    and removes the overlay.
 
 The booth's part (`Booth.restoreFromStash`):
@@ -863,7 +866,8 @@ user's own play data.
   tablet only).
 - Whether anything in `play.ui` or `app` asks for a stash restore (not
   searched).
-- What the screen flags 4 and 16 do, read from the code that uses them.
+- (Answered on 2026-10-14 in `screens.md`, part 1: flag 4 lets a screen
+  and its parts get input, flag 16 lets them be updated.)
 - The booth's own states beyond `empty` being where the day stash is
   taken; which key is number 5 (pause); the pause screen.
 - The load screen itself beyond the two functions named above ("read the

@@ -19,9 +19,10 @@ Everything here is confirmed in the code unless marked otherwise.
 
 ## What the night is given
 
-A `Family` object is built from: the game data, a random generator (not used
-by anything read here), the saved story's facts, the day's summary, and an
-"easy mode" switch. The summary (`play.day.Summary`) carries: the day number,
+A `Family` object is built from: the game data, a random generator (the
+day's night generator; no function of the night code draws from it, see
+`screens.md`, part 1), the saved story's facts, the day's summary, and an
+"easy mode" switch. It is built when the night screen is built. The summary (`play.day.Summary`) carries: the day number,
 travelers processed **paid** and **unpaid**, the number of penalties and
 their cost, bribe money, the attack result, whether there was an attack, a
 bomber or a poisoning, token ids, the day's night event ids, and escape
@@ -96,14 +97,18 @@ at 0 and cannot pass their limit:
    | `MEDICINE (WHO)` | -5, one line per living member who is sick | optional, ticked |
 
    "Fixed" and "optional" follow the rule for a line with no tick setting:
-   a cost is optional and ticked, anything else is always applied.
+   a cost is optional and ticked, anything else is always applied. The
+   night screen shows exactly this state and a click on an optional line
+   flips it (`screens.md`, part 1).
 5. **Attack message**: result `FAILED_DIDNOTHING`, `FAILED_FIREDGUN` or
    `SOLVED` runs the event `ATTACK_DIDNOTHING`, `ATTACK_FIREDGUN` or
    `ATTACK_SOLVED`. Result `NONE` runs `ATTACK_DIDNOTHING` if there was an
    attack of any kind or a bomber. Other results run nothing here.
 6. If there was a poisoning: the event `POISONING`.
-7. The day's own night messages from `Days.csv` (`DayLib.getNightMessages`,
-   not read) are added to the message list.
+7. The day's own night messages from `Days.csv` are added to the message
+   list. (`DayLib.getNightMessages`, read on 2026-10-14: it asks for a
+   cell named `NIGHTMSG`, which `Days.csv` does not have, so by the data
+   this adds nothing; `screens.md`, part 1.)
 8. If the "after 6PM" flag is not set and there were unpaid travelers: the
    event `AFTER_6PM`. Then messages for the family: who died last night
    (`family_died_<count>`), and one sickness line: `family_verysick_1` or
@@ -122,8 +127,10 @@ The calendar is never pruned: past entries stay in the saved text.
 While the total of ticked lines is negative: going from the **last** line
 upwards, untick each line that is optional and ticked. It stops as soon as
 the total is not negative, and reports the last line it unticked. Fixed lines
-are never unticked, so the total can stay negative. When the screen calls
-this is not read.
+are never unticked, so the total can stay negative. The screen calls this
+once when it is built and again after every click on an optional line
+(`screens.md`, part 1, which also says what the player sees and why a
+click can untick a different line).
 
 ## Going to sleep (`applyBudget`), in order
 
@@ -174,16 +181,18 @@ this is not read.
 
 ## Not studied
 
-- The night screen (`NightScreen`): when `balance` is called, how ticking
-  works, the sleep button, how the wanted ending is acted on.
-- `Family.buildMessage` (the reference infers it from the text entries),
-  `Family.getSummary`, `DayLib.getNightMessages`, `MapUtil.toSimpleString`,
-  the `FactAdaptor` classes (taken at face value: a fact path plus a
-  default).
+- (Studied since, on 2026-10-14, in `screens.md`, part 1: the night
+  screen, when `balance` is called, how ticking works, the sleep button,
+  how the wanted ending is acted on, `Family.buildMessage`,
+  `Family.getSummary`, `DayLib.getNightMessages`.)
+- The family pictures on the night screen (`FamilyVisuals`).
+- `MapUtil.toSimpleString`, the `FactAdaptor` classes (taken at face
+  value: a fact path plus a default).
 - Where the day fills in the summary, and how a script's `Night <id>`
   command adds to its night events.
-- What the random generator given to `Family` is used for (nothing in the
-  functions read).
+- (Answered on 2026-10-14: the random generator given to `Family` is
+  stored and never drawn from in any of the 228 `play.night` functions.
+  Code outside `play.night` was not searched. `screens.md`, part 1.)
 - Compared with the running game on 2026-10-14, through a real save folder
   (`save-format.md`): three nights of one hand-played game. For each night
   `scripts/checks/save_night_check.py` tries every number of paid travelers
@@ -209,7 +218,8 @@ this is not read.
   each takes its counter down by one. **Not exercised**: penalties,
   bribes, attacks, the scheduled events, the niece, the endings, a budget
   that does not balance.
-- **An open conflict about night 3.** Asked afterwards, the user confirmed
+- **A conflict about night 3, explained on 2026-10-14 as far as the code
+  can** (the last sentences of this entry). Asked afterwards, the user confirmed
   buying nothing on nights 1 and 2, but remembers buying everything on
   night 3, medicine for several sick members included. The save written
   after night 3 says otherwise, independently of this doc's rules: savings
@@ -217,18 +227,20 @@ this is not read.
   and three medicines would cost 45 and leave 15), everyone's cold and
   hungry counters went up, and the son's sickness went from 2 to 4. The
   user's description of the screen does fit that night (three members were
-  sick, so three medicine lines). Not resolved. Possibilities, none
-  checked: the memory is off; the clicks did the opposite of what was meant
-  (whether a line starts ticked, and what a click does, is in the night
-  screen, which is not read); or something about when the budget is applied
-  is missing here. The replay (above) narrows it: buying everything on
+  sick, so three medicine lines). The possibilities listed at the time:
+  the memory is off; the clicks did the opposite of what was meant; or
+  something about when the budget is applied is missing here. The replay (above) narrows it: buying everything on
   that same night gives savings 25 and nobody dies, and the model follows
   it, so the third possibility is unlikely and the first save was not a
   "bought everything" night. The user's own explanation, given afterwards:
   they probably unticked everything by mistake, thinking they were doing
-  the opposite. That would mean the lines start ticked; it is the likely
-  answer but not confirmed, and how ticking works is still to be read in
-  the night screen (the screens step).
+  the opposite. **The night screen was read on 2026-10-14 and agrees**
+  (`screens.md`, part 1): food, heat and medicine start ticked, the money
+  was enough that night so nothing was unticked for them, a click flips a
+  line, and the budget is applied in one place, on the sleep click, with
+  the lines as shown. So a save with nothing bought needs one click on
+  each of the five lines. That settles the rules; what was actually
+  clicked cannot be read from a save.
 - The user saw no notice of the son's death before quitting 20 seconds
   into day 4. That fits the death message being built at the start of the
   **next** night from the saved "just died" mark (the `Family` constructor,

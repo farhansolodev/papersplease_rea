@@ -1,9 +1,8 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-14, in the
-eighth session (after saves, part 2: how the game moves between screens,
-and the stash; code reading, plus one test of the stash in the real
-game).
+ninth session (after the screens, part 1: what every screen is built on,
+and the night screen; code reading only).
 `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
@@ -30,7 +29,10 @@ files (the encrypted store, the tree of saves, what one save holds; a real
 save folder decrypts and matches), and how the game moves between screens
 (19 kinds of request, one place that builds each screen, loads and saves),
 with the "stash", a resume snapshot that the desktop game writes but never
-reads back (seen in a test with the real game). The desktop
+reads back (seen in a test with the real game), and the first of the
+screens: the night screen (lines start ticked, a click flips one, the
+budget is balanced after every click, the appearing animation, the sleep
+button). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -50,7 +52,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). Not done: the screens (title, night, ending, endless, language chooser, load, pause), drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, part 1: the base of a screen and the night screen (`screens.md`). Not done: the other screens (title, ending, endless, language chooser, load, pause, settings, credits), the family pictures of the night screen, drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -92,6 +94,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
 | `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder. **Part 2**: the 19 requests a part of the game can make (`GameTransition`), how a screen change is queued and built (`Game.queueScreenChange`, `applyScreenChange`), the game's own five states (fade, pause), and the stash: when it is written, deleted and read, what it holds, how it is restored |
+| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). Ends with a list of things to watch in the game |
 | `ends-xml-format.md` | `Ends.xml` and `Intro.xml`: the 20 endings and the intro slides |
 | `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring |
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
@@ -126,7 +129,8 @@ remaining data file; the night's rules; the method for comparing with the
 running game and the first two runs; finding and fixing why the reference's
 error picks left the game's. Done in the fifth: the newspaper picture. Done
 in the sixth: the whole border scene, parts 1 to 4. Done in the seventh:
-saves, part 1. Done in the eighth: saves, part 2.)
+saves, part 1. Done in the eighth: saves, part 2. Done in the ninth: the
+screens, part 1.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -150,15 +154,23 @@ saves, part 1. Done in the eighth: saves, part 2.)
    and the screen that opened offered only a new game (the unfinished day
    was lost). The stash's content matches the description (`stash_check.py`,
    `0 problems`).
-4. **The screens, next**: title, the night screen, the ending player
-   (slide timing), the endless-mode screens, the language chooser, the
-   load screen, the pause screen, who shows and scrolls the credits. (The
-   news screen is done except its magnifier, `newspaper-picture.md`.) All
-   471 functions of `play.screen` are already decompiled in
-   `decompiled/screens.clean.c` (searched in part 2 of the saves, not
-   read). How a screen is asked for and built is in `save-format.md`,
-   part 2. Probably several parts; the night screen first would also
-   settle the "does a budget line start ticked" question below.
+4. **The screens, in progress.** Part 1 is done (`screens.md`): the base
+   of a screen (`GameScreen`, the entity switches) and the night screen.
+   **Next, part 2** (suggested: the title screen and the load screen with
+   its buttons, since they sit on the save tree of `save-format.md`; then
+   pause and settings). Still to do after that: the ending player (slide
+   timing), the endless-mode screens, the language chooser, who shows and
+   scrolls the credits, and the family pictures of the night screen
+   (`FamilyVisuals`, a 1,930-line constructor, proposed as its own part).
+   (The news screen is done except its magnifier,
+   `newspaper-picture.md`.) All 471 functions of `play.screen` are
+   decompiled in `decompiled/screens.clean.c`; only `NightScreen` and
+   part of `GameScreen` have been read. How a screen is asked for and
+   built is in `save-format.md`, part 2.
+   **A look at one night screen in the game would be worth a launch**
+   (the user's decision): the list is at the end of `screens.md`, part 1,
+   and its first item, the order of the budget lines, tests the
+   reference's sort.
 5. **Drawing**: how text is placed (`app.vis.Text`; the newspaper's title
    and subtitle rules in `newspaper-picture.md` wait on this), how a document page is
    laid out (`PaperInnerVisuals`, read only for its random draws), the
@@ -204,6 +216,34 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
+**From the ninth session** (`screens.md`, part 1)
+
+- **Nothing about the night screen has been watched in the game.** The
+  list of things to watch is at the end of `screens.md`, part 1.
+- **The order of the budget lines on screen.** The screen shows the lines
+  in the budget's order, and the reference predicts an order that changes
+  with the number of lines (heat above food with no one sick; salary above
+  savings with one or three sick). That comes from the game's sort moving
+  equal lines around. It has never been compared with the screen and
+  looks doubtful. If the game shows a steady order, the reference's sort
+  is wrong for the budget, and with it the order in which balancing
+  unticks lines. One look at a night screen settles it.
+- By the code, ticking a line that cannot be afforded can untick a lower
+  line and leave the clicked one ticked. Not watched.
+- By the code, nothing disables the sleep button while the screen is
+  still appearing. Not watched.
+- Whether desktop shows a pause button (`Layout.showPauseButton` is set in
+  two of three layout branches; which is desktop was not established),
+  and the desktop value of `Layout.nightMessageWidth` (screen width minus
+  20, or minus 50).
+- `Days.csv` has no `NIGHTMSG`, which `DayLib.getNightMessages` asks for;
+  what the table reader returns for a missing name was not read.
+- Not read: `FamilyVisuals` (the family pictures), `play.ui.Button`,
+  `DiagramLine`, the tween helper behind the blinking tick circles, what
+  the "instant" option of `Stater.go` changes.
+- Entity switches 8 ("the parts inside get input") and 16 have no name in
+  the code seen; switch 2 is tested nowhere in the three tree walks.
+
 **From the eighth session** (`save-format.md`, part 2)
 
 - **The stash was tested once in the running game** (`save-format.md`,
@@ -218,8 +258,9 @@ Collected from the docs, so they are not lost:
 - A design point for the port: the desktop original loses the current day
   when the game is closed. Whether the browser port should do better (a
   tab is closed easily) is the user's decision.
-- What the screen flags 4 and 16 do (cleared during a fade-out and under
-  the resume overlay; inferred: no update, no input).
+- (Answered in the ninth session, from the code: without flag 4 a screen
+  and everything in it get no input, without 16 they are not updated;
+  they are still drawn. `screens.md`, part 1.)
 - Which key is number 5 (it pauses the game).
 - The fade (0.125 s each way) and the 1-second wait of a screen change
   were read from the decompiler, not checked in the instructions.
@@ -237,9 +278,12 @@ Collected from the docs, so they are not lost:
   that day from the day-3 save and did tick everything: that save has
   savings 25 and nobody dead, and the night model follows it exactly. So
   the rules are not in doubt. The user's explanation for the first time:
-  they probably unticked everything by mistake. To confirm when the night
-  screen is read (the screens step): does a line start ticked, and what
-  does a click do (`night.md`, "Not studied").
+  they probably unticked everything by mistake. **The night screen was
+  read in the ninth session and agrees**: food, heat and medicine start
+  ticked, a click flips a line, and that night the money was enough, so
+  a save with nothing bought needs one click on each of the five lines
+  (`screens.md`, part 1). What was actually clicked cannot be read from a
+  save.
 - The save format is confirmed on one folder: four saves, one branch,
   three launches, two loads. Not exercised: deleting, the `stash` and
   `platover` entries. (Answered in the eighth session: the second sitting
@@ -379,8 +423,9 @@ Collected from the docs, so they are not lost:
 - What the day's token list (filled by `Token...` papers) and
   `Bulletin/PageMask` are used for; which classes outside `BoothEnv` call
   `addPaper`.
-- The night: the screen itself, and anything the night does that is not in
-  `night.md`'s list. The night's numbers were compared with the game on
+- The night: the screen itself is read since the ninth session
+  (`screens.md`, part 1; its family pictures are not). Still open:
+  anything the night does that is not in `night.md`'s list. The night's numbers were compared with the game on
   2026-10-14 for four nights of one hand-played game: three with nothing
   bought and one, a replay, with food, heat and three medicines bought
   (`night.md`, "Not studied"). Penalties, bribes, attacks, the scheduled
@@ -473,6 +518,7 @@ All gitignored. Nothing below is in git.
 | `extracted/stashrun/`, `extracted/stash_sample/` | small | The stash test of 2026-10-14: the test's save folder as it ended (no stash, it was deleted by the click on "Story"), and a copy taken after the first launch that still has `stash.sav` | Play again as described in `save-format.md` ("The stash test in the running game"); the same stash cannot be recreated |
 | `decompiled/saves*.c` | small | The save, store, story-state, settings, statistics, fact-set and `MapUtil` functions read for `save-format.md` | Step 4 of `ghidra-workflow.md` with the selectors in the `MODLOG.md` entry |
 | `decompiled/stash*.c`, `screens*.c`, `booth_ctor_asm.txt`, `game_stater.short.c`, `loadscreen_btn.short.c` | about 5 MB | Read for part 2 of `save-format.md`: the stash classes, `GameTransition`, the resume overlay; all 471 `play.screen` functions (`screens`, a few minutes; searched, not read); the instructions of the `Booth` constructor and of `HostUnity.CreateGame`; condensed views | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.stash." "play.GameTransition" "play.screen.UnstashOverlay"`, and with `"play.screen."`; `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
+| `decompiled/night_screen*.c`, `revealtext*.c`, `gamescreen.short.c`, `budgetent_ctor_asm.txt`, `budgetent_ctor_strings.txt`, `asm_family_buildmessage.txt` | about 3 MB | Read for `screens.md`, part 1: all 228 `play.night` functions plus `DayLib.getNightMessages`; the 32 `play.ui.RevealTextEnt` functions; a condensed `GameScreen`; the instructions of the `BudgetEnt` constructor and of `Family.buildMessage`; the `BudgetEnt` constructor's strings in machine-code order | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.night." "0x180447cf0"` (under a minute), and with `"play.ui.RevealTextEnt"`; `condense_decompile.py` on `screens.clean.c` with a filter for `GameScreen`; `DumpAssembly.java 0x1806c2a70` and `0x180757930`; `ListStringUses.java 0x1806c2a70` |
 | `extracted/autorun/` | 2 MB | The test player's folder: `auto.plan`, `auto.log`, copies of three `Player.log` runs, and scratch scripts from the fourth session (`show.sh` prints one decompiled function with the noise removed; `rand_uses2.py` lists functions matching a pattern; `log_step.py`; several experiments) | The logs: run the game as above (needs the go-ahead). The scratch scripts are conveniences, not needed |
 
 Outside the project: `C:\tools\Il2CppDumper-6.7.46`, `C:\tools\ghidra_12.1.4_PUBLIC`,
