@@ -32,10 +32,27 @@ studied**. **Nothing here has been compared with the running game.**
   generator object the `Day` constructor made (day seed + `0x1000`) and gave
   to `DayNews`. So `make` continues where `DayNews` stopped (after its 5 to 7
   draws when fillers are needed, `news-txt-format.md`). `make` then draws
-  roughly 190 times (below). `newsRand` was searched for in every cleaned
-  decompiled file `decompiled/` held then (before the whole-game decompile): its only users are the `Day` constructor and
-  `NewsScreen`. Those files did not cover the whole game, so "nothing else
-  uses it" is not established.
+  roughly 190 times (below). **Nothing else uses it** (answered on
+  2026-10-16 over the whole-game decompile; this line said before that
+  only part of the game had been searched, so it was not established).
+  Its only users are the `Day` constructor (makes it, passes it to the
+  `DayNews` constructor) and the `NewsScreen` constructor (passes it to
+  `DayNewsImage.make`, whose only caller this is). Neither keeps a copy:
+  `DayNews` has a field `rand`, but its constructor does not write it
+  (only the by-name field functions `__hx_getField`/`__hx_setField`
+  touch it), and `make` stores the generator nowhere; inside `make` it
+  also goes to `FaceSpec.fromString` for a news face (below). How it was
+  searched: the field name (5 functions: the `Day` constructor, `Day`'s
+  three by-name field functions, the `NewsScreen` constructor); the
+  name's hash `0x7daf0358`, by which Haxe code asks for a field by name
+  (only in `Day`'s own by-name get and set); the field's position
+  (`0xD0` in the fields, `0xe0` from the object's start) in reads without
+  a type, where the 3 pointer reads found are a desk item's reveal state;
+  and the instruction listings of the `Booth` and `Layout` constructors
+  (no match). Not traced: `State.getSnapshot` and `MapUtil` read fields
+  by names known only at run time; which objects they get was not
+  followed. The only call that lists an object's field names
+  (`Reflect.fields`) is in the test code's `test.Equal.equals`.
 
 ## The layout pictures (`LayoutImage`)
 
@@ -234,8 +251,9 @@ dropped, and it does not compute the stamp's position.
 
 ## Notes for the port
 
-- The word marks and stamp positions come from `newsRand`, which, as far as
-  found, feeds nothing else after the day's headlines are chosen. So an
+- The word marks and stamp positions come from `newsRand`, which feeds
+  nothing else after the day's headlines are chosen (whole-game search,
+  2026-10-16; "Which random generator" above). So an
   exact copy of these draws matters only for a pixel-identical newspaper.
 - Rounding the content height **up** to whole lines and the "one less than
   the pixel count" width and height of the layout rectangles must be copied

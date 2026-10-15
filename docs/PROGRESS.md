@@ -1,6 +1,8 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-10-15, in the
+**Read this first in a new session.** Last updated 2026-10-16 (a
+whole-game search showed nothing but the news screen uses the day's news
+generator, `newspaper-picture.md`); before that 2026-10-15, in the
 eleventh session (after the screens, part 6: the credits screen, and the
 game's frame rate; parts 1 to 5, in the ninth and tenth sessions, were
 the base of a screen, the night screen, the title screen, the menu
@@ -545,7 +547,8 @@ Collected from the docs, so they are not lost:
   with the running game; which headlines fall back to the regular font or
   lose their subtitle is not known until `app.vis.Text` is read; the
   stamp's angle (the number appears to be used as radians); whether a stamp
-  needs a title; whether anything else uses the news generator. (The news
+  needs a title. (Whether anything else uses the news generator was
+  answered on 2026-10-16: nothing does, `newspaper-picture.md`.) (The news
   screen is built on going to the next day and after a load:
   `save-format.md`, part 2.)
 - The news entry `DIPLOMAT_FIRST` is named by nothing found; who sets
