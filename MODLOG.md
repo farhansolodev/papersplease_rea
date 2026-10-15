@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-16 The endless code box and endless screen, watched in the real game
+
+**Changed:** `docs/screens.md` (part 7: new section "Compared with the running game"; the opening line, the title picture described as an infinity sign, the leaderboards row, the fallback now seen, watch item 4), `docs/endless-mode.md` (its "nothing compared" line), `docs/PROGRESS.md` (state line, open questions, machine-only table). Kept on this machine: `extracted/endlessrun/` (the test's save folder).
+**Why:** to check part 7 against the game without unlocking endless mode in the user's real settings.
+**Tested how:** the user ran `game\PapersPlease.exe savedir C:\Users\farha\dev\papersplease_rea\extracted\endlessrun` (a new empty folder), went through the six-item watch list of part 7, played one Perfection run on Course 2, and closed the game. I decoded the folder with `savefile.py` and printed `EndlessTitle.png` as text.
+**Result:** all six items matched what the user saw. No leaderboards button at all. The "title picture" is an infinity sign (`EndlessTitle.png`); the list called it only "the title picture", now fixed. Files: `endlessUnlocked = true`, `endlessId = perfection:course2`, `_Leaderboard:Perfection Course 2 = 0,33`, no story save. So the local best score is kept on a copy without leaderboards. The score was 0 with one traveler processed and one citation (inferred: the citation ended the run first).
+**Corrected in older docs:** `screens.md` part 7 ("code reading only", "should start on", "not checked" for the leaderboards button), `endless-mode.md` ("nothing compared"), `PROGRESS.md` (the "not watched" item and the GOG leaderboards question, both answered).
+**Still broken / not tested:** one run only, so a worse second run keeping the best score is not seen; the time's format in the result box was not noted; whether clicks reach the title through the code box was not tried. The real save folder was not looked at (by the code, `savedir` keeps the game out of it). Nothing committed.
+
 ## 2026-10-16 The screens, part 7: the endless code box and the endless screen
 
 **Changed:** `docs/screens.md` (new part 7: the code box `UnlockConfirm`, the endless screen `EndlessScreen`, selecting and the stored choice, the score under each course and how the local best score is kept, the result box, hidden things, port notes, watch list; plus the corrections below), `docs/endless-mode.md`, `docs/save-format.md`, `docs/data-files.md`, `docs/PROGRESS.md`. Kept on this machine: `decompiled/part7_run1.txt` (Ghidra output).

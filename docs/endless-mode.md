@@ -146,4 +146,10 @@ switched on.
   raise the three actions, how the random seed of a run is chosen).
 - (How the unlock code is entered and checked: `screens.md`, part 7,
   "The code box". The code is 62131.)
-- Nothing here has been compared with the running game.
+- The scoring has hardly been compared with the running game. One run
+  was watched on 2026-10-16 (`screens.md`, part 7, "Compared with the
+  running game"): Perfection, Course 2, one traveler processed with one
+  citation, the run over at 33 seconds with 0 points. That fits
+  `<mistake end="true"/>`; that the citation ended the run before the
+  traveler's points were added is inferred. Nothing else here was
+  compared.

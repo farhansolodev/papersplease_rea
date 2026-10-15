@@ -2,7 +2,10 @@
 
 **Read this first in a new session.** Last updated 2026-10-16, after the
 screens, part 7: the endless code box and the endless screen, with the
-local best score per course and style (`screens.md`; code reading only).
+local best score per course and style (`screens.md`; code reading, then
+watched by the user in the real game in a separate save folder: all
+matched, and the files it wrote confirm the stored choice and the local
+best score).
 Earlier the same day a whole-game search showed nothing but the news
 screen uses the day's news generator (`newspaper-picture.md`). Before
 that 2026-10-15, in the
@@ -268,12 +271,15 @@ Collected from the docs, so they are not lost:
 
 **From 2026-10-16** (`screens.md`, part 7)
 
-- **The code box and the endless screen have not been watched.** The
-  list is at the end of `screens.md`, part 7. The user has not played
-  endless mode; typing the code 62131 on the title's ENDLESS button
-  unlocks it for good (the setting `endlessUnlocked`), so watching
-  changes the user's own settings file. Suggested: do it in a copy of the
-  save folder, as with the stash test.
+- (**Watched on 2026-10-16**: the user ran the game with `savedir` set to
+  a new folder, `extracted/endlessrun`, went through the list at the end
+  of `screens.md`, part 7, and played one Perfection run. All six items
+  matched; the settings and statistics files agree with part 7. Still
+  unseen: whether a worse second run leaves the best score alone, and
+  how the result box writes the time. The game wrote its files into the
+  new folder, so by the code the user's real settings were not touched
+  and endless mode is still locked there; the real folder was not looked
+  at.)
 - **Decided by the user (2026-10-16): no leaderboards in the port**, since
   it will not be published. To go into `docs/DESIGN.md`'s list of
   decisions. The local best score per course and style is not a
@@ -284,9 +290,12 @@ Collected from the docs, so they are not lost:
   has no input handling of its own); `app.vis.Text`'s height, so some
   positions are formulas only; `StringUtil.formatTime` (the time in the
   result box); `DiagramLine`'s drawing.
-- Whether the GOG build's platform reports leaderboards (that decides
-  whether the original shows the leaderboards button); not checked, and
-  not needed for the port.
+- (Whether the GOG build's platform reports leaderboards: **no**, seen on
+  2026-10-16: the endless screen had no leaderboards button at all.)
+- A Perfection run with one traveler and one citation scored 0 (seen in
+  the statistics file). Inferred: the citation ended the run before the
+  traveler's points were added; the order of the two actions was not
+  read (`endless-mode.md`).
 
 **From the eleventh session** (`screens.md`, part 6; `border-view.md`,
 "The frame rate")
@@ -723,6 +732,7 @@ All gitignored. Nothing below is in git.
 | `extracted/checks/` | small | Test face pictures, the overview of all faces, the face height survey | `faces.py` (`show`, `overview`, `survey`) |
 | `extracted/Art.dat` | 3 MB | Archive cut from `sharedassets0.assets` by hand | Offsets in `art-dat-format.md` |
 | `extracted/art/` | 9 MB | The 614 unpacked files | `art-dat-format.md` commands |
+| `extracted/endlessrun/` | small | The save folder of the endless-mode test of 2026-10-16 (`screens.md`, part 7): settings with endless unlocked, statistics with one best score, names | Run the game with `savedir` pointing at an empty folder, type the code 62131 on ENDLESS, play one run |
 | `extracted/saverun/` | small | A real save folder: the user's hand-played game of 2026-10-14 (four saves with one branch, settings, statistics, name position) | Play again with `savedir` pointing at an empty folder (`save-format.md`); the same game cannot be recreated |
 | `extracted/stashrun/`, `extracted/stash_sample/` | small | The stash test of 2026-10-14: the test's save folder as it ended (no stash, it was deleted by the click on "Story"), and a copy taken after the first launch that still has `stash.sav` | Play again as described in `save-format.md` ("The stash test in the running game"); the same stash cannot be recreated |
 | `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |

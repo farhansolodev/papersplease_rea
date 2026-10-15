@@ -2133,8 +2133,11 @@ On the title screen, click "created by Lucas Pope" at the bottom.
 
 # Part 7: the endless code box and the endless screen
 
-Studied on 2026-10-16. Code reading only: **nothing in this part was
-compared with the running game.** The user has not played endless mode.
+Studied on 2026-10-16 by code reading, then **watched in the running
+game the same day** by the user, in a separate save folder ("Compared
+with the running game" below): everything on the watch list matched, and
+the files the game wrote confirm the stored choice and the local best
+score. Before that test the user had never played endless mode.
 
 The title's ENDLESS button opens a box asking for a code, unless endless
 mode is already unlocked (part 2, "What each button does"). The right
@@ -2249,13 +2252,13 @@ search only).
 | Part | What and where |
 |---|---|
 | Header | **None on desktop**: the header is added only when the layout's `headerInEndless` is on, and the desktop block has it off (`border-view.md`) |
-| Title | `EndlessTitle.png` (62 x 27), centred: x 254, y 15 |
+| Title | `EndlessTitle.png` (62 x 27): an infinity sign, no words. Centred: x 254, y 15 |
 | Style buttons | One per style, in the file's order (timed, perfection, endurance). Picture `EndlessStyleButton.png` (130 x 160: upper half up, lower half pressed), so each button is 130 x 80. Spaced 20 apart (screen width x 20 / 570) and centred as a row: x 70, 220, 370; y 60 |
 | Course buttons | One per course (course1 to course4). Picture `EndlessCourseButton.png` (80 x 120), so 80 x 60, spaced 20 and centred: x 95, 195, 295, 395; y 170 (60 + 110) |
 | Score texts | One per course **and** style (12): font `regular`, white, centred, more than one line allowed, empty and hidden at first. Each sits 2 pixels under its course button (y 232) and is centred on the button's middle. Only those of the selected style are shown (below) |
 | PLAY | A push button of the screen's menu (text `menu_play`), centred left to right, y 280 |
 | BACK | A push button (text `menu_back`, LEFT alignment) at x 20, y 280. It is the back button |
-| Leaderboards | A picture button `LeaderboardsButton.png` (43 x 66, 33 rows per state) at x 497 (570 - width - 30), y 270. **Switched on only when the platform says it has leaderboards**; if it is on and overlaps BACK, the two are put side by side, centred. Leave out of the port |
+| Leaderboards | A picture button `LeaderboardsButton.png` (43 x 66, 33 rows per state) at x 497 (570 - width - 30), y 270. **Switched on only when the platform says it has leaderboards** (on the GOG copy it was not shown at all, seen 2026-10-16); if it is on and overlaps BACK, the two are put side by side, centred. Leave out of the port |
 | Selection line | A white line with rounded corners (radius 4) around the selected style and course (below) |
 
 Inside each **style button** (drawn with it, in both states):
@@ -2292,8 +2295,8 @@ saved as `endlessId`, written like `perfection:course2`).
   file**, not the first: style `perfection` and course `course2`
   (`EndlessId` constructor, `get_defaultStyle`, `get_defaultCourse`:
   index 1). No starting value for `endlessIdStr` was found in the
-  settings code, so a first visit should start on **Perfection,
-  Course 2**.
+  settings code, so a first visit starts on **Perfection, Course 2**
+  (seen in the game on 2026-10-16 with a new, empty save folder).
 - A click on a style button keeps the course and selects that style; a
   click on a course button keeps the style and selects that course.
 
@@ -2419,6 +2422,46 @@ the score texts.
   (inferred: the compiler wrote the numbers into the code where they are
   used).
 
+## Compared with the running game (2026-10-16)
+
+The user ran the GOG copy in `game/` with `savedir` pointing at a new,
+empty folder, `extracted/endlessrun` (gitignored), so the unlock stayed
+out of the real settings. They went through the watch list below, played
+one Perfection run on Course 2 and closed the game. The folder was then
+decoded with `scripts/reference/savefile.py`.
+
+**Seen by the user** (their answers to items 1 to 6 of the watch list):
+all six as described. Two notes: the "title picture" is the infinity
+sign `EndlessTitle.png`, which the list first called only "the title
+picture" (wording fixed); and **there was no leaderboards button at
+all**, so on this copy the platform does not report leaderboards. The
+time's format in the result box was not noted. Only one run was played,
+so "a worse later run does not replace it" (item 6) could not have been
+seen.
+
+**In the files** (written by the game):
+
+| Part 7 says | The folder holds | Agrees |
+|---|---|---|
+| The right code turns on `endlessUnlocked` | `settings.sav`: `endlessUnlocked = true` | Yes |
+| The choice is stored as `style:course` | `endlessId = perfection:course2` | Yes (the screen stores its choice as soon as it opens, so this alone does not show the fallback; the user saw it on screen) |
+| The best score is kept as `_Leaderboard:<style> <course>` = `score,time`, time in whole seconds | `stats.sav`: `_Leaderboard:Perfection Course 2 = 0,33` | Yes |
+| An endless run writes no story save | No `headers` or `save_` file | Yes |
+
+So **the local best score is kept on a copy with no leaderboards**,
+which is what the port needs.
+
+The score was **0**, with `NumProcessed = 1` and `NumCitations = 1` in
+the same file. A correct traveler at 33 seconds would have given about
+10 points in Perfection, so most likely the one traveler drew a
+citation, which ends a Perfection run, and no points were added. That
+the citation was handled first and the points then ignored (actions are
+ignored once the run is ending, `endless-mode.md`) is inferred; the
+order was not read.
+
+Evidence strength: one run, one style and course, one person watching;
+the four file values are exact.
+
 ## For the port
 
 - The code box as above: code 62131, keys 1 to 9 and 0, five blinks
@@ -2461,12 +2504,13 @@ run, with the user's go-ahead.)
 3. Open it again (it is empty) and type 6 2 1 3 1: the digits blink five
    times, then the game fades to the endless screen. ENDLESS goes
    straight there from then on.
-4. The endless screen: no header, the title picture at the top, three
+4. The endless screen: no header, the title picture (an infinity sign)
+   at the top, three
    style buttons (Timed, Perfection, Endurance, each with an icon, name
    and description), four course buttons below, PLAY in the middle at the
    bottom and BACK at the bottom left. **Perfection and Course 2 are
    selected**, with a white outline around both. No leaderboards button
-   (GOG build, no platform service expected; not checked). No score
+   (seen on 2026-10-16: none at all on this GOG copy). No score
    under the courses (no runs played yet).
 5. Clicking another style or course moves the outline; leaving and coming
    back keeps the choice.
