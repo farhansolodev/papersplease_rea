@@ -33,9 +33,12 @@ the list is at the end.
 
 ## What was read
 
-Read in full, from `decompiled/night_screen.clean.c` (all 228
-`play.night` functions, decompiled for this part), `screens.clean.c`,
-`ent.clean.c`, `stater.clean.c` and `revealtext.clean.c`:
+Read in full, from files decompiled for this part (all 228 `play.night`
+functions) and older ones. Those files were removed on 2026-10-15 as
+duplicates; the same functions are in `decompiled/all/`
+(`play_night.clean.c`, `play_screen.clean.c`, `app_ent.clean.c`,
+`app_misc.clean.c` for `app.Stater`, `play_ui.clean.c`; search the whole
+folder, since a few sit in another part's file):
 
 | Class | Functions |
 |---|---|
@@ -582,7 +585,9 @@ in the stash test of the same day (`save-format.md`): "story" and
 
 ## What was read
 
-From `decompiled/screens.clean.c` (condensed copy `screens.short.c`):
+From `decompiled/all/play_screen.clean.c` (condensed copy
+`play_screen.short.c`; read at the time in an older copy of the same
+functions, removed on 2026-10-15 as a duplicate):
 
 | Class | Functions |
 |---|---|
@@ -760,7 +765,9 @@ continues from any save, and deletes saves.
 
 ## What was read
 
-From `decompiled/screens.clean.c` (condensed copy `screens.short.c`):
+From `decompiled/all/play_screen.clean.c` (condensed copy
+`play_screen.short.c`; read at the time in an older copy of the same
+functions, removed on 2026-10-15 as a duplicate):
 
 | Class | Functions |
 |---|---|
@@ -1009,9 +1016,10 @@ settings file, and who reads the forced-layout file `platover`.
 
 ## What was read
 
-From `decompiled/screens.clean.c` (condensed copy `screens.short.c`),
-`gameall.clean.c`, `saves.clean.c` and three small files decompiled for
-this part (`keys`, `keys_ctor`, `hostunity_update`):
+From `decompiled/all/` (`play_screen.clean.c`, `top.clean.c`,
+`play_misc.clean.c`, `app_ent.clean.c`; read at the time in older
+copies of the same functions and three small files decompiled for this
+part, removed on 2026-10-15 as duplicates):
 
 | Class | Functions |
 |---|---|
@@ -1642,8 +1650,9 @@ they are shown.
 
 ## What was read
 
-From `decompiled/screens.clean.c` (condensed copy `screens.short.c`) and
-the whole-game decompile in `decompiled/all/`:
+From the whole-game decompile in `decompiled/all/` (`play_screen.clean.c`
+and others; part of it was read at the time in an older copy, removed on
+2026-10-15 as a duplicate):
 
 | Class | Functions |
 |---|---|
@@ -1652,7 +1661,7 @@ the whole-game decompile in `decompiled/all/`:
 | `play.screen.EndScreen` | constructor `0x1807b9800`, its state function `EndScreen_81` `0x1807b96a0`, `intro_onDone`, `menu_onClick`, `update`, `restoreFromStash`, `get_statsText`, the class setup (all it has) |
 | `app.Stater`, `app.State` | `go`, `step`, `get_stateTime`, `State.enter`, `State.step`, `State.apply` (the state machine of `border-scene.md`, now read for how a state's in-between time works) |
 | `app.Interp`, `app.Num` | the `Interp` constructor, `get`, `lerp`; `Num.lerpScale` |
-| `play.ui.RevealTextEnt` | `set_text`, `stepReveal`, `revealAll` (from `decompiled/revealtext.clean.c`) |
+| `play.ui.RevealTextEnt` | `set_text`, `stepReveal`, `revealAll` (in `decompiled/all/play_ui.clean.c`) |
 | others | `GameScreen.enablePause`, `Layout.getFitScale`, `Ent.worldRect`, the shared `width`/`height` of full-screen entities, `app.vis.Sprite.width`, `play.AlltimeStats.awardAchievement`, the start of `AlltimeStats.or`, and the `EndBits` lines of the `LoadScreen` constructor |
 
 Checked beyond the decompiler (one read-only Ghidra run, output in

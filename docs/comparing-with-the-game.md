@@ -320,7 +320,7 @@ reference is at a different position in the booth's generator.
 
 - The booth has one generator (`BoothEnv.rand`); the error maker shares it.
 - `getSpeech` draws from it once per stock response looked up
-  (`decompiled/speech.clean.c`), and the game speaks stock lines for every
+  (`BoothEnv.getSpeech`, in `decompiled/all/play_day.clean.c`), and the game speaks stock lines for every
   traveler (`$ask-approved`, interrogation lines, and from day 4
   `$ask-purpose`, `$state-purpose`, ...). The reference did not model this.
 - **Correction of an earlier claim:** I wrote that days 2 and 3 "match

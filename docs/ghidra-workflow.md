@@ -103,8 +103,12 @@ their instruction listings are `decompiled/booth_ctor_asm.txt` and
 (`clean_decompile.py`); `play_ui`, `app_ent` and `play_screen` also have
 a condensed `.short.c`. A function whose address is shared with an
 earlier list is written only there, so search the whole folder, not one
-file. The older files in `decompiled/` stay; they overlap with this
-folder.
+file. The older per-topic decompiles in `decompiled/` were removed on
+2026-10-15: every function in them was in this folder, identical or
+better (`MODLOG.md`). Kept at the top of `decompiled/`: 16 `.c` and
+`.clean.c` files with library functions the game calls (Haxe's maps,
+`Array.sort`, `Lambda.has`, `Xml`, ...), which this folder does not
+hold, and all `.txt` files (instruction listings, string lists, logs).
 
 ## How to read the output
 

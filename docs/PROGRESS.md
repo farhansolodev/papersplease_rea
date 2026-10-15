@@ -7,7 +7,10 @@ the base of a screen, the night screen, the title screen, the menu
 helper, the load screen, the confirm box, the pause screen, the settings
 screen, and the intro and ending screens with their page player; all
 code reading, plus one screenshot of the real night screen that
-confirmed the budget's line order).
+confirmed the budget's line order). Also on 2026-10-15: the older
+per-topic decompiles were removed from `decompiled/`, which now holds
+only `all/`, `ghidra/`, 16 library-function files and the `.txt`
+listings (see "Things that exist only on this machine").
 `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
@@ -163,9 +166,12 @@ Done in the eleventh: the screens, part 6.)
    appear later (work pass, id card, access permit, vaccine certificate...).
    A full route takes about 40 seconds per day.
 2. **The border scene**: **done**, in four parts (`border-figures.md`,
-   `border-scene.md`, `border-shooting.md`, `border-view.md`). All 314
-   functions are in `decompiled/border.clean.c`; a condensed copy of
-   `Border` is in `decompiled/border.short.c`.
+   `border-scene.md`, `border-shooting.md`, `border-view.md`). The 314
+   functions read are in `decompiled/all/` (311 in
+   `play_day_border.clean.c`, 3 in `play_day_booth.clean.c`); a condensed
+   copy of `Border` can be made with `condense_decompile.py` and a name
+   filter. (They were read in older copies, removed on 2026-10-15 as
+   duplicates.)
 3. **Saves**: **done**, in two parts (`save-format.md`). Part 2 was code
    reading, and its main claim was then tested in the real game on
    2026-10-14: after the first traveler of day 1 had left and the window
@@ -189,8 +195,9 @@ Done in the eleventh: the screens, part 6.)
    as its own part). (The news screen is done except its magnifier,
    `newspaper-picture.md`.) All of `play.screen` is decompiled in
    `decompiled/all/play_screen.clean.c` (466 functions, with a condensed
-   copy `play_screen.short.c`; the older `decompiled/screens.clean.c`
-   holds the same plus five functions of other classes); read so far:
+   copy `play_screen.short.c`; parts 1 to 5 were read in an older copy,
+   removed on 2026-10-15 as a duplicate);
+   read so far:
    `NightScreen`, `TitleScreen`, `Menu`,
    `LoadScreen` and its helpers (the constructor for its parts only, not
    its positions), most of `Confirm` and `GameScreen`, `PauseScreen`,
@@ -672,20 +679,19 @@ All gitignored. Nothing below is in git.
 |---|---|---|---|
 | `game/` | 90 MB | Copy of the GOG install | Copy `C:\GOG Games\PapersPlease` |
 | `dumps/il2cppdumper/` | 31 MB | Names, layouts, string table | `il2cpp-name-recovery.md` |
-| `decompiled/ghidra/` | about 480 MB | Analysed Ghidra project with names and types | `ghidra-workflow.md` steps 1 to 3 (about 20 minutes) |
-| `decompiled/*.c`, `*.clean.c`, `*.txt` | tens of MB | Decompiled functions read in the sessions (about 80 cleaned files). The big ones: `boothall` (all 1,433 booth-class functions), `testauto` (the whole test player), `border` (all 314 border-scene functions; takes about 3 minutes; `border.short.c` is its condensed form), `stater` (the state machine classes), `border_view` (the drag helper, `app.Clock`, `app.ent.Pointer`), `layout_ctor_asm.txt` (the `Layout` constructor as machine instructions; the decompiler times out on it) | Step 4 of `ghidra-workflow.md`; `boothall` takes about 15 minutes |
+| `decompiled/ghidra/` | about 590 MB | Analysed Ghidra project with names and types | `ghidra-workflow.md` steps 1 to 3 (about 20 minutes) |
+| `decompiled/*.c`, `*.clean.c` (16 files), `decompiled/*.txt` (49 files) | about 4 MB | What is not in `decompiled/all/`. The `.c` files: library functions the game calls (Haxe's maps in `maps`, `Array.sort` in `news2`, `Lambda.has` in `paperhelpers2`, `Math.random` in `seedsrc`, `String.GetHashCode` in `strhash`, `Xml` and the XML parser in `xml`, three unnamed helpers in `border_misc` and `border_view2`; 41 functions in all), each with a cleaned copy. The `.txt` files: machine-code listings (among them `booth_ctor_asm.txt` and `layout_ctor_asm.txt`, the only readable form of the `Booth` and `Layout` constructors, on which the decompiler times out), string lists in machine-code order, and Ghidra logs with search results. The older decompiles of the game's own classes were removed on 2026-10-15: every function in them is in `decompiled/all/`, identical or better (`MODLOG.md`) | Step 4 of `ghidra-workflow.md`, with the addresses in each file's `// =====` lines; for a listing, `DumpAssembly.java` or `ListStringUses.java` with the address in its `MODLOG.md` entry |
 | `extracted/checks/` | small | Test face pictures, the overview of all faces, the face height survey | `faces.py` (`show`, `overview`, `survey`) |
 | `extracted/Art.dat` | 3 MB | Archive cut from `sharedassets0.assets` by hand | Offsets in `art-dat-format.md` |
 | `extracted/art/` | 9 MB | The 614 unpacked files | `art-dat-format.md` commands |
 | `extracted/saverun/` | small | A real save folder: the user's hand-played game of 2026-10-14 (four saves with one branch, settings, statistics, name position) | Play again with `savedir` pointing at an empty folder (`save-format.md`); the same game cannot be recreated |
 | `extracted/stashrun/`, `extracted/stash_sample/` | small | The stash test of 2026-10-14: the test's save folder as it ended (no stash, it was deleted by the click on "Story"), and a copy taken after the first launch that still has `stash.sav` | Play again as described in `save-format.md` ("The stash test in the running game"); the same stash cannot be recreated |
-| `decompiled/saves*.c` | small | The save, store, story-state, settings, statistics, fact-set and `MapUtil` functions read for `save-format.md` | Step 4 of `ghidra-workflow.md` with the selectors in the `MODLOG.md` entry |
-| `decompiled/stash*.c`, `screens*.c`, `booth_ctor_asm.txt`, `game_stater.short.c`, `loadscreen_btn.short.c` | about 5 MB | Read for part 2 of `save-format.md`: the stash classes, `GameTransition`, the resume overlay; all 471 `play.screen` functions (`screens`, a few minutes; searched, not read); the instructions of the `Booth` constructor and of `HostUnity.CreateGame`; condensed views | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.stash." "play.GameTransition" "play.screen.UnstashOverlay"`, and with `"play.screen."`; `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
-| `decompiled/screens.short.c`, `titlescreen_update_asm.txt`, `loadscreen_strings.txt` | about 1 MB | For `screens.md`, parts 2 and 3: a condensed copy of all `play.screen` functions, the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `condense_decompile.py` on `screens.clean.c`; `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
+| `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
+| `decompiled/titlescreen_update_asm.txt`, `loadscreen_strings.txt` | small | For `screens.md`, parts 2 and 3: the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
 | `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
 | `decompiled/part5_run1.txt` | under 1 MB | For `screens.md`, part 5: the instructions of the `EndScreen` constructor and the strings of the `Intro` and `EndScreen` constructors in machine-code order | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1807b9800`; `ListStringUses.java` with `0x1808fae90` and `0x1807b9800` |
-| `decompiled/keys*.c`, `hostunity_update*.c`, `settingsmenu_music_asm.txt`, `part4_run1.txt` to `part4_run3.txt` | under 1 MB | For `screens.md`, part 4: the key numbers (`app.ent.Key` setup), the `InputWrapper` functions and its key table, `HostUnity.Update`, the instructions of `SettingsMenu.musicButton_whenClick`, and the Ghidra output of three runs (string lists of four functions in machine-code order, three caller searches) | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `0x18048B510 0x1804AA120 0x1804AA390 0x1804AA180`, with `0x1804AA420`, and with `0x1809e8e80`; `DumpAssembly.java 0x180714b30`; `ListStringUses.java` with `0x180710150`, `0x180869f50`, `0x18086a9b0`, `0x1808035e0`; `FindReferences.java` with `0x18086FAF0`, `0x180870B30`, `0x1804AA120`, `0x180870210` |
-| `decompiled/night_screen*.c`, `revealtext*.c`, `gamescreen.short.c`, `budgetent_ctor_asm.txt`, `budgetent_ctor_strings.txt`, `asm_family_buildmessage.txt` | about 3 MB | Read for `screens.md`, part 1: all 228 `play.night` functions plus `DayLib.getNightMessages`; the 32 `play.ui.RevealTextEnt` functions; a condensed `GameScreen`; the instructions of the `BudgetEnt` constructor and of `Family.buildMessage`; the `BudgetEnt` constructor's strings in machine-code order | Step 4 of `ghidra-workflow.md`: `DecompileFunctions.java` with `"play.night." "0x180447cf0"` (under a minute), and with `"play.ui.RevealTextEnt"`; `condense_decompile.py` on `screens.clean.c` with a filter for `GameScreen`; `DumpAssembly.java 0x1806c2a70` and `0x180757930`; `ListStringUses.java 0x1806c2a70` |
+| `decompiled/settingsmenu_music_asm.txt`, `part4_run1.txt` to `part4_run3.txt` | small | For `screens.md`, part 4: the instructions of `SettingsMenu.musicButton_whenClick`, and the Ghidra output of three runs (string lists of four functions in machine-code order, three caller searches). (The key, `InputWrapper` and `HostUnity.Update` functions read for that part are in `decompiled/all/top.clean.c` and `app_ent.clean.c`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x180714b30`; `ListStringUses.java` with `0x180710150`, `0x180869f50`, `0x18086a9b0`, `0x1808035e0`; `FindReferences.java` with `0x18086FAF0`, `0x180870B30`, `0x1804AA120`, `0x180870210` |
+| `decompiled/budgetent_ctor_asm.txt`, `budgetent_ctor_strings.txt`, `asm_family_buildmessage.txt` | small | For `screens.md`, part 1: the instructions of the `BudgetEnt` constructor and of `Family.buildMessage`; the `BudgetEnt` constructor's strings in machine-code order. (The `play.night`, `RevealTextEnt` and `GameScreen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1806c2a70` and `0x180757930`; `ListStringUses.java 0x1806c2a70` |
 | `extracted/autorun/` | 2 MB | The test player's folder: `auto.plan`, `auto.log`, copies of three `Player.log` runs, and scratch scripts from the fourth session (`show.sh` prints one decompiled function with the noise removed; `rand_uses2.py` lists functions matching a pattern; `log_step.py`; several experiments) | The logs: run the game as above (needs the go-ahead). The scratch scripts are conveniences, not needed |
 
 Outside the project: `C:\tools\Il2CppDumper-6.7.46`, `C:\tools\ghidra_12.1.4_PUBLIC`,

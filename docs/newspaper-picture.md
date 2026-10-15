@@ -33,8 +33,8 @@ studied**. **Nothing here has been compared with the running game.**
   to `DayNews`. So `make` continues where `DayNews` stopped (after its 5 to 7
   draws when fillers are needed, `news-txt-format.md`). `make` then draws
   roughly 190 times (below). `newsRand` was searched for in every cleaned
-  decompiled file kept in `decompiled/`: its only users are the `Day` constructor and
-  `NewsScreen`. Those files do not cover the whole game, so "nothing else
+  decompiled file `decompiled/` held then (before the whole-game decompile): its only users are the `Day` constructor and
+  `NewsScreen`. Those files did not cover the whole game, so "nothing else
   uses it" is not established.
 
 ## The layout pictures (`LayoutImage`)
