@@ -16,7 +16,10 @@ rules behind a screen are in that topic's own doc (for the night:
 - **Part 5** (2026-10-14): the page player that shows the intro and every
   ending (`Intro`), the intro screen, the ending screen, and how the
   endings seen are recorded (`EndBits`).
-- Not written yet: endless-mode screens, language chooser, credits.
+- **Part 6** (2026-10-15): the credits screen (`CreditScreen`) and how it
+  scrolls the credits list; the game's frame rate, which sets the scroll
+  speed, is written up in `border-view.md`.
+- Not written yet: endless-mode screens, language chooser.
 
 ---
 
@@ -1052,8 +1055,9 @@ constructor's defaults and `ButtonHelper.react` (read afterwards, for
 and `show`, `RatingPopup`,
 `LangChooser` beyond the one function (it is its own screen),
 `Menu.applyCenterY` again (taken from part 2), the platform functions
-`canVibrate`, `getAvailableLanguageCodes`, `setFullscreen`,
-`getFullscreen`, `setCategoryVolume`, and `Bootstrap.setLanguage`.
+`canVibrate`, `setFullscreen`, `getFullscreen`, `setCategoryVolume`, and
+`Bootstrap.setLanguage`. (`getAvailableLanguageCodes` was on this list;
+it is read since part 6: the `.zip` files in `StreamingAssets/loc`.)
 
 ## Which key pauses: Escape
 
@@ -1097,8 +1101,9 @@ calls `enablePause` (part 1). A search of the 471 `play.screen` functions
 for that call finds four callers: the day screen, the night screen, the
 news screen and the intro screen. The title, load and settings
 constructors were read and do not call it; so was the ending screen's,
-in part 5 (it does not call it). For the endless and credits screens
-this rests on the search alone.
+in part 5 (it does not call it), and so was the credits screen's, in
+part 6 (it does not call it either). For the endless screen this rests
+on the search alone.
 
 ## The pause screen (`PauseScreen`)
 
@@ -1292,9 +1297,10 @@ title does nothing, and the trap does not exist.
 ## The header (`GameScreen.addHeader`)
 
 Called by the pause screen, the settings screen, the credits screen, the
-endless screen and the ending screen's statistics page (the credits and
-endless calls found by searching for the call, not read; the ending
-screen's call is read since part 5: title `menu_stats`). It adds:
+endless screen and the ending screen's statistics page (the endless call
+found by searching for the call, not read; the ending screen's call is
+read since part 5, title `menu_stats`, and the credits screen's since
+part 6, title `menu_credits`). It adds:
 
 - the picture `ScreenHeader.png`, centred left to right, at the layout's
   `gameScreenHeaderY` (13 on desktop: the start value, which the desktop
@@ -1901,3 +1907,207 @@ Each takes under a minute; a new game shows the intro.
    leftmost).
 9. The second click (above): click NEXT's spot twice quickly on an
    ending's last page.
+
+---
+
+# Part 6: the credits screen
+
+Studied on 2026-10-15. Code reading only: **nothing in this part was
+compared with the running game.**
+
+The credits screen shows the list described in `credits-txt-format.md`
+(what each line of `Credits.txt` becomes and how the lines are stacked)
+and scrolls it. This part is the screen around the list: who opens it,
+where the list sits, how fast it moves, and what the buttons do.
+
+## What was read
+
+From the whole-game decompile in `decompiled/all/`:
+
+| Class | Functions |
+|---|---|
+| `play.screen.CreditScreen` | constructor `0x180946900`, `menu_onClick` `0x180947b70`, `react` `0x180947d40`, `update` `0x180947db0`, `draw`, the two `.ctor` wrappers (everything it has besides Haxe's field-access helpers) |
+| `play.screen.CreditList` | constructor `0x1809447e0` again, `height`, `width`, `draw` (the rest was read for `credits-txt-format.md`) |
+| `Game.applyScreenChange` | the `credit` branch |
+| `HostUnity.UnityPlatformDisk` | `getAvailableLanguageCodes` `0x1809a8390` |
+| `app.ent.Input` | `getPointerOver` `0x1804af0f0`, `getPointerOverEvenIfCaptured` |
+| `play.screen.Menu` | `addPushButton` `0x1808ad720` (its alignment argument), `applyCenterY` |
+| `HostUnity`, `play.ui.FramerateCounter` | `HostUnity.Update` `0x1809e8e80` in full, `applyFrameSync` `0x1809ea8d0`, `limitFps` `0x180886980`: the frame rate, written up in `border-view.md` |
+
+Eleven number constants were read with `read_doubles.py`. Which field
+the constructor writes on the DONE button (its position's x) and which
+flag `react` reads on a pointer (`down`) were read from the field
+layouts in `dumps/il2cppdumper/il2cpp.h`. The test player has a step
+`ClickThroughCredits`; only its name was read.
+
+## Who opens it
+
+Two buttons fade to the screen `credit`: the title screen's "created by
+Lucas Pope" text at the bottom centre (id `credit`, part 2), and the
+ending screen's CREDITS button, which only the endings marked
+`gocredits` have (part 5). `Game.applyScreenChange` builds the screen
+and gives it the platform's list of available language codes, the same
+list the settings screen gets (part 4).
+
+## Which languages are "available"
+
+`getAvailableLanguageCodes` lists the `.zip` files in the game's
+`StreamingAssets/loc` folder, takes each file's name without `.zip`,
+sorts the names, and keeps the list for later calls. This install has 16:
+`cs de en es eu fr id it ja ko pl pt-BR ru tr ukr zh`. So both
+conditions in `Credits.txt` (`have-lang-id`, `have-lang-eu`) are met and
+the list shows all 113 of its lines (`credits-txt-format.md`).
+
+## What the screen builds, in order
+
+1. The hold time `kStopWait` = 4 seconds.
+2. Song `Victory`.
+3. The header with `menu_credits` ("CREDITS"), part 4. It returns the
+   bottom of the title; call it B.
+4. A `Menu` centred on y = screen height x 290 / 320 (whole numbers),
+   which is 290 on desktop, with one standard button: id `back`, text
+   `menu_done` ("DONE"). It is made with the alignment LEFT when the
+   screen shape is `LANDSCAPE` (desktop), CENTER otherwise. Its id makes
+   it a back button, so Escape presses it (part 4).
+5. The scroll area (`centerRect`): from x 0, the screen's full width
+   (570), from y = B + 2 down to y 320, the bottom of the screen. Then:
+   - on `LANDSCAPE`: the DONE button's x is set to 20, so it sits at the
+     bottom left, and the area keeps its height;
+   - on the portrait shapes: the area is cut to end 10 pixels above the
+     DONE button's top.
+6. The stop position `kStopY` = the area's top + 80.
+7. The credits list, told: clip top = the area's top, clip bottom = the
+   area's bottom, "offscreen" value = the area's bottom - `kStopY`, and
+   the language list. It is centred left to right: x = floor(570 x 0.5 -
+   260 x 0.5) = 155 on desktop.
+8. The scroll position starts at `kStopY`, and the countdown at 4 seconds.
+9. The two picture buttons `web` and `twitter` (`addMediaButtons`, the
+   same as on the settings screen, part 4).
+
+It does not call `enablePause`, so Escape never pauses here; it presses
+DONE. (Part 4 said this rested on a search only; the constructor is now
+read.)
+
+**Desktop numbers, partly estimated.** B depends on the height of the
+title text, and `app.vis.Text` is not read. If the title is 20 high
+(`title_tall`'s line height in the reference script), then: the header
+picture is at y 13 and 54 high, so its bottom edge is 67; the title's
+middle is on that edge, so B = 77; the area runs from y 79 to 320;
+`kStopY` = 159; the offscreen value is 161.
+
+## What the first view shows
+
+The list's top starts at `kStopY`. `[OFFSCREEN]` moves the next line to
+the offscreen value - 18 in the list's own positions, which on screen is
+the area's bottom - 18, whatever B is. In `Credits.txt` the line after
+`[OFFSCREEN]` is a role heading, and a role adds 20 pixels before itself
+(`credits-txt-format.md`), so it starts 2 pixels below the bottom of the
+area, where the list is clipped: out of sight. **So the first view shows
+only the lines before `[OFFSCREEN]`** (one role and one name, 80 pixels
+below the header) above an empty area, and holds for 4 seconds. This
+confirms, from the numbers, what `credits-txt-format.md` had inferred
+about `[OFFSCREEN]`.
+
+## Every frame (`update`)
+
+1. `GameScreen.update`.
+2. If the countdown is above 0: it goes down by the frame time (the
+   game's clock), not below 0. The list does not move.
+3. Otherwise:
+   1. The step is 0.5 pixel, or 2 pixels while "fast" (below).
+   2. The scroll position (a y, so smaller is higher on the screen) goes
+      down by the step: the list moves up.
+   3. If the position is now less than minus the list's height (the
+      list's bottom has gone past the top of the screen), it becomes 320:
+      the list starts again from below the screen.
+   4. If the position was greater than `kStopY` before this frame's step
+      and is less now, it is put exactly on `kStopY` and the countdown
+      starts again at 4 seconds.
+4. The list's y = the scroll position rounded down.
+
+So the screen loops for as long as it is open: the first view held for 4
+seconds; the whole list scrolls up and out of the top; the list comes up
+again from the bottom; it stops at the first view; 4 seconds; and so on.
+The frame of the jump to 320 cannot stop at once: step 3.4 compares with
+the position from before the jump.
+
+**The scroll moves by frame, not by time**: 0.5 pixel a frame. Only the
+hold is timed. At the game's usual 60 frames a second (`border-view.md`,
+"The frame rate") that is 30 pixels a second, 120 while fast; where the
+game runs at 65 frames a second, 32.5 and 130.
+
+### Fast
+
+Every frame (`react`) the screen asks the input for a pointer over the
+scroll area (`Input.getPointerOver`). If one is found, "fast" is that
+pointer's `down` flag; if none, it is off. So **holding the mouse button
+with the pointer anywhere in the area** (the full width, from just under
+the header to the bottom) scrolls 4 times as fast, and letting go slows
+it again. `getPointerOver` prefers a pointer that is held, and passes over
+pointers that another part of the screen has taken (captured) or that lie
+in a blocked area of the screen. Whether pressing DONE captures the
+pointer, so that the press does not also speed up the list, was not
+followed.
+
+### How long one loop takes (an estimate)
+
+The list's height was estimated at 2,272 pixels with every language, by
+a one-off script using the fonts reference (`fonts.py`) and the picture
+sizes, **assuming a text block is its number of lines times its font's
+line height** (`app.vis.Text` is not read). One loop moves the list by
+its height + 320 pixels, about 2,590 pixels: about 5,180 frames, so
+about 86 seconds at 60 frames a second, plus the 4-second hold. Held
+fast throughout: about 22 seconds.
+
+## What the buttons do (`menu_onClick`)
+
+| Id | What happens |
+|---|---|
+| `back` (DONE, or Escape) | Fade to the screen `title`, also when the screen was opened from an ending |
+| `web` | Opens the language's `url_homepage` in the system's browser |
+| `twitter` | Opens the language's `url_twitter` in the system's browser |
+
+## For the port
+
+- The screen as above: header CREDITS, DONE at the bottom left, the list
+  centred and clipped to the area under the header, the loop with its
+  4-second hold at the first view, song `Victory`, Escape as DONE.
+- **Speed: a decision.** The original ties the speed to the frame rate.
+  Suggested: 30 pixels a second, 120 while held, measured in time; this
+  equals the original at 60 frames a second. It belongs with the open
+  frame-time question (`border-view.md`).
+- `web` and `twitter`: on the settings screen you decided to leave them
+  out (2026-10-14). These are the same two buttons; suggested: leave
+  them out here too. Still yours to confirm.
+- Which languages count as available is set by which language packs the
+  port ships; two blocks of the list depend on it.
+
+## Not studied
+
+- `app.vis.Text`'s height, so B, `kStopY` and the list's height are
+  estimates.
+- What the LEFT alignment changes inside `GameScreen.makePushButton` (the
+  button's x is set to 20 afterwards in any case), and the DONE button's
+  size.
+- Whether pressing DONE stops the fast scroll.
+- The test player's `ClickThroughCredits` step beyond its name.
+- Where the song `Victory` is defined (as in part 5).
+
+## Things to watch in the game
+
+On the title screen, click "created by Lucas Pope" at the bottom.
+
+1. The header CREDITS and, about 80 pixels under it, the first credit
+   alone, with nothing else visible, for 4 seconds. The song is
+   `Victory`, the one three endings use (`ends-xml-format.md`).
+2. Then the list scrolls up slowly: about 30 pixels a second, so roughly
+   10 seconds for a screen's height.
+3. Holding the mouse button anywhere under the header scrolls 4 times as
+   fast; letting go slows it again.
+4. After the last line ("Glory to Arstotzka") has left the top, the list
+   comes up again from the bottom and stops at the first view for 4
+   seconds. One loop: about one and a half minutes (estimate).
+5. DONE at the bottom left goes back to the title; Escape does the same
+   and never pauses here.
+6. The Indonesian and Basque translation credits are both in the list
+   (both language packs are installed).

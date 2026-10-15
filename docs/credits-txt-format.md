@@ -7,11 +7,14 @@ tree top down and stacking each line under the previous one.
 Check: `scripts/checks/credits_check.py`.
 
 Functions read in full: `play.screen.CreditList` (constructor, `addNode`,
-`addText`, `addImage`, `draw`, its static values). **Not studied:** who
-creates the list and scrolls it, so the speed and when it appears are
-unknown. (This sentence first guessed "the title or ending screen". Since
-`screens.md` part 5, 2026-10-14: the ending screen does not make it; its
-CREDITS button fades to the separate credits screen `credit`.)
+`addText`, `addImage`, `draw`, its static values). The screen that
+creates the list and scrolls it is the credits screen `CreditScreen`,
+written up in `screens.md` part 6 (2026-10-15): where the list sits, the
+4-second hold at the first view, the speed (0.5 pixel a frame, 4 times
+that while the mouse button is held), the loop. (This sentence first
+guessed "the title or ending screen"; part 5 found that the ending
+screen does not make it, and part 6 that the title does not either: both
+only fade to the credits screen.)
 
 ## A line
 
@@ -25,7 +28,7 @@ line is:
 | `/` | text in the style **team** |
 | `-` | text in the style **small** |
 | `$` | text in the style **finale** |
-| `[OFFSCREEN]` | the next line starts 18 pixels above a height given by the screen (inferred: so that what follows begins below the visible area and scrolls in) |
+| `[OFFSCREEN]` | the next line starts 18 pixels above a height given by the screen. The credits screen gives the height that puts this point 18 pixels above the bottom of the visible band while the list is held at its first view; with the role heading that follows in the file (+20 before it), the next line starts 2 pixels below the band, out of sight (`screens.md` part 6). So the first view shows only what comes before `[OFFSCREEN]`. This was first an inference; it is now worked out from the code's numbers, not seen |
 | `[SPACE]` | a gap of 20 pixels |
 | `[IMAGE] <file>` | the picture `assets/<file>` |
 | anything else | text in the style **name**, the whole line |
@@ -76,7 +79,9 @@ Drawing clips the list to a band of the screen given by the creator
 
 ## Not known / not tested
 
-- Who shows the credits, the scroll speed, and what "available languages"
-  is exactly (the language chooser has a test for user-added languages; not
-  studied here).
+- (Answered on 2026-10-15, `screens.md` part 6: the credits screen shows
+  the list and sets the scroll speed. "Available languages" is the list
+  of `.zip` files in the game's `StreamingAssets/loc` folder; this install
+  has 16, including `id` and `eu`, so all 113 lines are shown. The
+  language chooser's test for user-added languages is still not studied.)
 - Nothing here was compared with the running game.

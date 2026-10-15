@@ -28,7 +28,7 @@ cross-checked, with a write-up in `docs/`.
 | `Text.xml` | `data.Lang` | Studied: `text-xml-format.md` (the loader, placeholders, the long date); aliases and typos in `value-helpers.md` |
 | `UpperCase.txt` | `data.Uppercaser` | Studied: `value-helpers.md` |
 | `NamesF.txt`, `NamesM.txt` | `data.NameLib`, `data.NameCycler` | Studied: `traveler-build.md` |
-| `Credits.txt` | `play.screen.CreditList` | Studied: `credits-txt-format.md` (the file and the layout of the list; who shows and scrolls it not studied) |
+| `Credits.txt` | `play.screen.CreditList` | Studied: `credits-txt-format.md` (the file and the layout of the list); the screen that shows and scrolls it: `screens.md` part 6 |
 | `Languages.txt`, `Languages.png` | `play.screen.LangChooser` | Studied: `languages-list.md` (the two files; the chooser screen and loading a language pack not studied) |
 | `TestScenarios.xml` | `data.TestScenarioLib` | Test tooling. Studied: `test-tooling-files.md` (the file; what starts a scenario not studied) |
 | `Auto.txt` | `test.auto.AutoRouteSet` | Test tooling. Studied: `test-tooling-files.md` (the file's structure; how each action is carried out not studied) |

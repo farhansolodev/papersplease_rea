@@ -304,6 +304,33 @@ Answers the open point in parts 1 and 2.
 - A frame can also be given a forced `dt` by the caller of `Clock.update`
   (who does that was not followed).
 
+### The frame rate (`HostUnity`)
+
+Read on 2026-10-15 for `screens.md` part 6 (the credits scroll by frame,
+not by time). Code reading only; no frame rate was measured.
+
+- **One game step per Unity frame.** `HostUnity.Update` (read in full)
+  matches the frame rate (below), reads the keys and pointers, calls the
+  game's update once, draws once, and quits if asked.
+- **Matching the screen, every frame.** For k = 1, 2, 3 it checks whether
+  the screen's refresh rate is within 2k of 60k Hz (less than 2 from 60,
+  less than 4 from 120, less than 6 from 180). At the first match it
+  turns on Unity's vertical sync every k-th refresh (`vSyncCount` = k)
+  and sets no frame-rate target (-1): **60 frames a second.** With no
+  match (a 75 or 144 Hz screen, for example), or with the launch word
+  `nosync`: no vertical sync and a target of **65 frames a second**.
+  `HostUnity.applyFrameSync` holds the same code; `CreateGame` also sets
+  60 and no vertical sync in one branch (which platform was not
+  followed); `Update` overrides both every frame.
+- **A cap.** Then `FramerateCounter.limitFps(70)` sleeps if less than
+  1/70 second has passed since the last frame, so never more than 70
+  frames a second.
+
+How exactly Unity keeps a target of 65 is Unity's own and was not
+studied. Anything that moves by a fixed amount per frame (the credits,
+part 6 of `screens.md`) therefore runs about 8% faster on a screen that
+does not match.
+
 ## Random draws
 
 None in panning or the scoreboard. The cameras draw twice per frame during
@@ -324,7 +351,11 @@ tablet layout.
   Anything that depends on frame boundaries (part 1's "events fire when a
   threshold is crossed") therefore differs slightly between runs of the
   original too. A port that wants repeatable behaviour can use a fixed
-  step, as the game's own test player does (1/20 s).
+  step, as the game's own test player does (1/20 s). The original runs
+  at 60 frames a second on most screens and 65 on the others (above,
+  "The frame rate"); a few things move by frame, not by time (the
+  credits, `screens.md` part 6); suggested for the port (the user's
+  decision): give those a speed in seconds equal to 60 frames a second.
 
 ## Results of the check
 

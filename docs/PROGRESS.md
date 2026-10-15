@@ -1,12 +1,13 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-10-14, in the
-tenth session (after the screens, part 5: the page player of the intro
-and the endings, the intro screen and the ending screen; parts 1 to 4,
-the same day, were the base of a screen, the night screen, the title
-screen, the menu helper, the load screen, the confirm box, the pause
-screen and the settings screen; all code reading, plus one screenshot of
-the real night screen that confirmed the budget's line order).
+**Read this first in a new session.** Last updated 2026-10-15, in the
+eleventh session (after the screens, part 6: the credits screen, and the
+game's frame rate; parts 1 to 5, in the ninth and tenth sessions, were
+the base of a screen, the night screen, the title screen, the menu
+helper, the load screen, the confirm box, the pause screen, the settings
+screen, and the intro and ending screens with their page player; all
+code reading, plus one screenshot of the real night screen that
+confirmed the budget's line order).
 `MODLOG.md` has the step-by-step history; this file is
 the current state, what to do next and what is still open. It is updated at
 the end of every step. The rules for how to work are in `CLAUDE.md`, not
@@ -47,7 +48,10 @@ applied and saved on the next frame; every key the game reads, and every
 other use of Escape, which is always a screen's "back button"), and the
 intro and the endings (one page player: a 1-second wipe from the right,
 then the caption types on, then NEXT; the ending fades to its statistics
-page over 2 + 2 + 2 seconds and records the ending in `EndBits`). The desktop
+page over 2 + 2 + 2 seconds and records the ending in `EndBits`), and the
+credits screen (the first credit held for 4 seconds, then the list
+scrolls 0.5 pixel a frame, 4 times that while the mouse button is held,
+and loops; the game runs at 60 frames a second on most screens). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -67,7 +71,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 5: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player (`screens.md`). Not done: the other screens (endless, language chooser, credits), the family pictures of the night screen, drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 6: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen (`screens.md`); the frame rate (`border-view.md`). Not done: the other screens (endless, language chooser), the family pictures of the night screen, drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -109,7 +113,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
 | `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder. **Part 2**: the 19 requests a part of the game can make (`GameTransition`), how a screen change is queued and built (`Game.queueScreenChange`, `applyScreenChange`), the game's own five states (fade, pause), and the stash: when it is written, deleted and read, what it holds, how it is restored |
-| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). **Part 2**: the title screen (its buttons and what each does, the title rising in 20 steps with the music, the logo bobbing), the menu helper `Menu`, and the desktop values of eight layout fields. **Part 3**: the load screen (the grid of save buttons, how saves are put on up to 5 tracks, what a click does, the summary box, deleting) and the confirm box `Confirm`. **Part 4**: which key pauses (Escape) and the game's 11 key numbers, the pause screen, the settings screen, the settings list both share (its rows in each form, what each click does, how a row is laid out), who writes the settings file (`Game.applySettings`), that nothing in the build reads `platover`, the header helper, and seven more desktop layout values (one of them corrects part 2). **Part 5**: the page player of the intro and the endings (the wipe, the typing caption, NEXT, hurrying a page from page 2 of the intro), the intro screen, the ending screen (its steps, the statistics text, the 2 + 2 + 2-second fade, the button), `EndBits` and the load screen's ending marks, restoring an ending stash. Each part ends with a list of things to watch in the game |
+| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). **Part 2**: the title screen (its buttons and what each does, the title rising in 20 steps with the music, the logo bobbing), the menu helper `Menu`, and the desktop values of eight layout fields. **Part 3**: the load screen (the grid of save buttons, how saves are put on up to 5 tracks, what a click does, the summary box, deleting) and the confirm box `Confirm`. **Part 4**: which key pauses (Escape) and the game's 11 key numbers, the pause screen, the settings screen, the settings list both share (its rows in each form, what each click does, how a row is laid out), who writes the settings file (`Game.applySettings`), that nothing in the build reads `platover`, the header helper, and seven more desktop layout values (one of them corrects part 2). **Part 5**: the page player of the intro and the endings (the wipe, the typing caption, NEXT, hurrying a page from page 2 of the intro), the intro screen, the ending screen (its steps, the statistics text, the 2 + 2 + 2-second fade, the button), `EndBits` and the load screen's ending marks, restoring an ending stash. **Part 6**: the credits screen (who opens it, which languages are available, where the list sits, the 4-second hold at the first view, the scroll by frame and the fast scroll while the mouse button is held, the loop, the buttons). Each part ends with a list of things to watch in the game |
 | `ends-xml-format.md` | `Ends.xml` and `Intro.xml`: the 20 endings and the intro slides |
 | `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring |
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
@@ -120,7 +124,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `border-figures.md` | **The border scene, part 1**: which random generator it uses, how a figure follows a path frame by frame (what `hold`, `delay`, `snap`, `warp`, `face` and the event attributes do), the waiting line (building, moving up, the ring of reused figures, dispersing, panic) and its random draws |
 | `border-scene.md` | **The border scene, part 2**: the figures `Border` owns, its 12 states, the normal call-in cycle, what happens when a traveler leaves or is detained, when and how the four attacks run, what each of the 36 path events does, explosions, how the day ends, saving, every random draw |
 | `border-shooting.md` | **The border scene, part 3**: when the player can shoot, the two rifles and their keys, what a shot does and whom it hits, the attack result and its six endings, bullet holes, the grenade's flight, slow motion and which clock runs what, the test player's aiming helpers |
-| `border-view.md` | **The border scene, part 4**: the three screen layouts and their border values (desktop: no panning, no cameras, no slow motion; hit box 8 x 18), how the view slides and follows a figure, the camera screens, the endless scoreboard and its flashing texts, the game's clock and frame time |
+| `border-view.md` | **The border scene, part 4**: the three screen layouts and their border values (desktop: no panning, no cameras, no slow motion; hit box 8 x 18), how the view slides and follows a figure, the camera screens, the endless scoreboard and its flashing texts, the game's clock and frame time, and the frame rate (60 frames a second when the screen's refresh matches, otherwise 65; added 2026-10-15) |
 | `credits-txt-format.md` | `Credits.txt` and the layout of the credits list |
 | `languages-list.md` | `Languages.txt`, `Languages.png` |
 | `test-tooling-files.md` | `TestScenarios.xml`, `Auto.txt` (a recipe for reaching every ending) |
@@ -145,7 +149,8 @@ running game and the first two runs; finding and fixing why the reference's
 error picks left the game's. Done in the fifth: the newspaper picture. Done
 in the sixth: the whole border scene, parts 1 to 4. Done in the seventh:
 saves, part 1. Done in the eighth: saves, part 2. Done in the ninth: the
-screens, parts 1 to 3. Done in the tenth: the screens, parts 4 and 5.)
+screens, parts 1 to 3. Done in the tenth: the screens, parts 4 and 5.
+Done in the eleventh: the screens, part 6.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -169,27 +174,28 @@ screens, parts 1 to 3. Done in the tenth: the screens, parts 4 and 5.)
    and the screen that opened offered only a new game (the unfinished day
    was lost). The stash's content matches the description (`stash_check.py`,
    `0 problems`).
-4. **The screens, in progress.** Parts 1 to 5 are done (`screens.md`):
+4. **The screens, in progress.** Parts 1 to 6 are done (`screens.md`):
    the base of a screen (`GameScreen`, the entity switches), the night
    screen, the title screen, the menu helper `Menu`, the load screen, the
    confirm box `Confirm`, the pause screen, the settings screen and the
    settings list they share, the page player of the intro and the
-   endings, the intro screen and the ending screen.
-   **Next, part 6** (suggested: the credits screen and who scrolls the
-   credits, `CreditScreen` and `CreditList`, since the ending's CREDITS
-   button leads there). Still to do after that: the endless-mode
-   screens, the language chooser, `UnlockConfirm` (the endless code box),
-   `play.ui.Button`'s modes and pictures (what a back button does is
-   read since part 4), and the family pictures of the night screen
-   (`FamilyVisuals`, a 1,930-line constructor, proposed as its own
-   part). (The news screen is done except its magnifier,
-   `newspaper-picture.md`.) All 471 functions of `play.screen` are
-   decompiled in `decompiled/screens.clean.c`, with a condensed copy
-   `screens.short.c`; read so far: `NightScreen`, `TitleScreen`, `Menu`,
+   endings, the intro screen, the ending screen, and the credits screen.
+   **Next, part 7** (suggested: the endless-mode screens together with
+   `UnlockConfirm`, the code box, since the title's ENDLESS button
+   leads through the box to the endless screen). Still to do after that:
+   the language chooser, `play.ui.Button`'s modes and pictures (what a
+   back button does is read since part 4), and the family pictures of
+   the night screen (`FamilyVisuals`, a 1,930-line constructor, proposed
+   as its own part). (The news screen is done except its magnifier,
+   `newspaper-picture.md`.) All of `play.screen` is decompiled in
+   `decompiled/all/play_screen.clean.c` (466 functions, with a condensed
+   copy `play_screen.short.c`; the older `decompiled/screens.clean.c`
+   holds the same plus five functions of other classes); read so far:
+   `NightScreen`, `TitleScreen`, `Menu`,
    `LoadScreen` and its helpers (the constructor for its parts only, not
    its positions), most of `Confirm` and `GameScreen`, `PauseScreen`,
    `SettingsScreen`, `SettingsMenu`, `SettingRow`, `SettingDim`,
-   `Intro`, `IntroScreen`, `EndScreen`. How a
+   `Intro`, `IntroScreen`, `EndScreen`, `CreditScreen`, `CreditList`. How a
    screen is asked for and built is in `save-format.md`, part 2.
    The user's screenshot of a night screen (2026-10-14) confirmed the
    order of the budget lines for one night (`screens.md`, part 1). A
@@ -239,6 +245,27 @@ Small jobs that fit anywhere:
 ## Open questions and unconfirmed items
 
 Collected from the docs, so they are not lost:
+
+**From the eleventh session** (`screens.md`, part 6; `border-view.md`,
+"The frame rate")
+
+- **The credits screen has not been watched.** The list is at the end of
+  `screens.md`, part 6; the title's "created by" text opens it.
+- **A decision for the port: the credits' speed.** The original scrolls
+  0.5 pixel a frame (2 while the mouse button is held), so the speed
+  follows the frame rate: 60 frames a second when the screen's refresh
+  is near 60, 120 or 180 Hz, otherwise a target of 65. Suggested: 30 and
+  120 pixels a second, by time. This joins the frame-time decision of
+  the sixth session (below).
+- The credits screen has the same `web` and `twitter` buttons as the
+  settings screen, which the user decided to leave out there; suggested:
+  leave them out here too (to confirm).
+- Estimated, not read: the header's bottom (77 if the title is 20 high),
+  so the scroll area's top (79) and the stop position (159), and the
+  list's height (about 2,272), all waiting on `app.vis.Text`.
+- Not followed: whether pressing DONE stops the fast scroll; what the
+  LEFT alignment changes in `makePushButton`; which platform the frame
+  settings in `HostUnity.CreateGame` are for.
 
 **From the tenth session** (`screens.md`, part 5)
 
@@ -443,7 +470,10 @@ Collected from the docs, so they are not lost:
   How closely the port copies this is a design decision.
 - **Frame time is a design decision too.** The original steps by real
   elapsed time (capped at 0.1 s a frame); its own test player uses a fixed
-  1/20 s (`border-view.md`). The port must pick one.
+  1/20 s (`border-view.md`). The port must pick one. (Known since the
+  eleventh session: the original runs at 60 frames a second on most
+  screens, 65 on the others, never above 70; `border-view.md`, "The frame
+  rate". A few things move by frame, such as the credits.)
 - "The desktop game has no panning, no cameras and no slow motion" comes
   from the layout values in the code only; it was not watched in the game.
   The user can confirm it by eye in a normal play session (day 2 has the

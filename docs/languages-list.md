@@ -39,9 +39,16 @@ page as fit the screen.
 
 `hasUserAddedLanguages(available codes)` answers yes when the list of
 available languages differs from `Languages.txt`: a different number, or a
-different code at any position. (The game can evidently find more language
-packs than the shipped ones; where it looks was not studied.) The credits
-use the same list of available codes for their `have-lang-` lines
+different code at any position. The available codes are the names of the
+`.zip` files in the game's `StreamingAssets/loc` folder, sorted
+(`HostUnity.UnityPlatformDisk.getAvailableLanguageCodes`, read on
+2026-10-15 for `screens.md` part 6; this sentence first said where the
+game looks was not studied). So a language is "user-added" when someone
+puts another `.zip` in that folder. This install has 16 files whose
+names are exactly the 16 codes above, in the same order, so the answer
+here is no (the sort is .NET's default string sort; for these 16 names
+it gives the order of the file, inferred, not run). The credits use the
+same list of available codes for their `have-lang-` lines
 (`credits-txt-format.md`).
 
 ## Cross-check with the files
