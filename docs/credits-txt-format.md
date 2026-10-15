@@ -83,5 +83,8 @@ Drawing clips the list to a band of the screen given by the creator
   the list and sets the scroll speed. "Available languages" is the list
   of `.zip` files in the game's `StreamingAssets/loc` folder; this install
   has 16, including `id` and `eu`, so all 113 lines are shown. The
-  language chooser's test for user-added languages is still not studied.)
+  language chooser's test for user-added languages is read since,
+  `languages-list.md`; the chooser itself is left out of the port by the
+  user's decision of 2026-10-16, English only. Which `have-lang-` lines
+  an English-only port shows is for the design.)
 - Nothing here was compared with the running game.

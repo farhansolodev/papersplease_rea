@@ -86,7 +86,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`). Not done: the language chooser, the family pictures of the night screen, drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`). Left out by the user's decision: the language chooser and the age rating. Not done: how the English language pack is loaded, the family pictures of the night screen, drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -200,10 +200,10 @@ screens, part 7.)
    settings list they share, the page player of the intro and the
    endings, the intro screen, the ending screen, the credits screen, the
    endless code box `UnlockConfirm` and the endless screen.
-   **Next, part 8** (suggested: the language chooser `LangChooser`
-   together with the rating screen `RatingScreen` / `RatingPopup`, since
-   a language change goes through the rating screen when that language
-   needs one, part 4). Still to do after that:
+   (The language chooser and the rating screen were suggested as part 8;
+   the user decided on 2026-10-16 to leave both out of the port, so
+   they will not be studied. Part 8 became how the English language
+   pack is loaded, `language-pack.md`.) Still to do:
    `play.ui.Button`'s modes and pictures (what a
    back button does is read since part 4), and the family pictures of
    the night screen (`FamilyVisuals`, a 1,930-line constructor, proposed
@@ -280,6 +280,12 @@ Collected from the docs, so they are not lost:
   new folder, so by the code the user's real settings were not touched
   and endless mode is still locked there; the real folder was not looked
   at.)
+- **Decided by the user (2026-10-16): English only, no age rating.** No
+  Language row, no language chooser (`LangChooser`), no rating screen or
+  box (`RatingScreen`, `RatingPopup`; only Korean uses them). They will
+  not be studied. To go into `docs/DESIGN.md`'s list of decisions. What
+  English itself loads from its own pack is still needed
+  (`language-pack.md`).
 - **Decided by the user (2026-10-16): no leaderboards in the port**, since
   it will not be published. To go into `docs/DESIGN.md`'s list of
   decisions. The local best score per course and style is not a
@@ -512,7 +518,8 @@ Collected from the docs, so they are not lost:
   `screens.md`, part 7, and `save-format.md`).
 - Characters above 255 would be damaged by the save encryption (the code
   does not cut character codes to 8 bits). Nothing above 127 was seen in a
-  real English save; other languages were not looked at.
+  real English save; other languages were not looked at (not needed: the
+  port is English only, the user's decision of 2026-10-16).
 
 **From the sixth session** (`border-figures.md`, `border-scene.md`,
 `border-shooting.md`, `border-view.md`)
@@ -610,7 +617,8 @@ Collected from the docs, so they are not lost:
 - Face sheet `M6` has artwork for one face only (piece 24); face `F1:0` has
   its shoulder dots in reverse order (`faces.md`).
 - A saved name-cycler position and the non-English alias swap sets are not
-  modelled in the reference scripts.
+  modelled in the reference scripts. (The swap sets are not needed: the
+  port is English only, the user's decision of 2026-10-16.)
 - `FilerEnvelope/Title`, `Citation/Message` and `Citation/Penalty` have no
   fact definitions in `Facts.xml` (`player-actions.md`).
 - `Facts.xml` `<cite when="*...">`: whether the `*` is stripped before the

@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-16 Recorded the user's decision: English only, no age rating
+
+**Changed:** `docs/PROGRESS.md` (new "Decided by the user" entry; the screens item no longer suggests the chooser and rating screen as part 8; the stage 4 row; two open items marked not needed), `docs/screens.md` (the overview, the Language and Rating rows of part 4, its port notes and "Not studied" list), `docs/languages-list.md`, `docs/data-files.md`, `docs/credits-txt-format.md`.
+**Why:** the user decided the port has no other languages, no language chooser and no age rating (only Korean shows one), so these are not studied.
+**Tested how:** doc edits only; docs searched for `LangChooser`, `RatingScreen`, `RatingPopup`, "language chooser", "other languages", "non-English", "Korean".
+**Result:** every "not studied / not read" line about the chooser and the rating screens now says they are left out by decision. The question of how a language pack is loaded is kept open, because English has a pack of its own (`StreamingAssets/loc/en.zip`); it becomes part 8 (`language-pack.md`).
+**Corrected in older docs:** `credits-txt-format.md` said the chooser's test for user-added languages was not studied; it was read on 2026-10-14 (`languages-list.md`). `fonts.md`'s "other languages may bring their own fonts" is left for part 8, which will say whether English's pack does.
+**Still broken / not tested:** nothing to test. Nothing committed.
+
 ## 2026-10-16 The endless code box and endless screen, watched in the real game
 
 **Changed:** `docs/screens.md` (part 7: new section "Compared with the running game"; the opening line, the title picture described as an infinity sign, the leaderboards row, the fallback now seen, watch item 4), `docs/endless-mode.md` (its "nothing compared" line), `docs/PROGRESS.md` (state line, open questions, machine-only table). Kept on this machine: `extracted/endlessrun/` (the test's save folder).

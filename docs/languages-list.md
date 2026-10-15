@@ -9,9 +9,12 @@ Check: `scripts/checks/languages_check.py`.
 
 Functions read in full: `LangChooser.hasUserAddedLanguages` and the static
 values. Read in part: the `play.screen.LangChooser` constructor and
-`setPage` (only where they use the two files). **Not studied:** the rest of
-the chooser (its buttons, pages and what happens when a language is
-applied), and how a language pack is loaded.
+`setPage` (only where they use the two files). **Not studied, by the
+user's decision of 2026-10-16:** the rest of the chooser (its buttons,
+pages and what happens when a language is applied). The port is English
+only and has no language chooser, so these two files are not needed by
+it. How a language pack is loaded is studied separately, because English
+has a pack too (`language-pack.md`).
 
 ## Languages.txt
 
@@ -64,9 +67,8 @@ same list of available codes for their `have-lang-` lines
 
 ## Not known / not tested
 
-- The chooser screen itself and language loading (see above).
-- Whether the port offers other languages at all is a design decision not
-  yet made. Of the language packs only the list of files inside has been
-  looked at (`art-dat-format.md`, "Not done"); their contents have not been
-  studied.
+- The chooser screen itself (left out, see above).
+- (Whether the port offers other languages was listed here as a design
+  decision not yet made. **Decided by the user on 2026-10-16: English
+  only.** Language loading and the English pack: `language-pack.md`.)
 - Nothing here was compared with the running game.

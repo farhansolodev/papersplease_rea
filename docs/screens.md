@@ -22,7 +22,10 @@ rules behind a screen are in that topic's own doc (for the night:
 - **Part 7** (2026-10-16): the endless code box (`UnlockConfirm`), the
   endless screen (`EndlessScreen`), the box shown after an endless run,
   and the local best score per course and style.
-- Not written yet: language chooser.
+- Left out by the user's decision (2026-10-16), so not studied: the
+  language chooser (`LangChooser`) and the age-rating screen and box
+  (`RatingScreen`, `RatingPopup`, shown only for Korean). The port is
+  English only, with no Language row and no age rating.
 
 ---
 
@@ -1394,9 +1397,9 @@ What each row does:
 | Music, Sound: minus and plus | The volume is first rounded to the nearest tenth, then moved by 0.1, and kept within 0 to 1. So eleven steps |
 | Music, Sound: the bar | While the pointer is held down on the bar, the volume is the pointer's place along the bar (0 at its left end, 1 at its right), rounded to the nearest tenth and kept within 0 to 1. The pointer shows the hand over the bar |
 | Device | Opens a box with `phone`, `tablet` and cancel (`PlatformChangeConfirm`). A choice goes to `GameTransition.requestPlatformChange` (`save-format.md`, part 2). Never on desktop |
-| Language, the usual form | Opens the language chooser (`LangChooser`, a screen of its own, not read) |
+| Language, the usual form | Opens the language chooser (`LangChooser`, a screen of its own, not read; left out of the port by the user's decision, 2026-10-16) |
 | Language, when the player has added languages | Minus and plus step through the available language codes, wrapping round at both ends, and set the language code |
-| Rating | Opens `RatingPopup` (not read) |
+| Rating | Opens `RatingPopup` (not read; left out of the port by the user's decision, 2026-10-16) |
 
 "The player has added languages" means: the platform's list of language
 codes is not the same, entry for entry, as the lines of `Languages.txt`
@@ -1578,16 +1581,20 @@ from it. The desktop values read for this part, from the same listing:
 - Escape is also the browser's own "leave fullscreen" key; in fullscreen
   the browser may take the first press for itself. Not tested; for the
   design.
-- Not needed for desktop: the Device row, `platover`, vibration, and
-  (unless Korean is offered) the rating row.
+- Not needed for desktop: the Device row, `platover`, vibration.
+- **Decided by the user (2026-10-16): English only.** No Language row,
+  no language chooser, and no age rating (the rating row, `RatingPopup`
+  and `RatingScreen`, which only Korean uses). Whatever English itself
+  needs from its language pack is still needed (`language-pack.md`).
 
 ## Not studied
 
 - `play.ui.Button`'s modes and pictures. (How it reacts and what a back
   button does were listed here; they are read since, "Escape on the pause
   screen".)
-- `LangChooser`, `RatingPopup`, `RatingScreen`, the
-  `PlatformChangeConfirm` box.
+- The `PlatformChangeConfirm` box. (`LangChooser`, `RatingPopup` and
+  `RatingScreen` were listed here; they are left out of the port by the
+  user's decision of 2026-10-16 and will not be studied.)
 - What `canVibrate` answers on desktop.
 - What "rebuilds the game's standing objects" covers after a language
   change (`Game.createDefaultEnts`), and `Bootstrap.setLanguage`.
