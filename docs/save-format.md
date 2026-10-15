@@ -428,10 +428,10 @@ In this order:
 
 | State | What it does |
 |---|---|
-| `on` | Normal running. On entry the fade cover (`screenFlash`) fades out |
+| `on` | Normal running. On entry the fade cover (`screenFlash`) fades out (its alpha to 0; `off` and `off-instant` take it to 1; `screens.md` part 11) |
 | `off` | On entry two flags of the current screen are cleared (4 and 16) and the fade cover fades in. After 1 second the pending screen change is applied and the state goes back to `on` |
 | `off-instant` | The same with no fade and no wait |
-| `flashing-to-title` | The same two flags are cleared, and the screen flash runs; when it is over, "title" becomes the pending change and the state is left (for which state: the decompiler dropped the argument) |
+| `flashing-to-title` | The same two flags are cleared, and the screen flash runs; when it is over, the state goes to `off-instant` and "title" becomes the pending change (the target state was read in the instructions on 2026-10-16, `screens.md` part 11; this row first said the decompiler had dropped it) |
 | `paused` | On entry: all sound paused, the pause screen created, the current screen hidden, the sound `button-drop`. Every frame it tells the clock to pause for one frame. On exit: sound resumed, pause screen removed, screen shown again, the sound `hover-up` |
 
 What the two flags mean was read on 2026-10-14 (`screens.md`, part 1):
@@ -441,10 +441,12 @@ Inferred from where they are cleared (here, and under the resume overlay
 below): the screen is no longer updated and gets no input.
 
 The fade is 0.125 s each way (half of 0.25). With the debug switch
-`skipSlowStuff` it is 0.005 s and the 1-second wait is 0. These numbers
-were read from the decompiler and the constants in the file; which
-argument is the wait and which the fade was not checked in the
-instructions.
+`skipSlowStuff` it is 0.005 s and the 1-second wait is 0. Checked in the
+instructions on 2026-10-16 (`screens.md` part 11; this said "not
+checked" before): each state is set up with `app.State`'s
+`setInterpDuration` (0.125 s for `on` and `off`, 0 for `off-instant`),
+`setDuration` (`off`: 1 s, then `on`; `off-instant`: 0 s, then `on`)
+and `addTarget(screenFlash, fadeT = 0 for on, 1 for the other two)`.
 
 `paused` is entered by `SET_PAUSE`, or in `Game.update` when key number 5
 is pressed, the state is `on` and the current screen says it can be paused.
@@ -616,7 +618,7 @@ it.
 4. The screen `day`, `night` or `end` is built at once, without a fade.
 5. The screen restores itself:
    - **Day**: the booth, then the border, then a running tutorial is
-     stopped.
+     stopped. (Only phones have one: `screens.md` part 11.)
    - **Night**: the budget's reveal animation is skipped.
    - **Ending**: the opening flip is finished at once. (Since
      `screens.md` part 5: the ending screen is built by its normal

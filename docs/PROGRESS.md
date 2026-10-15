@@ -1,11 +1,15 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-16, after
-part 10: the night screen's family pictures (`night-pictures.md`; code
-reading, one constructor checked in its instructions, a check of the six
-pictures and a reference script that renders them; not run in the game,
-but it agrees with the description of the user's night-3 screenshot).
-Before it the same day, part 9: buttons (`buttons.md`; code reading, two
+part 11 of the screens: the day screen, the wait screen, the screen
+shake, the screen flash and the news magnifier (`screens.md` part 11;
+code reading, one Ghidra run for what the decompiler dropped, a
+reference script `screenfx.py`; not run in the game). It closes the
+screens step. Before it the same day, part 10: the night screen's family
+pictures (`night-pictures.md`; code reading, one constructor checked in
+its instructions, a check of the six pictures and a reference script
+that renders them; not run in the game, but it agrees with the
+description of the user's night-3 screenshot). Before that, part 9: buttons (`buttons.md`; code reading, two
 constructors read as instructions, and a check of the button pictures;
 not run in the game). It also found that desktop never loads the
 archive's `layout/` folders (`art-dat-format.md`). Before that, part 8: how a language
@@ -89,7 +93,12 @@ over it; every button the game makes is listed with its picture and
 cut), and the night screen's family pictures (fixed desktop positions:
 a row of status badges and the name per member on the right, the
 apartment class top right, seven token places, the passports with their
-count and four upgrade places on the left; no random draws). The desktop
+count and four upgrade places on the left; no random draws), and the
+last screens (the day screen holds the booth and the border scene and,
+on desktop, no tutorial; every screen has its own shaker, which moves the
+whole screen by whole pixels with its own fixed-seed generator; a "flash
+to the title" turns the screen white, then black, then shows the title,
+after a time bomb, a grenade on the booth or touching poison). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -109,7 +118,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`). Left out by the user's decision: the language chooser and the age rating. Not done: drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Not done: drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -151,7 +160,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
 | `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder. **Part 2**: the 19 requests a part of the game can make (`GameTransition`), how a screen change is queued and built (`Game.queueScreenChange`, `applyScreenChange`), the game's own five states (fade, pause), and the stash: when it is written, deleted and read, what it holds, how it is restored |
-| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). **Part 2**: the title screen (its buttons and what each does, the title rising in 20 steps with the music, the logo bobbing), the menu helper `Menu`, and the desktop values of eight layout fields. **Part 3**: the load screen (the grid of save buttons, how saves are put on up to 5 tracks, what a click does, the summary box, deleting) and the confirm box `Confirm`. **Part 4**: which key pauses (Escape) and the game's 11 key numbers, the pause screen, the settings screen, the settings list both share (its rows in each form, what each click does, how a row is laid out), who writes the settings file (`Game.applySettings`), that nothing in the build reads `platover`, the header helper, and seven more desktop layout values (one of them corrects part 2). **Part 5**: the page player of the intro and the endings (the wipe, the typing caption, NEXT, hurrying a page from page 2 of the intro), the intro screen, the ending screen (its steps, the statistics text, the 2 + 2 + 2-second fade, the button), `EndBits` and the load screen's ending marks, restoring an ending stash. **Part 6**: the credits screen (who opens it, which languages are available, where the list sits, the 4-second hold at the first view, the scroll by frame and the fast scroll while the mouse button is held, the loop, the buttons). **Part 7**: the endless code box (`UnlockConfirm`: the keys, the check, the blinking, the code 62131), the endless screen (its two rows, selecting and the stored choice with its fallback, the selection line, PLAY and BACK, the score under each course and the local best score kept in the statistics, the result box after a run, the hidden clear-achievements box and press-kit helper; where it touches leaderboards, left out by the user's decision). Each part ends with a list of things to watch in the game |
+| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). **Part 2**: the title screen (its buttons and what each does, the title rising in 20 steps with the music, the logo bobbing), the menu helper `Menu`, and the desktop values of eight layout fields. **Part 3**: the load screen (the grid of save buttons, how saves are put on up to 5 tracks, what a click does, the summary box, deleting) and the confirm box `Confirm`. **Part 4**: which key pauses (Escape) and the game's 11 key numbers, the pause screen, the settings screen, the settings list both share (its rows in each form, what each click does, how a row is laid out), who writes the settings file (`Game.applySettings`), that nothing in the build reads `platover`, the header helper, and seven more desktop layout values (one of them corrects part 2). **Part 5**: the page player of the intro and the endings (the wipe, the typing caption, NEXT, hurrying a page from page 2 of the intro), the intro screen, the ending screen (its steps, the statistics text, the 2 + 2 + 2-second fade, the button), `EndBits` and the load screen's ending marks, restoring an ending stash. **Part 6**: the credits screen (who opens it, which languages are available, where the list sits, the 4-second hold at the first view, the scroll by frame and the fast scroll while the mouse button is held, the loop, the buttons). **Part 7**: the endless code box (`UnlockConfirm`: the keys, the check, the blinking, the code 62131), the endless screen (its two rows, selecting and the stored choice with its fallback, the selection line, PLAY and BACK, the score under each course and the local best score kept in the statistics, the result box after a run, the hidden clear-achievements box and press-kit helper; where it touches leaderboards, left out by the user's decision). **Part 11**: the day screen (`DayScreen`: booth, border, a tutorial on phones only), the wait screen (phones and tablets), the screen shake (one per screen, seed `0x6500065`, the formula, who shakes), the screen flash and fade cover (`ScreenFlash`, the flash to the title and its three users), the news magnifier (never on desktop) and `Layout.getFitScale`. Each part ends with a list of things to watch in the game |
 | `ends-xml-format.md` | `Ends.xml` and `Intro.xml`: the 20 endings and the intro slides |
 | `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring (the endless screen is in `screens.md`, part 7) |
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
@@ -193,7 +202,7 @@ saves, part 1. Done in the eighth: saves, part 2. Done in the ninth: the
 screens, parts 1 to 3. Done in the tenth: the screens, parts 4 and 5.
 Done in the eleventh: the screens, part 6. Done on 2026-10-16: the
 screens, part 7; part 8, the language pack; part 9, buttons; part 10,
-the night screen's family pictures.)
+the night screen's family pictures; part 11, the last screens.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -220,8 +229,9 @@ the night screen's family pictures.)
    and the screen that opened offered only a new game (the unfinished day
    was lost). The stash's content matches the description (`stash_check.py`,
    `0 problems`).
-4. **The screens, in progress.** Parts 1 to 7 are done (`screens.md`),
-   and parts 8 to 10 in their own docs (below). In `screens.md`:
+4. **The screens: done** on 2026-10-16, in 11 parts. Parts 1 to 7 and
+   11 are in `screens.md`, parts 8 to 10 in their own docs (below). In
+   `screens.md`:
    the base of a screen (`GameScreen`, the entity switches), the night
    screen, the title screen, the menu helper `Menu`, the load screen, the
    confirm box `Confirm`, the pause screen, the settings screen and the
@@ -234,11 +244,12 @@ the night screen's family pictures.)
    pack is loaded: **done** on 2026-10-16, `language-pack.md`. Part 9,
    buttons: **done** on 2026-10-16, `buttons.md`. Part 10, the night
    screen's family pictures: **done** on 2026-10-16,
-   `night-pictures.md`.) Still to do, **next, part 11** (suggested): the
-   `play.screen` classes not read yet, all small: `DayScreen` (9
-   functions), `WaitScreen` (6), `ScreenFlash` (17), `ScreenShake` (12,
-   with `GameScreen.shake`), `NewsScreenMagnifier` (9; the news screen
-   is otherwise done, `newspaper-picture.md`). Left out: `LangChooser`,
+   `night-pictures.md`. Part 11, **done** on 2026-10-16 in
+   `screens.md`: `DayScreen`, `WaitScreen`, `ScreenShake` with
+   `GameScreen.shake`, `ScreenFlash`, `NewsScreenMagnifier`.) Not read in
+   `play.screen`, both small: `ScrollPassthroughEnt` (7 functions, made
+   by the `LoadScreen` constructor) and `ReactPassthroughEnt` (7; no
+   code making it was found by name). Left out: `LangChooser`,
    `RatingScreen`, `RatingPopup` (the user's decision);
    `UnstashOverlay` and `PlatformChangeConfirm` are phone and tablet
    only by the earlier reading (`save-format.md`, `screens.md` part 4).
@@ -252,13 +263,15 @@ the night screen's family pictures.)
    its positions), most of `Confirm` and `GameScreen`, `PauseScreen`,
    `SettingsScreen`, `SettingsMenu`, `SettingRow`, `SettingDim`,
    `Intro`, `IntroScreen`, `EndScreen`, `CreditScreen`, `CreditList`,
-   `UnlockConfirm`, `EndlessScreen` (its desktop branch in detail). How a
+   `UnlockConfirm`, `EndlessScreen` (its desktop branch in detail),
+   `DayScreen`, `WaitScreen`, `ScreenShake`, `ScreenFlash`,
+   `NewsScreenMagnifier`. How a
    screen is asked for and built is in `save-format.md`, part 2.
    The user's screenshot of a night screen (2026-10-14) confirmed the
    order of the budget lines for one night (`screens.md`, part 1). A
    second look, at a night with no one sick, would test a different
    line count; the other items of that list need a live screen.
-5. **Drawing**: how text is placed (`app.vis.Text`; the newspaper's title
+5. **Drawing, next**: how text is placed (`app.vis.Text`; the newspaper's title
    and subtitle rules in `newspaper-picture.md` wait on this), how a document page is
    laid out (`PaperInnerVisuals`, read only for its random draws), the
    search photo, the rest of `app.vis` and `play.ui`; input handling.
@@ -304,6 +317,20 @@ Small jobs that fit anywhere:
 ## Open questions and unconfirmed items
 
 Collected from the docs, so they are not lost:
+
+**From 2026-10-16** (`screens.md`, part 11)
+
+- **Nothing of part 11 has been watched in the game.** The four items at
+  the end of part 11: no tutorial on day 1, the border explosion's
+  shake, the time bomb's flash, the poison touch's shakes and flash.
+- Not read: `play.day.booth.Tutor` (phone only), how the Unity host uses
+  `Game.wantPlatformKind`, whether the flash is sized in game or window
+  pixels, the order inside one frame of a state's timed functions and the
+  screen's update (the reference script assumes the shake moves the
+  screen in the frame it starts), and what `setPaperPoisoned`'s argument
+  means when the poison is touched.
+- Inferred, not seen: during a flash to the title the screen is not
+  updated, so a running shake freezes at its last offset.
 
 **From 2026-10-16** (`night-pictures.md`, part 10)
 
@@ -571,8 +598,10 @@ Collected from the docs, so they are not lost:
   they are still drawn. `screens.md`, part 1.)
 - (Answered in the tenth session: key number 5 is Escape. `screens.md`,
   part 4.)
-- The fade (0.125 s each way) and the 1-second wait of a screen change
-  were read from the decompiler, not checked in the instructions.
+- (The fade, 0.125 s each way, and the 1-second wait of a screen change
+  were listed here as read from the decompiler only. Checked in the
+  instructions on 2026-10-16, `save-format.md` part 2 and `screens.md`
+  part 11.)
 - Who handles the error an invalid stash raises at start-up (phone and
   tablet only). Whether anything in `play.ui` or `app` asks for a restore.
 - After a stash restore a new `Day` is built and no random generator is
@@ -855,6 +884,7 @@ All gitignored. Nothing below is in git.
 | `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `decompiled/titlescreen_update_asm.txt`, `loadscreen_strings.txt` | small | For `screens.md`, parts 2 and 3: the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
 | `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
+| `decompiled/part11_run1.txt` | under 1 MB | For `screens.md`, part 11: the instructions of `System.Math.Cos` and `Sin` (which helper is which), `ScreenShake.update`, `Game.createStater` (the fade targets) and the function that ends the flash to the title | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1803c21e0 0x1803c2430 0x1808635e0 0x18058a9e0 0x18058a580`, output redirected to the file |
 | `decompiled/part10_run1.txt` | under 1 MB | For `night-pictures.md`: the instructions of the `FamilyVisuals` constructor (the name field, the alignment, the passport halving, the count's gap, the empty-token test) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x18074cdc0`, output redirected to the file |
 | `decompiled/part9_run1.txt` | under 1 MB | For `buttons.md`: the instructions of the `Border` constructor (the booth button's click margins) and of the `HoverButton` constructor (the arrow's position) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x180437070 0x1809eb520` |
 | `decompiled/part7_run1.txt` | under 1 MB | For `screens.md`, part 7: the instructions of the `UnlockConfirm` and `EndlessScreen` constructors, `EndlessScreen.refreshScoreTexts`, `ScoreEntry.isBetterThan` and `ScoreEntry.toString` | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1806859c0 0x1807c1390 0x1807c6fc0 0x1808608d0 0x180860900` |
@@ -876,5 +906,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures; needs Pillow to render; `night-pictures.md`) |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11) |
 | `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, and `night_pictures_check.py` against the night screen's family pictures; see its `README.md` for each script's arguments |

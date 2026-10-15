@@ -124,8 +124,10 @@ was touched on this or the previous frame). Otherwise, by the wanted side:
    of impact (not above 400): the bounce is `4 + 6 x v/400` pixels deep and
    lasts `0.2 + 0.2 x v/400` seconds. The view dips back into the scene by
    one smooth arc and returns to the end; then the wanted side is `NONE`.
-   (The arc function is called with pi x progress, so it is taken to be a
-   sine. Inferred from that; the function itself was not identified.)
+   (The arc function is called with pi x progress. It is the sine:
+   `System.Math.Sin` is a single jump to it, read in the instructions on
+   2026-10-16, `screens.md` part 11. Until then this was inferred from
+   the call only.)
 
 Last, every frame: the pan is rounded to a whole pixel and forced into the
 range 0 to the largest pan, and the 2-frame countdown goes down by one.
@@ -387,8 +389,9 @@ small models of what was read. It is not a comparison with the running game.
   neither writes them.
 - The tablet and phone layout values, the phone branch of the scoreboard,
   and `BorderCamVisual.buildTiles` line by line.
-- The two math helpers (sine in the bounce, remainder in the flash) are
-  identified from how they are called, not from their code.
+- The remainder helper in the flash is identified from how it is
+  called, not from its code. (The sine in the bounce was listed here too;
+  confirmed on 2026-10-16, `screens.md` part 11.)
 - `StringUtil.formatTime`'s arithmetic (see above).
 - `app.vis.Text` (measuring and drawing text) is not read; the scoreboard's
   text positions depend on its `width` and on the font's ascent.

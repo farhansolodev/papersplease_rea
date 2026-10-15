@@ -102,9 +102,13 @@ rectangles, which only the tablet layout does (corrected 2026-10-14; this
 said "twice per day" without the condition; `border-view.md`). On desktop
 these two generators are never created. The rest of the border scene makes no
 generator of its own: it uses the day's border generator
-(`border-figures.md`). **What seed each of the remaining sites uses**
-(`CriminalPoster`, `TakeBursts`, `ScreenShake`, `PullChain`, `LoadScreen`,
-`SoundDefLib`) **is not studied.**
+(`border-figures.md`). `ScreenShake` uses the fixed seed `0x6500065`
+(105,906,277): every screen makes its own shaker and so a fresh generator
+with that seed, used only for the shake's direction (read 2026-10-16,
+`screens.md` part 11; this sentence listed it as not studied before).
+**What seed each of the remaining sites uses** (`CriminalPoster`,
+`TakeBursts`, `PullChain`, `LoadScreen`, `SoundDefLib`) **is not
+studied.**
 
 ## How it was verified
 

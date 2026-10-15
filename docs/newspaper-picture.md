@@ -224,8 +224,12 @@ grey box, unless traveler news adds more.
   by `layout.getFitScale(width, height, buttonY)` and centred:
   `x = floor((layout.kPixelWidth - width) / 2)`,
   `y = floor(buttonY / 2 - height / 2)`.
-- If the scale is below 0.999 a `NewsScreenMagnifier` is added (**not
-  studied**).
+- If the scale is below 0.999 a `NewsScreenMagnifier` is added.
+  `getFitScale` gives 1 when the newspaper fits and 2/3 otherwise; **on
+  desktop it fits** (365 x 220 on a 570-wide screen, button at y 290),
+  so the scale is 1, the newspaper sits at (102, 35) and there is no
+  magnifier. (This said "not studied" until 2026-10-16; `screens.md`
+  part 11 has both functions.)
 - `update` only adds the frame time to the story's play time.
 
 ## Check against the data files
@@ -271,7 +275,8 @@ dropped, and it does not compute the stamp's position.
 - `Face.getDocImage` and `makeFace` beyond their draws: what the face looks
   like at half scale with the two colours.
 - `Image.transformed` in full, and so the stamp's real angle.
-- `Layout.getFitScale` and `NewsScreenMagnifier`.
+- (`Layout.getFitScale` and `NewsScreenMagnifier` were listed here;
+  read on 2026-10-16, `screens.md` part 11.)
 - (Answered 2026-10-14, `save-format.md` part 2, from the code: the news
   screen is built when the game goes on to the next day and when a save is
   loaded; a new game goes to the intro screen first. Whether `make` runs

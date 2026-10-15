@@ -147,7 +147,7 @@ sniping time scale is 1.0, so nothing slows (part 4, `border-view.md`).
 |---|---|
 | `off` | Every frame: on a boss day, keep the view on the boss (and on his car for the first 3 s) |
 | `waiting-for-chat` | The same code as `off` |
-| `ready-to-call` | The booth button can be clicked and blinks (highlight for 0.375 s of every 0.75 s). The tutorial can block it. On leaving: button back to normal |
+| `ready-to-call` | The booth button can be clicked and blinks (highlight for 0.375 s of every 0.75 s). The tutorial can block it (phones only; desktop has no tutorial, `screens.md` part 11). On leaving: button back to normal |
 | `calling-next` | On entering: tell the booth (`onCallingNextTraveler`), play `speech-announce`, show the text `border_next`. After 1 s: the waiting line moves up (`advance()`), or, if the next traveler is the chatty prison guard, `guard1` walks in (`guard1-enterchat-midday`) |
 | `inspecting` | On entering: maybe schedule the day's attack (below). Every frame: when the booth is ready for the next traveler, go to `ready-to-call` |
 | `runner`, `truckwreck`, `bikeattack`, `bikerunner` | The four attack scenes (below) |
@@ -347,7 +347,8 @@ chains of `Paths.xml` and the events below.
   get `guard<n>-panic`; the line panics (part 1); leaving figures on
   `exit-right` get `exit-right-panic` and those on `exit-left` get `panic-2`.
 - **Explosion** (`spawnExplosion(pos, kill guards and end the day = yes)`):
-  show the explosion at `pos`, shake the screen, start the white flash,
+  show the explosion at `pos`, shake the screen (1 s, magnitude 2; how
+  a shake works is in `screens.md` part 11), start the white flash,
   panic, sound `border-boom`. Every living enemy within 30 units gets
   `enemy-grenaded`. With "kill guards and end the day": 0.1 s later guards
   2, 3 and 4 on duty get `guard<n>-grenaded`; the friendly guard is recorded

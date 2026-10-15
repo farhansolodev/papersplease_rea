@@ -25,6 +25,10 @@ rules behind a screen are in that topic's own doc (for the night:
 - Part 8 (the language pack) is `language-pack.md`, part 9 (buttons)
   `buttons.md`, and **part 10** (2026-10-16), the night screen's family
   pictures, `night-pictures.md`.
+- **Part 11** (2026-10-16): the day screen (`DayScreen`), the wait
+  screen, the screen shake, the screen flash and fade cover, and the news
+  screen's magnifier. Desktop has no tutorial, no wait screen and no
+  magnifier.
 - Left out by the user's decision (2026-10-16), so not studied: the
   language chooser (`LangChooser`) and the age-rating screen and box
   (`RatingScreen`, `RatingPopup`, shown only for Korean). The port is
@@ -74,7 +78,8 @@ sleep button's height on screen. The rest of its pixel arithmetic was read
 from the decompiler only.
 
 **Not read:** `play.ui.DiagramLine`,
-`app.vis.Text`; `GameScreen.shake`. (`play.ui.Button` was on this list;
+`app.vis.Text`. (`GameScreen.shake` was on this list; read since, in
+part 11.) (`play.ui.Button` was on this list;
 read since, on 2026-10-16, `buttons.md`.) (`GameScreen.addHeader` and
 `addMediaButtons` were on this list; they are read since, in part 4.)
 (The `FamilyVisuals` constructor and `FamilyVisualsDim` were on this
@@ -114,7 +119,9 @@ no input", was right.)
 ## What every screen is built on (`GameScreen`)
 
 - A screen is an entity with a list of pictures of its own (`visuals`,
-  drawn in order by `draw`), a song name (`songId`) and a screen shaker.
+  drawn in order by `draw`), a song name (`songId`) and a screen shaker
+  (`ScreenShake`, made by the constructor as a child of the screen; how
+  it shakes is in part 11).
 - `enablePause(black)` marks the screen as one that can be paused
   (`canPause`). If the layout has `showPauseButton` set, it also makes a
   pause button in the top right corner (4 pixels from the top), white, or
@@ -2552,3 +2559,272 @@ run, with the user's go-ahead.)
    with a box: style, course, time and "N Points", and OKAY. The number
    then shows under that course while that style is selected, and a
    worse later run does not replace it.
+
+---
+
+# Part 11: the day screen, the wait screen, the screen shake, the screen flash and the news magnifier
+
+Studied on 2026-10-16 by code reading. What the decompiler dropped was
+read from the instructions: one read-only Ghidra run
+(`decompiled/part11_run1.txt`, `DumpAssembly.java` on `Math.Cos`,
+`Math.Sin`, `ScreenShake.update`, `Game.createStater` and the function
+that ends the flash), and the `Booth` constructor's listing of
+2026-10-14 (`decompiled/booth_ctor_asm.txt`) for when the booth shakes.
+Numbers with `read_doubles.py`. **Not run in the game.** The reference
+script is `scripts/reference/screenfx.py`.
+
+These are the last small classes of `play.screen` that matter on
+desktop. Two of them never appear on desktop (the wait screen and the
+magnifier); they are described briefly so the port knows what it leaves
+out.
+
+## What was read
+
+From the whole-game decompile in `decompiled/all/`:
+
+| Class | Functions |
+|---|---|
+| `play.screen.DayScreen` | constructor `0x18044b860`, `makeStash`, `restoreFromStash`, the field list (all of it besides the field-access helpers) |
+| `play.screen.WaitScreen` | constructor `0x1807d4b40`; `draw` is shared code (`0x1801c5ac0`, also `RatingScreen.draw` and `Booth.draw`) |
+| `play.screen.ScreenShake` | constructor `0x180862cb0`, `start` `0x180863570`, `update` `0x1808635e0`, `clear` |
+| `play.screen.GameScreen` | `shake` `0x18057e120`, the constructor again (part 1) |
+| `play.screen.ScreenFlash` | constructor `0x1808615f0`, `applyFlash` `0x1808627f0`, `draw`, `clear`, `startFlash`, `get_fadeT`, `set_fadeT`, `get_flashT`, `set_flashT`, `get_isFading` (all of it besides the field-access helpers) |
+| `play.screen.NewsScreenMagnifier` | constructor `0x1806d4bb0`, static constructor, `react` `0x1806d5790`, `draw` |
+| `play.screen.NewsScreen` | the constructor's scaling part again |
+| `Layout` | `getFitScale` `0x1804a1920` |
+| `Game` | the ScreenFlash part of the constructor, `applyTransition` (`FLASH_TO_TITLE`, `REQUEST_PLATFORM_CHANGE`), `createStater` and its `flashing-to-title` function `0x18058a580`, `draw`, `wantPlatformKind` |
+| `play.day.booth.Booth` | `timeBombExplode`, the `#poison-touch` part of `paper_onUnhandledLinkClicked`, the four timed functions of its `poisoned` state (closures 589, 593, 597, 601) |
+| `play.day.border.Border` | `spawnExplosion` (the shake), the grenade-on-the-booth function (the flash) |
+| `play.GameTransition` | `flashToTitle` |
+| `app.Num` | `lerpScale` |
+
+Every caller of `GameScreen.shake`, `ScreenFlash.startFlash`,
+`applyFlash`, `flashToTitle` and the `WaitScreen` and `Tutor`
+constructors was found by searching the whole decompile.
+
+## The day screen (`DayScreen`)
+
+The screen `day` (how it is asked for: `save-format.md`, part 2). It
+holds the day, the booth, the border scene and, on phones only, a
+tutorial. The constructor, in order:
+
+1. The base of every screen (part 1), which also makes the screen's
+   shaker (below).
+2. The booth: `Booth(screen, boothEnvRun, day)`.
+3. The border scene: `Border(screen, day, booth, day.borderRand)`
+   (`border-figures.md`).
+4. **The tutorial (`Tutor`), only when the day is day 1, not an endless
+   day, and the run's platform is `PHONE`** (`day.run.platformKind`
+   compared with the third value of `PlatformKind`: `DESKTOP`, `TABLET`,
+   `PHONE`, in that order in `dump.cs`). No other code makes a `Tutor`
+   (whole-decompile search; the test player only checks for one). **So
+   desktop has no tutorial**, also not on day 1.
+5. `enablePause(true)`: the screen can be paused (Escape on desktop,
+   part 4). The black pause button is made only where the layout has
+   `showPauseButton`, which desktop does not (part 1).
+
+The constructor sets no song. The screen has no `update`, `draw` or
+`react` of its own (it keeps the base screen's): the booth and the
+border scene are its children and run through the entity tree (part 1).
+
+`makeStash` stores the booth's stash, then the border's.
+`restoreFromStash` restores the booth, then the border, and if both
+worked stops a running tutorial (`abort`); on desktop there is none.
+This matches `save-format.md`, part 2.
+
+## The wait screen (`WaitScreen`): phones and tablets only
+
+The screen `wait` is queued only by `REQUEST_PLATFORM_CHANGE`
+(`save-format.md`, part 2), which only the settings' Device row sends,
+and that row is not made on desktop (part 4). It shows
+`assets/Wait.png` (47 x 7) centred: `x = floor((kPixelWidth - 47) / 2)`,
+`y = floor((kPixelHeight - 7) / 2)`, and draws nothing else. While it
+is the current screen and the game's state has been `on` for more than
+0.01 s, `Game.wantPlatformKind` returns the requested layout instead of
+the current one. That value is read by the Unity host and by the test
+player (neither followed further). **Leave it out of the port.**
+
+## The screen shake (`ScreenShake`, `GameScreen.shake`)
+
+**Every screen has its own shaker.** The `GameScreen` constructor makes a
+`ScreenShake` as a child of the screen (field `screenShake`). It moves
+the whole screen: it sets the screen's position, and everything in the
+screen is drawn relative to it.
+
+**Its random generator** is made in the shaker's constructor with the
+fixed seed `0x6500065` (105,906,277). So each new screen starts a fresh
+generator with the same seed; it is used for nothing else.
+
+**Starting** (`GameScreen.shake(ent, duration, magnitude)`): from `ent`,
+the function walks up through the parents to the first `GameScreen` and
+calls its shaker's `start`. If no parent is a screen, nothing happens.
+`start` records the duration, the magnitude and the game clock's
+current time (the trunk's clock). A shake started while another runs
+replaces it.
+
+**Every update** of the shaker, while a shake runs (start time not 0):
+
+```
+elapsed = clamp(now - start, 0, duration)
+amount  = (1 - elapsed / duration) ^ 1.5 * magnitude
+if amount < 0.001:
+    stop (start time = 0); screen position = (0, 0)          (no draw)
+else:
+    angle = random() * 2 * pi                                 (one draw)
+    screen x = floor(cos(angle) * amount)
+    screen y = floor(sin(angle) * amount)
+```
+
+`lerpScale` clamps (read), which gives the `clamp`. The order of
+`cos` for x and `sin` for y was read in the instructions:
+`Math.Cos` and `Math.Sin` are one-jump functions to the two runtime
+helpers the decompiler calls `FUN_18012fb50` and `FUN_180130a00`, and
+`update` calls the first for x and the second for y. (`border-view.md`
+had inferred that `FUN_180130a00` is the sine; this confirms it.)
+
+So the screen jumps to a new whole-pixel offset every frame, smaller and
+smaller, and because of `floor` it leans up and left: with magnitude 2
+the offsets run from -2 to +1 in practice (+2 only for an angle of
+exactly 0). A screen whose update switch is off (part 1) does not move
+its shake either: the offset stays where it is.
+
+**Who shakes** (every caller in the whole decompile):
+
+| When | Duration, magnitude |
+|---|---|
+| An explosion in the border scene (`Border.spawnExplosion`, `border-scene.md`) | 1 s, 2 |
+| The booth's `poisoned` state, on entering | 0.5 s, 2 |
+| the same, 2 s after entering | 1 s, 2 |
+| the same, 4 s after entering | 6 s, 3 |
+
+**The `poisoned` state** is entered when a paper's `#poison-touch` link
+is clicked and the booth is not already in that state
+(`Booth.paper_onUnhandledLinkClicked`). In `Papers.xml` that link
+belongs to the `$Powder1` mark (line 442). The booth then also tells the
+engine (`setPaperPoisoned`, its argument not checked) and plays
+`poison-apply`. **6 s after entering, the state asks for a flash to the
+title of 3 s** (below). The four timed steps were read in the `Booth`
+constructor's instructions: the state is added under the name
+`poisoned`, then one function on entering and three at 2, 4 and 6 s,
+then the next state begins.
+
+Inferred from the flash's game state (it clears the screen's update
+switch, `save-format.md` part 2): from 6 s on the day screen is no
+longer updated, so the last shake freezes at whatever offset it had,
+under the flash. The reference script follows this (`screenfx.py
+poison`: 210 draws at 60 frames a second, if a shake started in a
+frame is applied in that frame; that order was not read).
+
+## The screen flash (`ScreenFlash`)
+
+One object for the whole game, made by `Game` at start-up with the
+platform's width and height (not a screen, not in the entity tree).
+`Game.draw` draws it **after the whole entity tree, at (0, 0)**, so it
+covers everything and is not moved by a shake.
+
+It holds two full-screen fills, both on layer 10 and hidden at first:
+
+| Fill | Colour | Its alpha is called |
+|---|---|---|
+| The fade cover | black, opaque colour (0, 0, 0, 1) | `fadeT` |
+| The flash | white (1, 1, 1, 1) | `flashT` |
+
+Setting `fadeT` or `flashT` sets that fill's alpha; 0 hides it, anything
+else shows it. The black cover is drawn first, the white over it.
+
+**The fade between screens** is the black cover. `Game`'s states
+(`save-format.md`, part 2) tween `fadeT`: read from the instructions,
+`on` takes it to 0, `off` to 1 (both over 0.125 s, or 0.005 s with
+`skipSlowStuff`), and `off-instant` to 1 at once.
+
+**A flash to the title** (`FLASH_TO_TITLE(d)`, from
+`GameTransition.flashToTitle(d)`): `Game` calls `startFlash(d, 2)` and
+goes to its state `flashing-to-title`. There, every frame, with `t` the
+time in that state:
+
+```
+after = clamp((t - d) / 2, 0, 1)
+if after > 0:  white alpha = 1 - after;  black alpha = 1
+else:          white alpha = min(1, t / d)
+when t >= d + 2: go to state off-instant, pending screen = title
+```
+
+So the screen turns white over `d` seconds, then the white fades over 2
+seconds to a black screen, and the title screen is built (and fades in
+from black by the `on` state). The state's exit to `off-instant` was
+read in the instructions (`save-format.md` had it as dropped by the
+decompiler). `clear` hides the white only; `Game.applyScreenChange`
+calls it.
+
+**Who flashes** (every caller of `flashToTitle`):
+
+| When | `d` | Title after |
+|---|---|---|
+| The booth's time bomb explodes (`Booth.timeBombExplode`, after the sound `booth-boom`) | 0.1 s | 2.1 s |
+| A grenade lands on the booth (`border-scene.md`; 2 s after it lands) | 0.1 s | 2.1 s |
+| The booth's `poisoned` state, 6 s after entering | 3 s | 5 s (11 s after the touch) |
+
+`get_isFading` (black cover shown and its alpha above 0.01) is read only
+by the test player. The class also has three fields named
+`shakeStartTime`, `shakeDuration` and `shakeMagnitude`: none of its own
+functions uses them, and a search of the whole decompile for the three
+names found only `ScreenFlash`'s and `ScreenShake`'s own code.
+
+## The news screen's magnifier (`NewsScreenMagnifier`): never on desktop
+
+`Layout.getFitScale(w, h, availableH)` returns 1 when `w` fits the
+screen width and `h` fits `availableH`, else 2/3. The news screen
+passes the newspaper's size and its button's y, and adds the magnifier
+only when the scale is below 0.999. **On desktop the newspaper (365 x
+220) fits** (570 wide, button at y 290), so the scale is 1, the
+newspaper sits at x = floor((570 - 365) / 2) = 102,
+y = floor(290 / 2 - 220 / 2) = 35, and there is no magnifier.
+
+Where it is used (layouts where the newspaper does not fit): while a
+pointer is held on the newspaper, a strip of the full-size newspaper
+(as wide as the newspaper or the screen, whichever is less, and 75 high)
+around the pointer is shown with its bottom edge 20 pixels above the
+pointer, centred on it left to right, kept inside the screen, with a black shadow of alpha
+128/255 offset 5 to the right and down; sounds `inspect-highlight` when
+it appears and `inspect-unhighlight` when it goes. **Leave it out of the
+port.**
+
+## For the port
+
+- The day screen: the booth and the border scene, pausable, **no
+  tutorial**.
+- One shaker per screen with its own generator (seed 105,906,277),
+  the formula above, whole pixels; the fade and flash are drawn over the
+  screen and do not shake. The four shakes and three flashes in the
+  tables. Exact shake offsets only matter for a frame-identical picture:
+  the shaker's generator feeds nothing else.
+- The fade cover and the flash to the title as above.
+- Leave out the wait screen, the magnifier and `Tutor`.
+
+## Not studied
+
+- `play.day.booth.Tutor` (phone only).
+- How the Unity host uses `wantPlatformKind`.
+- Whether the platform's width and height that size the flash are game
+  pixels or window pixels.
+- The order inside one frame of a state's timed functions and the
+  screen's update (when a shake started in a frame first moves the
+  screen); the reference script assumes the same frame.
+- What `setPaperPoisoned`'s argument means in the `#poison-touch` case.
+
+## Things to watch in the game
+
+(Watching needs the game to run, with the user's go-ahead.)
+
+1. **Day 1 on desktop: nothing from a tutorial.** (On phones a `Tutor`
+   runs on day 1; what it shows was not read.)
+2. **A border explosion** (an attack day): the whole screen jitters for
+   about a second, by a pixel or two, mostly up and left.
+3. **The time bomb exploding** (for example a wire cut out of order):
+   the booth sound, the
+   screen goes white almost at once, fades to black over 2 seconds,
+   then the title screen.
+4. **Touching the poison powder** on a paper: a short shake at once,
+   another at 2 s, a longer stronger one at 4 s; at 6 s the screen
+   whitens over 3 seconds (the shake freezes), fades to black over 2,
+   and the title appears about 11 seconds after the touch.
