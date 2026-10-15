@@ -252,9 +252,77 @@ script `scripts/reference/newsimage.py`:
   `NewsEzicStamp.png` (44 x 44); every article with either has a title.
 
 The reference script models the layout, which article goes where, the word
-marks and the **number** of draws. It does **not** lay out text, so it does
-not know whether a title falls back to the regular font or a subtitle is
-dropped, and it does not compute the stamp's position.
+marks and the **number** of draws. Since 2026-10-16 it also lays the texts
+out (`fit`, with `text.py`): which font a title ends up in, whether the
+subtitle is shown, where each text goes and the content height (below,
+"Which real headlines are cut"). It does not compute the stamp's position
+(the turned stamp's size is not known). (Until 2026-10-16 this paragraph
+said the script did not lay out text.)
+
+## Which real headlines are cut
+
+Worked out on 2026-10-16 with `scripts/checks/news_fit_check.py`, which
+uses `newsimage.fit` and so `text.py` and `fonts.py` (**not compared with
+the running game**). Before running it, the four numbers `make` uses
+here were read from the DLL with `read_doubles.py`: 0.5 (`0x180a36c30`,
+the centring), 2 (`0x180a36c40`, `kTextDrop`), 4 (`0x180a36c50`, the
+subtitle gap), 6 (`0x180a36c60`, the line step); and the alignment the
+code passes is the second value of `Align`, CENTER (`dump.cs`).
+
+**On the real days with no traveler news (days 1 to 31, 200 master
+seeds), two headlines lose their subtitle, on every seed, and none
+changes font:**
+
+| Day | Rectangle | Headline | Why |
+|---|---|---|---|
+| 2 | 1 (1 column, 14 lines) | "Grestin Checkpoint a Success!" loses "Entry Restrictions To Relax, Admit Foreigners" | the title takes 3 lines of `title_news` (60 px), the subtitle 4 lines of `regular`; together 98 px against 84 |
+| 13 | 1 (2 columns, 7 lines) | "Another Bomber Slips Through!" loses "Immigrant Screening Falls Short" | the title takes 2 lines (40 px); with the subtitle 51 px against 42 |
+
+Every other placed article (19,600 of 20,000 placements) is shown whole.
+No day's result depends on the seed: the fillers that change with the
+seed are subtitle-only articles, and they always fit.
+
+**With traveler news** (the paper of the day after the traveler; every
+combination of at most one id per traveler entry, the entries reached
+from the day's `TRAVELERS` and `FILL` cells directly or through
+`INCLUDE`, 200 seeds each), an extra article pushes the day's own ones
+into smaller rectangles:
+
+| Paper of day | Added news | What happens |
+|---|---|---|
+| 7 | either `PIMP_` id | "Another Attack At Grestin Checkpoint!" (2 x 7) loses its subtitle |
+| 10 | a `BUSTED_SPY_GAVE...` id and `GENERIC_BOMBER` | the spy headline (1 x 17) loses its subtitle |
+| 12 | `EZIC_ATTACK0` and `GENERIC_BOMBER` | "The History of Arstotzka" (1 x 11) loses its subtitle |
+| 15 | any of `EZIC_ATTACK1_GIFT`, `_NOGIFT`, `GENERIC_BOMBER` | "Breakthrough Spinal Surgery Perfected" is set in `regular` and loses its subtitle (1 x 17 or 1 x 9); with `_GIFT` and the bomber also "Gov't Headquarters In Paradizna Evacuated!" (1 x 17) loses its subtitle |
+| 16 | `GENERIC_BOMBER` | "Consolidation, Reassignment At Border" in `regular` without subtitle (1 x 17); "Ministries Fight Over Staff" (1 x 10) loses its subtitle |
+| 21 | `POISONING` and/or `GENERIC_BOMBER` | the added headline in 1 x 17 loses its subtitle; with both, "Mysterious Poison Hospitalizes Several!" goes to 1 x 9 and is set in `regular` without subtitle |
+| 25 | `GENERIC_BOMBER` | "Full-blown Epidemic Threatens United Fed!" (2 x 7) loses its subtitle |
+| 31 | `SERIAL_KILLER_MURDERED` | "Grestin Checkpoint Future Uncertain" (2 x 7) loses its subtitle |
+
+No real placement shows nothing (the fallback title is always short
+enough); "nothing shown" happens only in a 1 x 5 rectangle, where no
+titled article lands.
+
+Why each real fallback to `regular` happens: "Breakthrough Spinal
+Surgery Perfected" and "Consolidation, Reassignment At Border" because a
+word is cut with a hyphen ("Breakthrough" is 79 pixels wide in
+`title_news` against a limit of 78, "Consolidation," 82); "Mysterious
+Poison Hospitalizes Several!" in 1 x 9 because of the height (4 lines of
+`title_news`, 80 px, is 13.3 lines against 9; it has no cut word).
+
+**Results on a knife edge.** Two outcomes depend on one pixel and so on
+the exact edge rules of `Font.split`, which `fonts.md` lists as not fully
+certain: "Breakthrough" (79 against 78) is cut, and "Headquarters" (77
+against 78) is not. If the game measured either differently, day 15's
+surgery headline would keep `title_news`, or the Paradizna headline would
+fall back. Every other result has a margin of at least 3 pixels (the
+History of Arstotzka subtitle: 69 against 66).
+
+Over every rectangle size of the six layouts (part 1 of the check), all
+54 titled articles of `News.txt` are cut in at least one size (the 52
+with a subtitle lose it; the 2 without fall back to `regular` in the
+smallest sizes); the 10 subtitle-only articles always fit. The two
+tables above are the cases the real days reach.
 
 ## Notes for the port
 
@@ -265,14 +333,16 @@ dropped, and it does not compute the stamp's position.
 - Rounding the content height **up** to whole lines and the "one less than
   the pixel count" width and height of the layout rectangles must be copied
   or text will sit one line off.
-- The title's fallback to the regular font drops the subtitle.
+- The title's fallback to the regular font drops the subtitle. A port
+  that measures text even one pixel differently changes day 15's paper
+  ("Which real headlines are cut").
 
 ## Not studied
 
-- The fallback rules above, evaluated for real headlines. What they
-  waited on, how `app.vis.Text` measures, wraps, centres and hyphenates,
-  is read since 2026-10-16 (`text-drawing.md`, with `fonts.md`), so this
-  can now be done with `text.py`; it was not done.
+- (The fallback rules evaluated for real headlines were listed here;
+  done on 2026-10-16 with `text.py`, "Which real headlines are cut"
+  above. Not compared with the game: day 2's paper would show it, with
+  "Grestin Checkpoint a Success!" in the left column and no subtitle.)
 - `Face.getDocImage` and `makeFace` beyond their draws: what the face looks
   like at half scale with the two colours.
 - `Image.transformed` in full, and so the stamp's real angle.

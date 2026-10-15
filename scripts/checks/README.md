@@ -37,6 +37,8 @@ Run from the project root with `python -I`. Paths below assume
 | `booth_check.py` | `scripts\reference <assets> [master seeds]` (`<assets>` = `extracted\art\assets`; needs Pillow; about one minute per master seed, default 4; `0` runs only the short first part; progress lines go to the error stream) | `traveler-creation.md`, `fact-values.md`, `papers-on-desk.md` (the reference script `booth.py`, which chains all the layers) |
 | `news_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`) | `news-txt-format.md` (the reference script `news.py`) |
 | `newsimage_check.py` | `scripts\reference <assets>` (`<assets>` = `extracted\art\assets`; needs Pillow) | `newspaper-picture.md` (the reference script `newsimage.py`) |
+| `news_fit_check.py` | `scripts\reference <assets> [master seeds]` (default 200; needs Pillow; about 10 seconds) | `newspaper-picture.md`, "Which real headlines are cut" (`newsimage.fit`, with `text.py`: every article in every rectangle size, the real days, traveler news) |
+| `page_layout_check.py` | `scripts\reference <assets>` (needs Pillow) | `page-layout.md` (marker pixels of every page picture against the marks without `pos`; every page laid out with `pages.py`) |
 | `nights_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `nights-txt-format.md` (the reference script `nights.py`) |
 | `night_check.py` | `scripts\reference D` | `night.md` (the `Family` class in `nights.py`) |
 | `ends_check.py` | `scripts\reference <assets> dumps\il2cppdumper\stringliteral.json` (`<assets>` = `extracted\art\assets`) | `ends-xml-format.md` |

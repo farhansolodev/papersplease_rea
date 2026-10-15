@@ -1,7 +1,17 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-16, after
-part 1 of the drawing step: how a text is laid out and drawn
+part 2 of the drawing step: how a document page is laid out
+(`page-layout.md`; code reading, two Ghidra runs for the instructions, a
+reference script `pages.py` that lays a page out and draws a preview, a
+check of all 120 page pictures; not run in the game). Main finding: a
+mark without `pos` takes its place from a marker pixel in the page
+picture (black for side 0, red for side 1), and every such pixel is
+painted over, the tokens' black details included. Before it the same
+day: which real newspaper headlines lose their subtitle or fall back to
+the regular font, worked out with `text.py` (`newspaper-picture.md`,
+"Which real headlines are cut"; `newsimage.py` now lays the texts out).
+Before that, part 1 of the drawing step: how a text is laid out and drawn
 (`text-drawing.md`; code reading, three Ghidra runs for the instructions,
 a reference script `text.py` that lays a text out and draws a preview, a
 check of the fonts against the English texts; not run in the game). It
@@ -108,7 +118,14 @@ text is drawn (the line breaker's lines, one piece of the font sheet per
 letter, a filled box for a letter the font lacks; the size is the widest
 line and the number of lines times the line height, plus padding; a
 text's position is the top left corner of its box; on screen each letter
-becomes a quad, and a letter with no colour set is skipped). The desktop
+becomes a quad, and a letter with no colour set is skipped), and how a
+document page is laid out (marks without a position take it from marker
+pixels in the page picture, black or red by side, which are then painted
+over; texts sit one pixel above their base line, can flow down or right
+from the last one, links become rounded buttons, seals are drawn at half
+opacity), and which newspaper headlines are cut (on the plain days, two
+lose their subtitle; traveler news adds more, and one title falls back
+to the small font because "Breakthrough" is one pixel too wide). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -128,7 +145,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`). Not done: the document pages, the rest of drawing (blending, the Unity side) |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`). Not done: the fact pictures of a page (photos, fingerprints, seals), the rest of drawing (blending, the Unity side) |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -166,7 +183,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `emblems-and-bodies.md` | `Emblems.xml` (seals) and `Bodies.xml` (body types, contraband) |
 | **Around the day** | |
 | `news-txt-format.md` | `News.txt`, which headlines a day gets and in what order |
-| `newspaper-picture.md` | The newspaper picture: the six layout pictures, which article goes in which rectangle, what is drawn, its random draws; the news screen. Text fitting not modelled |
+| `newspaper-picture.md` | The newspaper picture: the six layout pictures, which article goes in which rectangle, what is drawn, its random draws; the news screen; which real headlines lose their subtitle or fall back to the regular font (worked out with `text.py`) |
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
 | `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder. **Part 2**: the 19 requests a part of the game can make (`GameTransition`), how a screen change is queued and built (`Game.queueScreenChange`, `applyScreenChange`), the game's own five states (fade, pause), and the stash: when it is written, deleted and read, what it holds, how it is restored |
@@ -177,6 +194,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `sounds-xml-format.md` | `Sounds.xml`: which recording plays, song names |
 | `fonts.md` | `Fonts.xml` and the `.fnt` files: measurements, text width, line breaking |
 | `text-drawing.md` | **Drawing, part 1**: `app.vis.Text`: its settings, how it is laid out (lines, alignment, padding, line spacing, the background and its cut corners, the box for a missing letter), its size, where its position puts it, how it is drawn on screen (quads, the 0.001 alpha test) and into a picture (`Image.paste` cuts positions toward zero), letters revealed one by one, which code sets padding, spacing or a background |
+| `page-layout.md` | **Drawing, part 2**: `PaperInnerVisuals`: who builds a page, the page picture and its marker pixels (black side 0, red side 1, painted over), the positions, which marks a link leaves out (`PaperNav` and the page mask), text marks (flow, the base line, boxes, link buttons, wrap, touch padding), picture marks, seal marks (half opacity), clipping; finding marks and pages |
 | `paths-xml-format.md` | `Paths.xml`: paths and animations of the figures in the top view |
 | `borderanim-xml-format.md` | `BorderAnim.xml`: the picture atlas and how an animation finds its frames |
 | `border-figures.md` | **The border scene, part 1**: which random generator it uses, how a figure follows a path frame by frame (what `hold`, `delay`, `snap`, `warp`, `face` and the event attributes do), the waiting line (building, moving up, the ring of reused figures, dispersing, panic) and its random draws |
@@ -283,14 +301,15 @@ the night screen's family pictures; part 11, the last screens.)
    second look, at a night with no one sick, would test a different
    line count; the other items of that list need a live screen.
 5. **Drawing**: part 1, how a text is laid out and drawn
-   (`app.vis.Text`), **done** on 2026-10-16, `text-drawing.md`. Suggested
-   part 2: how a document page is laid out (`PaperInnerVisuals`, read
-   only for its random draws so far; it is the main user of text padding
-   and rounded backgrounds). Then: `Image.paste` and `Image.draw` (blend
-   and tint), the search photo, the rest of `app.vis` and `play.ui`; input
-   handling. Small and now possible: run the newspaper's title and
-   subtitle fallback rules (`newspaper-picture.md`) on real headlines
-   with `text.py`.
+   (`app.vis.Text`), **done** on 2026-10-16, `text-drawing.md`. Part 2,
+   how a document page is laid out (`PaperInnerVisuals`), **done** on
+   2026-10-16, `page-layout.md`. The newspaper's fallback rules run on
+   real headlines: **done** on 2026-10-16 (`newspaper-picture.md`).
+   Suggested part 3: the fact pictures of a page (`BoothEnv.getImage`:
+   photos, fingerprints, contraband, seals; `Image.transformed`). Then:
+   `Image.paste` and `Image.draw` (blend and tint), the desk side
+   (`DeskItem.setInnerImage`, `addInnerVisual`), the search photo, the
+   rest of `app.vis` and `play.ui`; input handling.
 6. **Audio extraction** (probably `sharedassets0.resource`; not checked).
    Independent of the steps above; may need a Unity asset tool (ask before
    downloading). (The language zips in `StreamingAssets/loc/` were also

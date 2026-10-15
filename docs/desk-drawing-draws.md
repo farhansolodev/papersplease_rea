@@ -17,7 +17,9 @@ Functions read in full: `BoothEngine.addNewEnvPapers`,
 Read in part (the parts that touch the generator, and what leads to them):
 the `play.day.booth.Paper` constructor, the `play.day.PaperInnerVisuals`
 constructor, `BoothEnv.getImage`, `Page.getInnerImageAndMarkPositions`,
-`Face.getDocImage`. How they were found: all 1,433 functions of the booth
+`Face.getDocImage`. (The `PaperInnerVisuals` constructor and
+`getInnerImageAndMarkPositions` were read in full on 2026-10-16,
+`page-layout.md`; the draws listed below hold.) How they were found: all 1,433 functions of the booth
 classes were decompiled and searched for uses of a generator; every function
 in the game that takes a generator as a parameter was listed from the
 recovered names.

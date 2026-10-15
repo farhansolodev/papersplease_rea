@@ -189,9 +189,9 @@ method table; no other code writes the fields):
 
 | Setting | Set by |
 |---|---|
-| padding | `PaperInnerVisuals` (the document pages), `InspectUi` (booth), `GameScreen.addHeader` (x only, 8), `FramerateCounter` |
+| padding | `PaperInnerVisuals` (the document pages: x 1 for a text with `backcolor`, x and y 1 for a link button; `page-layout.md`), `InspectUi` (booth), `GameScreen.addHeader` (x only, 8), `FramerateCounter` |
 | line spacing | `Paper` and `Filer` (booth) |
-| background | `PaperInnerVisuals` (rounded too), `InspectUi`, `GameScreen.addHeader` (black), `FramerateCounter` |
+| background | `PaperInnerVisuals` (`backcolor`; rounded, in `textcolor`, for a link button), `InspectUi`, `GameScreen.addHeader` (black), `FramerateCounter` |
 | `wordWrap` (no effect) | `DayNewsImage.make`, `PaperInnerVisuals`, `Filer`, `FamilyVisuals`, `BudgetEnt.createMessageTexts`, `CreditList.addText`, `EndScreen`, `RevealTextEnt` |
 
 So every other text in the game (the menus, buttons, credits, the
@@ -266,8 +266,9 @@ draws the family names and the passport count with `text.py`.
   certainty"); this part only confirmed which width it returns.
 - Which texts use which font and settings, beyond the setter search above
   and the screens already written up.
-- The rest of the drawing step: `PaperInnerVisuals` (the document pages),
-  the search photo, the rest of `app.vis` and `play.ui`, input handling.
+- The rest of the drawing step: the search photo, the rest of `app.vis`
+  and `play.ui`, input handling. (`PaperInnerVisuals`, the document
+  pages, was listed here; read on 2026-10-16, `page-layout.md`.)
 
 ## Things to watch in the game
 

@@ -116,7 +116,10 @@ The kind is decided by the first of these attributes present:
 value starting with `$` is not literal. The rest of it is the id of a *fact*
 whose value is filled in for each traveler (166 of 197 text marks, 75 of 307
 image marks). An emblem mark's fact id is `Emblem/` plus its emblem id. If
-`proxy` is set, that fact id is used instead.
+`proxy` is set, that fact id is used instead (`getProxiedFactId`, for
+inspection; drawing a page uses the mark's own fact id and ignores
+`proxy`: `page-layout.md`, 2026-10-16. The nine `proxy` marks are
+transparent `BLANK:` pictures on the rulebook's document pages).
 
 | Attribute | Field | Inherited | Default with nothing to inherit |
 |---|---|---|---|
@@ -194,8 +197,10 @@ to be found and are not reported as errors.
 ## Not studied
 
 - `MogrifierPhone` and `MogrifierTablet` (platform-specific rewrites).
-- How marks are laid out and drawn (`Page.getInnerImageAndMarkPositions`),
-  including what `flow`, `side`, `link` and `pos2` do.
+- (How marks are laid out and drawn, including what `flow`, `side`,
+  `link` and `pos2` do, was listed here; read on 2026-10-16,
+  `page-layout.md`. In short: a mark without `pos` takes its place from
+  a marker pixel in the page picture, black for side 0, red for side 1.)
 - (Studied since: the fact system that supplies `$` values, and
   `Facts.xml`, in `facts-xml-format.md` and `fact-values.md`.) Note:
   `Facts.xml` is **not well-formed XML**; a strict parser stops at line 96,

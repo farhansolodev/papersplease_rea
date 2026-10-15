@@ -14,6 +14,23 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-16 Drawing, part 2: how a document page is laid out (`PaperInnerVisuals`)
+
+**Changed:** new `docs/page-layout.md`; new `scripts/reference/pages.py` (Papers.xml loader with inheritance, marker-pixel positions, the layout rules, a preview); new `scripts/checks/page_layout_check.py` (and its README row); `docs/PROGRESS.md` (state line, summary, stage 4, docs table, next step 5). Kept on this machine: `decompiled/drawing2_run1.txt`, `drawing2_run2.txt` (Ghidra output).
+**Why:** next part of the drawing step; the user asked for it without a plan.
+**Tested how:** code reading (all of `PaperInnerVisuals` and `PaperNav`, `Page.getInnerImageAndMarkPositions`, `Mark.getFactId`/`getImage`/`getRandomForcePos`, `BoothEnv.getLocalizedText`, `Paper.setPage`, `Res.getImage`); two read-only Ghidra runs (`DumpAssembly.java 0x180613260`; `0x18060b940 0x1809f45e0`); one constant (55); `touchTargetExpand` from `layout_ctor_asm.txt`; `page_layout_check.py` run; four previews looked at (passport, rulebook contents and documents pages, a token). The game was not run.
+**Result:** marks without `pos` take the next marker pixel of their side (opaque black side 0, opaque red side 1), scanned row by row; every marker pixel is painted with the pixel before it, on a copy of the picture. Matches on 109 of 120 pages exactly and on all 17 side-1 pages (blue on none); the other 11 are explained (seal last, flow-down list, tokens and three stray pixels). Text y = position y + 1 - ascent; flow down/right from the last drawn visual; link texts are rounded buttons (padding 1, colours swapped); `backcolor` box with paddingX 1; seals at half opacity; touch padding is 0 on desktop. `problems: none`.
+**Corrected in older docs:** `papers-xml-format.md` (the "not studied" layout item; `proxy` is not used for drawing), `text-drawing.md` (padding/background rows; the "not studied" item), `desk-drawing-draws.md` (the two functions now read in full). Docs searched for `PaperInnerVisuals`, `getInnerImageAndMarkPositions`, `flow`, `side`, `pos2`, "marker pixel".
+**Still broken / not tested:** nothing compared with the game (three items at the end of `page-layout.md`, among them whether tokens lose their black details). Not read: `BoothEnv.getImage`, `Image.transformed`, `EmblemLib.getEmblemImage`, the desk side, `compareProximity` in detail; desktop's layout shape is inferred to be LANDSCAPE. `open questions` list in `PROGRESS.md` not updated for this part.
+
+## 2026-10-16 Newspaper headlines run through the text layout
+
+**Changed:** `scripts/reference/newsimage.py` (new `fit()`: title font or regular, subtitle shown or not, text positions, content height; `Plan.fits`); new `scripts/checks/news_fit_check.py` (and its README row); `docs/newspaper-picture.md` (new section "Which real headlines are cut"; the script paragraph, notes for the port and the "not studied" item corrected).
+**Why:** small job left by drawing part 1; the user asked for it.
+**Tested how:** re-read `DayNewsImage.make`; four constants read from the DLL (0.5, 2, 4, 6) and the `Align` value (CENTER); `news_fit_check.py` with 200 master seeds; `newsimage_check.py` re-run (`problems: none`); margins measured for each real case.
+**Result:** plain days: day 2 ("Grestin Checkpoint a Success!", 1 x 14) and day 13 ("Another Bomber Slips Through!", 2 x 7) lose their subtitle on every seed; nothing changes font. With traveler news, more cuts (days 7, 10, 12, 15, 16, 21, 25, 31); "Breakthrough Spinal Surgery Perfected" falls back to `regular` because "Breakthrough" is 79 px against 78 (a one-pixel edge, as is "Headquarters" at 77).
+**Still broken / not tested:** not compared with the game; results depend on `Font.split`'s edge rules (`fonts.md`).
+
 ## 2026-10-16 Drawing, part 1: how a text is laid out and drawn (`app.vis.Text`)
 
 **Changed:** new `docs/text-drawing.md`; new `scripts/reference/text.py` (lays a text out tile by tile, gives its size, draws a preview); new `scripts/checks/text_drawing_check.py` (and its row in `scripts/checks/README.md`); `scripts/reference/fonts.py` (bug fix below); `scripts/reference/nightpics.py` (its render now draws the texts through `text.py`; comments updated); `docs/PROGRESS.md` (state line, summary, stage 4, docs table, next step 5, new open items, six old items, machine-only and scripts tables); older docs corrected (below). Kept on this machine: `decompiled/step5_run1.txt` to `step5_run3.txt` (Ghidra output).
