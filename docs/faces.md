@@ -220,9 +220,11 @@ equality with the game; nothing has been compared with the running game.
 - `Face.getDocImage` and `getPhotoHeadImage` (how the document photo and
   the search photos are cut and coloured), and where the head-only picture
   is used.
-- `Image.copy` with a rectangle goes through `Image.paste`, which was not
-  read; `faces.py` assumes a plain copy (the sheets have no partly
-  transparent pixels, so a blend would give the same result).
+- `Image.copy` with a rectangle goes through `Image.paste`, whose
+  blending was not read (its position handling was, on 2026-10-16:
+  positions are cut toward zero, `text-drawing.md`); `faces.py` assumes a
+  plain copy (the sheets have no partly transparent pixels, so a blend
+  would give the same result).
 - The PNG decoder (`format.png`); `faces.py` uses Pillow instead. The sheets
   are palette PNGs.
 - `Bodies.xml` and the body images in the same folder.

@@ -4,15 +4,16 @@ play.night.FamilyVisuals and FamilyVisualsDim (docs/night-pictures.md).
 Given the family and the night's facts, lists every picture the game places
 (which file, which piece of it, where) and every text, in the order the
 game adds them. Positions are the ones the code gives each picture's
-position field; how a picture or text is drawn from it (top left corner,
-or the text's base line) is in app.vis, partly not read.
+position field. A text's position is the top left corner of its box
+(app.vis.Text, docs/text-drawing.md); how a picture is drawn from its
+position is not read (taken as its top left corner).
 
     python -I scripts/reference/nightpics.py <assets dir> list   <night.json | demo>
     python -I scripts/reference/nightpics.py <assets dir> render <night.json | demo> <out.png>
 
-render draws the pictures only (needs Pillow) on a 570 x 320 grey screen,
-so their places can be compared with a screenshot; texts are outlined with
-a box of their measured width (fonts.py), not drawn.
+render draws the pictures and the texts (needs Pillow; texts through
+text.py) on a 570 x 320 grey screen, so their places can be compared with
+a screenshot.
 
 night.json holds:
     {"members": [{"name": "Wife", "emotions": ["COLD", "SICK"]}, ...],
@@ -145,7 +146,7 @@ def layout(night, token_order, font=None):
         name = "papers/PassportOuterArstotzka.png" if have_family == 1 else "papers/PassportOuterObristan.png"
         items.append(("pic", name, None, 0.5, PASSPORT_POS[0], PASSPORT_POS[1]))
         text = "x%d" % count
-        text_h = font.line_height if font else 0          # app.vis.Text.height not read: line height assumed
+        text_h = font.line_height if font else 0          # one line, no padding: Text.height is the line height
         items.append(("text", text, NAME_COLOR if have_family == 1 else OBRISTAN_COLOR,
                       PASSPORT_POS[0] + PASSPORT_W + 1, PASSPORT_POS[1] + PASSPORT_H - text_h))
     else:
@@ -182,9 +183,9 @@ def main():
                 _, text, colour, x, y = item
                 print("text    %-36r colour %08x                at %4d, %4d" % (text, colour, x, y))
     elif command == "render":
-        from PIL import Image, ImageDraw
+        from PIL import Image
+        import text as T
         screen = Image.new("RGBA", (SCREEN_W, SCREEN_H), (40, 40, 40, 255))
-        draw = ImageDraw.Draw(screen)
         for item in items:
             if item[0] == "pic":
                 _, name, piece, scale, x, y = item
@@ -197,9 +198,9 @@ def main():
                                              Image.NEAREST)
                 screen.alpha_composite(picture, (x, y))
             else:
-                _, text, colour, x, y = item
-                w = font.text_width(text)
-                draw.rectangle((x, y, x + w - 1, y + font.cap_height - 1), outline=(0x55, 0x68, 0x55, 255))
+                _, string, colour, x, y = item
+                label = T.Text(font, string, multi_line=True, align="CENTER", color=colour)
+                screen.alpha_composite(T.render(label, assets_dir, margin=0, backdrop=False), (x, y))
         screen.save(sys.argv[4])
         print("wrote", sys.argv[4])
     else:

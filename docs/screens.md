@@ -77,9 +77,9 @@ reused one variable for two things), the desktop rectangle, and the
 sleep button's height on screen. The rest of its pixel arithmetic was read
 from the decompiler only.
 
-**Not read:** `play.ui.DiagramLine`,
-`app.vis.Text`. (`GameScreen.shake` was on this list; read since, in
-part 11.) (`play.ui.Button` was on this list;
+**Not read:** `play.ui.DiagramLine`. (`app.vis.Text` was on this list;
+read on 2026-10-16, `text-drawing.md`.) (`GameScreen.shake` was on this
+list; read since, in part 11.) (`play.ui.Button` was on this list;
 read since, on 2026-10-16, `buttons.md`.) (`GameScreen.addHeader` and
 `addMediaButtons` were on this list; they are read since, in part 4.)
 (The `FamilyVisuals` constructor and `FamilyVisualsDim` were on this
@@ -541,7 +541,8 @@ circles, a booklet picture marked "x5", and four dotted rectangles.
   the apartment, the tokens and the passports, were listed here; studied
   since, on 2026-10-16, as part 10: `night-pictures.md`.)
 - The exact placement of everything (see "Layout").
-- `play.ui.DiagramLine` (the rule), `app.vis.Text`. (`play.ui.Button`'s
+- `play.ui.DiagramLine` (the rule). (`app.vis.Text` was listed here;
+  read on 2026-10-16, `text-drawing.md`.) (`play.ui.Button`'s
   modes were listed here; read since, on 2026-10-16, `buttons.md`.) (The tween helper behind `flashCheck` was
   listed here at first; it is read since, "Timed changes" above. Its
   core, `Tween.step`, had in fact been read in an earlier session for
@@ -1801,7 +1802,7 @@ time of the game's clock (`update`), so a pause stops it.
 | Picture top | y = 32 | Room = footer y - 40 - (320 - footer y) = 290 - 40 - 30 = 220. The block of picture (160), gap (35, that is 35/320 of the height) and one caption line (20) is centred in it: floor(220/2 + 30 - (160 + 35 + 20)/2) = 32. The 20 is `title_tall`'s line height from `fonts.md`'s reference script, not from the game |
 | Picture left | x = 165 | Centred: floor(285 - 240/2) |
 | Caption centre line | y = 227 | 32 + 160 + 35 |
-| Caption | 380 wide; its top at floor(227 - height/2) | `introTextWidth`, 380 on desktop (`0x18049d310`, the third of its three writes, in the same block as the desktop write of `menuItemPaddingY`). Its left edge is floor(285 - width/2); what `width` answers for a fixed-width text is in `app.vis.Text`, not read |
+| Caption | 380 wide; its top at floor(227 - height/2) | `introTextWidth`, 380 on desktop (`0x18049d310`, the third of its three writes, in the same block as the desktop write of `menuItemPaddingY`). Its left edge is floor(285 - width/2), where `width` is the widest of its wrapped lines, not 380 (`app.vis.Text`, read on 2026-10-16, `text-drawing.md`; this said it was not read). No code sets its alignment (searched by name), so its lines start at that edge. Its height is lines x 20 |
 | NEXT | top at y = 290, centred left to right | y = `standardFooterButtonY` itself. A `Menu` would centre its button on 290 instead; this one is placed by hand, so it sits about 10 pixels lower than the ending screen's button (the button is 19 rows high, part 1) |
 
 ## The intro screen (`IntroScreen`)
@@ -1928,8 +1929,9 @@ starts a fade, and a fade stops the screen's input (part 1).
 
 - What `Sprite.width` answers for an empty holder, so whether the first
   page wipes or appears at once.
-- `app.vis.Text`'s width for a fixed-width text, so the caption's exact
-  left edge.
+- (`app.vis.Text`'s width for a fixed-width text was listed here; read
+  on 2026-10-16, `text-drawing.md`: the widest wrapped line. The caption's
+  left edge therefore depends on its text.)
 - In which positions a clip rectangle is applied (`app.vis`), taken to be
   screen positions.
 - `RevealTextEnt.revealCount`.
@@ -2042,9 +2044,11 @@ It does not call `enablePause`, so Escape never pauses here; it presses
 DONE. (Part 4 said this rested on a search only; the constructor is now
 read.)
 
-**Desktop numbers, partly estimated.** B depends on the height of the
-title text, and `app.vis.Text` is not read. If the title is 20 high
-(`title_tall`'s line height in the reference script), then: the header
+**Desktop numbers.** B depends on the height of the title text. The
+title is one line of `title_tall` with padding only left and right, so
+its height is the font's line height, 20 in the reference script
+(`app.vis.Text`, read on 2026-10-16, `text-drawing.md`; this paragraph
+said it was not read and the 20 was an assumption). So: the header
 picture is at y 13 and 54 high, so its bottom edge is 67; the title's
 middle is on that edge, so B = 77; the area runs from y 79 to 320;
 `kStopY` = 159; the offscreen value is 161.
@@ -2107,8 +2111,10 @@ followed.
 
 The list's height was estimated at 2,272 pixels with every language, by
 a one-off script using the fonts reference (`fonts.py`) and the picture
-sizes, **assuming a text block is its number of lines times its font's
-line height** (`app.vis.Text` is not read). One loop moves the list by
+sizes, taking a text block as its number of lines times its font's line
+height. That is the game's rule for these texts, which set no padding or
+line spacing (`app.vis.Text`, read on 2026-10-16, `text-drawing.md`; this
+said it was an assumption). The total was not recomputed. One loop moves the list by
 its height + 320 pixels, about 2,590 pixels: about 5,180 frames, so
 about 86 seconds at 60 frames a second, plus the 4-second hold. Held
 fast throughout: about 22 seconds.
@@ -2138,8 +2144,10 @@ fast throughout: about 22 seconds.
 
 ## Not studied
 
-- `app.vis.Text`'s height, so B, `kStopY` and the list's height are
-  estimates.
+- (`app.vis.Text`'s height was listed here, which made B, `kStopY` and
+  the list's height estimates; read on 2026-10-16, `text-drawing.md`. B
+  and `kStopY` now follow; the list's height of about 2,272 was not
+  recomputed.)
 - (What the LEFT alignment changes inside `GameScreen.makePushButton`,
   and the DONE button's size, were listed here. Answered on 2026-10-16,
   `buttons.md`: LEFT puts the text 2 pixels from the button's left edge
@@ -2520,8 +2528,10 @@ the four file values are exact.
 ## Not studied
 
 - The constructor's portrait branches (tablet, phone).
-- `app.vis.Text`'s height, so the code box's digit line and the style
-  buttons' description lines are given as formulas, not pixels.
+- The code box's digit line and the style buttons' description lines are
+  given as formulas, not pixels. (`app.vis.Text`'s height, which they
+  waited on, is read since 2026-10-16, `text-drawing.md`: lines x line
+  height for these texts; the pixels were not worked out.)
 - (What the LEFT alignment changes in BACK's push button was listed here,
   as in part 6. Answered on 2026-10-16, `buttons.md`: the text sits 2
   pixels from the button's left edge instead of being centred.)

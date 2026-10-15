@@ -150,8 +150,9 @@ to pressed or back. It does not run every frame.
      width x 0.5)` if CENTER; `picture width - text width - 2` if RIGHT
      (not rounded down);
    - the text's top: `floor(picture height x 0.5 - text height x 0.5)`.
-     The text's height comes from `app.vis.Text`, not read, so exact
-     positions wait on it.
+     A button's text is one line with no padding, so its height is the
+     font's line height and its width the text's width (`app.vis.Text`,
+     read on 2026-10-16, `text-drawing.md`; this said it was not read).
 
    If the text is empty, the colour and position are left as they were;
    nothing is drawn for an empty text anyway.
@@ -408,9 +409,14 @@ a ring.
 
 ## Not studied
 
-- `app.vis.Text`'s width and height, so the exact text positions.
-- What a scaled picture answers for its width (`Sprite.width`), and
-  whether `Image.paste` rounds half-pixel positions.
+- (`app.vis.Text`'s width and height were listed here; read on
+  2026-10-16, `text-drawing.md`: one line's height is the font's line
+  height, its width the text's width.)
+- What a scaled picture answers for its width (`Sprite.width`). (Whether
+  `Image.paste` rounds half-pixel positions was listed here: it cuts them
+  toward zero, `text-drawing.md`. A button on screen is drawn as quads,
+  which the game code does not round; what the Unity side does with them
+  was not read.)
 - The shape of the `BOUNCEBACK` curve (`app.Interp.get`, case 6).
 - When the stamp bar drops its button and what the click does
   (`StampBar`, `DropRemote`); the criminal-poster pin's behaviour beyond

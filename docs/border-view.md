@@ -393,6 +393,8 @@ small models of what was read. It is not a comparison with the running game.
   called, not from its code. (The sine in the bounce was listed here too;
   confirmed on 2026-10-16, `screens.md` part 11.)
 - `StringUtil.formatTime`'s arithmetic (see above).
-- `app.vis.Text` (measuring and drawing text) is not read; the scoreboard's
-  text positions depend on its `width` and on the font's ascent.
+- The scoreboard's exact text positions were not worked out. They
+  depend on the texts' `width` and the font's ascent; `app.vis.Text`, which
+  this said was not read, is read since 2026-10-16 (`text-drawing.md`):
+  these texts set no padding, so `width` is the text's width.
 - Who creates `Endless` and when its clock starts.

@@ -9,7 +9,8 @@ Functions read in full: `data.FontLib` (constructor, `get`, `getAll`), the
 `data.FontDef` constructor, and `app.vis.Font` (constructor, `getTextWidth`,
 `get_descent`, `escape`, the static values). `Font.split` (line breaking)
 was read in full, but the decompiler scrambled its order of steps; see the
-note there. Drawing text (`app.vis.Text`) is not studied.
+note there. Drawing text (`app.vis.Text`) was studied on 2026-10-16:
+`text-drawing.md`.
 
 ## Fonts.xml
 
@@ -82,7 +83,12 @@ Characters the font does not have count as nothing.
   - Each finished line has its trailing spaces removed.
 - Without `multiLine`, only the first line is kept.
 - The result: the lines with their widths, whether anything was hyphenated,
-  the widest line, and the number of non-space characters.
+  the widest line, and the number of non-space characters. **The widest
+  line is measured before a one-line text drops its other lines**, so it
+  can be wider than the line kept (checked in the instructions on
+  2026-10-16, `text-drawing.md`). Corrected on 2026-10-16: this said only
+  "the widest line", and `fonts.py` measured the kept lines; it is fixed.
+  The non-space count is taken after the drop.
 
 **Note on certainty:** the decompiler output for `split` jumps in and out of
 its loops, so the order "add word / cut word / finish line" above is my
@@ -131,8 +137,9 @@ Measurements, from the reference script (**not from the running game**):
 
 ## Not known
 
-- How `app.vis.Text` places lines and letters (alignment, padding, the
-  background box), and which code asks for which font id.
+- Which code asks for which font id. (How `app.vis.Text` places lines and
+  letters, with alignment, padding and the background box, was listed
+  here; read on 2026-10-16, `text-drawing.md`.)
 - Other languages: the language packs in `StreamingAssets/loc/` may bring
   their own fonts; not looked at, and not needed (the port is English
   only, the user's decision of 2026-10-16). The English pack has no font

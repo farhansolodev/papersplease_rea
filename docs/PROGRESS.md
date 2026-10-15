@@ -1,7 +1,12 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-16, after
-part 11 of the screens: the day screen, the wait screen, the screen
+part 1 of the drawing step: how a text is laid out and drawn
+(`text-drawing.md`; code reading, three Ghidra runs for the instructions,
+a reference script `text.py` that lays a text out and draws a preview, a
+check of the fonts against the English texts; not run in the game). It
+also corrected `fonts.py` (the width of a one-line text). Before it the
+same day, part 11 of the screens: the day screen, the wait screen, the screen
 shake, the screen flash and the news magnifier (`screens.md` part 11;
 code reading, one Ghidra run for what the decompiler dropped, a
 reference script `screenfx.py`; not run in the game). It closes the
@@ -98,7 +103,12 @@ last screens (the day screen holds the booth and the border scene and,
 on desktop, no tutorial; every screen has its own shaker, which moves the
 whole screen by whole pixels with its own fixed-seed generator; a "flash
 to the title" turns the screen white, then black, then shows the title,
-after a time bomb, a grenade on the booth or touching poison). The desktop
+after a time bomb, a grenade on the booth or touching poison), and how a
+text is drawn (the line breaker's lines, one piece of the font sheet per
+letter, a filled box for a letter the font lacks; the size is the widest
+line and the number of lines times the line height, plus padding; a
+text's position is the top left corner of its box; on screen each letter
+becomes a quad, and a letter with no colour set is skipped). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -118,7 +128,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Not done: drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`). Not done: the document pages, the rest of drawing (blending, the Unity side) |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -166,6 +176,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
 | `sounds-xml-format.md` | `Sounds.xml`: which recording plays, song names |
 | `fonts.md` | `Fonts.xml` and the `.fnt` files: measurements, text width, line breaking |
+| `text-drawing.md` | **Drawing, part 1**: `app.vis.Text`: its settings, how it is laid out (lines, alignment, padding, line spacing, the background and its cut corners, the box for a missing letter), its size, where its position puts it, how it is drawn on screen (quads, the 0.001 alpha test) and into a picture (`Image.paste` cuts positions toward zero), letters revealed one by one, which code sets padding, spacing or a background |
 | `paths-xml-format.md` | `Paths.xml`: paths and animations of the figures in the top view |
 | `borderanim-xml-format.md` | `BorderAnim.xml`: the picture atlas and how an animation finds its frames |
 | `border-figures.md` | **The border scene, part 1**: which random generator it uses, how a figure follows a path frame by frame (what `hold`, `delay`, `snap`, `warp`, `face` and the event attributes do), the waiting line (building, moving up, the ring of reused figures, dispersing, panic) and its random draws |
@@ -271,10 +282,15 @@ the night screen's family pictures; part 11, the last screens.)
    order of the budget lines for one night (`screens.md`, part 1). A
    second look, at a night with no one sick, would test a different
    line count; the other items of that list need a live screen.
-5. **Drawing, next**: how text is placed (`app.vis.Text`; the newspaper's title
-   and subtitle rules in `newspaper-picture.md` wait on this), how a document page is
-   laid out (`PaperInnerVisuals`, read only for its random draws), the
-   search photo, the rest of `app.vis` and `play.ui`; input handling.
+5. **Drawing**: part 1, how a text is laid out and drawn
+   (`app.vis.Text`), **done** on 2026-10-16, `text-drawing.md`. Suggested
+   part 2: how a document page is laid out (`PaperInnerVisuals`, read
+   only for its random draws so far; it is the main user of text padding
+   and rounded backgrounds). Then: `Image.paste` and `Image.draw` (blend
+   and tint), the search photo, the rest of `app.vis` and `play.ui`; input
+   handling. Small and now possible: run the newspaper's title and
+   subtitle fallback rules (`newspaper-picture.md`) on real headlines
+   with `text.py`.
 6. **Audio extraction** (probably `sharedassets0.resource`; not checked).
    Independent of the steps above; may need a Unity asset tool (ask before
    downloading). (The language zips in `StreamingAssets/loc/` were also
@@ -318,6 +334,25 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
+**From 2026-10-16** (`text-drawing.md`, drawing part 1)
+
+- **Nothing of it has been watched in the game.** Three items at the end
+  of `text-drawing.md`: the settings header box (64 x 20), the intro
+  caption's left-aligned lines, a typing caption that does not move.
+- Not read: what the Unity side does with the quads (so where a
+  fractional position lands on screen, and how the colour is applied
+  there); `Image.paste`'s blend and tint arithmetic and `Image.draw`.
+  The preview in `text.py` assumes the tint multiplies; with the font
+  sheets (white, alpha 0 or 255) any multiplying tint gives the same
+  pixels.
+- Read but surprising, so worth a look in the game: a missing letter's
+  box starts one pixel before the next pen position (checked in the
+  instructions); a rounded background leaves one pixel more on the left
+  than on the right; a one-line text is as wide as the widest line of its
+  whole string.
+- `willDraw` has no caller in the game code (only the by-name helpers);
+  found by searching the whole decompile for its name and its slot.
+
 **From 2026-10-16** (`screens.md`, part 11)
 
 - **Nothing of part 11 has been watched in the game.** The four items at
@@ -342,11 +377,13 @@ Collected from the docs, so they are not lost:
 - **Predicted from the code, not seen:** a member with four badges (the
   son with a mood plus hungry, cold and sick) would have a row running 7
   pixels past the right edge of the screen.
-- Not read: where `app.vis.Text` puts a text from its position (the
-  member names and the passport count), and whether a fixed width of 0
-  turns wrapping off; how a sprite is drawn from its position (the
-  preview in `nightpics.py` takes it as the top-left corner); how
-  `Image.transformed` halves the passport covers.
+- Not read: how a sprite is drawn from its position (the preview in
+  `nightpics.py` takes it as the top-left corner); how
+  `Image.transformed` halves the passport covers. (Where `app.vis.Text`
+  puts the member names and the passport count, and whether a fixed
+  width of 0 turns wrapping off, were listed here; read on 2026-10-16,
+  `text-drawing.md`: the position is the box's top left, and 0 means no
+  wrapping.)
 
 **From 2026-10-16** (`buttons.md`, part 9)
 
@@ -365,11 +402,12 @@ Collected from the docs, so they are not lost:
 - **Inferred from a missing write:** the border's booth button has no
   extra click margin on desktop (the only write of the margin, 6, is in
   another platform's block).
-- Not read: `app.vis.Text`'s size (so exact text positions on buttons),
-  the `BOUNCEBACK` curve of the stamp bar's sliding button, when the
-  stamp bar drops it and what its click does, whether `Image.paste`
-  rounds half pixels, `PlatformChangeButton.png`'s cut, the root save
-  button's two pictures.
+- Not read: the `BOUNCEBACK` curve of the stamp bar's sliding button,
+  when the stamp bar drops it and what its click does,
+  `PlatformChangeButton.png`'s cut, the root save button's two pictures.
+  (`app.vis.Text`'s size and whether `Image.paste` rounds half pixels
+  were listed here; read on 2026-10-16, `text-drawing.md`: a button text
+  is one line high, and paste cuts toward zero.)
 - Found unused: the enum `ButtonReactResult`; no caller by name of
   `Button.cycleMode` or `get_hasBackButtonId`.
 
@@ -416,9 +454,11 @@ Collected from the docs, so they are not lost:
 - Suggested, still the user's to confirm: leave out the endless screen's
   hidden "clear achievements" box and the `presskit_prep` helper.
 - Whether the title's buttons can be clicked through the code box (it
-  has no input handling of its own); `app.vis.Text`'s height, so some
-  positions are formulas only; `StringUtil.formatTime` (the time in the
-  result box); `DiagramLine`'s drawing.
+  has no input handling of its own); some positions are formulas only
+  (`app.vis.Text`'s height, which they waited on, is read since
+  2026-10-16, `text-drawing.md`; the pixels were not worked out);
+  `StringUtil.formatTime` (the time in the result box); `DiagramLine`'s
+  drawing.
 - (Whether the GOG build's platform reports leaderboards: **no**, seen on
   2026-10-16: the endless screen had no leaderboards button at all.)
 - A Perfection run with one traveler and one citation scored 0 (seen in
@@ -440,9 +480,12 @@ Collected from the docs, so they are not lost:
 - The credits screen has the same `web` and `twitter` buttons as the
   settings screen, which the user decided to leave out there; suggested:
   leave them out here too (to confirm).
-- Estimated, not read: the header's bottom (77 if the title is 20 high),
-  so the scroll area's top (79) and the stop position (159), and the
-  list's height (about 2,272), all waiting on `app.vis.Text`.
+- The header's bottom (77), the scroll area's top (79) and the stop
+  position (159) now follow from the code (`app.vis.Text`, read on
+  2026-10-16, `text-drawing.md`: the title is 20 high), with `title_tall`'s
+  line height from the reference script. The list's height (about 2,272)
+  rests on the same rule but was not recomputed. (This item said all four
+  were estimates waiting on `app.vis.Text`.)
 - Not followed: whether pressing DONE stops the fast scroll; which
   platform the frame settings in `HostUnity.CreateGame` are for. (What
   the LEFT alignment changes in `makePushButton` was listed here;
@@ -459,8 +502,10 @@ Collected from the docs, so they are not lost:
 - **Predicted from the code, not seen:** a second click on NEXT's spot
   within 4 seconds of an ending's last page restarts the fade to black
   and adds a second STATS header. Item 9 of the watch list.
-- The caption's exact left edge waits on `app.vis.Text` (step 5); the
-  picture's top (y 32) uses `title_tall`'s line height from the
+- The caption's left edge is floor(285 - width / 2) with `width` the
+  widest of its wrapped lines, so it depends on the text (`app.vis.Text`,
+  read on 2026-10-16, `text-drawing.md`; this item said it waited on
+  it). The picture's top (y 32) uses `title_tall`'s line height from the
   reference script, not from the game.
 
 **From the tenth session** (`screens.md`, part 4)
@@ -733,7 +778,8 @@ Collected from the docs, so they are not lost:
   part 2.)
 - The newspaper (`newspaper-picture.md`): nothing in it has been compared
   with the running game; which headlines fall back to the regular font or
-  lose their subtitle is not known until `app.vis.Text` is read; the
+  lose their subtitle has not been worked out (`app.vis.Text`, which it
+  waited on, is read since 2026-10-16, `text-drawing.md`); the
   stamp's angle (the number appears to be used as radians); whether a stamp
   needs a title. (Whether anything else uses the news generator was
   answered on 2026-10-16: nothing does, `newspaper-picture.md`.) (The news
@@ -884,6 +930,7 @@ All gitignored. Nothing below is in git.
 | `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `decompiled/titlescreen_update_asm.txt`, `loadscreen_strings.txt` | small | For `screens.md`, parts 2 and 3: the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
 | `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
+| `decompiled/step5_run1.txt` to `step5_run3.txt` | under 1 MB | For `text-drawing.md`: the instructions of `Text.buildTiles` and `Visual.renderToImage`, of `Image.paste`, and of `Font.split` | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x18066ef30 0x1807d4480`, then `0x1809f5f80`, then `0x18087f080`, output redirected to the file |
 | `decompiled/part11_run1.txt` | under 1 MB | For `screens.md`, part 11: the instructions of `System.Math.Cos` and `Sin` (which helper is which), `ScreenShake.update`, `Game.createStater` (the fade targets) and the function that ends the flash to the title | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1803c21e0 0x1803c2430 0x1808635e0 0x18058a9e0 0x18058a580`, output redirected to the file |
 | `decompiled/part10_run1.txt` | under 1 MB | For `night-pictures.md`: the instructions of the `FamilyVisuals` constructor (the name field, the alignment, the passport halving, the count's gap, the empty-token test) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x18074cdc0`, output redirected to the file |
 | `decompiled/part9_run1.txt` | under 1 MB | For `buttons.md`: the instructions of the `Border` constructor (the booth button's click margins) and of the `HoverButton` constructor (the arrow's position) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x180437070 0x1809eb520` |
@@ -906,5 +953,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11) |
-| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, and `night_pictures_check.py` against the night screen's family pictures; see its `README.md` for each script's arguments |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`) |
+| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, and `text_drawing_check.py` (fonts against the English texts, the font sheets' colours); see its `README.md` for each script's arguments |

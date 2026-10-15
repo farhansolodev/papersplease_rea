@@ -33,9 +33,9 @@ width is the whole part of the step's x; the passport cover is made with
 passport count is 1.0; and the empty-token test asks the map for place
 number 0 to 6 in turn. Number constants were read with `read_doubles.py`.
 
-Not read: `app.vis.Text` (so where a text's position puts its letters),
-`app.vis.Sprite` and `app.vis.Fill` beyond their constructors' arguments,
-`Image.transformed`'s scaling method.
+Not read: `app.vis.Sprite` and `app.vis.Fill` beyond their constructors'
+arguments, `Image.transformed`'s scaling method. (`app.vis.Text` was on
+this list; read on 2026-10-16, `text-drawing.md`.)
 
 ## In short
 
@@ -93,9 +93,12 @@ number i (from 0):
   on desktop is 0), saying the member's `statusName`: the texts
   `family_<member>_status` ("Wife", "Son", "Mother-in-law", "Uncle",
   "Niece"). x = floor(centre - text width / 2); y = floor(centre y + 15)
-  - the font's ascent + its capital height. What y means to
-  `app.vis.Text`, and whether a fixed width of 0 means "no wrapping" as it
-  does in the line breaker (`fonts.md`), was not read.
+  - the font's ascent + its capital height. That is `Text.set_capY`:
+  the top of the name's capitals is at floor(centre y + 15), and y is the
+  top of the text's box (`text-drawing.md`, read on 2026-10-16; this said
+  it was not read). A fixed width of 0 does mean "no wrapping" (the text
+  hands it to the line breaker as its limit), and the word-wrap switch has
+  no effect, so a name is one line unless it holds a line break.
 
 ### 3. The tokens
 
@@ -136,7 +139,9 @@ Placed at **(76, 158)**, 30 x 40.
   Arstotzkan passports and **red `0x8a0c0c`** with the Obristan ones
   (`kObristantFamilyStatusColor`). x = 76 + the cover's width + 1;
   y = 158 + the cover's height - the text's height (the text's bottom on
-  the cover's bottom; `Text.height` not read).
+  the cover's bottom). The text's height is the line height, 9 for
+  `regular` (one line, no padding: `text-drawing.md`; this said
+  `Text.height` was not read).
 
 ### 5. The upgrades
 
@@ -199,8 +204,8 @@ not been seen.
 - Use the desktop positions above. The portrait branches and the divider
   are not needed.
 - The reference `scripts/reference/nightpics.py` lists every item with
-  its picture piece and position, and can render the pictures (not the
-  texts) for a given night:
+  its picture piece and position, and can render the pictures and (since
+  2026-10-16, through `text.py`) the texts for a given night:
 
       python -I scripts\reference\nightpics.py extracted\art\assets list demo
       python -I scripts\reference\nightpics.py extracted\art\assets render demo out.png
@@ -213,8 +218,10 @@ not been seen.
 
 ## Not studied
 
-- `app.vis.Text`: where the names and the passport count really sit, and
-  whether a fixed width of 0 turns wrapping off.
+- (`app.vis.Text`, where the names and the passport count really sit and
+  whether a fixed width of 0 turns wrapping off, was listed here; read on
+  2026-10-16, `text-drawing.md`. `nightpics.py render` now draws the
+  texts.)
 - How a sprite is drawn from its position (taken as its top-left corner in
   the preview), and how `Image.transformed` halves the passport covers
   (which pixels it keeps).

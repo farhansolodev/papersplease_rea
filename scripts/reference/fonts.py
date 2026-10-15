@@ -117,9 +117,10 @@ class Font:
                     current, width = "", 0
             if current.rstrip():
                 flush(current)
-        if not multi_line and len(lines) > 1:
-            lines = lines[:1]
-        return (lines, hyphenated, max([w for _, w in lines], default=0),
+        widest = max([w for _, w in lines], default=0)   # taken before a one-line text drops its
+        if not multi_line and len(lines) > 1:            # other lines (checked in the instructions,
+            lines = lines[:1]                            # docs/text-drawing.md)
+        return (lines, hyphenated, widest,
                 sum(1 for line, _ in lines for c in line if c != " "))
 
 

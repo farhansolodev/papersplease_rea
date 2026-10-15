@@ -269,9 +269,10 @@ dropped, and it does not compute the stamp's position.
 
 ## Not studied
 
-- How `app.vis.Text` measures, wraps, centres and hyphenates (step 6 of
-  `PROGRESS.md`); the fonts' numbers are in `fonts.md`. Until then the
-  fallback rules above cannot be evaluated for real headlines.
+- The fallback rules above, evaluated for real headlines. What they
+  waited on, how `app.vis.Text` measures, wraps, centres and hyphenates,
+  is read since 2026-10-16 (`text-drawing.md`, with `fonts.md`), so this
+  can now be done with `text.py`; it was not done.
 - `Face.getDocImage` and `makeFace` beyond their draws: what the face looks
   like at half scale with the two colours.
 - `Image.transformed` in full, and so the stamp's real angle.
