@@ -22,6 +22,9 @@ rules behind a screen are in that topic's own doc (for the night:
 - **Part 7** (2026-10-16): the endless code box (`UnlockConfirm`), the
   endless screen (`EndlessScreen`), the box shown after an endless run,
   and the local best score per course and style.
+- Part 8 (the language pack) is `language-pack.md`, part 9 (buttons)
+  `buttons.md`, and **part 10** (2026-10-16), the night screen's family
+  pictures, `night-pictures.md`.
 - Left out by the user's decision (2026-10-16), so not studied: the
   language chooser (`LangChooser`) and the age-rating screen and box
   (`RatingScreen`, `RatingPopup`, shown only for Korean). The port is
@@ -70,12 +73,12 @@ reused one variable for two things), the desktop rectangle, and the
 sleep button's height on screen. The rest of its pixel arithmetic was read
 from the decompiler only.
 
-**Not read:** the `FamilyVisuals` constructor (1,930 lines: the family
-portraits, the apartment, the tokens, the passports) and
-`FamilyVisualsDim`; `play.ui.DiagramLine`,
+**Not read:** `play.ui.DiagramLine`,
 `app.vis.Text`; `GameScreen.shake`. (`play.ui.Button` was on this list;
 read since, on 2026-10-16, `buttons.md`.) (`GameScreen.addHeader` and
 `addMediaButtons` were on this list; they are read since, in part 4.)
+(The `FamilyVisuals` constructor and `FamilyVisualsDim` were on this
+list; read since, on 2026-10-16, `night-pictures.md`.)
 
 Numbers the decompiler showed only as addresses were read with
 `read_doubles.py`.
@@ -156,7 +159,8 @@ It does very little itself:
    screen is built, before anything is shown.
 2. The header picture `NightReport.png`, centred at the top.
 3. The rectangle the budget may use, chosen by the layout's shape.
-4. The family pictures (`Family.makeVisuals`, not read).
+4. The family pictures (`Family.makeVisuals`; read since, on 2026-10-16:
+   `night-pictures.md`).
 5. The sleep button: a standard button with the text `budget_sleep`
    ("SLEEP") and the id `sleep`.
 6. The texts `night_endof` ("END OF") and `night_day` ("DAY" and the day
@@ -189,7 +193,9 @@ all the messages in the font tried:
    If 13 x n + T + M is still more than the rectangle: again in
    `regular_short2`, wrapped at the screen width minus 2. If it is still
    more: the divider above the family pictures is hidden
-   (`FamilyVisuals.hideTopDivider`).
+   (`FamilyVisuals.hideTopDivider`). **On desktop this does nothing**:
+   only the two portrait layouts make that divider (`night-pictures.md`,
+   found 2026-10-16).
 
 This does not depend on the screen shape.
 
@@ -444,8 +450,8 @@ From the decompiler: a line's amount is right-aligned at the rectangle's
 width and the tick circle starts 10 pixels after it. Both, and the
 rectangle's x and width, agree with the screenshot to within a pixel or
 two (next section). The rest of the placement (header, texts, the split
-between messages and lines in `calcSplit`, the family pictures) is left
-for the drawing step.
+between messages and lines in `calcSplit`) is left for the drawing step.
+The family pictures' positions are in `night-pictures.md` (2026-10-16).
 
 The width the messages wrap at (`Layout.nightMessageWidth`) is the screen
 width minus 50 in the desktop block: **520** (settled in part 2; part 1
@@ -515,16 +521,18 @@ The amounts ending a good pixel short of 385 fits a letter's built-in
 spacing on its right; that was not checked in the font. Vertical positions were
 not compared (the window's title bar makes the top uncertain).
 
-What the picture shows of the parts **not read** (`FamilyVisuals`), noted
-for the part that will read them: on the right, one row per living member
+What the picture shows of the parts not read at the time (`FamilyVisuals`;
+read since, on 2026-10-16, and compared with this description in
+`night-pictures.md`: it agrees): on the right, one row per living member
 with round badges (COLD, SICK, HUNGRY) and the name under them; top right,
 the apartment class ("8 CLASS"); on the left, a column of seven dotted
 circles, a booklet picture marked "x5", and four dotted rectangles.
 
 ## Not studied
 
-- `FamilyVisuals` and `FamilyVisualsDim`: every picture of the family, the
-  apartment, the tokens and the passports. Proposed as its own part.
+- (`FamilyVisuals` and `FamilyVisualsDim`, every picture of the family,
+  the apartment, the tokens and the passports, were listed here; studied
+  since, on 2026-10-16, as part 10: `night-pictures.md`.)
 - The exact placement of everything (see "Layout").
 - `play.ui.DiagramLine` (the rule), `app.vis.Text`. (`play.ui.Button`'s
   modes were listed here; read since, on 2026-10-16, `buttons.md`.) (The tween helper behind `flashCheck` was

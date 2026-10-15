@@ -209,8 +209,10 @@ Most are kept as raw nodes and read when needed.
   Ids match the `CONFISCATE` row of `Days.csv` (`DistrictAltan`, `Native`).
 - **`<misc>`**: attributes fetched by name; missing ones give empty text.
   Present: `hiddenAdditionalErrorPerc`, `speechAdditionalErrorPerc`,
-  `tokenOrder`. All three names are used somewhere in the code; where is not
-  studied.
+  `tokenOrder`. All three names are used somewhere in the code. Where
+  `tokenOrder` is used is known since 2026-10-16: it sets the place of
+  each token in the night screen's column of tokens (`night-pictures.md`).
+  Where the other two are used is not studied here.
 - **`<rulebook><page id rule confiscation>`**: decides which rulebook pages
   are shown. A page is included when it has no `rule` or its rule is in
   force, and it has no `confiscation` or that equals the day's confiscation

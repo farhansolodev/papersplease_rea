@@ -185,7 +185,9 @@ click can untick a different line).
   screen, when `balance` is called, how ticking works, the sleep button,
   how the wanted ending is acted on, `Family.buildMessage`,
   `Family.getSummary`, `DayLib.getNightMessages`.)
-- The family pictures on the night screen (`FamilyVisuals`).
+- (Studied since, on 2026-10-16: the family pictures on the night screen,
+  `FamilyVisuals`, in `night-pictures.md`. They show what this doc
+  describes and change nothing.)
 - `MapUtil.toSimpleString`, the `FactAdaptor` classes (taken at face
   value: a fact path plus a default).
 - Where the day fills in the summary, and how a script's `Night <id>`
