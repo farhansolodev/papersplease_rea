@@ -19,7 +19,10 @@ rules behind a screen are in that topic's own doc (for the night:
 - **Part 6** (2026-10-15): the credits screen (`CreditScreen`) and how it
   scrolls the credits list; the game's frame rate, which sets the scroll
   speed, is written up in `border-view.md`.
-- Not written yet: endless-mode screens, language chooser.
+- **Part 7** (2026-10-16): the endless code box (`UnlockConfirm`), the
+  endless screen (`EndlessScreen`), the box shown after an endless run,
+  and the local best score per course and style.
+- Not written yet: language chooser.
 
 ---
 
@@ -599,7 +602,8 @@ Checked in the instructions: the two arguments the decompiler dropped in
 (`decompiled/layout_ctor_asm.txt`). Seven number constants read with
 `read_doubles.py`.
 
-**Not read:** `UnlockConfirm` (the box that asks for the endless code),
+**Not read:** `UnlockConfirm` (the box that asks for the endless code;
+read since, part 7),
 `play.ui.Button`, `app.aud.Music` (what a "beat" is), the platform
 functions `canExit`, `osName` and `decoratedVersion`, the test tooling
 class `SoakTapper`.
@@ -665,7 +669,7 @@ settings buttons are stacked in the middle instead.
 | Id | What happens |
 |---|---|
 | `story` | Fade to the screen `load` (the load screen, where a new story is also started) |
-| `endless` | If the setting `endlessUnlocked` is on: fade to the screen `endless`. If not: a box asking for a code is shown (`UnlockConfirm`, with the text `endless_unlock` and the code `endless_code` from the language's fixed values). When the box reports success: the setting is turned on and the game fades to `endless` |
+| `endless` | If the setting `endlessUnlocked` is on: fade to the screen `endless`. If not: a box asking for a code is shown (`UnlockConfirm`, with the text `endless_unlock` and the code `endless_code` from the language's fixed values). When the box reports success: the setting is turned on and the game fades to `endless` (the box and the endless screen: part 7) |
 | `quit` | `GameTransition.quit()` |
 | `credit` | Fade to the screen `credit` |
 | `settings` | Fade to the screen `settings` |
@@ -732,7 +736,8 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
 
 ## Not studied
 
-- `UnlockConfirm`: how the code is typed and checked.
+- (`UnlockConfirm`, how the code is typed and checked: read since, part 7,
+  "The code box".)
 - The music's beat, so the rise's length in seconds and the bob's tempo.
 - `play.ui.Button` beyond its key and mouse handling. (What a "back
   button" is was listed here, inferred from the name to be the button a
@@ -1110,8 +1115,9 @@ for that call finds four callers: the day screen, the night screen, the
 news screen and the intro screen. The title, load and settings
 constructors were read and do not call it; so was the ending screen's,
 in part 5 (it does not call it), and so was the credits screen's, in
-part 6 (it does not call it either). For the endless screen this rests
-on the search alone.
+part 6 (it does not call it either), and the endless screen's, in
+part 7 (it does not call it; this rested on the search alone until
+then).
 
 ## The pause screen (`PauseScreen`)
 
@@ -1280,7 +1286,7 @@ pausing is a back button. All of them in the game:
 | Credits screen | back (`back`) | Back to the title |
 | Endless screen | back (`back`) | Back to the title |
 | Endless code box (`UnlockConfirm`) | CANCEL | Closes the box, no unlock |
-| Endless screen's hidden "clear achievements" box (20 quick taps in the top right corner; not studied, rule 4) | CANCEL | Closes the box |
+| Endless screen's hidden "clear achievements" box (21 quick presses in the top right corner, each within half a second of the last; read in part 7, where this row's earlier "20 quick taps" was corrected on 2026-10-16) | CANCEL | Closes the box |
 | Device box (`PlatformChangeConfirm`, not on desktop) | CANCEL | Closes the box |
 | Language chooser | none: its CANCEL is made without `setAsBackButton` | Nothing |
 | Ending screen | none | Nothing (it cannot be paused either) |
@@ -1305,8 +1311,10 @@ title does nothing, and the trap does not exist.
 ## The header (`GameScreen.addHeader`)
 
 Called by the pause screen, the settings screen, the credits screen, the
-endless screen and the ending screen's statistics page (the endless call
-found by searching for the call, not read; the ending screen's call is
+endless screen and the ending screen's statistics page (the endless call,
+first found only by a search, is read since part 7: it is made only when
+the layout's `headerInEndless` is on, so **not on desktop**, and with an
+empty title; the ending screen's call is
 read since part 5, title `menu_stats`, and the credits screen's since
 part 6, title `menu_credits`). It adds:
 
@@ -2120,3 +2128,349 @@ On the title screen, click "created by Lucas Pope" at the bottom.
    and never pauses here.
 6. The Indonesian and Basque translation credits are both in the list
    (both language packs are installed).
+
+---
+
+# Part 7: the endless code box and the endless screen
+
+Studied on 2026-10-16. Code reading only: **nothing in this part was
+compared with the running game.** The user has not played endless mode.
+
+The title's ENDLESS button opens a box asking for a code, unless endless
+mode is already unlocked (part 2, "What each button does"). The right
+code unlocks it for good and fades to the endless screen, where the
+player picks a **style** (Timed, Perfection, Endurance) and a **course**
+(1 to 4) and presses PLAY. When a run ends, the endless screen comes back
+with a box showing the result. Styles, courses and scoring are in
+`endless-mode.md`.
+
+**Leaderboards: left out of the port** (the user's decision, 2026-10-16:
+the port will not be published, so it will have no leaderboards). Where
+the screen touches them is recorded below, so that the port knows what to
+drop; nothing behind those calls was read.
+
+## What was read
+
+From the whole-game decompile in `decompiled/all/`:
+
+| Class | Functions |
+|---|---|
+| `play.screen.UnlockConfirm` | constructor `0x1806859c0`, `show` `0x180688850`, `button_onClick` `0x1806881f0`, `tween_flash` `0x180688970`, `draw`, the static values (everything it has besides Haxe's field-access helpers) |
+| `play.screen.TitleScreen` | `menu_onClick` and `unlockConfirm_onDone` again (part 2) |
+| `play.screen.EndlessScreen` | constructor `0x1807c1390`, `select` `0x1807c74d0`, `styleButton_onClick`, `courseButton_onClick`, `menu_onClick` `0x1807c6210`, `react` `0x1807c6910`, `update` `0x1807c8640`, `refreshScoreTexts` `0x1807c6fc0`, `get_endlessId`, `set_endlessId`, `secretConfirm_onClick`, `presskit_prep` `0x1807c6380`, `setLeaderboardsButtonActive`, `alltimeStats_onGotRankedScore`, the static values (all of it besides the field-access helpers) |
+| `Game.applyScreenChange` | the `endless` branch, and where its result argument comes from |
+| `play.day.Endless` | `end` `0x1807c97a0` |
+| `play.day.EndlessResult` | `getDescription` `0x1807beb30` |
+| `play.AlltimeStats` | `addScore`, `addScoreLocal` `0x1808cd060`, `getRankedScore` `0x1808cd5b0`, `get_hasLeaderboards`; `awardAchievement` was seen in passing |
+| `play.ScoreEntry` | `fromString`, `isBetterThan` `0x1808608d0`, `toString` |
+| `data.EndlessId`, `data.EndlessLib` | the `EndlessId` constructor `0x1807bc560`, `toString`, `toLeaderboardId`; `getEndlessIdFromString`, `getStyle`, `get_defaultStyle`, `get_defaultCourse` |
+| `play.Settings` | `set_endlessIdStr`, and the `endlessId` line of `load` |
+
+**Not read** (rule 4, online): what `AlltimeStats` asks of the platform
+(`connectToSocialIfNotConnected`, `showLeaderboards`,
+`clearAchievements`, the platform's `getLeaderboardScore`,
+`reportLeaderboardScore` and `hasLeaderboards`).
+
+One Ghidra run (`DumpAssembly.java` on the two constructors,
+`refreshScoreTexts`, `ScoreEntry.isBetterThan` and `ScoreEntry.toString`;
+output in `decompiled/part7_run1.txt`) settled four things the decompiler
+dropped: the digit on each key of the code box, the number shown as a
+score, the first text of a score field (empty), and that each course
+picture is attached to its button. 20 number constants were read with
+`read_doubles.py`. Slot numbers were looked up in `dump.cs` (`Button`,
+`Mode`, `Image`, `GameTransition`, `Confirm`, `Align`), field positions
+of `Pointer` there too, picture sizes in `extracted/art/assets/`, and the
+texts in `Text.xml`.
+
+## The code box (`UnlockConfirm`)
+
+**Made once, then reused.** The first click on ENDLESS (while
+`endlessUnlocked` is off) makes the box with the text `endless_unlock`
+("Complete story mode with your job intact to unlock endless mode") and
+the code `endless_code` from the language's fixed values: **62131**
+(`text-xml-format.md`). Later clicks show the same box again (`show`).
+
+**What it builds** (desktop numbers: screen 570 x 320):
+
+| Part | What and where |
+|---|---|
+| Shade | A black rectangle at half opacity over the whole screen |
+| Box | `ConfirmBox.png` (244 x 192), centred: x 163, y 64 |
+| Message | Font `title_tall`, white, centred, wrapped to 214 pixels (box width - 2 x 15). x = floor((570 - its width) / 2); y = box top + 18 - ascent + cap height |
+| Typed digits | Font `fixed`, white. Centred in the box by the width of the text `1 2 3 4 5 `; y = floor((message y + message height + box top + 100) / 2 - ascent / 2) - ascent + cap height, so about halfway between the message's bottom and the keys |
+| Underlines | One per digit of the code (5): white, 9 x 1, at x = digits' x + 12 x n - 2, 3 pixels below the digits' cap line. 12 pixels is two characters of `fixed` (a digit and a space, `fonts.md`) |
+| Keys | 10 picture buttons from `NumpadButton.png` (35 x 42: the upper 21 rows when up, the lower 21 when pressed), in 2 rows of 5, 3 pixels apart. Labels, read in the instructions: **1 2 3 4 5** on the top row, **6 7 8 9 0** below (key n, counted from 0, shows (n + 1) mod 10). On desktop: x 191, 229, 267, 305, 343; y 164 and 188. Ids `numpad1` ... `numpad9`, `numpad0`. Label colour white, up and pressed |
+| CANCEL | A standard push button (part 1), text `confirm_cancel`, centred in the box, its bottom 15 pixels above the box's bottom (x 220, y 222). It is the back button, so Escape presses it |
+
+`show`: switches the box on, empties the typed digits, and lets every key
+take input again (switch 4, part 1).
+
+**A key click** (`button_onClick`):
+
+1. The digit is added to what was typed, and the display shows it with
+   spaces between the digits (`6 2 1`).
+2. Nothing more happens until as many digits as the code has are typed.
+3. Then, if they differ from the code, the display changes to
+   `endless_wrongcode`, "S O R R Y". Either way every key (and CANCEL)
+   stops taking input, and a 3-second timed change starts (`tween_flash`,
+   part 1, "Timed changes").
+4. During those 3 seconds the display blinks: it is shown while
+   (t x 5) mod 1 is under 0.5, so **five blinks**.
+5. At the end the title is told the result (`unlockConfirm_onDone`).
+   - **Right code**: the box stays on screen while the title turns on
+     the setting `endlessUnlocked` and fades to the endless screen. The
+     settings file is written on the next frame (part 4, "Who writes the
+     settings file"), so the code is never asked for again.
+   - **Wrong code**: the box closes. Clicking ENDLESS again shows it
+     empty.
+
+**CANCEL** tells the title "not unlocked" (it does nothing with that)
+and closes the box.
+
+`UnlockConfirm` has no `react` of its own, unlike `Confirm` (part 3),
+which blocks input to what lies under it. Whether the title's buttons
+under the box still take clicks was not established (it depends on the
+order in which the title's children get input; not read).
+
+Two of its static values, 10 and 19, are not used by any of its
+functions.
+
+## The endless screen (`EndlessScreen`)
+
+Built by `Game.applyScreenChange` for the screen name `endless` with the
+all-time statistics and, only when the request was
+`FADE_TO_ENDLESS_RESULT`, the result of the run that just ended
+(`save-format.md`, part 2). Its song is `Theme`. It cannot be paused: its
+constructor does not call `enablePause` (read; part 4 had this from a
+search only).
+
+### What it builds (desktop)
+
+| Part | What and where |
+|---|---|
+| Header | **None on desktop**: the header is added only when the layout's `headerInEndless` is on, and the desktop block has it off (`border-view.md`) |
+| Title | `EndlessTitle.png` (62 x 27), centred: x 254, y 15 |
+| Style buttons | One per style, in the file's order (timed, perfection, endurance). Picture `EndlessStyleButton.png` (130 x 160: upper half up, lower half pressed), so each button is 130 x 80. Spaced 20 apart (screen width x 20 / 570) and centred as a row: x 70, 220, 370; y 60 |
+| Course buttons | One per course (course1 to course4). Picture `EndlessCourseButton.png` (80 x 120), so 80 x 60, spaced 20 and centred: x 95, 195, 295, 395; y 170 (60 + 110) |
+| Score texts | One per course **and** style (12): font `regular`, white, centred, more than one line allowed, empty and hidden at first. Each sits 2 pixels under its course button (y 232) and is centred on the button's middle. Only those of the selected style are shown (below) |
+| PLAY | A push button of the screen's menu (text `menu_play`), centred left to right, y 280 |
+| BACK | A push button (text `menu_back`, LEFT alignment) at x 20, y 280. It is the back button |
+| Leaderboards | A picture button `LeaderboardsButton.png` (43 x 66, 33 rows per state) at x 497 (570 - width - 30), y 270. **Switched on only when the platform says it has leaderboards**; if it is on and overlaps BACK, the two are put side by side, centred. Leave out of the port |
+| Selection line | A white line with rounded corners (radius 4) around the selected style and course (below) |
+
+Inside each **style button** (drawn with it, in both states):
+
+- the style's `icon` picture (8 x 8), copied with its grey `0xffb5b5b5`
+  turned white, centred, y 10;
+- the style's `name`, font `title_tall`, white, centred; y = icon bottom
+  + 7 - ascent + cap height;
+- the style's `desc`, font `large`, white, centred, wrapped to 120
+  pixels (button width - 10); y = name's y + name's height + 6 - ascent +
+  cap height.
+
+Inside each **course button**: the course's `button` picture
+(`EndlessCourse1.png` ..., 80 x 60), centred, so it fills the button.
+
+**This answers `endless-mode.md`'s question about the three missing
+pictures**: the screen never asks for the style's `button` picture
+(`EndlessStyleTimed.png` ...). It builds every style button from
+`EndlessStyleButton.png` plus the style's icon. A search of the
+decompile for reads of that field by name found only the style's own
+constructor and its by-name table (a read by position cannot be found
+this way).
+
+The constructor's other branches (the two portrait layouts) place the
+rows differently and were not followed in detail.
+
+### Selecting (`select`)
+
+The selection is one style and one course together (an `EndlessId`).
+The screen starts with the one stored in the settings (`endlessIdStr`,
+saved as `endlessId`, written like `perfection:course2`).
+
+- **Unknown or missing names fall back to the second entry of the
+  file**, not the first: style `perfection` and course `course2`
+  (`EndlessId` constructor, `get_defaultStyle`, `get_defaultCourse`:
+  index 1). No starting value for `endlessIdStr` was found in the
+  settings code, so a first visit should start on **Perfection,
+  Course 2**.
+- A click on a style button keeps the course and selects that style; a
+  click on a course button keeps the style and selects that course.
+
+`select`:
+
+1. Stores the selection in the settings (the file is written on the next
+   frame, part 4).
+2. Shows the score texts of the selected style, hides the others.
+3. Redraws the selection line. With s = the style button and c = the
+   course button, the line runs from s's top left corner along its top to
+   its right edge, down that edge, across to c's right edge, down to c's
+   bottom, along c's bottom to its left edge, up that edge, across to s's
+   left edge and up to the start. The two crossings lie in the 30-pixel
+   gap between the rows, 7 pixels from its top and 7 from its bottom (on
+   desktop y 147 and 163: (170 - 140) / 2 - 2 x radius = 7); which
+   crossing is the upper one depends on whether s's right edge is left
+   of c's. The line is set fully drawn (`visibleT` = 1); no animation
+   was found.
+
+Every frame (`update`): the line is hidden while a confirm box is on
+screen; the score texts are refreshed when the all-time statistics
+change; the leaderboards button follows the platform.
+
+### PLAY and BACK (`menu_onClick`)
+
+| Id | What happens |
+|---|---|
+| `play` | `GameTransition.fadeToEndlessDay` with the selection: the day screen for the course's day, with a new `Endless` run (`save-format.md`, part 2, "Building the screen") |
+| `back` | Fade to the title |
+| `leaderboards` | Asks the platform to show the selection's leaderboard. Leave out |
+
+### The score under each course
+
+`refreshScoreTexts` fills each of the 12 score texts from
+`AlltimeStats.getRankedScore` with the leaderboard name of its pair
+(`EndlessId.toLeaderboardId`: the style's `leaderboard`, a space, the
+course's `leaderboard`, for example `Perfection Course 2`):
+
+- If the platform has a score for that name, that score is used (and
+  copied into the local record, below), with its rank.
+- **Otherwise the local record is used**: the entry
+  `_Leaderboard:<leaderboard name>` of the all-time statistics, a text
+  `score,time` (for example `_Leaderboard:Perfection Course 2` =
+  `14,95`). Its rank is -1.
+- The text is empty if there is no score (or a negative one). Otherwise
+  it is the score (checked in the instructions), and when the rank is
+  above 0 a second line `endless_ranked` ("Ranked #3"). **Offline only
+  the number shows**: the local record has no rank.
+- After the text is set it is centred again on the button's middle.
+
+**So this is not only a leaderboard feature**: without any online
+service the screen shows the player's best score for each course in the
+selected style. This corrects `endless-mode.md`, which said the
+`leaderboard` names were needed only for leaderboards (corrected there
+on 2026-10-16).
+
+When the platform answers later (`alltimeStats_onGotRankedScore`), the
+text of that pair is rewritten the same way. With no platform this does
+not happen (not read further).
+
+### How the local best score is kept
+
+When a run ends (`Endless.end`, the only caller found):
+
+1. The run's score is taken: the final score, or the highest score
+   reached for a style with `reportscoremax` (Endurance,
+   `endless-mode.md`). The time is the run's clock in whole seconds.
+2. `AlltimeStats.addScore`: first `addScoreLocal`, then the score is
+   reported to the platform (leave out).
+3. `addScoreLocal` replaces the stored `_Leaderboard:<name>` entry only
+   if the new one is better (`ScoreEntry.isBetterThan`, read in the
+   instructions): **a higher score wins; on an equal score, the longer
+   time wins**. With no stored entry the new one is always stored. Then
+   the statistics file is saved (its one-second countdown,
+   `save-format.md`).
+4. An `EndlessResult` (style, course, score, time) is made and the game
+   fades to the endless screen with it (`FADE_TO_ENDLESS_RESULT`).
+
+### The result box
+
+When the screen is built with a result it shows a confirm box (part 3)
+at once, with one button `confirm_ok` ("OKAY") and the text
+`endless_complete` with the result filled in
+(`EndlessResult.getDescription`):
+
+```
+<style name>
+<course name>
+
+<time>
+<score> Points
+```
+
+(the time goes through `StringUtil.formatTime`, not read). The selection
+line is hidden while the box is up. Clicking OKAY closes it; nothing else
+happens (no callback is given).
+
+Without a result the constructor instead asks the platform to connect
+(`connectToSocialIfNotConnected`, leave out). In both cases it then asks
+`getRankedScore` once for each of the 12 pairs without using the answer
+(inferred: so that an online service fetches them; not read), and fills
+the score texts.
+
+### Hidden things
+
+- **A "clear achievements" box.** A new press (`Pointer.justDown`) in
+  the top right corner (x at least 520, y under 50), repeated quickly:
+  each press within half a second of the one before adds one to a count,
+  a slower one resets it to 0. When the count reaches 20 (so 21 quick
+  presses, the first one only starting the count), a confirm box asks
+  "Clear Achievements?" (English, written in the code) with CLEAR and
+  CANCEL. CLEAR calls `AlltimeStats.clearAchievements` (not read:
+  achievements belong to the platform). Part 4's table of back buttons
+  said 20 taps; corrected there on 2026-10-16. **For the port: leave
+  out** (no achievements).
+- **`presskit_prep`**: selects Perfection / Course 2 and writes made-up
+  numbers into the Perfection score texts (14, 20, 17, 8 for courses 1
+  to 4), by the name apparently for press screenshots. Nothing calls it
+  except the class's own call-by-name table; its name appears in no
+  other function of the decompile. **For the port: leave out.**
+- Four static values of the class (15, 2, 4 and the colour `0xff546754`)
+  are set when the class is set up and read nowhere in the decompile
+  (inferred: the compiler wrote the numbers into the code where they are
+  used).
+
+## For the port
+
+- The code box as above: code 62131, keys 1 to 9 and 0, five blinks
+  over 3 seconds, "S O R R Y" on a wrong code, Escape as CANCEL;
+  `endlessUnlocked` in the settings afterwards.
+- The endless screen with the two rows, the selection line, PLAY and
+  BACK, the selection stored as `style:course` with Perfection / Course
+  2 as the fallback, and the result box after a run.
+- **Keep the local best scores** (`_Leaderboard:<style> <course>` =
+  `score,time` in the all-time statistics; better = higher score, then
+  longer time) and show them under the courses. Drop the rank line, the
+  leaderboards button, every platform call, the clear-achievements box
+  and `presskit_prep`.
+- If the port reads the original game's statistics file, the same keys
+  carry over; otherwise the names can be the port's own.
+
+## Not studied
+
+- The constructor's portrait branches (tablet, phone).
+- `app.vis.Text`'s height, so the code box's digit line and the style
+  buttons' description lines are given as formulas, not pixels.
+- What the LEFT alignment changes in BACK's push button (as in part 6).
+- `StringUtil.formatTime`, so the look of the time in the result box.
+- Whether the title's buttons can be clicked through the code box.
+- `play.ui.DiagramLine`'s drawing (dotted or solid, line width); only
+  its colour and corner radius were read.
+- Everything behind the platform calls named above (rule 4).
+
+## Things to watch in the game
+
+On the title screen, click ENDLESS. (Watching this needs the game to
+run, with the user's go-ahead.)
+
+1. A box with "Complete story mode with your job intact to unlock
+   endless mode", five underlines, keys 1 2 3 4 5 / 6 7 8 9 0 and
+   CANCEL. Escape closes it.
+2. Type a wrong five-digit code: the digits appear with spaces between
+   them, then "S O R R Y" blinks five times over about 3 seconds and the
+   box closes.
+3. Open it again (it is empty) and type 6 2 1 3 1: the digits blink five
+   times, then the game fades to the endless screen. ENDLESS goes
+   straight there from then on.
+4. The endless screen: no header, the title picture at the top, three
+   style buttons (Timed, Perfection, Endurance, each with an icon, name
+   and description), four course buttons below, PLAY in the middle at the
+   bottom and BACK at the bottom left. **Perfection and Course 2 are
+   selected**, with a white outline around both. No leaderboards button
+   (GOG build, no platform service expected; not checked). No score
+   under the courses (no runs played yet).
+5. Clicking another style or course moves the outline; leaving and coming
+   back keeps the choice.
+6. After a run (PLAY, then the run ends), the endless screen comes back
+   with a box: style, course, time and "N Points", and OKAY. The number
+   then shows under that course while that style is selected, and a
+   worse later run does not replace it.

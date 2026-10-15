@@ -16,7 +16,9 @@ plain setters, the `data.FactValue` constructor, `app.MapUtil.toXml` and
 `toString`, `setFromString`, the two platform-override functions. From
 `play.AlltimeStats` only `load`, `save`, `queSave` and `update` were read:
 the rest of that class talks to the platform's achievements and leaderboards
-service, which is out of scope (online). Six number constants were read from
+service, which is out of scope (online). (Its local score keeping was read
+later, on 2026-10-16: `addScore`, `addScoreLocal`, `getRankedScore`, in
+`screens.md`, part 7.) Six number constants were read from
 the DLL and five dropped string arguments were recovered with
 `ListStringUses.java`.
 
@@ -285,10 +287,25 @@ settings file"): `Game.applySettings`, which `Game.update` runs on the
 frame after any setter has changed a value. (That fits the real folder:
 the file appeared when the user changed a volume, not at start-up.)
 
-**Statistics.** `stats` is the all-time table: names to whole numbers. It
+**Statistics.** `stats` is the all-time table: names to values, whole
+numbers for the counters and texts for the two kinds of entry below
+(until 2026-10-16 this said "names to whole numbers"). It
 is read at start-up. A change starts a one-second countdown and the file is
 written when it runs out. The rest of `AlltimeStats` (achievements,
-leaderboards) was not read: out of scope.
+leaderboards) was not read: out of scope. One part of it is local and was
+read on 2026-10-16 (`screens.md`, part 7): the best endless score per
+style and course is kept in this same table, under the name
+`_Leaderboard:<style> <course>` (for example
+`_Leaderboard:Perfection Course 2`), as a text `score,time`; seen in
+passing, `awardAchievement` keeps the achievements won under
+`_Achievements`, a list of ids. So the table is not only names to whole
+numbers (the first sentence of this paragraph was written from the real
+folder, whose statistics hold only whole numbers). Checked on 2026-10-16: the three
+copies of `stats.sav` on this machine (`extracted/saverun`, `stashrun`,
+`stash_sample`) hold only whole numbers under `Day`, `PlayTime`,
+`NumStamps`, `NumApproved`, `NumProcessed` and `NumDenied` (`NumDenied`
+only in `saverun`), and neither of the two names; no endless run was
+played for them.
 
 **Forced layout.** `platover.sav` holds `tablet` or `phone`, unencrypted,
 and makes the game use that layout. It is written when a
@@ -898,7 +915,9 @@ user's own play data.
 - When "the day is not later than the parent's day" applies in play.
 - Who sets `Game/Stat/Day`. In the real folder the all-time `Day` is 4
   while the last save's `Game/Stat/Day` is 3.
-- `AlltimeStats` beyond its file: out of scope (online service).
+- `AlltimeStats` beyond its file: out of scope (online service). Its
+  local endless best scores are read since 2026-10-16 (`screens.md`,
+  part 7).
 - The order of facts in a save was not compared with `haxemap.py`.
 - Two arguments the decompiler dropped were not checked in the machine
   instructions: the id passed to `StoryState.load` in `LOAD_TO_SCREEN`, and

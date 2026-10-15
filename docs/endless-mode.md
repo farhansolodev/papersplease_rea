@@ -116,20 +116,34 @@ switched on.
   `EndlessStyleTimed.png`, `EndlessStylePerfection.png`,
   `EndlessStyleEndurance.png` (the `button` of each style). An
   `EndlessStyleButton.png` exists instead. Whether the game ever asks for the
-  three named files is in the endless menu screen, which is not read.
+  three named files: **the endless screen does not** (read on 2026-10-16,
+  `screens.md`, part 7). It builds each style button from
+  `EndlessStyleButton.png` plus the style's `icon`; no read of the style's
+  `button` field by name was found elsewhere in the decompile.
 
 ## Notes for the port
 
-- Leaderboards are online and out of scope; the styles' and courses'
-  `leaderboard` names are only needed for that.
+- Leaderboards are online and out of scope (the user's decision,
+  2026-10-16: no leaderboards in the port). **But the `leaderboard` names
+  are also used offline**: `<style leaderboard> <course leaderboard>`
+  (for example `Perfection Course 2`) is the key of the player's local
+  best score, kept in the all-time statistics as
+  `_Leaderboard:<key>` = `score,time` and shown on the endless screen
+  (`screens.md`, part 7, "The score under each course"). This corrects
+  the note that stood here until 2026-10-16, that the names were needed
+  only for leaderboards.
 - The multiplier is cut to a whole number before multiplying.
 
 ## Not studied
 
 - (The scoreboard display is now studied: `border-view.md`, including the
   three messages `Endless` sends it.)
-- The endless menu and result screens, and how an
-  endless day differs from a story day in the booth (which events raise the
-  three actions, how the random seed of a run is chosen).
-- How the unlock code is entered and checked.
+- (The endless screen and the result box after a run are studied since
+  2026-10-16: `screens.md`, part 7. So is `Endless.end`, what a run hands
+  over when it ends: the score, or the highest score for `reportscoremax`,
+  and the clock in whole seconds.)
+- How an endless day differs from a story day in the booth (which events
+  raise the three actions, how the random seed of a run is chosen).
+- (How the unlock code is entered and checked: `screens.md`, part 7,
+  "The code box". The code is 62131.)
 - Nothing here has been compared with the running game.

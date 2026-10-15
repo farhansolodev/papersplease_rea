@@ -17,7 +17,7 @@ cross-checked, with a write-up in `docs/`.
 | `News.txt` | `data.NewsArticleLib` | Studied: `news-txt-format.md` (the file and which headlines a day gets) and `newspaper-picture.md` (drawing the newspaper; fitting its text not studied) |
 | `Nights.txt` | `data.NightLib` | Studied: `nights-txt-format.md` (the file, the calendar, running an event) and `night.md` (the family and the budget) and `screens.md`, part 1 (the night screen) |
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Studied: `ends-xml-format.md` (the files and what each attribute does); the slide player's timing and input in `screens.md`, part 5 (this cell said "not studied" until 2026-10-14) |
-| `Endlesses.xml` | `data.EndlessLib` | Studied: `endless-mode.md` (styles, courses, scoring; the endless screens not studied) |
+| `Endlesses.xml` | `data.EndlessLib` | Studied: `endless-mode.md` (styles, courses, scoring); the endless screen that shows them: `screens.md`, part 7 |
 | `Faces.xml` | `data.FaceLib` | Studied: `faces.md` (the loader and how a face picture is built); how the metadata of four pieces is combined in `traveler-build.md` |
 | `Bodies.xml` | `data.BodyLib` | Studied: `emblems-and-bodies.md` (drawing the search photo not studied) |
 | `Emblems.xml` | `data.EmblemLib` | Studied: `emblems-and-bodies.md` (stamping emblems on documents not studied) |

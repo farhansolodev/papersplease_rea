@@ -1,8 +1,11 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-10-16 (a
-whole-game search showed nothing but the news screen uses the day's news
-generator, `newspaper-picture.md`); before that 2026-10-15, in the
+**Read this first in a new session.** Last updated 2026-10-16, after the
+screens, part 7: the endless code box and the endless screen, with the
+local best score per course and style (`screens.md`; code reading only).
+Earlier the same day a whole-game search showed nothing but the news
+screen uses the day's news generator (`newspaper-picture.md`). Before
+that 2026-10-15, in the
 eleventh session (after the screens, part 6: the credits screen, and the
 game's frame rate; parts 1 to 5, in the ninth and tenth sessions, were
 the base of a screen, the night screen, the title screen, the menu
@@ -56,7 +59,11 @@ then the caption types on, then NEXT; the ending fades to its statistics
 page over 2 + 2 + 2 seconds and records the ending in `EndBits`), and the
 credits screen (the first credit held for 4 seconds, then the list
 scrolls 0.5 pixel a frame, 4 times that while the mouse button is held,
-and loops; the game runs at 60 frames a second on most screens). The desktop
+and loops; the game runs at 60 frames a second on most screens), and the
+endless screens (the code box: code 62131, five blinks over 3 seconds;
+the endless screen: style and course rows, the choice kept in the
+settings, a result box after a run, and the player's best score per
+course kept locally even without leaderboards). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -76,7 +83,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 6: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen (`screens.md`); the frame rate (`border-view.md`). Not done: the other screens (endless, language chooser), the family pictures of the night screen, drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`). Not done: the language chooser, the family pictures of the night screen, drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -118,9 +125,9 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `nights-txt-format.md` | `Nights.txt`: scheduled events, budget lines, the calendar |
 | `night.md` | The night itself: family members, the budget, illness, hunger, cold, the debt and death endings |
 | `save-format.md` | **Saves, part 1**: the save folder and its `.sav` files, the encryption, the tree of saves (`headers`), what one save holds (the story facts as XML), saving / loading / deleting, `StoryState`, the settings and statistics files, the debug jump's faked facts, and the comparison with a real save folder. **Part 2**: the 19 requests a part of the game can make (`GameTransition`), how a screen change is queued and built (`Game.queueScreenChange`, `applyScreenChange`), the game's own five states (fade, pause), and the stash: when it is written, deleted and read, what it holds, how it is restored |
-| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). **Part 2**: the title screen (its buttons and what each does, the title rising in 20 steps with the music, the logo bobbing), the menu helper `Menu`, and the desktop values of eight layout fields. **Part 3**: the load screen (the grid of save buttons, how saves are put on up to 5 tracks, what a click does, the summary box, deleting) and the confirm box `Confirm`. **Part 4**: which key pauses (Escape) and the game's 11 key numbers, the pause screen, the settings screen, the settings list both share (its rows in each form, what each click does, how a row is laid out), who writes the settings file (`Game.applySettings`), that nothing in the build reads `platover`, the header helper, and seven more desktop layout values (one of them corrects part 2). **Part 5**: the page player of the intro and the endings (the wipe, the typing caption, NEXT, hurrying a page from page 2 of the intro), the intro screen, the ending screen (its steps, the statistics text, the 2 + 2 + 2-second fade, the button), `EndBits` and the load screen's ending marks, restoring an ending stash. **Part 6**: the credits screen (who opens it, which languages are available, where the list sits, the 4-second hold at the first view, the scroll by frame and the fast scroll while the mouse button is held, the loop, the buttons). Each part ends with a list of things to watch in the game |
+| `screens.md` | **The screens, part 1**: the switches every on-screen object carries (active, takes input, is updated), what every screen is built on (`GameScreen`), and the night screen: what it builds and in what order, tall or short budget lines, ticking, when the budget is balanced and what the player sees, the appearing animation and its timings, the sleep button, the family sentences (`Family.buildMessage`). **Part 2**: the title screen (its buttons and what each does, the title rising in 20 steps with the music, the logo bobbing), the menu helper `Menu`, and the desktop values of eight layout fields. **Part 3**: the load screen (the grid of save buttons, how saves are put on up to 5 tracks, what a click does, the summary box, deleting) and the confirm box `Confirm`. **Part 4**: which key pauses (Escape) and the game's 11 key numbers, the pause screen, the settings screen, the settings list both share (its rows in each form, what each click does, how a row is laid out), who writes the settings file (`Game.applySettings`), that nothing in the build reads `platover`, the header helper, and seven more desktop layout values (one of them corrects part 2). **Part 5**: the page player of the intro and the endings (the wipe, the typing caption, NEXT, hurrying a page from page 2 of the intro), the intro screen, the ending screen (its steps, the statistics text, the 2 + 2 + 2-second fade, the button), `EndBits` and the load screen's ending marks, restoring an ending stash. **Part 6**: the credits screen (who opens it, which languages are available, where the list sits, the 4-second hold at the first view, the scroll by frame and the fast scroll while the mouse button is held, the loop, the buttons). **Part 7**: the endless code box (`UnlockConfirm`: the keys, the check, the blinking, the code 62131), the endless screen (its two rows, selecting and the stored choice with its fallback, the selection line, PLAY and BACK, the score under each course and the local best score kept in the statistics, the result box after a run, the hidden clear-achievements box and press-kit helper; where it touches leaderboards, left out by the user's decision). Each part ends with a list of things to watch in the game |
 | `ends-xml-format.md` | `Ends.xml` and `Intro.xml`: the 20 endings and the intro slides |
-| `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring |
+| `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring (the endless screen is in `screens.md`, part 7) |
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
 | `sounds-xml-format.md` | `Sounds.xml`: which recording plays, song names |
 | `fonts.md` | `Fonts.xml` and the `.fnt` files: measurements, text width, line breaking |
@@ -155,7 +162,8 @@ error picks left the game's. Done in the fifth: the newspaper picture. Done
 in the sixth: the whole border scene, parts 1 to 4. Done in the seventh:
 saves, part 1. Done in the eighth: saves, part 2. Done in the ninth: the
 screens, parts 1 to 3. Done in the tenth: the screens, parts 4 and 5.
-Done in the eleventh: the screens, part 6.)
+Done in the eleventh: the screens, part 6. Done on 2026-10-16: the
+screens, part 7.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -182,16 +190,18 @@ Done in the eleventh: the screens, part 6.)
    and the screen that opened offered only a new game (the unfinished day
    was lost). The stash's content matches the description (`stash_check.py`,
    `0 problems`).
-4. **The screens, in progress.** Parts 1 to 6 are done (`screens.md`):
+4. **The screens, in progress.** Parts 1 to 7 are done (`screens.md`):
    the base of a screen (`GameScreen`, the entity switches), the night
    screen, the title screen, the menu helper `Menu`, the load screen, the
    confirm box `Confirm`, the pause screen, the settings screen and the
    settings list they share, the page player of the intro and the
-   endings, the intro screen, the ending screen, and the credits screen.
-   **Next, part 7** (suggested: the endless-mode screens together with
-   `UnlockConfirm`, the code box, since the title's ENDLESS button
-   leads through the box to the endless screen). Still to do after that:
-   the language chooser, `play.ui.Button`'s modes and pictures (what a
+   endings, the intro screen, the ending screen, the credits screen, the
+   endless code box `UnlockConfirm` and the endless screen.
+   **Next, part 8** (suggested: the language chooser `LangChooser`
+   together with the rating screen `RatingScreen` / `RatingPopup`, since
+   a language change goes through the rating screen when that language
+   needs one, part 4). Still to do after that:
+   `play.ui.Button`'s modes and pictures (what a
    back button does is read since part 4), and the family pictures of
    the night screen (`FamilyVisuals`, a 1,930-line constructor, proposed
    as its own part). (The news screen is done except its magnifier,
@@ -204,7 +214,8 @@ Done in the eleventh: the screens, part 6.)
    `LoadScreen` and its helpers (the constructor for its parts only, not
    its positions), most of `Confirm` and `GameScreen`, `PauseScreen`,
    `SettingsScreen`, `SettingsMenu`, `SettingRow`, `SettingDim`,
-   `Intro`, `IntroScreen`, `EndScreen`, `CreditScreen`, `CreditList`. How a
+   `Intro`, `IntroScreen`, `EndScreen`, `CreditScreen`, `CreditList`,
+   `UnlockConfirm`, `EndlessScreen` (its desktop branch in detail). How a
    screen is asked for and built is in `save-format.md`, part 2.
    The user's screenshot of a night screen (2026-10-14) confirmed the
    order of the budget lines for one night (`screens.md`, part 1). A
@@ -254,6 +265,28 @@ Small jobs that fit anywhere:
 ## Open questions and unconfirmed items
 
 Collected from the docs, so they are not lost:
+
+**From 2026-10-16** (`screens.md`, part 7)
+
+- **The code box and the endless screen have not been watched.** The
+  list is at the end of `screens.md`, part 7. The user has not played
+  endless mode; typing the code 62131 on the title's ENDLESS button
+  unlocks it for good (the setting `endlessUnlocked`), so watching
+  changes the user's own settings file. Suggested: do it in a copy of the
+  save folder, as with the stash test.
+- **Decided by the user (2026-10-16): no leaderboards in the port**, since
+  it will not be published. To go into `docs/DESIGN.md`'s list of
+  decisions. The local best score per course and style is not a
+  leaderboard and is kept (`screens.md`, part 7, "For the port").
+- Suggested, still the user's to confirm: leave out the endless screen's
+  hidden "clear achievements" box and the `presskit_prep` helper.
+- Whether the title's buttons can be clicked through the code box (it
+  has no input handling of its own); `app.vis.Text`'s height, so some
+  positions are formulas only; `StringUtil.formatTime` (the time in the
+  result box); `DiagramLine`'s drawing.
+- Whether the GOG build's platform reports leaderboards (that decides
+  whether the original shows the leaderboards button); not checked, and
+  not needed for the port.
 
 **From the eleventh session** (`screens.md`, part 6; `border-view.md`,
 "The frame rate")
@@ -372,8 +405,9 @@ Collected from the docs, so they are not lost:
   developer's "check for updates" web page. Suggested: leave it out or
   show plain text. Not studied further.
 - What a "beat" of the music is (`app.aud.Music`), so how long the
-  title's rise takes in seconds; `UnlockConfirm` (how the endless code is
-  typed and checked); whether a `newversion` button is made anywhere.
+  title's rise takes in seconds; whether a `newversion` button is made
+  anywhere. (`UnlockConfirm`, how the endless code is typed and checked,
+  was on this list: read on 2026-10-16, `screens.md`, part 7.)
 - **The load screen (part 3) has not been watched.** Its list is at the
   end of `screens.md`, part 3; the save folder with a branch
   (`extracted/saverun`, used through a copy) would show most of it.
@@ -464,7 +498,9 @@ Collected from the docs, so they are not lost:
   (`desk-drawing-draws.md`) is unknown.
 - `play.AlltimeStats` beyond its local file talks to the platform's
   achievements and leaderboards service. Not read: out of scope (rule 4).
-  The port needs only local statistics, if any.
+  The port needs only local statistics, which include the endless best
+  scores (`_Leaderboard:<style> <course>`, read on 2026-10-16,
+  `screens.md`, part 7, and `save-format.md`).
 - Characters above 255 would be damaged by the save encryption (the code
   does not cut character codes to 8 bits). Nothing above 127 was seen in a
   real English save; other languages were not looked at.
@@ -692,6 +728,7 @@ All gitignored. Nothing below is in git.
 | `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `decompiled/titlescreen_update_asm.txt`, `loadscreen_strings.txt` | small | For `screens.md`, parts 2 and 3: the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
 | `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
+| `decompiled/part7_run1.txt` | under 1 MB | For `screens.md`, part 7: the instructions of the `UnlockConfirm` and `EndlessScreen` constructors, `EndlessScreen.refreshScoreTexts`, `ScoreEntry.isBetterThan` and `ScoreEntry.toString` | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1806859c0 0x1807c1390 0x1807c6fc0 0x1808608d0 0x180860900` |
 | `decompiled/part5_run1.txt` | under 1 MB | For `screens.md`, part 5: the instructions of the `EndScreen` constructor and the strings of the `Intro` and `EndScreen` constructors in machine-code order | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1807b9800`; `ListStringUses.java` with `0x1808fae90` and `0x1807b9800` |
 | `decompiled/settingsmenu_music_asm.txt`, `part4_run1.txt` to `part4_run3.txt` | small | For `screens.md`, part 4: the instructions of `SettingsMenu.musicButton_whenClick`, and the Ghidra output of three runs (string lists of four functions in machine-code order, three caller searches). (The key, `InputWrapper` and `HostUnity.Update` functions read for that part are in `decompiled/all/top.clean.c` and `app_ent.clean.c`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x180714b30`; `ListStringUses.java` with `0x180710150`, `0x180869f50`, `0x18086a9b0`, `0x1808035e0`; `FindReferences.java` with `0x18086FAF0`, `0x180870B30`, `0x1804AA120`, `0x180870210` |
 | `decompiled/budgetent_ctor_asm.txt`, `budgetent_ctor_strings.txt`, `asm_family_buildmessage.txt` | small | For `screens.md`, part 1: the instructions of the `BudgetEnt` constructor and of `Family.buildMessage`; the `BudgetEnt` constructor's strings in machine-code order. (The `play.night`, `RevealTextEnt` and `GameScreen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1806c2a70` and `0x180757930`; `ListStringUses.java 0x1806c2a70` |
