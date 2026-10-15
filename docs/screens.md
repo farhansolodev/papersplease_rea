@@ -72,8 +72,9 @@ from the decompiler only.
 
 **Not read:** the `FamilyVisuals` constructor (1,930 lines: the family
 portraits, the apartment, the tokens, the passports) and
-`FamilyVisualsDim`; `play.ui.Button`, `play.ui.DiagramLine`,
-`app.vis.Text`; `GameScreen.shake`. (`GameScreen.addHeader` and
+`FamilyVisualsDim`; `play.ui.DiagramLine`,
+`app.vis.Text`; `GameScreen.shake`. (`play.ui.Button` was on this list;
+read since, on 2026-10-16, `buttons.md`.) (`GameScreen.addHeader` and
 `addMediaButtons` were on this list; they are read since, in part 4.)
 
 Numbers the decompiler showed only as addresses were read with
@@ -124,8 +125,10 @@ no input", was right.)
   wide button from `PushButton.png` (129 x 38) or `PushButtonRed.png`,
   with text colour `0x556855`, or `0xcc2e2e` on the red one. The picture
   is cut into an upper and a lower half of 19 rows, both given to the
-  button's `normal` mode; what the second half is for (pressed, by the
-  look of the picture) is in `play.ui.Button`, not read.
+  button's `normal` mode: the upper half (a dotted outline) is the normal
+  picture and the lower half (filled) the pressed one, and the pressed
+  text is black. (This sentence first left the second half's use open;
+  answered on 2026-10-16, `buttons.md`.)
 
 ## The night screen (`NightScreen`)
 
@@ -523,9 +526,8 @@ circles, a booklet picture marked "x5", and four dotted rectangles.
 - `FamilyVisuals` and `FamilyVisualsDim`: every picture of the family, the
   apartment, the tokens and the passports. Proposed as its own part.
 - The exact placement of everything (see "Layout").
-- `play.ui.Button`'s modes (how it reacts to the mouse and its shortcut
-  key is read since, part 4, "Escape on the pause screen"),
-  `play.ui.DiagramLine` (the rule), `app.vis.Text`. (The tween helper behind `flashCheck` was
+- `play.ui.DiagramLine` (the rule), `app.vis.Text`. (`play.ui.Button`'s
+  modes were listed here; read since, on 2026-10-16, `buttons.md`.) (The tween helper behind `flashCheck` was
   listed here at first; it is read since, "Timed changes" above. Its
   core, `Tween.step`, had in fact been read in an earlier session for
   `border-shooting.md`; this part missed that when it was written.)
@@ -607,9 +609,10 @@ Checked in the instructions: the two arguments the decompiler dropped in
 
 **Not read:** `UnlockConfirm` (the box that asks for the endless code;
 read since, part 7),
-`play.ui.Button`, `app.aud.Music` (what a "beat" is), the platform
+`app.aud.Music` (what a "beat" is), the platform
 functions `canExit`, `osName` and `decoratedVersion`, the test tooling
-class `SoakTapper`.
+class `SoakTapper`. (`play.ui.Button` was on this list; read since,
+`buttons.md`.)
 
 ## The desktop block of the layout
 
@@ -742,9 +745,10 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
 - (`UnlockConfirm`, how the code is typed and checked: read since, part 7,
   "The code box".)
 - The music's beat, so the rise's length in seconds and the bob's tempo.
-- `play.ui.Button` beyond its key and mouse handling. (What a "back
-  button" is was listed here, inferred from the name to be the button a
-  back key presses. Read since, part 4: Escape presses it, on release.)
+- (`play.ui.Button` beyond its key and mouse handling was listed here;
+  read since, on 2026-10-16, `buttons.md`. What a "back button" is was
+  also listed, inferred from the name to be the button a back key
+  presses. Read since, part 4: Escape presses it, on release.)
 - Whether a `newversion` button is made anywhere.
 - `Layout.notchHeight` on desktop (inferred 0: there is no notch).
 
@@ -799,7 +803,8 @@ the instructions. What is said below about where things sit comes from
 **Not read:** `LoadButton.drawConnectingLine` (229 lines: the line from a
 save to the save it continues), the `Confirm` constructor (its frame),
 `play.ui.KineticScroll` (dragging with momentum), the two "passthrough"
-helper classes, `play.ui.Button`.
+helper classes. (`play.ui.Button` was on this list; read since,
+`buttons.md`, which also gives the delete button's three bands.)
 
 ## The sizes (`LoadScreenDim`)
 
@@ -1065,9 +1070,10 @@ passed to the setter); the layout values in the existing
 `read_doubles.py`. Two searches for callers with `FindReferences.java`
 (below).
 
-**Not read:** `play.ui.Button` beyond `react`, `setAsBackButton`, the
-constructor's defaults and `ButtonHelper.react` (read afterwards, for
-"Escape on the pause screen"), the `PlatformChangeConfirm` constructor
+**Not read:** (`play.ui.Button` beyond `react`, `setAsBackButton`, the
+constructor's defaults and `ButtonHelper.react`, which were read
+afterwards for "Escape on the pause screen": read since, on 2026-10-16,
+`buttons.md`), the `PlatformChangeConfirm` constructor
 and `show`, `RatingPopup`,
 `LangChooser` beyond the one function (it is its own screen),
 `Menu.applyCenterY` again (taken from part 2), the platform functions
@@ -1154,7 +1160,9 @@ like every screen. In order:
    switch is cleared, part 1), `resume` is centred on the screen and
    `mainmenu` sits 20 below it.
 
-If the standard button is 19 high (part 3) and the gap is 10 (the layout
+The standard button is 19 high (part 3; confirmed from the code on
+2026-10-16: a button is as high as its picture, here half of the 38-row
+`PushButton.png`, `buttons.md`). With the gap of 10 (the layout
 table below), the three buttons take 77 pixels, so on desktop they run
 from about y 231 to 308. This sum was done by hand; `applyCenterY`'s own
 rounding was not re-read.
@@ -1515,9 +1523,12 @@ device buttons are two columns wide: 2 x 15 + 4 = 34), taller if the icon
 needs it, filled black, with a dotted white border (every second pixel).
 The pressed picture has its inside, 2 pixels in from each edge, filled
 white. The icon is then pasted in the middle of both, with the paste mode
-`BLEND`. (The picture functions used here are called by number and their
-names were not resolved; "copy", "fill a rectangle" and "paste" are read
-from their arguments.) The tick box has two looks, `off` and `on`, each with its own
+`BLEND`. (The picture functions used here are called by number; this
+sentence first said their names were not resolved and that "copy", "fill
+a rectangle" and "paste" were read from their arguments. Resolved on
+2026-10-16 from their slots in the class dump: `copy`, `clone`, `fill`
+and `paste`, which confirms that reading; `buttons.md`, which also gives
+the border dots exactly: a dot where x + y is even.) The tick box has two looks, `off` and `on`, each with its own
 pair; the device button has `phone` and `tablet` (the upper and lower half
 of its picture).
 
@@ -1590,9 +1601,9 @@ from it. The desktop values read for this part, from the same listing:
 
 ## Not studied
 
-- `play.ui.Button`'s modes and pictures. (How it reacts and what a back
-  button does were listed here; they are read since, "Escape on the pause
-  screen".)
+- (`play.ui.Button`'s modes and pictures were listed here: read since,
+  on 2026-10-16, `buttons.md`. How it reacts and what a back button does
+  were listed too; they are read since, "Escape on the pause screen".)
 - The `PlatformChangeConfirm` box. (`LangChooser`, `RatingPopup` and
   `RatingScreen` were listed here; they are left out of the port by the
   user's decision of 2026-10-16 and will not be studied.)
@@ -2114,9 +2125,11 @@ fast throughout: about 22 seconds.
 
 - `app.vis.Text`'s height, so B, `kStopY` and the list's height are
   estimates.
-- What the LEFT alignment changes inside `GameScreen.makePushButton` (the
-  button's x is set to 20 afterwards in any case), and the DONE button's
-  size.
+- (What the LEFT alignment changes inside `GameScreen.makePushButton`,
+  and the DONE button's size, were listed here. Answered on 2026-10-16,
+  `buttons.md`: LEFT puts the text 2 pixels from the button's left edge
+  instead of centring it; the button itself still sits at x 20. A push
+  button is the size of its picture's half, 129 x 38 / 2 = **129 x 19**.)
 - Whether pressing DONE stops the fast scroll.
 - The test player's `ClickThroughCredits` step beyond its name.
 - Where the song `Victory` is defined (as in part 5).
@@ -2494,7 +2507,9 @@ the four file values are exact.
 - The constructor's portrait branches (tablet, phone).
 - `app.vis.Text`'s height, so the code box's digit line and the style
   buttons' description lines are given as formulas, not pixels.
-- What the LEFT alignment changes in BACK's push button (as in part 6).
+- (What the LEFT alignment changes in BACK's push button was listed here,
+  as in part 6. Answered on 2026-10-16, `buttons.md`: the text sits 2
+  pixels from the button's left edge instead of being centred.)
 - `StringUtil.formatTime`, so the look of the time in the result box.
 - Whether the title's buttons can be clicked through the code box.
 - `play.ui.DiagramLine`'s drawing (dotted or solid, line width); only

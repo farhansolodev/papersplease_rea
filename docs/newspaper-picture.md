@@ -79,8 +79,11 @@ The constructor `LayoutImage(res, dayId)`:
    `assets/NewsTall.png` instead, with a piece of `News.png` (x 54, y 0,
    253 x 52) pasted at the top, centred. That is the phone layout:
    `assets/layout/phone/` holds six 30 x 40 layout pictures and
-   `NewsTall.png` (280 x 304). When the phone folder replaces the default
-   files is described in `art-dat-format.md`; on the desktop it does not.
+   `NewsTall.png` (280 x 304). On desktop the layout folders are never
+   loaded, so the desktop always uses the six main layouts. (This
+   sentence first said the rule was described in `art-dat-format.md`; it
+   was not. Corrected on 2026-10-16, when the rule was read from the code
+   and added there.)
 
 The rectangles of the six desktop layouts (columns and lines), from
 `newsimage_check.py`:

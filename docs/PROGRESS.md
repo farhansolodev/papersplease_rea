@@ -1,9 +1,13 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-16, after
-part 8: how a language pack is loaded and what the English pack changes
+part 9: buttons (`buttons.md`; code reading, two constructors read as
+instructions, and a check of the button pictures; not run in the game).
+It also found that desktop never loads the archive's `layout/` folders
+(`art-dat-format.md`). Before it the same day, part 8: how a language
+pack is loaded and what the English pack changes
 (`language-pack.md`; code reading and a comparison of the files, not run
-in the game). Before it the same day: the user decided the port is
+in the game). Before that the same day: the user decided the port is
 English only, with no language chooser and no age rating. Earlier that
 day, the screens, part 7: the endless code box and the endless screen, with the
 local best score per course and style (`screens.md`; code reading, then
@@ -73,7 +77,12 @@ settings, a result box after a run, and the player's best score per
 course kept locally even without leaderboards), and the language pack
 (English is loaded as a pack too: every file lookup tries `en.zip` first,
 and its table fixes 3 typos, shows `Gender` as `Sex` and adds line breaks
-to 16 texts; one bulletin picture exists only in the pack). The desktop
+to 16 texts; one bulletin picture exists only in the pack), and the
+buttons (a button has looks, each with a normal and a pressed picture,
+usually two bands of one picture, and a text whose colour changes when
+pressed; the press must start on the button and a click is the release
+over it; every button the game makes is listed with its picture and
+cut). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -93,7 +102,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`). Left out by the user's decision: the language chooser and the age rating. Not done: the family pictures of the night screen, drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`). Left out by the user's decision: the language chooser and the age rating. Not done: the family pictures of the night screen, drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -150,6 +159,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `credits-txt-format.md` | `Credits.txt` and the layout of the credits list |
 | `languages-list.md` | `Languages.txt`, `Languages.png` |
 | `language-pack.md` | **Part 8**: how a language pack (`StreamingAssets/loc/<code>.zip`) is loaded, which language starts, how the pack's table replaces text in the data files (the 27 extractors), what is in `en.zip`, and the 23 texts the English pack changes. English only, by the user's decision |
+| `buttons.md` | **Part 9**: `play.ui.Button` and its looks (`Mode`): the normal and pressed pictures, the text, its colours and where it sits, drawing, how the mouse and the shortcut key press and click a button, the hand cursor, every button the game makes with its picture and cut, the stamp bar's sliding `DropButton`, the phone-only `HoverButton`, and which button pictures exist only for phones |
 | `test-tooling-files.md` | `TestScenarios.xml`, `Auto.txt` (a recipe for reaching every ending) |
 | `unused-data-files.md` | `Threads.txt`, `TravelerGraph.txt`, `Version.txt`: not read by the game |
 | **Checking against the original** | |
@@ -174,7 +184,7 @@ in the sixth: the whole border scene, parts 1 to 4. Done in the seventh:
 saves, part 1. Done in the eighth: saves, part 2. Done in the ninth: the
 screens, parts 1 to 3. Done in the tenth: the screens, parts 4 and 5.
 Done in the eleventh: the screens, part 6. Done on 2026-10-16: the
-screens, part 7; part 8, the language pack.)
+screens, part 7; part 8, the language pack; part 9, buttons.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -211,12 +221,11 @@ screens, part 7; part 8, the language pack.)
    (The language chooser and the rating screen were suggested as part 8;
    the user decided on 2026-10-16 to leave both out of the port, so
    they will not be studied. Part 8 became how the English language
-   pack is loaded: **done** on 2026-10-16, `language-pack.md`.) Still to
-   do, **next, part 9** (suggested):
-   `play.ui.Button`'s modes and pictures (what a
-   back button does is read since part 4), and the family pictures of
-   the night screen (`FamilyVisuals`, a 1,930-line constructor, proposed
-   as its own part). (The news screen is done except its magnifier,
+   pack is loaded: **done** on 2026-10-16, `language-pack.md`. Part 9,
+   buttons: **done** on 2026-10-16, `buttons.md`.) Still to do, **next,
+   part 10** (suggested): the family pictures of the night screen
+   (`FamilyVisuals`, a 1,930-line constructor, proposed as its own
+   part). (The news screen is done except its magnifier,
    `newspaper-picture.md`.) All of `play.screen` is decompiled in
    `decompiled/all/play_screen.clean.c` (466 functions, with a condensed
    copy `play_screen.short.c`; parts 1 to 5 were read in an older copy,
@@ -279,6 +288,31 @@ Small jobs that fit anywhere:
 ## Open questions and unconfirmed items
 
 Collected from the docs, so they are not lost:
+
+**From 2026-10-16** (`buttons.md`, part 9)
+
+- **Nothing about buttons has been seen in the game.** The watch list at
+  the end of `buttons.md` (six items, a few seconds each on the title
+  screen; the last one in the booth) would test the reading: the pressed
+  look, sliding off and back, letting go outside, a press that starts
+  outside, the hand cursor, the stamp bar's blinking reason button.
+- **Inferred, not seen:** a desktop booth makes neither the carousel's
+  hover buttons nor the criminal-poster pin, because their pictures exist
+  only in `layout/phone/` and desktop never loads the layout folders
+  (`art-dat-format.md`). Whether a desktop booth has a `Carousel` object
+  at all is still open: `Layout.carousel` is written once, at
+  `0x180497c38`, and which block of the `Layout` constructor that is in
+  was not settled.
+- **Inferred from a missing write:** the border's booth button has no
+  extra click margin on desktop (the only write of the margin, 6, is in
+  another platform's block).
+- Not read: `app.vis.Text`'s size (so exact text positions on buttons),
+  the `BOUNCEBACK` curve of the stamp bar's sliding button, when the
+  stamp bar drops it and what its click does, whether `Image.paste`
+  rounds half pixels, `PlatformChangeButton.png`'s cut, the root save
+  button's two pictures.
+- Found unused: the enum `ButtonReactResult`; no caller by name of
+  `Button.cycleMode` or `get_hasBackButtonId`.
 
 **From 2026-10-16** (`language-pack.md`, part 8)
 
@@ -350,9 +384,11 @@ Collected from the docs, so they are not lost:
 - Estimated, not read: the header's bottom (77 if the title is 20 high),
   so the scroll area's top (79) and the stop position (159), and the
   list's height (about 2,272), all waiting on `app.vis.Text`.
-- Not followed: whether pressing DONE stops the fast scroll; what the
-  LEFT alignment changes in `makePushButton`; which platform the frame
-  settings in `HostUnity.CreateGame` are for.
+- Not followed: whether pressing DONE stops the fast scroll; which
+  platform the frame settings in `HostUnity.CreateGame` are for. (What
+  the LEFT alignment changes in `makePushButton` was listed here;
+  answered on 2026-10-16, `buttons.md`: the text sits 2 pixels from the
+  button's left edge instead of centred.)
 
 **From the tenth session** (`screens.md`, part 5)
 
@@ -401,6 +437,10 @@ Collected from the docs, so they are not lost:
   Irrelevant to the port (no quit option), but it tests the reading.
 - Which stamp bar a desktop booth has: a `StampBar` unless the booth has
   a carousel; when it has one was not settled (inferred: phone only).
+  (More evidence on 2026-10-16, `buttons.md`: the carousel's buttons
+  need pictures that only phones load, but the carousel makes them only
+  when the layout has a carousel rectangle, so this is still open; see
+  the part 9 entry above.)
 - Whether a desktop PC shows a Vibration row (`canVibrate`, not read).
 - What the nudity setting changes: its readers were not looked up.
 - **A mistake of the ninth session, found and corrected**: `screens.md`
@@ -470,8 +510,9 @@ Collected from the docs, so they are not lost:
   day's real first headline. Not followed further.
 - `Days.csv` has no `NIGHTMSG`, which `DayLib.getNightMessages` asks for;
   what the table reader returns for a missing name was not read.
-- Not read: `FamilyVisuals` (the family pictures), `play.ui.Button`,
+- Not read: `FamilyVisuals` (the family pictures),
   `DiagramLine`, what the "instant" option of `Stater.go` changes.
+  (`play.ui.Button` was on this list; read on 2026-10-16, `buttons.md`.)
   (The tween helper was on this list; it is read since: a timed change
   lasts its number in seconds, so the tick circles blink for 2 seconds.
   `screens.md`, part 1, "Timed changes".)
@@ -780,6 +821,7 @@ All gitignored. Nothing below is in git.
 | `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `decompiled/titlescreen_update_asm.txt`, `loadscreen_strings.txt` | small | For `screens.md`, parts 2 and 3: the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
 | `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
+| `decompiled/part9_run1.txt` | under 1 MB | For `buttons.md`: the instructions of the `Border` constructor (the booth button's click margins) and of the `HoverButton` constructor (the arrow's position) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x180437070 0x1809eb520` |
 | `decompiled/part7_run1.txt` | under 1 MB | For `screens.md`, part 7: the instructions of the `UnlockConfirm` and `EndlessScreen` constructors, `EndlessScreen.refreshScoreTexts`, `ScoreEntry.isBetterThan` and `ScoreEntry.toString` | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1806859c0 0x1807c1390 0x1807c6fc0 0x1808608d0 0x180860900` |
 | `decompiled/part5_run1.txt` | under 1 MB | For `screens.md`, part 5: the instructions of the `EndScreen` constructor and the strings of the `Intro` and `EndScreen` constructors in machine-code order | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1807b9800`; `ListStringUses.java` with `0x1808fae90` and `0x1807b9800` |
 | `decompiled/settingsmenu_music_asm.txt`, `part4_run1.txt` to `part4_run3.txt` | small | For `screens.md`, part 4: the instructions of `SettingsMenu.musicButton_whenClick`, and the Ghidra output of three runs (string lists of four functions in machine-code order, three caller searches). (The key, `InputWrapper` and `HostUnity.Update` functions read for that part are in `decompiled/all/top.clean.c` and `app_ent.clean.c`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x180714b30`; `ListStringUses.java` with `0x180710150`, `0x180869f50`, `0x18086a9b0`, `0x1808035e0`; `FindReferences.java` with `0x18086FAF0`, `0x180870B30`, `0x1804AA120`, `0x180870210` |
@@ -800,4 +842,4 @@ Running the game writes Unity's `Player.log` under
 | `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
 | `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`) |
-| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, and `stash_check.py` against a real stash; see its `README.md` for each script's arguments |
+| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, and `button_pictures_check.py` against the button pictures; see its `README.md` for each script's arguments |

@@ -82,6 +82,26 @@ Folders: `assets/` (155 files), `assets/papers/` (225), `assets/faces/` (60),
 `assets/layout/phone/` and `tablet/` (77), `assets/intro/` (29),
 `assets/fonts/` (24), `assets/achievements/` (13), `assets/data/` (31).
 
+**The layout folders are for phones and tablets only.** Read on
+2026-10-16 (the loop of the `Res` constructor `0x180775820` that loads the
+archive, and `Platform.resOverrideDir`; for `buttons.md`). For every file
+of the archive:
+
+- On desktop (`resOverrideDir` gives nothing for the platform kind
+  `DESKTOP`), every file whose name contains `/layout/` is skipped: it is
+  never loaded, and asking for it later fails ("Res asset not found").
+- On a tablet or phone (`/layout/tablet/` or `/layout/phone/`), a file in
+  that platform's folder is loaded under the name without the folder
+  (`assets/layout/phone/HoverButton.png` becomes `assets/HoverButton.png`)
+  and wins over the main file of the same name, whichever comes first in
+  the archive. (A file of the other platform's folder keeps its long
+  name, so it is loaded but nothing asks for it; inferred from the
+  name replacement, not followed further.)
+
+So a desktop port needs none of the 77 files under `assets/layout/`.
+Three of them exist only there and are asked for by phone-only code
+(`buttons.md`, "Pictures only phones have").
+
 `assets/data/` holds the game definitions: `Days.csv`, `Papers.xml`,
 `Facts.xml`, `Travelers.txt`, `TravelerGraph.txt`, `Paths.xml`, `Faces.xml`,
 `Bodies.xml`, `Ends.xml`, `Nights.txt`, `News.txt`, `Speeches.txt`,

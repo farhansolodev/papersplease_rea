@@ -59,6 +59,7 @@ Run from the project root with `python -I`. Paths below assume
 | `save_check.py` | `scripts\reference <save folder> dumps\il2cppdumper\stringliteral.json` (a real save folder, for example `extracted\saverun`) | `save-format.md` (the reference script `savefile.py`: decrypting and re-encrypting every file, the tree of saves, header against facts, settings, statistics, names) |
 | `stash_check.py` | `scripts\reference <folder with stash.sav> dumps\il2cppdumper\stringliteral.json D` (a stash the game wrote, for example `extracted\stash_sample`) | `save-format.md`, part 2 (reads the stash with `hxserial.py`: its kind and versions, the fields of each stash class, no generator state, the day's counters, the desk papers, which documents' facts are kept) |
 | `save_night_check.py` | `scripts\reference D <save folder> dumps\il2cppdumper\stringliteral.json` | `night.md` and `save-format.md` (replays the night before each save of a real folder with `nights.py`, starting from the parent save's facts and trying every possibility, and counts the ones that give the saved facts) |
+| `button_pictures_check.py` | `<assets>` (`<assets>` = `extracted\art\assets`; needs Pillow) | `buttons.md` (each button picture is where the code asks for it and divides exactly into the bands or columns the code cuts; the three phone-only pictures are absent from the main folder) |
 
 The ones taking `scripts\reference` as their first argument import
 `tabtree.py` from there.
