@@ -200,7 +200,10 @@ to be found and are not reported as errors.
   `Facts.xml`, in `facts-xml-format.md` and `fact-values.md`.) Note:
   `Facts.xml` is **not well-formed XML**; a strict parser stops at line 96,
   so the port will need a lenient reader or a clean-up step.
-- How the language packs override text (`data.loc.Extractors` also reads
-  this file).
+- (How the language packs override text was listed here; read on
+  2026-10-16, `language-pack.md`: the pack can replace `text` attributes
+  of `page/mark` without `$`, context `paper:<id>`. In English it changes
+  nothing in this file. The bulletin page `diplotut`'s picture,
+  `BulletinInnerDiploTut.png`, exists only in the language packs.)
 - No reader has been written for the port, so none of this is tested end to
   end.

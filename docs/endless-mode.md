@@ -25,7 +25,9 @@ Everything here is confirmed in the code unless marked otherwise.
 <course id="course1" name="Course 1" day="1" button="EndlessCourse1.png" leaderboard="Course 1"/>
 ```
 
-`<style>` attributes: `id`, `name`, `desc` (description), `bulletin` (a text;
+`<style>` attributes: `id`, `name`, `desc` (description), `bulletin` (a text,
+with `\n` written as two characters; the English language pack turns each
+into a real line break, `language-pack.md`;
 that it goes in the booth's bulletin is inferred from the name), `icon`, `button` (picture names), `leaderboard`
 (out of scope), `time` (a time limit in seconds; 0 or absent means none) and
 `reportscoremax` (exactly `true`: the result is the highest score reached,

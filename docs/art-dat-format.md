@@ -104,8 +104,12 @@ the offsets above; there is no script for that step yet.
 
 ## Not done
 
-- Each `StreamingAssets/loc/<lang>.zip` holds localized replacements (130
-  PNGs, a CSV, an XML and two text files for English). They are plain zips;
-  how `Res.loadLanguage` merges them is not studied.
+- (Each `StreamingAssets/loc/<lang>.zip` holds localized replacements (130
+  PNGs, a CSV, an XML and two text files for English). How
+  `Res.loadLanguage` merges them was listed here as not studied; it is
+  read since, on 2026-10-16, `language-pack.md`: every file lookup tries
+  the pack first, then this archive. In English, 129 of the pictures and
+  `Text.xml` are the same as the archive's; one picture,
+  `papers/BulletinInnerDiploTut.png`, exists only in the packs.)
 - `Res.toAsset` was read in full for the text files (`tab-tree-format.md`),
   but how it turns bytes into images and fonts is not written up anywhere.

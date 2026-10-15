@@ -218,7 +218,9 @@ Most are kept as raw nodes and read when needed.
   the page ids of the `Rules` paper in `Papers.xml`.
 - **`<loc id val section>`**: a table from internal word to display text.
   Lookup returns the word itself when there is no entry. `section` is **not
-  read**.
+  read**. The language pack can replace `val` (context `facts`); the
+  English pack changes two: `Gender` shows as `Sex`, and `district` becomes
+  `$0  DISTRICT` with two spaces (`language-pack.md`, 2026-10-16).
 
 Rule tests throughout are **substring tests** on a rules text, so
 `RuleNeedIdCard` would also match inside a longer rule name.

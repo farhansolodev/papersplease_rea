@@ -99,7 +99,9 @@ Script: `scripts/checks/speech_check.py`.
   `wrong-diplonation`. Whether the code builds these names from parts was
   not searched.
 - **`[m]`, `[f]` and `[x]` appear nowhere in the English data.** The
-  language packs may use them; not checked.
+  language packs may use them; not checked, and not needed (the port is
+  English only, the user's decision of 2026-10-16). The English pack
+  changes no line of `Speeches.txt` (`language-pack.md`).
 - **Data slip**: `ask-forgery-asylumgrant` reads the fact
   `WorkPermit/Emblem/MinistryOfAdmission`, which is not a fact in
   `Facts.xml`. Its value is therefore always empty and its `=NONE` line can

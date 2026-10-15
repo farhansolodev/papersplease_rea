@@ -1071,8 +1071,9 @@ constructor's defaults and `ButtonHelper.react` (read afterwards, for
 and `show`, `RatingPopup`,
 `LangChooser` beyond the one function (it is its own screen),
 `Menu.applyCenterY` again (taken from part 2), the platform functions
-`canVibrate`, `setFullscreen`, `getFullscreen`, `setCategoryVolume`, and
-`Bootstrap.setLanguage`. (`getAvailableLanguageCodes` was on this list;
+`canVibrate`, `setFullscreen`, `getFullscreen`, `setCategoryVolume`.
+(`Bootstrap.setLanguage` was on this list; it is read since, on
+2026-10-16, `language-pack.md`.) (`getAvailableLanguageCodes` was on this list;
 it is read since part 6: the `.zip` files in `StreamingAssets/loc`.)
 
 ## Which key pauses: Escape
@@ -1597,7 +1598,10 @@ from it. The desktop values read for this part, from the same listing:
   user's decision of 2026-10-16 and will not be studied.)
 - What `canVibrate` answers on desktop.
 - What "rebuilds the game's standing objects" covers after a language
-  change (`Game.createDefaultEnts`), and `Bootstrap.setLanguage`.
+  change (`Game.createDefaultEnts`). Not needed for an English-only port.
+  (`Bootstrap.setLanguage` was listed here; it is read since, on
+  2026-10-16: it loads the pack and builds new data, day run, booth run
+  and entity environment, `language-pack.md`.)
 - What the nudity setting changes: its readers were not looked up. (Easy
   mode's effect is known: the night adds the event `EASY_MODE` when the
   setting is on, `night.md`.)

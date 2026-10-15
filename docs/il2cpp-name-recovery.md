@@ -89,4 +89,7 @@ Addresses in `script.json` are RVAs (offsets from the image base). Add
   studied 2026-10-14 and confirmed by decrypting a real save folder,
   `save-format.md`). Whether anything else calls it has not been searched.
 - `format.png` and `haxe.zip` are in the game code, so it likely reads PNG and
-  ZIP data itself (the `StreamingAssets/loc/*.zip` files). Not verified.
+  ZIP data itself (the `StreamingAssets/loc/*.zip` files). For the zips
+  this is confirmed since 2026-10-16: `data.loc.Pack.loadInternal` reads a
+  language pack with `haxe.zip.Reader` (`language-pack.md`). The PNG part
+  is not verified.

@@ -134,4 +134,6 @@ Measurements, from the reference script (**not from the running game**):
 - How `app.vis.Text` places lines and letters (alignment, padding, the
   background box), and which code asks for which font id.
 - Other languages: the language packs in `StreamingAssets/loc/` may bring
-  their own fonts; not looked at.
+  their own fonts; not looked at, and not needed (the port is English
+  only, the user's decision of 2026-10-16). The English pack has no font
+  files (`language-pack.md`).

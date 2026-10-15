@@ -37,12 +37,18 @@ cross-checked, with a write-up in `docs/`.
 | `Version.txt` | nothing | Not read by the game: `unused-data-files.md` (holds `1.4.11.124`) |
 
 Two names the code asks for are not in the archive: `Loc.csv` and
-`LocVersion.txt`, requested by `data.loc.Pack.loadInternal`. Each language
-zip in `StreamingAssets/loc/` contains a CSV and text files; that these are
-the same files is inferred.
+`LocVersion.txt`, requested by `data.loc.Pack.loadInternal`. They come
+from the language pack: each zip in `StreamingAssets/loc/` holds
+`/data/Loc.csv` and `/data/LocVersion.txt`, which the loader names
+`assets/data/...` (read 2026-10-16, `language-pack.md`; this paragraph
+first said that these are the same files was inferred).
 
-`data.loc.Extractors.init` also names many of these files. It is part of the
-localization tooling and is not studied.
+`data.loc.Extractors.init` also names many of these files. **Corrected on
+2026-10-16:** this paragraph said it was "part of the localization tooling"
+and not studied. It is not tooling: the game itself runs it every time it
+reads one of these files, to put the language pack's text into them, in
+English too. Which files, and the 23 texts the English pack changes, are in
+`language-pack.md`.
 
 Shared formats and helpers:
 

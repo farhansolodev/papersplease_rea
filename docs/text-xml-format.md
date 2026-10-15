@@ -101,9 +101,12 @@ and leaderboards are outside the port's scope (offline, single player).
 
 ## Not studied
 
-- The language packs (`data.loc`, `StreamingAssets/loc/`): how a pack's text
-  replaces these entries and in what order relative to `Text.xml`.
-  `loadFromXml` is called through the object, so its other callers were not
-  listed.
+- (How a language pack's text replaces these entries was listed here; read
+  on 2026-10-16, `language-pack.md`: `Text.xml` is read by plain file
+  lookup, which tries the pack first, so a pack's own `Text.xml` replaces
+  the archive's whole file; its `Loc.csv` rows for `text:` are not applied
+  by any code. The English pack's `Text.xml` is the same as the
+  archive's.) `loadFromXml` is called through the object, so its other
+  callers were not listed.
 - Text wrapping and the `wrap_hyphen` entry; fonts (`Fonts.xml`).
 - Nothing here has been compared with the running game.

@@ -229,5 +229,8 @@ is created. It is read by `BoothEnv.findDefaultRunOpNode`
   condition. (Response conditions in general: `responses-and-events.md`.)
 - The custom error and custom fact group classes beyond how they are built.
 - What reads each variable (`want`, `special`, `slow`, `face` and so on).
-- How the language packs alter the tree.
+- (How the language packs alter the tree was listed here; read on
+  2026-10-16, `language-pack.md`. In English: three typos in spoken lines
+  are fixed (4 lines), and the 13 EZIC note messages get real line breaks
+  in place of `\n`.)
 - (A reference reader now exists: `scripts/reference/travspec.py`, above.)

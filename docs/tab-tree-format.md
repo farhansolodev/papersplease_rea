@@ -69,7 +69,12 @@ Expansion is a separate step that the loader has to ask for:
 ## Language packs
 
 `Res.getTabParser` passes the finished tree to the active language pack
-(`locPack.localizeTab`) when there is one. What that changes is not studied.
+(`locPack.localizeTab`) when there is one, before any template is
+expanded. What that changes was listed here as not studied; it is read
+since, on 2026-10-16 (`language-pack.md`): for `Speeches.txt`,
+`Travelers.txt`, `News.txt` and `Nights.txt`, chosen words of chosen lines
+are replaced by the pack's text. In English, 17 lines of `Travelers.txt`
+change.
 
 ## Checks
 

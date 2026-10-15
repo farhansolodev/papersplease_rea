@@ -1,7 +1,11 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-10-16, after the
-screens, part 7: the endless code box and the endless screen, with the
+**Read this first in a new session.** Last updated 2026-10-16, after
+part 8: how a language pack is loaded and what the English pack changes
+(`language-pack.md`; code reading and a comparison of the files, not run
+in the game). Before it the same day: the user decided the port is
+English only, with no language chooser and no age rating. Earlier that
+day, the screens, part 7: the endless code box and the endless screen, with the
 local best score per course and style (`screens.md`; code reading, then
 watched by the user in the real game in a separate save folder: all
 matched, and the files it wrote confirm the stored choice and the local
@@ -66,7 +70,10 @@ and loops; the game runs at 60 frames a second on most screens), and the
 endless screens (the code box: code 62131, five blinks over 3 seconds;
 the endless screen: style and course rows, the choice kept in the
 settings, a result box after a run, and the player's best score per
-course kept locally even without leaderboards). The desktop
+course kept locally even without leaderboards), and the language pack
+(English is loaded as a pack too: every file lookup tries `en.zip` first,
+and its table fixes 3 typos, shows `Gender` as `Sex` and adds line breaks
+to 16 texts; one bulletin picture exists only in the pack). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -84,9 +91,9 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | Stage | Share | State |
 |---|---|---|
 | 1. Tools to read the code | 3% | Done |
-| 2. Getting assets out | 5% | About half: images, fonts, data done; audio, language packs, scripted `Art.dat` cut-out not done |
+| 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`). Left out by the user's decision: the language chooser and the age rating. Not done: how the English language pack is loaded, the family pictures of the night screen, drawing text and documents |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`). Left out by the user's decision: the language chooser and the age rating. Not done: the family pictures of the night screen, drawing text and documents |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -142,6 +149,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `border-view.md` | **The border scene, part 4**: the three screen layouts and their border values (desktop: no panning, no cameras, no slow motion; hit box 8 x 18), how the view slides and follows a figure, the camera screens, the endless scoreboard and its flashing texts, the game's clock and frame time, and the frame rate (60 frames a second when the screen's refresh matches, otherwise 65; added 2026-10-15) |
 | `credits-txt-format.md` | `Credits.txt` and the layout of the credits list |
 | `languages-list.md` | `Languages.txt`, `Languages.png` |
+| `language-pack.md` | **Part 8**: how a language pack (`StreamingAssets/loc/<code>.zip`) is loaded, which language starts, how the pack's table replaces text in the data files (the 27 extractors), what is in `en.zip`, and the 23 texts the English pack changes. English only, by the user's decision |
 | `test-tooling-files.md` | `TestScenarios.xml`, `Auto.txt` (a recipe for reaching every ending) |
 | `unused-data-files.md` | `Threads.txt`, `TravelerGraph.txt`, `Version.txt`: not read by the game |
 | **Checking against the original** | |
@@ -166,7 +174,7 @@ in the sixth: the whole border scene, parts 1 to 4. Done in the seventh:
 saves, part 1. Done in the eighth: saves, part 2. Done in the ninth: the
 screens, parts 1 to 3. Done in the tenth: the screens, parts 4 and 5.
 Done in the eleventh: the screens, part 6. Done on 2026-10-16: the
-screens, part 7.)
+screens, part 7; part 8, the language pack.)
 
 1. **A longer comparison run of the game**: **postponed by the user on
    2026-10-14** ("skip for now"). Do not start it without being asked; it
@@ -203,7 +211,8 @@ screens, part 7.)
    (The language chooser and the rating screen were suggested as part 8;
    the user decided on 2026-10-16 to leave both out of the port, so
    they will not be studied. Part 8 became how the English language
-   pack is loaded, `language-pack.md`.) Still to do:
+   pack is loaded: **done** on 2026-10-16, `language-pack.md`.) Still to
+   do, **next, part 9** (suggested):
    `play.ui.Button`'s modes and pictures (what a
    back button does is read since part 4), and the family pictures of
    the night screen (`FamilyVisuals`, a 1,930-line constructor, proposed
@@ -228,9 +237,11 @@ screens, part 7.)
    and subtitle rules in `newspaper-picture.md` wait on this), how a document page is
    laid out (`PaperInnerVisuals`, read only for its random draws), the
    search photo, the rest of `app.vis` and `play.ui`; input handling.
-6. **Audio extraction** (probably `sharedassets0.resource`; not checked) and
-   the language zips in `StreamingAssets/loc/`. Independent of the steps
-   above; may need a Unity asset tool (ask before downloading).
+6. **Audio extraction** (probably `sharedassets0.resource`; not checked).
+   Independent of the steps above; may need a Unity asset tool (ask before
+   downloading). (The language zips in `StreamingAssets/loc/` were also
+   here: only `en.zip` is needed, and it is a plain zip that Python reads;
+   compared with the archive on 2026-10-16, `language-pack.md`.)
 7. **Sort the open questions** (added 2026-10-14 at the user's request),
    before any design work. Go through every entry under "Open questions and
    unconfirmed items" once and put it in one of five kinds:
@@ -269,7 +280,27 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
-**From 2026-10-16** (`screens.md`, part 7)
+**From 2026-10-16** (`language-pack.md`, part 8)
+
+- **Nothing about the language pack has been seen in the game.** The
+  quickest checks: `WATCH_GIVER0` should say "All Arstotzkans are same."
+  and `KID_KILLER2` "Damn it." (both fixed by the pack); a fact named
+  `Gender` should be displayed as `Sex` (where it is displayed was not
+  followed).
+- **A design decision**: apply the English pack once when the assets are
+  prepared (suggested; simpler) or load it at run time as the original
+  does. Either must give the 23 changes listed in `language-pack.md` and
+  the picture `papers/BulletinInnerDiploTut.png`, which is only in the
+  pack.
+- Suggested: keep the one-off script that applies the pack as a reference
+  script, so a check can compare the port's data with it. It was written
+  in the session scratchpad and not kept; it is about 210 lines.
+- For the EZIC notes the pack's line breaks are probably invisible (the
+  page drawing turns `\n` into a line break too); for the endless
+  descriptions it was not followed. Not read: `Res.toAsset` for pictures,
+  `TabEntry.set_text` in full.
+
+**Also from 2026-10-16** (`screens.md`, part 7)
 
 - (**Watched on 2026-10-16**: the user ran the game with `savedir` set to
   a new folder, `extracted/endlessrun`, went through the list at the end
@@ -583,7 +614,10 @@ Collected from the docs, so they are not lost:
 - `TestScenarios.xml`: what starts a scenario. `Auto.txt`: the order in
   which instruction blocks are consulted, and how each action is carried
   out.
-- Where user-added languages come from; how a language pack is loaded.
+- (Where user-added languages come from and how a language pack is loaded
+  were listed here. Answered: a user-added language is another `.zip` in
+  `StreamingAssets/loc/`, `languages-list.md` (2026-10-15); loading,
+  `language-pack.md` (2026-10-16).)
 - The test player's audit pictures come out empty in this build, and its
   frame capture needs files that only existed on the developer's Mac
   (`comparing-with-the-game.md`, "Dead ends"). Neither is usable.
@@ -635,7 +669,8 @@ Collected from the docs, so they are not lost:
 - The seeds of 6 minor generators (`rand.md`; `BorderCam`'s is now known).
 - 20 traveler entries nothing refers to (`travelers-txt-format.md`).
 - Six speech responses named nowhere found (`speech.md`). `[m]`/`[f]` gender
-  switches are unused in English; the language packs were not checked.
+  switches are unused in English; the language packs were not checked
+  (not needed: English only, 2026-10-16).
 - What `canDetain`, `forceDeny`, `slow` and `special` do in play beyond what
   `responses-and-events.md` shows. (`leaveDir` is known since part 2 of the
   border scene: it picks the exit path, `border-scene.md`.)
