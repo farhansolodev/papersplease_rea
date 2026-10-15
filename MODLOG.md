@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-16 Kept the language-pack script as `scripts/reference/locpack.py`
+
+**Changed:** new `scripts/reference/locpack.py` (the one-off script of part 8, cleaned up: `Pack` loads a pack as `Pack.load` does, `apply` runs the 27 extractors over the data files, `compare_files` compares the pack's files with the extracted archive); `docs/language-pack.md` (the script is named and its command given; "not kept" removed); `docs/PROGRESS.md` (the open item to keep it, now done; the scripts table).
+**Why:** the user asked to keep it, so the port's English text can be checked against it later.
+**Tested how:** ran `python -I scripts/reference/locpack.py extracted/art/assets game/PapersPlease_Data/StreamingAssets/loc/en.zip`.
+**Result:** the same as the one-off script and `language-pack.md`: 133 pack files after `Loc.csv` is dropped (130 the same as the archive, 3 only in the pack: `LocVersion.txt`, `UsedChars.txt`, `papers/BulletinInnerDiploTut.png`), 2,102 pieces found, 8 not found, 404 of 749 contexts used, 23 texts changed.
+**Corrected in older docs:** the part 8 entry below says the script was not kept; that was true then and is left as history.
+**Still broken / not tested:** not modelled: `data.CsvTable` itself, Haxe's XML reader, writing a changed text back. Nothing compared with the running game. Nothing committed.
+
 ## 2026-10-16 Part 8: how a language pack is loaded, and what the English pack changes
 
 **Changed:** new `docs/language-pack.md`; `docs/PROGRESS.md` (state line, summary, stages 2 and 4, docs table, next steps 4 and 6, new open items, two old items answered); older docs corrected (below). No script kept (the one-off script is in the session scratchpad).

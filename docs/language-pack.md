@@ -2,7 +2,8 @@
 
 Studied on 2026-10-16 (part 8 of the screens step; not a screen itself).
 Code reading, plus a comparison of `en.zip` with the main archive and a
-one-off script that applies the English pack to the data files. **Nothing
+script that applies the English pack to the data files (now the reference
+script `scripts/reference/locpack.py`, below). **Nothing
 here has been compared with the running game.**
 
 Why it matters for an English-only port (the user's decision of
@@ -182,9 +183,18 @@ In `Loc.csv`, column 2 equals column 1 in all but 6 rows.
 
 ## What applying en.zip changes
 
-A one-off script (session scratchpad, not kept) applied the 27 extractors
-above to the data files in `extracted/art/assets/data/` and the English
-`Loc.csv`, with the key and clean-up rules above. Result:
+`scripts/reference/locpack.py` applies the 27 extractors above to the data
+files in `extracted/art/assets/data/` and the English `Loc.csv`, with the
+key and clean-up rules above, and compares the pack's files with the
+archive. (It was first a one-off script; it was kept as a reference
+script at the user's request the same day, and gives the same result.)
+
+    python -I scripts/reference/locpack.py extracted/art/assets game/PapersPlease_Data/StreamingAssets/loc/en.zip
+
+What it does not model: `data.CsvTable` itself (Python's CSV reader with
+every cell trimmed), Haxe's XML reader (a lenient clean-up before Python's,
+as the checks do), and writing a changed text back (`TabEntry.set_text`).
+Result:
 
 - 2,102 text pieces found their row in the pack; 8 did not (they keep
   their text: the spoken lines `ask-missing-passport` and
@@ -249,9 +259,9 @@ nothing in English.
      that already hold the 23 changed texts and adding
      `papers/BulletinInnerDiploTut.png` to the pictures; or
   2. load `en.zip` at run time and apply it as the original does.
-  The first is simpler; either must give the 23 changes above. Writing the
-  one-off script as a reference script (`scripts/reference/`) would let a
-  check compare the port's data with it.
+  The first is simpler; either must give the 23 changes above.
+  `scripts/reference/locpack.py` lists them, so a check can compare the
+  port's data with it.
 - The picture `papers/BulletinInnerDiploTut.png` must come from a pack;
   without it the bulletin page `diplotut` has no picture.
 - The pack load draws nothing random by itself, but `setLanguage` draws the

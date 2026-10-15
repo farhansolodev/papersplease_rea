@@ -292,9 +292,8 @@ Collected from the docs, so they are not lost:
   does. Either must give the 23 changes listed in `language-pack.md` and
   the picture `papers/BulletinInnerDiploTut.png`, which is only in the
   pack.
-- Suggested: keep the one-off script that applies the pack as a reference
-  script, so a check can compare the port's data with it. It was written
-  in the session scratchpad and not kept; it is about 210 lines.
+- (Keeping the script that applies the pack was suggested here; done the
+  same day at the user's request: `scripts/reference/locpack.py`.)
 - For the EZIC notes the pack's line breaks are probably invisible (the
   page drawing turns `\n` into a line break too); for the endless
   descriptions it was not followed. Not read: `Res.toAsset` for pictures,
@@ -800,5 +799,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs) |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`) |
 | `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, and `stash_check.py` against a real stash; see its `README.md` for each script's arguments |
