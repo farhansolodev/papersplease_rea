@@ -14,6 +14,14 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-16 Note on scope drift
+
+**Changed:** new `SCOPE-DRIFT.md` in the project root.
+**Why:** the user noticed that each step's suggested next part changes after the step (items dropped, others added); the note records it for reference in case it keeps happening.
+**Tested how:** not applicable (a note).
+**Result:** the note describes the pattern, the drawing part 4 example, the likely cause and the options discussed. The user chose to keep the current pace; no process change.
+**Still broken / not tested:** nothing committed.
+
 ## 2026-10-16 Drawing, part 4: a paper's pictures on the desk (`DeskItem`)
 
 **Changed:** new `docs/desk-pictures.md`; new `scripts/reference/deskpics.py` (closed, drawer, wall, rack and shadow pictures; clipping; `compareProximity` and the mark picker; stamp ink; `Image.render`); new `scripts/checks/desk_pictures_check.py` (and its README row); `docs/PROGRESS.md` (state line, summary, stage 4, docs table, next step 5, open questions, machine-only and scripts tables); older docs corrected (below). Kept on this machine: `decompiled/drawing4_run1.txt` (Ghidra output), `extracted/previews/deskpics/` (previews).
