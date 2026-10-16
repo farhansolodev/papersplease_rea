@@ -87,7 +87,7 @@ A line with no group of that name runs nothing.
 
 | Command | Effect |
 |---|---|
-| `Upgrade-INSPECT_HOTKEY`, `-INSPECT_DOUBLECLICK`, `-RULEBOOK_TABS`, `-STAMPBAR_HOTKEY`, `-BOOTH_MULTITOUCH` | Gives the player that booth upgrade. What the two key upgrades do (Space for inspect mode, Tab or Enter for the stamp bar): `screens.md`, part 4, "Every key the game reads" |
+| `Upgrade-INSPECT_HOTKEY`, `-INSPECT_DOUBLECLICK`, `-RULEBOOK_TABS`, `-STAMPBAR_HOTKEY`, `-BOOTH_MULTITOUCH` | Gives the player that booth upgrade. What the two key upgrades do (Space for inspect mode, Tab or Enter for the stamp bar): `screens.md`, part 4, "Every key the game reads"; `INSPECT_DOUBLECLICK`: a double click on a paper opens the inspect mode with that fact marked (`inspect-mode.md`) |
 | `MakeSonHappy`, `MakeSonSad` | If the son is alive, sets his mood |
 | `AdoptNiece` | Sets "have niece" to 1 |
 | `RemoveSavings` | Sets savings to 0 and updates the savings budget line |

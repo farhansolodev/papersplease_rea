@@ -135,9 +135,9 @@ y 0 +-------------+--------------------------------------+
 | `shutterSwitch` | (150, 4) | |
 | `reasonSprite` | (182, 0) | |
 | `fingerprintButton`, `searchButton`, `detainButton` | (277, 0), (191, 0), (105, 0) | |
-| `interrogateButtonRect` | x 73, y 163, w 33, h 49 | The interrogate button (the inspect mode, drawing part 5) |
+| `interrogateButtonRect` | x 73, y 163, w 33, h 49 | The interrogate button (`inspect-mode.md`) |
 | `interrogateButtonTextCentered` | true | |
-| `inspectableCounter`, `inspectableFace` | x 9, y 120, w 160, h 46; x 47, y 23, w 80, h 80 | Things in the booth that the inspect mode can mark (the inspect mode, drawing part 5) |
+| `inspectableCounter`, `inspectableFace` | x 9, y 120, w 160, h 46; x 47, y 23, w 80, h 80 | Things in the booth that the inspect mode can mark (`inspect-mode.md`) |
 | `inspectableClock`, `inspectableWeight` | x 2, y 184, w 30, h 31; x 146, y 184, w 30, h 31 | Same |
 | `consoleClock`, `consoleTranscriptBolt`, `consoleDate`, `consoleTravelerCount`, `consoleWeight` | (9, 21), (85, 31), (4, 48), (86, 42), (164, 34) | Inside the console |
 | `consoleKind` | `UNDEROVER` | |

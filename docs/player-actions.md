@@ -159,7 +159,8 @@ No `Confiscated-` or `Unconfiscated-` response exists in `Travelers.txt`.
 
 ## Interrogating (`interrogateFactPaths`)
 
-The player marks **exactly two** facts (inspect mode).
+The player marks **exactly two** facts (inspect mode; how they are
+marked and when the button shows: `inspect-mode.md`).
 
 1. Find the operation: over the booth's fact groups in order (the
    nation's `Facts.xml` groups, then the traveler's custom groups, both set

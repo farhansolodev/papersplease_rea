@@ -8,7 +8,7 @@ of the screen), drawn, and clicked, how the mark under the cursor is
 picked, how stamp ink lands on a page, and `Image.render`, the last picture
 operation not yet read. Dragging, the reveal and hide animations and the
 drawer's own logic are in part 5a (`desk-movement.md`), the inspect mode
-in part 5b.
+in part 5b (`inspect-mode.md`).
 
 Everything here is from the code; **nothing was compared with the running
 game**.
@@ -304,8 +304,10 @@ and height for layout use are the shown sprite's (`width`, `height`).
 
 ## Picking the mark under the cursor
 
-`DeskItem.getInnerVisualAt(point)` (used by the inspect mode and links,
-not read here):
+`DeskItem.getInnerVisualAt(point)` (used by clicks and links,
+`desk-movement.md`; **corrected 2026-10-16**: this said the inspect mode
+uses it too, but the inspect mode uses `getInnerVisualsAt` below and
+sorts with `compareProximity` itself, `inspect-mode.md`):
 
 1. Nothing when the placement is `MOUNT` or the page is hidden.
 2. The point is moved into the item's coordinates. It must be inside the
@@ -437,8 +439,8 @@ shadow.
 - (Where the item is and how it moves, the drawer, the dock points, the
   give area, the depth order and the reveal chosen in the `Paper`
   constructor were listed here; read since, on 2026-10-16,
-  `desk-movement.md`. The inspect mode was listed here too; it is part
-  5b.)
+  `desk-movement.md`. The inspect mode was listed here too;
+  read since, `inspect-mode.md`.)
 
 ## Things to watch in the game
 

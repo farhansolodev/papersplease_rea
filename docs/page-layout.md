@@ -290,9 +290,10 @@ documents, the Arstotzka token before and after the painting over.
   2026-10-13: `emblems-and-bodies.md`.)
 - What the day's rule table maps (`Rule0` ...) and where the page masks
   are set.
-- Inspection (the inspect mode). (The desk side, `DeskItem.setInnerImage`
-  and `addInnerVisual`, and `compareProximity` in detail were listed here:
-  read on 2026-10-16, `desk-pictures.md`.)
+- (Inspection was listed here: read on 2026-10-16, `inspect-mode.md`.
+  The desk side, `DeskItem.setInnerImage` and `addInnerVisual`, and
+  `compareProximity` in detail were also listed: read on 2026-10-16,
+  `desk-pictures.md`.)
 
 ## Things to watch in the game
 

@@ -6,7 +6,7 @@ appears (the reveal animations), how it leaves (the hide animations),
 dragging and dropping between the counter, the desk, the drawer and the
 wall, the give area, what a paper does when let go, the dock points of
 the rulebook, bulletin and transcript, and the drawer's movement. The
-inspect mode is part 5b.
+inspect mode is part 5b (`inspect-mode.md`).
 
 Everything here is from the code; **nothing was compared with the running
 game**. Positions are in booth coordinates (`booth-layout.md`: the booth
@@ -185,7 +185,7 @@ pointer's cursor yet this frame. Then:
 - when the paper is being dragged and the pointer is not held (or no
   pointer was given for it this frame): `endCustomDrag`;
 - on a double click: `whenDoubleClicked` (the inspect mode's quick
-  inspect, part 5b).
+  inspect, `inspect-mode.md`).
 
 `startCustomDrag` works only in the state `NORMAL`. It remembers the
 placement at the start, sets "dragging", "not yet moved" and "was
