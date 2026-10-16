@@ -19,7 +19,9 @@ the `play.day.booth.Paper` constructor, the `play.day.PaperInnerVisuals`
 constructor, `BoothEnv.getImage`, `Page.getInnerImageAndMarkPositions`,
 `Face.getDocImage`. (The `PaperInnerVisuals` constructor and
 `getInnerImageAndMarkPositions` were read in full on 2026-10-16,
-`page-layout.md`; the draws listed below hold.) How they were found: all 1,433 functions of the booth
+`page-layout.md`; `BoothEnv.getImage`, `Face.getDocImage` and the
+fingerprint and contraband pictures the same day, `fact-pictures.md`. The
+draws listed below hold, and the fingerprint draws were added.) How they were found: all 1,433 functions of the booth
 classes were decompiled and searched for uses of a generator; every function
 in the game that takes a generator as a parameter was listed from the
 recovered names.
@@ -51,9 +53,19 @@ A missing paper never gets a picture. A hidden one gets it when revealed.
       and `pos2`, two draws (x, then y, between the two points).
    2. Then mark by mark, in file order:
       - a picture mark showing the fact `Face`: **one draw**
-        (`Face.getDocImage` shifts the photo vertically a little);
+        (`Face.getDocImage` shifts the photo down by 3 to 6 pixels). A
+        value that is neither `VALID` nor a full face specification first
+        draws once for each missing or `*` part (`fact-pictures.md`; not
+        modelled in `desk.py`);
       - a picture mark showing `Criminal0`...: one draw if that slot has a
         criminal (same function), none if it is blank;
+      - a picture mark showing `Fingerprints` or `Thumbprint`: a random
+        fingerprint code that the value then overwrites (five draws plus
+        redraws, `traveler-build.md`), then one draw per finger shown (5,
+        or 1 for the thumbprint). Added 2026-10-16 (`fact-pictures.md`);
+      - (a search photo's contraband: one draw, the first time for a
+        traveler, if the fact is invalid. It is on the photo's second page,
+        so it is not a first-page draw.)
       - a seal mark (`emblem="..."`): nothing if the seal's fact
         `<paper>/Emblem/<id>` is neither `VALID` nor `INVALID`; otherwise
         **three draws**: which seal picture (any valid one, or any invalid
@@ -100,9 +112,15 @@ spoken lines are needed.
   (three photos) would draw on every visit. Not modelled, not tested.
 - The fingerprint, thumbprint and contraband pictures receive the generator
   too (`FingerprintCode.fromString`, `Traveler.getContrabandImage`). Their
-  draws were not read. The identity record (three `pos2` marks and a
-  fingerprint picture) appeared once in the log, after the last pick that
-  could show a difference, so it is **not tested**.
+  draws were read on 2026-10-16 (`fact-pictures.md`; listed above), and
+  `desk.py` counts the fingerprint and thumbprint ones. **Not tested**:
+  route 20 draws four fingerprint pictures (identity record and
+  fingerprint paper, twice each), but they all come after the last pick
+  the log can show. With three deliberate extra draws in them, the
+  comparison still matched 36 of 36.
+- `PaperInnerVisuals.autoGetPageIndexForFactId` also calls `getImage`,
+  and so makes these draws. Its callers appear to serve the test player
+  only (inferred, `fact-pictures.md`).
 - The criminal photo draw and the invalid seal are from the code only.
 - A hidden paper shown later: modelled, but the one case in the log came
   after the last informative pick. Not tested.

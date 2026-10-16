@@ -16,10 +16,11 @@ Options: --width N (fixed width, 0 = break only at line breaks),
 
 Prints the size and every tile. --png draws a preview (needs Pillow): the
 letters in the text colour where the font sheet is opaque (every sheet here
-is white with alpha 0 or 255, so the game's tint gives the same pixels if
-it multiplies, which the decompiled paste suggests but was not read in
-full); the background and missing-letter boxes as filled rectangles (the
-game stretches a 1 x 1 white picture as a quad, drawn by code not read).
+is white with alpha 0 or 255, and the game's tint multiplies each channel
+by colour / 255, read in Image.paste, docs/fact-pictures.md, so the pixels
+are the same); the background and missing-letter boxes as filled
+rectangles (the game stretches a 1 x 1 white picture as a quad, drawn by
+Image.render, not read).
 """
 
 import os

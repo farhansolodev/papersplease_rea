@@ -114,7 +114,9 @@ fingers differ is not applied again.
 
 `FingerprintCode.fromString(rand, text)` makes a random code (using up its
 draws) and then overwrites finger `i` from character `i`: `-` gives −1, a
-digit gives that digit, anything else 0. Who calls it is not studied.
+digit gives that digit, anything else 0. Its only caller is
+`BoothEnv.getImage`, for the fingerprint and thumbprint pictures (searched
+2026-10-16, `fact-pictures.md`).
 
 ## Dates (`app.GregorianDate`)
 

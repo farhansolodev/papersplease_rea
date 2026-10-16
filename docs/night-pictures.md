@@ -34,8 +34,9 @@ passport count is 1.0; and the empty-token test asks the map for place
 number 0 to 6 in turn. Number constants were read with `read_doubles.py`.
 
 Not read: `app.vis.Sprite` and `app.vis.Fill` beyond their constructors'
-arguments, `Image.transformed`'s scaling method. (`app.vis.Text` was on
-this list; read on 2026-10-16, `text-drawing.md`.)
+arguments. (`app.vis.Text` was on this list; read on 2026-10-16,
+`text-drawing.md`. So was `Image.transformed`'s scaling method; read the
+same day, `fact-pictures.md`.)
 
 ## In short
 
@@ -132,7 +133,8 @@ Placed at **(76, 158)**, 30 x 40.
 - Otherwise the count is `Night/NumEscapePassports` and the picture is
   `papers/PassportOuterObristan.png`.
 - Both covers are 60 x 80 and are **halved** to 30 x 40 when the sprite is
-  made (`Image.transformed(0, 0.5)`).
+  made (`Image.transformed(0, 0.5)`). It keeps the even pixels: target
+  pixel x shows source pixel 2x (`fact-pictures.md`).
 - If the count is 0: the dotted outline `NightPassportFrame.png` (30 x 40)
   instead, and no text.
 - Otherwise a text `x<count>` in `regular`, colour `0x556855` with the
@@ -223,8 +225,10 @@ not been seen.
   2026-10-16, `text-drawing.md`. `nightpics.py render` now draws the
   texts.)
 - How a sprite is drawn from its position (taken as its top-left corner in
-  the preview), and how `Image.transformed` halves the passport covers
-  (which pixels it keeps).
+  the preview). (How `Image.transformed` halves the passport covers was
+  also listed here: it keeps the even pixels, `fact-pictures.md`,
+  2026-10-16. `nightpics.py render` halved them with Pillow, which keeps
+  other pixels, 106 of 1,200 different; it now uses `factpics.py`.)
 - The portrait branches were read for their structure only, not their
   numbers (not needed for a desktop port).
 

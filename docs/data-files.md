@@ -14,14 +14,14 @@ cross-checked, with a write-up in `docs/`.
 | `Travelers.txt` | `data.TravelerLib` | Studied: `travelers-txt-format.md`; responses at the booth in `responses-and-events.md` and `player-actions.md` |
 | `Errors.txt` | `data.ErrorLib` | Studied: `errors-txt-format.md`; applying an error in `operations-and-fact-validity.md` |
 | `Speeches.txt` | `data.SpeechLib` | Studied: `speech.md` |
-| `News.txt` | `data.NewsArticleLib` | Studied: `news-txt-format.md` (the file and which headlines a day gets) and `newspaper-picture.md` (drawing the newspaper; fitting its text not studied) |
+| `News.txt` | `data.NewsArticleLib` | Studied: `news-txt-format.md` (the file and which headlines a day gets) and `newspaper-picture.md` (drawing the newspaper, and which real headlines are cut) |
 | `Nights.txt` | `data.NightLib` | Studied: `nights-txt-format.md` (the file, the calendar, running an event) and `night.md` (the family and the budget) and `screens.md`, part 1 (the night screen) |
 | `Ends.xml`, `Intro.xml` | `data.EndLib` | Studied: `ends-xml-format.md` (the files and what each attribute does); the slide player's timing and input in `screens.md`, part 5 (this cell said "not studied" until 2026-10-14) |
 | `Endlesses.xml` | `data.EndlessLib` | Studied: `endless-mode.md` (styles, courses, scoring); the endless screen that shows them: `screens.md`, part 7 |
 | `Faces.xml` | `data.FaceLib` | Studied: `faces.md` (the loader and how a face picture is built); how the metadata of four pieces is combined in `traveler-build.md` |
-| `Bodies.xml` | `data.BodyLib` | Studied: `emblems-and-bodies.md` (drawing the search photo not studied) |
-| `Emblems.xml` | `data.EmblemLib` | Studied: `emblems-and-bodies.md` (stamping emblems on documents not studied) |
-| `Fonts.xml` | `data.FontLib` | Studied: `fonts.md` (the file, the `.fnt` files, measurements, line breaking; drawing text not studied) |
+| `Bodies.xml` | `data.BodyLib` | Studied: `emblems-and-bodies.md`; the search photo's pictures in `fact-pictures.md` |
+| `Emblems.xml` | `data.EmblemLib` | Studied: `emblems-and-bodies.md`; the seal on a page in `page-layout.md`, the rulebook's seal sheets and the bulletin seal in `fact-pictures.md` |
+| `Fonts.xml` | `data.FontLib` | Studied: `fonts.md` (the file, the `.fnt` files, measurements, line breaking); drawing text in `text-drawing.md` |
 | `Paths.xml` | `data.PathLib` | Studied: `paths-xml-format.md` (the file, building a path, points along it) and `border-figures.md` (how a figure follows a path, the waiting line), `border-scene.md` (what each event does, which paths the code starts) |
 | `Sounds.xml` | `data.SoundDefLib` | Studied: `sounds-xml-format.md` (the file, which recording plays, how songs are named; the audio files are not extracted yet) |
 | `BorderAnim.xml` | `data.AtlasLib` (asked for by `play.day.border.Border`) | Studied: `borderanim-xml-format.md` (the atlas and how an animation finds its frames). Of the border scene itself, the figures and the waiting line (`border-figures.md`) `Border` (`border-scene.md`), shooting (`border-shooting.md`) and the cameras and panning (`border-view.md`) are studied |

@@ -124,8 +124,9 @@ eyes, nose-and-mouth piece numbers), mirrored if asked, then:
    the shoulders' chin dot ended up. Nothing moves or stretches vertically
    here, so the head's rows shift by (shoulders' chin row − head's chin
    row).
-6. A second picture with the head alone, and where its chin is, are kept
-   (for later use; not studied).
+6. A second picture with the head alone, and where its chin is, are kept.
+   They make the search photo's head (`Face.getPhotoHeadImage`, read on
+   2026-10-16: `fact-pictures.md`).
 
 For a document photo the work stops here. Otherwise:
 
@@ -217,14 +218,14 @@ equality with the game; nothing has been compared with the running game.
 
 ## Not studied
 
-- `Face.getDocImage` and `getPhotoHeadImage` (how the document photo and
-  the search photos are cut and coloured), and where the head-only picture
-  is used.
-- `Image.copy` with a rectangle goes through `Image.paste`, whose
-  blending was not read (its position handling was, on 2026-10-16:
-  positions are cut toward zero, `text-drawing.md`); `faces.py` assumes a
-  plain copy (the sheets have no partly transparent pixels, so a blend
-  would give the same result).
+- (`Face.getDocImage`, `getPhotoHeadImage` and where the head-only
+  picture is used were listed here: read on 2026-10-16,
+  `fact-pictures.md`. The head-only picture makes the search photo's
+  head.)
+- (`Image.copy` with a rectangle was listed here, because its `Image.paste`
+  had not been read. Read on 2026-10-16, `fact-pictures.md`: `copy` pastes
+  with `REPLACE`, a plain copy of every pixel, alpha included, so
+  `faces.py`'s plain copy is what the game does.)
 - The PNG decoder (`format.png`); `faces.py` uses Pillow instead. The sheets
   are palette PNGs.
 - `Bodies.xml` and the body images in the same folder.

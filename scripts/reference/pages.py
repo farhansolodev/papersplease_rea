@@ -11,14 +11,18 @@ by its alignment and flow.
     python -I scripts/reference/pages.py <assets dir> <paper id> [page index] [options]
 
 Options: --nation N (which Passport), --values "k=v;k=v" (fact values; others
-show their fact name), --mask "id id" (the paper's PageMask text), --upgrade
-(the rulebook tabs upgrade), --png out.png [--scale N].
+show their fact name; a picture fact's value is a file in assets/papers),
+--mask "id id" (the paper's PageMask text), --upgrade (the rulebook tabs
+upgrade), --face SPEC (a face for the document and criminal photos, e.g.
+M-3-7-12-1-2-0), --prints CODE (fingerprints, e.g. 31415), --seed N (their
+draws), --png out.png [--scale N].
 
-Not modelled: what a fact's text is (BoothEnv.getLocalizedText, given here
-by --values), the pictures of fact-valued image marks (BoothEnv.getImage:
-photos, fingerprints, seals...; drawn as an outlined box of unknown size),
-a seal mark's picture, image scaling (Image.transformed), the Transcript's
-page count, the rules and news fact renames.
+Fact pictures come from factpics.py (BoothEnv.getImage) where the preview
+knows the value (see picture_source); the others are left out, as the game
+leaves out a mark with no picture. Not modelled: what a fact's text is
+(BoothEnv.getLocalizedText, given here by --values), the search photo,
+a seal mark's picture, the Transcript's page count, the rules and news
+fact renames.
 """
 
 import os
@@ -201,17 +205,19 @@ class Nav:
 
 
 class Placed:
-    def __init__(self, index, kind, mark, x, y, text=None, size=None, clip=None):
+    def __init__(self, index, kind, mark, x, y, text=None, size=None, clip=None, picture=None):
         self.index, self.kind, self.mark = index, kind, mark
         self.x, self.y, self.text, self.size, self.clip = x, y, text, size, clip
+        self.picture = picture        # a factpics (faces.Image) picture, when known
         self.name = "MARK#%d" % index
 
 
 def layout(paper, page_index, image, font_lib, value_text=None, nav=None, rand=None,
-           has_rulebook_tabs=False, touch_target_expand=0, image_size=None):
+           has_rulebook_tabs=False, touch_target_expand=0, image_size=None, image_for=None):
     """PaperInnerVisuals: the visuals of one page, in mark order.
     value_text(fact_id) gives a fact mark's text (BoothEnv.getLocalizedText);
-    image_size(mark) the size of a mark's picture, or None to leave it out."""
+    image_for(mark) a mark's picture (see picture_source), or image_size(mark)
+    only its size; None leaves the mark out."""
     page = paper.pages[page_index]
     nav = nav or Nav(paper)
     value_text = value_text or (lambda fact_id: fact_id)
@@ -277,7 +283,11 @@ def layout(paper, page_index, image, font_lib, value_text=None, nav=None, rand=N
         elif mark.type == "IMAGE":
             if mark.image.startswith("RulesTab") and not has_rulebook_tabs:
                 continue
-            size = image_size(mark) if image_size else None
+            picture = image_for(mark) if image_for else None
+            if picture is not None:
+                size = (picture.width, picture.height)
+            else:
+                size = image_size(mark) if image_size else None
             if size is None:
                 continue                       # no picture: the mark is left out
             x, y = px, py
@@ -291,7 +301,7 @@ def layout(paper, page_index, image, font_lib, value_text=None, nav=None, rand=N
             elif mark.align == "RIGHT":
                 x = float(int((x - w) // 1))
             right, bottom = x + w, y + h
-            visual = Placed(index, "image", mark, x, y, size=size)
+            visual = Placed(index, "image", mark, x, y, size=size, picture=picture)
         elif mark.type == "EMBLEM":
             # drawn only when the seal's status is VALID or INCORRECT; the picture
             # and its place inside emblem_rect take three draws (not modelled here)
@@ -305,21 +315,94 @@ def layout(paper, page_index, image, font_lib, value_text=None, nav=None, rand=N
 
 
 def literal_image_size(assets_dir):
-    """image_size for the preview: literal pictures from assets/papers, BLANK:WxH;
-    fact-valued pictures are unknown (None)."""
-    from PIL import Image
-    import re
+    """image_size for the layout check: the size of a literal picture
+    (picture_source with no fact values); fact-valued pictures are None."""
+    source = picture_source(assets_dir, None)
 
     def size(mark):
-        name = mark.image
-        if name.startswith("$"):
-            return None
-        if name.startswith("BLANK:"):
-            m = re.match(r"BLANK:(\d+)x(\d+)", name)
-            return (int(m.group(1)), int(m.group(2))) if m else (10, 10)
-        path = os.path.join(assets_dir, "papers", name)
-        return Image.open(path).size if os.path.exists(path) else None
+        picture = source(mark)
+        return (picture.width, picture.height) if picture is not None else None
     return size
+
+
+def picture_source(assets_dir, paper_id, values=None, face_spec=None, prints=None, seed=1):
+    """image_for for the preview (factpics.py, docs/fact-pictures.md).
+    Literal pictures: Mark.getImage (BLANK:WxH, or the file scaled by `scale`).
+    Fact pictures, as BoothEnv.getImage makes them, only where the preview
+    knows the value: a picture file named by --values or by Facts.xml, the
+    rulebook's seal sheets, the bulletin seal; a document or criminal photo
+    with --face SPEC; fingerprints and the thumbprint with --prints CODE.
+    The random draws come from a generator of their own (`seed`), not the
+    booth's."""
+    import re
+    import factpics as FP
+    import faces as F
+    from rand import Rand
+    data = os.path.join(assets_dir, "data")
+    values = values or {}
+    rand = Rand(seed)
+    state = {}
+
+    def facts():
+        if "lib" not in state:
+            import factlib
+            state["lib"] = factlib.FactLib(open(os.path.join(data, "Facts.xml"), encoding="utf-8").read())
+        return state["lib"]
+
+    def doc_face():
+        if "face" not in state:
+            lib = F.FaceLib(os.path.join(data, "Faces.xml"), os.path.join(assets_dir, "FacePalette.png"))
+            state["face"] = F.Face(os.path.join(assets_dir, "faces"), lib, F.FaceSpec(face_spec), for_doc=True)
+        return state["face"]
+
+    def source(mark):
+        name = mark.image
+        if not name.startswith("$"):
+            if name.startswith("BLANK:"):
+                m = re.match(r"BLANK:(\d+)x(\d+)", name)
+                return F.Image(*((int(m.group(1)), int(m.group(2))) if m else (10, 10)))
+            path = os.path.join(assets_dir, "papers", name)
+            if not os.path.exists(path):
+                return None
+            picture = FP.load(path)
+            return FP.transformed(picture, 0.0, mark.scale) if mark.scale != 1.0 else picture
+        fact = name[1:]
+        text, back = mark.text_color & 0xFFFFFF, mark.back_color & 0xFFFFFF
+        if fact == "Face":
+            if face_spec is None:
+                return None
+            mirrored = paper_id != "Passport"
+            return FP.doc_image(doc_face(), rand, mark.scale, mirrored, mirrored, text, back)
+        if paper_id == "Photo":
+            return None                    # the search photo needs a traveler: not previewed
+        if fact in ("Fingerprints", "Thumbprint"):
+            if prints is None:
+                return None
+            code = FP.fingerprint_code(rand, prints)
+            picture = FP.fingerprint_image(assets_dir, code, rand, text, fact == "Fingerprints")
+        elif fact.startswith("Criminal"):
+            if face_spec is None:
+                return None
+            picture = FP.doc_image(doc_face(), rand, 1.0, False, True, text, back)
+        elif fact in ("SealsMoa", "SealsMol"):
+            emblem = "MinistryOfAdmission" if fact == "SealsMoa" else "MinistryOfLabor"
+            picture = FP.valid_seals_image(FP.Emblems(assets_dir), emblem, back)
+        else:
+            value = values.get(fact)
+            if value is None:
+                definition = facts().fact_defs.get("%s/%s" % (paper_id, fact))
+                value = definition.val if definition is not None else ""
+            if not value:
+                return None
+            if value == "BulletinEmblem":
+                picture = FP.bulletin_emblem_image(FP.Emblems(assets_dir))
+            else:
+                path = os.path.join(assets_dir, "papers", value)
+                if not os.path.exists(path):
+                    return None
+                picture = FP.load(path)
+        return FP.scaled(picture, mark.scale)
+    return source
 
 
 def render(placed, image, assets_dir, scale=1):
@@ -336,10 +419,16 @@ def render(placed, image, assets_dir, scale=1):
                 piece = piece.crop((0, 0, piece.width, min(piece.height, v.clip[3])))
             out.alpha_composite(piece, (int(v.x), int(v.y)))
         elif v.kind == "image":
-            name = v.mark.image
-            path = os.path.join(assets_dir, "papers", name)
-            if os.path.exists(path):
-                out.alpha_composite(Image.open(path).convert("RGBA"), (int(v.x), int(v.y)))
+            if v.picture is not None:
+                p = v.picture
+                piece = Image.new("RGBA", (p.width, p.height))
+                piece.putdata([((c >> 16) & 255, (c >> 8) & 255, c & 255, c >> 24) for c in p.px])
+                if v.clip:
+                    piece = piece.crop((0, 0, piece.width, min(piece.height, v.clip[3])))
+                out.alpha_composite(piece, (int(v.x), int(v.y)))
+            else:
+                x, y = int(v.x), int(v.y)
+                draw.rectangle((x, y, x + v.size[0] - 1, y + v.size[1] - 1), outline=(255, 0, 255, 255))
         else:
             x, y, w, h = v.mark.emblem_rect
             draw.rectangle((x, y, x + w - 1, y + h - 1), outline=(255, 0, 255, 255))
@@ -357,6 +446,7 @@ def main(argv):
     args = argv[3:]
     page_index = int(args.pop(0)) if args and args[0].isdigit() else 0
     nation, values, mask, upgrade, png, scale = "", {}, "", False, None, 3
+    face_spec, prints, seed = None, None, 1
     i = 0
     while i < len(args):
         a = args[i]
@@ -372,6 +462,12 @@ def main(argv):
             png = args[i + 1]; i += 1
         elif a == "--scale":
             scale = int(args[i + 1]); i += 1
+        elif a == "--face":
+            face_spec = args[i + 1]; i += 1
+        elif a == "--prints":
+            prints = args[i + 1]; i += 1
+        elif a == "--seed":
+            seed = int(args[i + 1]); i += 1
         else:
             raise SystemExit("unknown option " + a)
         i += 1
@@ -383,7 +479,8 @@ def main(argv):
     image = Image.open(os.path.join(assets, "papers", page.image)).convert("RGBA")
     placed = layout(paper, page_index, image, fonts.FontLib(assets),
                     value_text=lambda f: values.get(f, f), nav=Nav(paper, mask),
-                    has_rulebook_tabs=upgrade, image_size=literal_image_size(assets))
+                    has_rulebook_tabs=upgrade,
+                    image_for=picture_source(assets, paper.id, values, face_spec, prints, seed))
     print("%s%s page %d (%s), picture %s %dx%d, %d marks, %d drawn" % (
         paper.id, " " + paper.nation if paper.nation else "", page_index, page.id, page.image,
         image.width, image.height, len(page.marks), len(placed)))

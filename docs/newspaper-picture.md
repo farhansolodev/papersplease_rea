@@ -10,7 +10,8 @@ Functions read in full: `play.day.DayNewsImage` (static setup, `make`,
 `getColorBoundsRect`); `play.screen.NewsScreen` (constructor, `draw`,
 `update`, `goButton_onClick`); the `app.vis.Fill` constructor. Read in part:
 `Face.getDocImage` (only for its random draw), `Image.transformed` (only for
-how it uses the angle). Three places where the decompiler dropped arguments
+how it uses the angle). Both were read in full on 2026-10-16
+(`fact-pictures.md`). Three places where the decompiler dropped arguments
 were read from the raw instructions (marked "from the instructions").
 
 Everything here was read in the code unless marked **inferred** or **not
@@ -166,9 +167,10 @@ Everything is collected in a list of drawable things and pasted at the end.
         `(y + subtitleHeight - top) / 6 <= h`.
       - **Stamp** (the `$` line). The picture `assets/<stamp>` is turned by
         an angle of `r1 * 60 - 30` (first draw; from the instructions) with
-        `Image.transformed`, which **uses the number as radians as it is**
-        (**inferred** from two maths calls on it that were not identified;
-        if so, the stamp can end up at any angle). Then two more draws place
+        `Image.transformed`, which **uses the number as radians as it is**:
+        the two maths calls are `System.Math.Cos` and `Sin` (checked
+        2026-10-16, `fact-pictures.md`; this said "inferred" before). So the
+        stamp can end up at any angle. Then two more draws place
         it: `x = floor(left + (width - stampWidth) * r2)`,
         `y = floor(top + (textBottom - top - stampHeight) * r3)`. It is
         drawn at 80% opacity (colour 1, 1, 1, 0.8). **Three draws.** In the
@@ -343,9 +345,13 @@ tables above are the cases the real days reach.
   done on 2026-10-16 with `text.py`, "Which real headlines are cut"
   above. Not compared with the game: day 2's paper would show it, with
   "Grestin Checkpoint a Success!" in the left column and no subtitle.)
-- `Face.getDocImage` and `makeFace` beyond their draws: what the face looks
-  like at half scale with the two colours.
-- `Image.transformed` in full, and so the stamp's real angle.
+- (`Face.getDocImage` was listed here; read on 2026-10-16,
+  `fact-pictures.md`: at half scale it is 40 x 48, the face scaled by 0.5
+  with its bottom 3 to 6 pixels below the picture's, not mirrored here,
+  and its two tones replaced by `kImageColor` and `kPaperColor`.)
+- (`Image.transformed` in full was listed here; read on 2026-10-16,
+  `fact-pictures.md`. The stamp's angle is r1 x 60 − 30 radians, taken
+  as it is.)
 - (`Layout.getFitScale` and `NewsScreenMagnifier` were listed here;
   read on 2026-10-16, `screens.md` part 11.)
 - (Answered 2026-10-14, `save-format.md` part 2, from the code: the news

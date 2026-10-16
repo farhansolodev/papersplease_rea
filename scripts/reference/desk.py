@@ -8,11 +8,24 @@ errors and document values, so they must be counted for the booth to stay in
 step with the game. Only the number and order of the draws is modelled, not
 the pictures.
 
-Not modelled: pages drawn again later (turning a page, following a link),
-and the draws inside the fingerprint, thumbprint and contraband pictures.
+The fingerprint and thumbprint pictures' draws are counted too
+(docs/fact-pictures.md): a fresh random code that the fact's text then
+overwrites (five draws plus redraws), then one draw per finger shown.
+
+Not modelled: pages drawn again later (turning a page, following a link;
+the contraband draw sits on the search photo's second page), a document
+photo whose value is neither VALID nor a full face specification
+(FaceSpec.fromString draws for each missing or '*' part; the generated
+values were not checked for those), a picture fact with no fact at all
+(no picture, no draw).
 """
 
+import os
+import sys
 import xml.etree.ElementTree as ET
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from person import make_fingerprints  # noqa: E402
 
 
 class Mark:
@@ -87,6 +100,10 @@ class Desk:
             elif mark.image_fact is not None and mark.image_fact.startswith("Criminal"):
                 if self.booth.value_text("%s/%s" % (key, mark.image_fact)) != "":
                     rand.random()
+            elif mark.image_fact in ("Fingerprints", "Thumbprint"):
+                make_fingerprints(rand)       # FingerprintCode.fromString: a random code first
+                for _ in range(5 if mark.image_fact == "Fingerprints" else 1):
+                    rand.random()             # FingerprintCode.getImage: one per finger shown
             if mark.emblem is not None:
                 status = self.booth.value_text("%s/Emblem/%s" % (key, mark.emblem))
                 if status in ("VALID", "INVALID"):

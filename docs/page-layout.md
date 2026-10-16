@@ -24,7 +24,8 @@ In `decompiled/all/play_day.clean.c`: all of `play.day.PaperInnerVisuals`
 `Mark.getFactId`, `getImage`, `getRandomForcePos`. In
 `decompiled/all/play_day_booth.clean.c`: `Paper.setPage` and the filer
 branch of the `Paper` constructor (the two callers). `Res.getImage`.
-`BoothEnv.getImage` was only listed (what it calls), not read.
+`BoothEnv.getImage` was only listed (what it calls), not read here; it
+was read on 2026-10-16 in part 3 (`fact-pictures.md`).
 
 The decompiler typed the mark as an `app.vis.Text`, so its field names in
 the constructor are wrong; they were mapped by offset from `dump.cs`
@@ -206,9 +207,11 @@ the rule table holds.
 2. The picture: for a literal, `Mark.getImage`: `BLANK:WxH` is a
    transparent picture of that size (`BLANK:` without a match, 10 x 10);
    anything else is `assets/papers/<name>`, scaled by `scale` when it
-   differs from 1 (`Image.transformed`, not read). For a fact,
+   differs from 1 (`Image.transformed`: sizes rounded up, nearest pixel;
+   `fact-pictures.md`). For a fact,
    `BoothEnv.getImage(<paper id with index>, <fact>, scale, textcolor,
-   backcolor)` (photos, fingerprints, contraband, seals; not read). No
+   backcolor)`: the photos, fingerprints, contraband, seal sheets and
+   pictures named by the value, all in `fact-pictures.md` (part 3). No
    picture leaves the mark out.
 3. Position: the mark's position; `flow` down or right as for a text
    (y or x only; no ascent); then the same alignment rule with the
@@ -275,9 +278,10 @@ documents, the Arstotzka token before and after the painting over.
 
 ## Not studied
 
-- `BoothEnv.getImage` (the fact pictures: photos, fingerprints,
-  contraband, seals), `Image.transformed` (scaled pictures), and
-  `EmblemLib.getEmblemImage`.
+- (`BoothEnv.getImage` and `Image.transformed` were listed here: read on
+  2026-10-16, `fact-pictures.md`. `EmblemLib.getEmblemImage`, the seal
+  mark's picture, was also listed, but it had been read in full on
+  2026-10-13: `emblems-and-bodies.md`.)
 - What the day's rule table maps (`Rule0` ...) and where the page masks
   are set.
 - The desk side: `DeskItem.setInnerImage` and `addInnerVisual` (how the

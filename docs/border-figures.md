@@ -379,8 +379,10 @@ figures are not in `Border`'s list.
 - (Answered in part 4, `border-view.md`: the game's `dt` does vary. It is
   the real time since the previous frame, capped at 0.1 s; the test player
   fixes it at 1/20 s.)
-- The rounding function used to place the picture (`Math.round`) was not
-  read.
+- (The rounding function used to place the picture, `Math.round`, was
+  listed here; read on 2026-10-16, `fact-pictures.md`: the whole part, plus
+  one when the rest is 0.5 or more, minus one when it is below −0.5, so
+  halves go up for positive numbers.)
 - Which picture a queue figure shows in its first few frames: the idle start
   draw sets a picture number, but the pictures are then reloaded and the
   walk animation's speed is still in effect for 4 frames. The draws are

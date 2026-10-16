@@ -155,7 +155,10 @@ colour. `Image.paste` turns each coordinate into a whole pixel by
 **cutting toward zero** (`CVTTSD2SI`, checked in the instructions), so
 10.7 becomes 10 and -0.5 becomes 0. A stretched tile (the background, the
 missing-letter box) goes through `Quad.make` as above and then
-`Image.draw`, which was not read.
+`Image.render(quad, paste mode)`, which was not read. (Corrected
+2026-10-16: this said `Image.draw`. The call is by slot number 31, which is
+`render`; `draw` is slot 30. Found while reading `Image` for
+`fact-pictures.md`.)
 
 `willDraw` (visible, not empty, colour alpha not 0) has no caller in the
 decompiled game code other than the generic by-name helpers, so it is not
@@ -167,9 +170,10 @@ gives every value back unchanged, so no colour is off by one.
 
 All twelve font sheets are white with alpha 0 or 255 only
 (`text_drawing_check.py`), so a letter shows as solid text colour where
-the sheet is opaque **if the tint multiplies**. The decompiled paste
-suggests a multiplication by colour / 255 per channel, but its tint and
-blend code was not read in full.
+the sheet is opaque. The tint does multiply: `Image.paste` was read in
+full on 2026-10-16 (`fact-pictures.md`). Each channel, alpha included,
+becomes sheet x colour / 255 (whole numbers), and `BLEND` then mixes by
+that alpha. So white sheet pixels give exactly the text colour.
 
 ## Letters shown one by one (`getBuiltLetters`)
 
@@ -257,9 +261,11 @@ draws the family names and the passport count with `text.py`.
 
 ## Not studied
 
-- `Image.paste`'s blend and tint arithmetic, and `Image.draw` (how a
-  stretched tile, a background or a box, is filled; whether its edges are
-  cut the same way).
+- (`Image.paste`'s blend and tint arithmetic was listed here; read on
+  2026-10-16, `fact-pictures.md`.) `Image.render` (how a stretched tile, a
+  background or a box, is filled into a picture; whether its edges are cut
+  the same way). This item named `Image.draw` until 2026-10-16; the call
+  is `render`.
 - How the Unity side draws the quads on screen, so where a fractional
   position lands and how the colour is applied there.
 - How `Font.split` behaves at its edges (`fonts.md`, "Note on

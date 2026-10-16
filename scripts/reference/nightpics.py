@@ -194,8 +194,13 @@ def main():
                     px, py, pw, ph = piece
                     picture = picture.crop((px, py, px + pw, py + ph))
                 if scale != 1:
-                    picture = picture.resize((int(picture.width * scale), int(picture.height * scale)),
-                                             Image.NEAREST)
+                    # Image.transformed, as the game halves the covers (factpics.py)
+                    import factpics as FP
+                    source = FP.F.Image(picture.width, picture.height)
+                    source.px = [(a << 24) | (r << 16) | (g << 8) | b for r, g, b, a in picture.getdata()]
+                    small = FP.transformed(source, 0.0, scale)
+                    picture = Image.new("RGBA", (small.width, small.height))
+                    picture.putdata([((c >> 16) & 255, (c >> 8) & 255, c & 255, c >> 24) for c in small.px])
                 screen.alpha_composite(picture, (x, y))
             else:
                 _, string, colour, x, y = item

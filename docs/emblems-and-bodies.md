@@ -7,7 +7,8 @@ the body-search photo.
 Functions read in full: the `data.EmblemLib` constructor, `getEmblemImage`
 and its two search helpers; the `data.BodyLib` constructor,
 `getTypeMatches`, `getBodyId`, `getBodyImage`, `getContraband`,
-`getRandomNonBombContrabandType`. Read in part: `EmblemLib.getValidImage`.
+`getRandomNonBombContrabandType`. Read in part: `EmblemLib.getValidImage`
+(read in full on 2026-10-16, `fact-pictures.md`).
 
 Everything here is confirmed in the code unless marked otherwise.
 
@@ -46,8 +47,10 @@ The cell is cut from the sheet at column `n mod columns`, row
 width.
 
 `getValidImage(id, backColor)` builds one picture showing all the valid
-emblems of a set in two columns on a coloured background (for the rulebook,
-inferred from the name and layout; its exact spacing was not worked out).
+emblems of a set in two columns on a coloured background. It serves the
+rulebook's facts `SealsMoa` and `SealsMol`; its sizes and spacing are in
+`fact-pictures.md` (this said "inferred" and "not worked out" until
+2026-10-16).
 
 The generator passed in is the booth's own, and the pick happens when the
 paper's page is drawn on the desk, followed by two more draws for the seal's
@@ -78,8 +81,13 @@ mass index is below 21, `2` if above 24, otherwise `1`. The picture is
 2. Pick one at random (one draw). None gives nothing.
 3. Take the place's rectangle and the entry's offset for this body, or
    `0 0` when there is none. The piece is **cut from the contraband picture
-   at the rectangle moved back by the offset, and pasted on the body at the
-   rectangle itself**.
+   at the rectangle moved back by the offset**. Its place on the body, kept
+   as `pastePos`, is the rectangle's corner. (Corrected 2026-10-16: this
+   said the piece is "pasted on the body". Nothing pastes it there: no code
+   reads `pastePos` except the by-name field reader. The search photo's page
+   shows the piece as its own picture, and its mark's `pos` equals the body
+   mark's `pos` plus the rectangle's corner, so it lands at the same place;
+   `fact-pictures.md`.)
 
 **Type test** (`getTypeMatches`): if `types` starts with `$`, the rest must
 appear in the entry's **file name** (so `$Gun0` means exactly
@@ -122,8 +130,13 @@ from the list of the types of all non-bomb entries, repeats included
 
 ## Not studied
 
-- The drawing side: how the search photo is composed (`SearchPhoto`, front
-  and back views in the 200-wide body picture), how emblems are stamped on a
-  document, and which random generator those picks use.
-- `EmblemLib.getValidImage` in detail.
+- (The search photo was listed here as "`SearchPhoto`"; no class of that
+  name exists. It is the `Photo` paper, whose head, body and contraband
+  pictures are fact pictures: `fact-pictures.md`, 2026-10-16. The body is
+  the left (front) or right (back) half of the 200-wide picture, 160 high.
+  The contraband pick uses the booth's generator.) How emblems are stamped
+  on a document: the seal mark, `page-layout.md` and
+  `desk-drawing-draws.md`.
+- (`EmblemLib.getValidImage` in detail: done 2026-10-16,
+  `fact-pictures.md`.)
 - Nothing here has been compared with the running game.

@@ -1,6 +1,21 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-16, after
+part 3 of the drawing step: the fact pictures of a page
+(`fact-pictures.md`). It was code reading, with one Ghidra run for the
+instructions, a reference script `factpics.py` that makes the pictures
+(now used by `pages.py`), and a check of every picture fact in
+`Papers.xml`. It was not run in the game. Main findings:
+
+- Every paper except `Passport` shows its photo mirrored and recoloured.
+- A fingerprint picture costs a random code's draws plus one draw per
+  finger. `desk.py` now counts them; the logs cannot test it.
+- `Image.paste`, `tint` and `transformed` are read.
+
+It also corrected `text-drawing.md` (a stretched tile goes through
+`Image.render`, not `Image.draw`), `emblems-and-bodies.md` (nothing
+pastes the contraband on the body) and `nightpics.py` (it halved the
+passport cover with other pixels than the game). Before it the same day,
 part 2 of the drawing step: how a document page is laid out
 (`page-layout.md`; code reading, two Ghidra runs for the instructions, a
 reference script `pages.py` that lays a page out and draws a preview, a
@@ -125,7 +140,12 @@ over; texts sit one pixel above their base line, can flow down or right
 from the last one, links become rounded buttons, seals are drawn at half
 opacity), and which newspaper headlines are cut (on the plain days, two
 lose their subtitle; traveler news adds more, and one title falls back
-to the small font because "Breakthrough" is one pixel too wide). The desktop
+to the small font because "Breakthrough" is one pixel too wide), and the
+fact pictures of a page (the document photo, mirrored and recoloured on
+every paper but the passport; the search photo's head, body and
+contraband; fingerprints cut to the outline of a random print; the
+bulletin's criminal photos; the rulebook's seal sheets; pictures named by
+a fact's value; and the picture operations paste, tint and scaling). The desktop
 layout turned out to have no panning, no camera screens and no slow motion:
 those exist only in the phone and tablet layouts. A Python reference builds
 complete travelers from a master seed, and **it now matches the running
@@ -145,7 +165,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`). Not done: the fact pictures of a page (photos, fingerprints, seals), the rest of drawing (blending, the Unity side) |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`). Not done: the rest of drawing (`Image.render`, the desk side, the Unity side) |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -175,7 +195,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `fact-values.md` | How each document value is generated |
 | `value-helpers.md` | Wrong names, aliases, typos, wrong faces and fingerprints, dates |
 | `papers-on-desk.md` | Adding and removing papers, staying papers, the bulletin |
-| `desk-drawing-draws.md` | **The random draws made when a paper is drawn on the desk** (tilt, photo, seal). Needed to stay in step with the game |
+| `desk-drawing-draws.md` | **The random draws made when a paper is drawn on the desk** (tilt, photo, seal, fingerprints). Needed to stay in step with the game |
 | `speech.md` | `Speeches.txt` and how say lines become speech (each stock line draws) |
 | `responses-and-events.md` | The booth's events, responses, conditions, operation queue, button commands, citations |
 | `player-actions.md` | Stamping, giving and confiscating, the filer, interrogation, fingerprint / search / detain, poison and bomb, judging, penalties |
@@ -195,6 +215,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `fonts.md` | `Fonts.xml` and the `.fnt` files: measurements, text width, line breaking |
 | `text-drawing.md` | **Drawing, part 1**: `app.vis.Text`: its settings, how it is laid out (lines, alignment, padding, line spacing, the background and its cut corners, the box for a missing letter), its size, where its position puts it, how it is drawn on screen (quads, the 0.001 alpha test) and into a picture (`Image.paste` cuts positions toward zero), letters revealed one by one, which code sets padding, spacing or a background |
 | `page-layout.md` | **Drawing, part 2**: `PaperInnerVisuals`: who builds a page, the page picture and its marker pixels (black side 0, red side 1, painted over), the positions, which marks a link leaves out (`PaperNav` and the page mask), text marks (flow, the base line, boxes, link buttons, wrap, touch padding), picture marks, seal marks (half opacity), clipping; finding marks and pages |
+| `fact-pictures.md` | **Drawing, part 3**: `BoothEnv.getImage`, the picture a fact shows: the document photo (`Face.getDocImage`; mirrored and recoloured except on `Passport`), the search photo's head, body and contraband, fingerprints and the thumbprint, the bulletin's criminal photos, the rulebook's seal sheets, the bulletin seal, pictures named by the value (where each value comes from), the final scaling; the picture operations (`draw`, `transformed`, `paste` with its modes and tint, `copy`, `fill`, `replace`, `tint`, `Math.round`); every random draw; who reads the Nudity setting |
 | `paths-xml-format.md` | `Paths.xml`: paths and animations of the figures in the top view |
 | `borderanim-xml-format.md` | `BorderAnim.xml`: the picture atlas and how an animation finds its frames |
 | `border-figures.md` | **The border scene, part 1**: which random generator it uses, how a figure follows a path frame by frame (what `hold`, `delay`, `snap`, `warp`, `face` and the event attributes do), the waiting line (building, moving up, the ring of reused figures, dispersing, panic) and its random draws |
@@ -305,11 +326,14 @@ the night screen's family pictures; part 11, the last screens.)
    how a document page is laid out (`PaperInnerVisuals`), **done** on
    2026-10-16, `page-layout.md`. The newspaper's fallback rules run on
    real headlines: **done** on 2026-10-16 (`newspaper-picture.md`).
-   Suggested part 3: the fact pictures of a page (`BoothEnv.getImage`:
-   photos, fingerprints, contraband, seals; `Image.transformed`). Then:
-   `Image.paste` and `Image.draw` (blend and tint), the desk side
-   (`DeskItem.setInnerImage`, `addInnerVisual`), the search photo, the
-   rest of `app.vis` and `play.ui`; input handling.
+   Part 3, the fact pictures of a page (`BoothEnv.getImage`) and the
+   picture operations they use (`paste` with its modes and tint, `copy`,
+   `fill`, `replace`, `tint`, `transformed`), **done** on 2026-10-16,
+   `fact-pictures.md`.
+   Suggested part 4: the desk side (`DeskItem.setInnerImage`,
+   `addInnerVisual`: how a page and its visuals are put on the desk),
+   `Image.render`, and inspection (`compareProximity`, the inspect
+   mode). Then: the rest of `app.vis` and `play.ui`; input handling.
 6. **Audio extraction** (probably `sharedassets0.resource`; not checked).
    Independent of the steps above; may need a Unity asset tool (ask before
    downloading). (The language zips in `StreamingAssets/loc/` were also
@@ -353,6 +377,24 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
+**From 2026-10-16** (`fact-pictures.md`, drawing part 3)
+
+- **Nothing of it has been watched in the game.** Six items at the end
+  of `fact-pictures.md`, among them the id card's mirrored photo, the
+  criminal photos' 32 x 39 size and the Ministry of Admission seal sheet's
+  one-pixel drop.
+- The fingerprint and thumbprint draws are in `desk.py` but untested by
+  the logs (they come after the last informative pick).
+- Inferred: the `BoothEnv.auto...` functions, which also call `getImage`
+  and so make its draws, serve only the test player. No caller was found
+  except the by-name dispatch.
+- Not read: `Image.render`; `BoothEngine.applyUpdatedSettings`; the
+  tablet and phone upgrade pictures in full; whether anything reads the
+  alpha-1 pixels of a fingerprint picture.
+- For `DESIGN.md`: whether the port keeps the fingerprint picture's
+  alpha-1 background and the seal sheet's one-pixel drop (both what the
+  code does, neither visible in a normal look).
+
 **From 2026-10-16** (`text-drawing.md`, drawing part 1)
 
 - **Nothing of it has been watched in the game.** Three items at the end
@@ -360,10 +402,11 @@ Collected from the docs, so they are not lost:
   caption's left-aligned lines, a typing caption that does not move.
 - Not read: what the Unity side does with the quads (so where a
   fractional position lands on screen, and how the colour is applied
-  there); `Image.paste`'s blend and tint arithmetic and `Image.draw`.
-  The preview in `text.py` assumes the tint multiplies; with the font
-  sheets (white, alpha 0 or 255) any multiplying tint gives the same
-  pixels.
+  there); `Image.render`, which fills a stretched tile into a picture
+  (this named `Image.draw` until 2026-10-16; the call is `render`).
+  (`Image.paste`'s blend and tint arithmetic was listed here; read on
+  2026-10-16, `fact-pictures.md`: the tint multiplies, as `text.py`
+  assumed.)
 - Read but surprising, so worth a look in the game: a missing letter's
   box starts one pixel before the next pen position (checked in the
   instructions); a rounded background leaves one pixel more on the left
@@ -397,8 +440,10 @@ Collected from the docs, so they are not lost:
   son with a mood plus hungry, cold and sick) would have a row running 7
   pixels past the right edge of the screen.
 - Not read: how a sprite is drawn from its position (the preview in
-  `nightpics.py` takes it as the top-left corner); how
-  `Image.transformed` halves the passport covers. (Where `app.vis.Text`
+  `nightpics.py` takes it as the top-left corner). (How
+  `Image.transformed` halves the passport covers was listed here: it keeps
+  the even pixels, `fact-pictures.md`, 2026-10-16; `nightpics.py` now
+  halves them the same way.) (Where `app.vis.Text`
   puts the member names and the passport count, and whether a fixed
   width of 0 turns wrapping off, were listed here; read on 2026-10-16,
   `text-drawing.md`: the position is the box's top left, and 0 means no
@@ -565,7 +610,11 @@ Collected from the docs, so they are not lost:
   when the layout has a carousel rectangle, so this is still open; see
   the part 9 entry above.)
 - Whether a desktop PC shows a Vibration row (`canVibrate`, not read).
-- What the nudity setting changes: its readers were not looked up.
+- What the nudity setting changes: looked up on 2026-10-16
+  (`fact-pictures.md`). It picks the search photo's body picture
+  (unclothed or clothed), and `Booth.update` calls
+  `BoothEngine.applyUpdatedSettings` when it changes. What that call
+  redraws was not read.
 - **A mistake of the ninth session, found and corrected**: `screens.md`
   part 2 said the gap between menu buttons (`menuItemPaddingY`) is 0 on
   desktop. It is 10; the write was in the listing and was missed. No
@@ -766,8 +815,10 @@ Collected from the docs, so they are not lost:
 - Drawing a page again repeats its random draws (`desk-drawing-draws.md`).
   So in the original, which pages the player looks at can change later
   travelers. Whether the port copies this exactly is a design decision.
-- The draws inside the fingerprint, thumbprint and contraband pictures were
-  not read.
+- The draws inside the fingerprint, thumbprint and contraband pictures:
+  read on 2026-10-16 (`fact-pictures.md`), and `desk.py` counts the
+  fingerprint ones. Not tested: in the logged runs they all come after
+  the last pick the log can show.
 - The evidence that the reference matches the game is one seed, days 1 to 4
   (36 travelers), plus day 1 of a second route.
 - `Paths.xml`: the number in automatic path names (`auto-<number>`) was not
@@ -949,6 +1000,8 @@ All gitignored. Nothing below is in git.
 | `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `decompiled/titlescreen_update_asm.txt`, `loadscreen_strings.txt` | small | For `screens.md`, parts 2 and 3: the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
 | `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
+| `decompiled/drawing3_run1.txt` | under 1 MB | For `fact-pictures.md`: the instructions of `System.Math.Cos` and `Sin`, `Math.round`, `EmblemLib.getValidImage`, `FingerprintCode.getImage`, `BoothEnv.getImage` and `Image.transformed` | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1803c21e0 0x1803c2430 0x1808a84d0 0x1807b5540 0x180878e10 0x180477970 0x1809f95e0`, output redirected to the file |
+| `extracted/previews/factpics/` | small | Previews from `factpics.py` and `pages.py` (fact pictures, pages with them, the night screen), made from the game's art | `factpics.py <assets> extracted/previews/factpics`; `pages.py ... --png` |
 | `decompiled/step5_run1.txt` to `step5_run3.txt` | under 1 MB | For `text-drawing.md`: the instructions of `Text.buildTiles` and `Visual.renderToImage`, of `Image.paste`, and of `Font.split` | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x18066ef30 0x1807d4480`, then `0x1809f5f80`, then `0x18087f080`, output redirected to the file |
 | `decompiled/part11_run1.txt` | under 1 MB | For `screens.md`, part 11: the instructions of `System.Math.Cos` and `Sin` (which helper is which), `ScreenShake.update`, `Game.createStater` (the fade targets) and the function that ends the flash to the title | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1803c21e0 0x1803c2430 0x1808635e0 0x18058a9e0 0x18058a580`, output redirected to the file |
 | `decompiled/part10_run1.txt` | under 1 MB | For `night-pictures.md`: the instructions of the `FamilyVisuals` constructor (the name field, the alignment, the passport halving, the count's gap, the empty-token test) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x18074cdc0`, output redirected to the file |
@@ -972,5 +1025,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`) |
-| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, and `text_drawing_check.py` (fonts against the English texts, the font sheets' colours); see its `README.md` for each script's arguments |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`), `pages.py` (lays a document page out and draws a preview; `page-layout.md`), `factpics.py` (the fact pictures and the picture operations; `fact-pictures.md`) |
+| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, `text_drawing_check.py` (fonts against the English texts, the font sheets' colours), `page_layout_check.py` (marker pixels of every page picture) and `fact_pictures_check.py` (every picture fact, its files and sizes); see its `README.md` for each script's arguments |
