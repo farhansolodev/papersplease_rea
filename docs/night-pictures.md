@@ -33,8 +33,9 @@ width is the whole part of the step's x; the passport cover is made with
 passport count is 1.0; and the empty-token test asks the map for place
 number 0 to 6 in turn. Number constants were read with `read_doubles.py`.
 
-Not read: `app.vis.Sprite` and `app.vis.Fill` beyond their constructors'
-arguments. (`app.vis.Text` was on this list; read on 2026-10-16,
+(`app.vis.Sprite` and `app.vis.Fill` were listed here as not read beyond
+their constructors' arguments; read since, on 2026-10-16,
+`desk-pictures.md` and `vis-basics.md`.) (`app.vis.Text` was on this list; read on 2026-10-16,
 `text-drawing.md`. So was `Image.transformed`'s scaling method; read the
 same day, `fact-pictures.md`.)
 

@@ -516,6 +516,7 @@ All from the day's border generator (part 1).
 - (Answered in part 3: the delayed calls, including the attack delay, run on
   the game's clock, not on the scene's slowed one. See "Slow motion" in
   `border-shooting.md`.)
-- `Chip` (the picture class): the byte the code sets to make a figure
-  visible was taken to be `visible` from its use; the class was not read.
+- (`Chip`, the picture class, was listed here: the byte the code sets to
+  make a figure visible was taken to be `visible` from its use. Read on
+  2026-10-16, `vis-basics.md`: it is `visible`, at `+0x20`.)
 - `ArrayUtil.makeShuffled` (bullet-hole order) was not read here.
