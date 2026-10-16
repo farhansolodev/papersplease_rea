@@ -482,6 +482,24 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
+**From 2026-10-16** (`input-handling.md`, input handling)
+
+- **Nothing of it has been watched in the game.** Five items at the end
+  of `input-handling.md` (the game's own cursor and the hand; no cursor
+  before the mouse first moves; the double click; the rifle's scope
+  cursor; the right button doing nothing).
+- **Not settled: the host's `phantomCursor`.** `HostUnity.Update` places a
+  Unity object called `phantomCursor` at the mouse and shows it while
+  pointer 0 is the mouse, hidden otherwise. What it shows, and whether it
+  can be seen next to the cursor the game draws itself, was not settled.
+  Inferred, not confirmed: it shows `CursorPhantom.png` (19 x 26), the
+  picture `Game.phantomCursorImage` returns; the host's call to that
+  function goes through the game's interface and was not followed.
+  Matters for the port only if it is visible: then the browser build
+  needs it too.
+- Not followed: where the input mode becomes touch (mode 2), and the
+  phone swipes. Will not matter for a desktop port.
+
 **From 2026-10-16** (`desk-pictures.md`, drawing part 4)
 
 - **Nothing of it has been watched in the game.** Six items at the end

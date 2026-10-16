@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-17 List the input step's open items in PROGRESS
+
+**Changed:** `docs/PROGRESS.md`, "Open questions and unconfirmed items": a new entry for `input-handling.md` (the watch list, the unsettled `phantomCursor`, the touch mode).
+**Why:** the input step of 2026-10-16 wrote these only in `input-handling.md` and its MODLOG entry, so a new session reading `PROGRESS.md` first would miss them. The user agreed to the fix.
+**Tested how:** not tested beyond reading the edit back; doc change only.
+**Result:** the items are now listed where the next session starts.
+**Corrected in older docs:** none.
+**Still broken / not tested:** what `phantomCursor` shows is still not settled.
+
 ## 2026-10-16 Input handling: the mouse, the keys and the drawn cursor
 
 **Changed:** new `docs/input-handling.md`; new `scripts/reference/inputs.py` (the mouse to game pixels, `Pointer.update`, `Input.update`, `getPointerOver`, `getPointerJustDown`, blocked areas, keys masked until release, the cursor's place); new `scripts/checks/input_check.py` (and its README row); `docs/PROGRESS.md` (state line, stage 4, docs table, next step 5, scripts tables); older docs corrected (below).
