@@ -68,7 +68,9 @@ Each button has its own small state machine:
 
 Selecting a rifle deselects the other and plays `rifle-cock`. Each rifle
 has a scope cursor picture that is passed along when the scene tests for a
-press; how it is shown was not read. `resetLeavingPeopleAndEnemies` (part 2)
+press. (How it is shown was not read here; read since, on 2026-10-16,
+`input-handling.md`: it is the cursor over the border picture while that
+rifle is selected, 47 x 47, centred on the mouse.) `resetLeavingPeopleAndEnemies` (part 2)
 refills them to 2 and 3 shots.
 
 What happens to the key paper after unlocking was not followed (it is
@@ -248,8 +250,10 @@ Not part of normal play; listed so they are not mistaken for it.
 - (Answered in part 4, `border-view.md`: on desktop the hit box,
   `Layout.borderPersonHitSize`, is 8 wide and 18 high, and the slow-motion
   scale, `Layout.borderSnipingTimescale`, is 1.0, meaning none.)
-- How a press becomes a point (`Input.getPointerJustDown`) and the scope
-  cursor.
+- (How a press becomes a point, `Input.getPointerJustDown`, and the scope
+  cursor were listed here; read on 2026-10-16, `input-handling.md`: the
+  point is the pointer's place in whole game pixels, held inside the
+  screen.)
 - What the key paper does after unlocking, and whether an unlocked rifle
   stays unlocked on later days.
 - The rifle buttons' slide positions and the bullet pictures (drawing).

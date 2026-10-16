@@ -180,8 +180,10 @@ pointer's cursor yet this frame. Then:
 
 - on the press (`justDown`): `startCustomDrag`;
 - while held (`down`): the drag's cursor position is updated and the
-  pointer is captured for the paper until the end of the frame (input
-  handling is a later step);
+  pointer is captured for the paper until the end of the frame (how a
+  take works, and that it lasts to the end of the next frame:
+  `input-handling.md`, read on 2026-10-16; this said input handling was a
+  later step);
 - when the paper is being dragged and the pointer is not held (or no
   pointer was given for it this frame): `endCustomDrag`;
 - on a double click: `whenDoubleClicked` (the inspect mode's quick

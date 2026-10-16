@@ -504,8 +504,11 @@ Also seen in the picture, each matching the code reading:
   user reports that the mouse cursor becomes a pointing hand anywhere on
   an optional row, also between the name and the amount, not only on the
   text or the circle. (In the picture the hand is on the HEAT row between
-  the two.) That fits `react` testing the line's whole rectangle. What
-  changes the cursor was not read, and a click there was not reported.
+  the two.) That fits `react` testing the line's whole rectangle. (What
+  changes the cursor was not read here; read since, on 2026-10-16,
+  `input-handling.md`: `BudgetLineEnt.react` asks `checkPointerJustDown`
+  for its whole rectangle with no cursor given, and the default is the
+  hand.) A click there was not reported.
 - The fixed lines (salary, savings, rent) have no circle.
 - A dotted rule under the lines and the total with a `$`, right-aligned
   with the amounts.

@@ -273,9 +273,11 @@ draws the family names and the passport count with `text.py`.
   certainty"); this part only confirmed which width it returns.
 - Which texts use which font and settings, beyond the setter search above
   and the screens already written up.
-- The rest of the drawing step: the search photo, the rest of `app.vis`
-  and `play.ui`, input handling. (`PaperInnerVisuals`, the document
-  pages, was listed here; read on 2026-10-16, `page-layout.md`.)
+- The rest of the drawing step: the search photo. (`PaperInnerVisuals`,
+  the document pages, was listed here; read on 2026-10-16,
+  `page-layout.md`. The rest of `app.vis`, of `play.ui` and input
+  handling were listed too; read on 2026-10-16, `vis-basics.md`,
+  `ui-parts.md`, `input-handling.md`.)
 
 ## Things to watch in the game
 

@@ -154,7 +154,7 @@ do not show as calls): the `Rect` constructor, `Point.setXY`,
 - `Point.transform(p, m)`: (m00 x + m01 y + m02, m10 x + m11 y + m12).
 - `Point.distToSeg(a, b, p)`: the distance from p to the segment a..b
   (the nearest point held to the segment's ends). Its one caller is the
-  pointer's update (input handling).
+  pointer's update, for phone swipes only (`input-handling.md`).
 
 ## What the game never calls
 
