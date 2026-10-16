@@ -1293,9 +1293,11 @@ The upgrades are bought at night (`nights-txt-format.md`, the
 `Upgrade-...` commands). **Two stamp bars:** the booth makes a `StampBar`
 unless the screen shape is `PORTRAIT_THIN`, and replaces it with a
 `StampDesk` when it has a carousel (from the `Booth` constructor's
-instructions). When the booth has a carousel was not settled; from the
-names it is the phone layout (inferred). On desktop the Tab key would
-then go only through `Booth.react`, with the upgrade test.
+instructions). The booth has a carousel only with the shape
+`PORTRAIT_THIN`, the phone layout (settled on 2026-10-16 from the same
+instructions, `desk-pictures.md`; this was inferred from the names). So
+on desktop the stamp bar is a `StampBar`, and the Tab key goes only
+through `Booth.react`, with the upgrade test.
 
 **Shortcut keys on buttons:** the only shortcut any button gets is
 Escape, through `setAsBackButton`. So everything Escape does besides
@@ -1637,8 +1639,9 @@ from it. The desktop values read for this part, from the same listing:
 - Where the documents folder for screenshots is. (What keys 0 to 4 and 6
   to 9 do was listed here; answered the same day, "Every key the game
   reads".)
-- When the booth has a carousel (so which stamp bar a desktop booth
-  has); inferred: only on the phone layout.
+- (When the booth has a carousel was listed here: only with the shape
+  `PORTRAIT_THIN`, so a desktop booth has a `StampBar`; settled on
+  2026-10-16, `desk-pictures.md`.)
 - The portrait arrangements.
 
 ## Things to watch in the game

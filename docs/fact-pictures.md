@@ -468,8 +468,9 @@ Previews looked at:
 
 ## Not studied
 
-- `Image.render` (how a quad is drawn into a picture), and how the page's
-  visuals reach the screen (the Unity side).
+- How the page's visuals reach the screen (the Unity side). (`Image.render`
+  was listed here: read on 2026-10-16, `desk-pictures.md`; so is how the
+  page and its visuals are put on the desk item.)
 - `BoothEngine.applyUpdatedSettings` (what a change of the Nudity setting
   redraws, and whether that makes draws again).
 - The tablet and phone upgrade pictures in full.

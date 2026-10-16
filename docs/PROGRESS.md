@@ -1,11 +1,26 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-16, after
-part 3 of the drawing step: the fact pictures of a page
-(`fact-pictures.md`). It was code reading, with one Ghidra run for the
-instructions, a reference script `factpics.py` that makes the pictures
-(now used by `pages.py`), and a check of every picture fact in
-`Papers.xml`. It was not run in the game. Main findings:
+part 4 of the drawing step: a paper's pictures on the desk
+(`desk-pictures.md`). It was code reading, with one Ghidra run for the
+instructions, a reference script `deskpics.py` and a check over every
+paper in `Papers.xml`. It was not run in the game. Main findings:
+
+- A desktop booth has **no carousel** (the booth makes one only for the
+  phone layout). This settles an open question of `buttons.md` and
+  `screens.md`: the desktop stamp bar is a `StampBar`.
+- A closed paper is its picture turned by up to 30° either way and
+  **halved**, with a grey-green shadow at (−1, 2); docked and hung papers
+  keep theirs as it is (but still make the tilt draw).
+- On the desk a page's visuals take the page's clip, so the `Citation`'s
+  36-pixel `clipheight` has no effect there (by the code).
+- `compareProximity` (which mark the cursor picks) and `Image.render`
+  are read in full.
+
+Before it the same day, part 3 of the drawing step: the fact pictures of
+a page (`fact-pictures.md`; code reading, one Ghidra run, a reference
+script `factpics.py` now used by `pages.py`, a check of every picture
+fact in `Papers.xml`; not run in the game). Main findings:
 
 - Every paper except `Passport` shows its photo mirrored and recoloured.
 - A fingerprint picture costs a random code's draws plus one draw per
@@ -165,7 +180,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`). Not done: the rest of drawing (`Image.render`, the desk side, the Unity side) |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Not done: the rest of drawing (the desk item's movement, the inspect mode, the layout's booth rectangles, the Unity side) |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -216,6 +231,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `text-drawing.md` | **Drawing, part 1**: `app.vis.Text`: its settings, how it is laid out (lines, alignment, padding, line spacing, the background and its cut corners, the box for a missing letter), its size, where its position puts it, how it is drawn on screen (quads, the 0.001 alpha test) and into a picture (`Image.paste` cuts positions toward zero), letters revealed one by one, which code sets padding, spacing or a background |
 | `page-layout.md` | **Drawing, part 2**: `PaperInnerVisuals`: who builds a page, the page picture and its marker pixels (black side 0, red side 1, painted over), the positions, which marks a link leaves out (`PaperNav` and the page mask), text marks (flow, the base line, boxes, link buttons, wrap, touch padding), picture marks, seal marks (half opacity), clipping; finding marks and pages |
 | `fact-pictures.md` | **Drawing, part 3**: `BoothEnv.getImage`, the picture a fact shows: the document photo (`Face.getDocImage`; mirrored and recoloured except on `Passport`), the search photo's head, body and contraband, fingerprints and the thumbprint, the bulletin's criminal photos, the rulebook's seal sheets, the bulletin seal, pictures named by the value (where each value comes from), the final scaling; the picture operations (`draw`, `transformed`, `paste` with its modes and tint, `copy`, `fill`, `replace`, `tint`, `Math.round`); every random draw; who reads the Nudity setting |
+| `desk-pictures.md` | **Drawing, part 4**: a paper's pictures on the desk (`DeskItem`, made by `Paper`): the closed picture (tilt up to 30°, halved, shadow; docked and hung papers as they are), the open page (`setPage`, `setInnerImage`, `addInnerVisual`), the drawer envelope, the wall picture, the phone-only rack; a desktop booth has no carousel; clipping and which rectangle each sprite is cut to; drawing order and layers; clicking and the odd-shape test; picking the mark under the cursor (`getInnerVisualAt`, `compareProximity` in full); stamp ink; `Image.render` |
 | `paths-xml-format.md` | `Paths.xml`: paths and animations of the figures in the top view |
 | `borderanim-xml-format.md` | `BorderAnim.xml`: the picture atlas and how an animation finds its frames |
 | `border-figures.md` | **The border scene, part 1**: which random generator it uses, how a figure follows a path frame by frame (what `hold`, `delay`, `snap`, `warp`, `face` and the event attributes do), the waiting line (building, moving up, the ring of reused figures, dispersing, panic) and its random draws |
@@ -330,10 +346,17 @@ the night screen's family pictures; part 11, the last screens.)
    picture operations they use (`paste` with its modes and tint, `copy`,
    `fill`, `replace`, `tint`, `transformed`), **done** on 2026-10-16,
    `fact-pictures.md`.
-   Suggested part 4: the desk side (`DeskItem.setInnerImage`,
-   `addInnerVisual`: how a page and its visuals are put on the desk),
-   `Image.render`, and inspection (`compareProximity`, the inspect
-   mode). Then: the rest of `app.vis` and `play.ui`; input handling.
+   Part 4, a paper's pictures on the desk (`DeskItem`: its pictures,
+   clipping, drawing, clicking, picking a mark with `compareProximity`,
+   stamp ink) and `Image.render`, **done** on 2026-10-16,
+   `desk-pictures.md`.
+   Suggested part 5: the desk item's movement (dragging, dropping,
+   `clampPlacementPos`, placement changes between counter, desk, drawer
+   and wall, the reveal and hide animations, the give area) and the
+   inspect mode (`Paper.getInspectables`, the booth's inspect code).
+   Then: the desktop values of the layout's booth rectangles (computed
+   in the `Layout` constructor; perhaps by running it in Ghidra's
+   emulator); the rest of `app.vis` and `play.ui`; input handling.
 6. **Audio extraction** (probably `sharedassets0.resource`; not checked).
    Independent of the steps above; may need a Unity asset tool (ask before
    downloading). (The language zips in `StreamingAssets/loc/` were also
@@ -377,6 +400,24 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
+**From 2026-10-16** (`desk-pictures.md`, drawing part 4)
+
+- **Nothing of it has been watched in the game.** Six items at the end
+  of `desk-pictures.md` (the closed paper's size, tilt and shadow; the
+  docked papers untilted; the drawer envelope; the drag shadow; clicks
+  through see-through pixels; a long citation message).
+- Not read: the desktop values of `Layout.booth`, `boothInnerClip`,
+  `boothOuter`, `wall`, `slotCenter`, `counterTopEdgeY` (computed in the
+  `Layout` constructor); how the drawer orders its layers (inferred:
+  lower numbers first); the give icon's rule; dragging and the
+  animations (suggested part 5).
+- By the code, not seen: the `Citation`'s `clipheight="36"` is replaced
+  by the page's clip on the desk, so a long message is not cut. Whether
+  any citation message is taller than 36 pixels was not checked. For
+  `DESIGN.md`: whether the port keeps that.
+- By the code: the stamp ink layer stays when a page is turned and keeps
+  its first size. Every stampable paper has one page, so it cannot show.
+
 **From 2026-10-16** (`fact-pictures.md`, drawing part 3)
 
 - **Nothing of it has been watched in the game.** Six items at the end
@@ -388,9 +429,10 @@ Collected from the docs, so they are not lost:
 - Inferred: the `BoothEnv.auto...` functions, which also call `getImage`
   and so make its draws, serve only the test player. No caller was found
   except the by-name dispatch.
-- Not read: `Image.render`; `BoothEngine.applyUpdatedSettings`; the
-  tablet and phone upgrade pictures in full; whether anything reads the
-  alpha-1 pixels of a fingerprint picture.
+- Not read: `BoothEngine.applyUpdatedSettings`; the tablet and phone
+  upgrade pictures in full; whether anything reads the alpha-1 pixels of
+  a fingerprint picture. (`Image.render` was listed here: read on
+  2026-10-16, `desk-pictures.md`.)
 - For `DESIGN.md`: whether the port keeps the fingerprint picture's
   alpha-1 background and the seal sheet's one-pixel drop (both what the
   code does, neither visible in a normal look).
@@ -402,8 +444,8 @@ Collected from the docs, so they are not lost:
   caption's left-aligned lines, a typing caption that does not move.
 - Not read: what the Unity side does with the quads (so where a
   fractional position lands on screen, and how the colour is applied
-  there); `Image.render`, which fills a stretched tile into a picture
-  (this named `Image.draw` until 2026-10-16; the call is `render`).
+  there). (`Image.render`, which fills a stretched tile into a picture,
+  was listed here: read on 2026-10-16, `desk-pictures.md`.)
   (`Image.paste`'s blend and tint arithmetic was listed here; read on
   2026-10-16, `fact-pictures.md`: the tint multiplies, as `text.py`
   assumed.)
@@ -460,9 +502,9 @@ Collected from the docs, so they are not lost:
   hover buttons nor the criminal-poster pin, because their pictures exist
   only in `layout/phone/` and desktop never loads the layout folders
   (`art-dat-format.md`). Whether a desktop booth has a `Carousel` object
-  at all is still open: `Layout.carousel` is written once, at
-  `0x180497c38`, and which block of the `Layout` constructor that is in
-  was not settled.
+  at all was open here; settled on 2026-10-16 (`desk-pictures.md`): the
+  `Booth` constructor makes one only for the shape `PORTRAIT_THIN`, so a
+  desktop booth has none.
 - **Inferred from a missing write:** the border's booth button has no
   extra click margin on desktop (the only write of the margin, 6, is in
   another platform's block).
@@ -603,12 +645,9 @@ Collected from the docs, so they are not lost:
   also quit the game when the key is let go (the skip masks the mouse,
   not the key). Escape on the finished title quits at once in any case.
   Irrelevant to the port (no quit option), but it tests the reading.
-- Which stamp bar a desktop booth has: a `StampBar` unless the booth has
-  a carousel; when it has one was not settled (inferred: phone only).
-  (More evidence on 2026-10-16, `buttons.md`: the carousel's buttons
-  need pictures that only phones load, but the carousel makes them only
-  when the layout has a carousel rectangle, so this is still open; see
-  the part 9 entry above.)
+- (Which stamp bar a desktop booth has was listed here. Settled on
+  2026-10-16, `desk-pictures.md`: the booth has a carousel only with the
+  shape `PORTRAIT_THIN`, so a desktop booth has a `StampBar`.)
 - Whether a desktop PC shows a Vibration row (`canVibrate`, not read).
 - What the nudity setting changes: looked up on 2026-10-16
   (`fact-pictures.md`). It picks the search photo's body picture
@@ -1000,8 +1039,10 @@ All gitignored. Nothing below is in git.
 | `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
 | `decompiled/titlescreen_update_asm.txt`, `loadscreen_strings.txt` | small | For `screens.md`, parts 2 and 3: the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
 | `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
+| `decompiled/drawing4_run1.txt` | under 1 MB | For `desk-pictures.md`: the instructions of `DeskItem.updateClipRects`, `PaperDef.generateRotatedOuterImage` and `PaperInnerVisuals.compareProximity`, and the string list of the `Paper` constructor | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x18045dfe0 0x180612010 0x180615fe0` and `ListStringUses.java 0x180616b80`, output redirected to the file |
 | `decompiled/drawing3_run1.txt` | under 1 MB | For `fact-pictures.md`: the instructions of `System.Math.Cos` and `Sin`, `Math.round`, `EmblemLib.getValidImage`, `FingerprintCode.getImage`, `BoothEnv.getImage` and `Image.transformed` | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1803c21e0 0x1803c2430 0x1808a84d0 0x1807b5540 0x180878e10 0x180477970 0x1809f95e0`, output redirected to the file |
 | `extracted/previews/factpics/` | small | Previews from `factpics.py` and `pages.py` (fact pictures, pages with them, the night screen), made from the game's art | `factpics.py <assets> extracted/previews/factpics`; `pages.py ... --png` |
+| `extracted/previews/deskpics/` | small | Previews from `deskpics.py` (closed papers at three tilts, a wall plaque, a passport in the drawer envelope, a drag shadow), made from the game's art | `deskpics.py extracted/art extracted/previews/deskpics` |
 | `decompiled/step5_run1.txt` to `step5_run3.txt` | under 1 MB | For `text-drawing.md`: the instructions of `Text.buildTiles` and `Visual.renderToImage`, of `Image.paste`, and of `Font.split` | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x18066ef30 0x1807d4480`, then `0x1809f5f80`, then `0x18087f080`, output redirected to the file |
 | `decompiled/part11_run1.txt` | under 1 MB | For `screens.md`, part 11: the instructions of `System.Math.Cos` and `Sin` (which helper is which), `ScreenShake.update`, `Game.createStater` (the fade targets) and the function that ends the flash to the title | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1803c21e0 0x1803c2430 0x1808635e0 0x18058a9e0 0x18058a580`, output redirected to the file |
 | `decompiled/part10_run1.txt` | under 1 MB | For `night-pictures.md`: the instructions of the `FamilyVisuals` constructor (the name field, the alignment, the passport halving, the count's gap, the empty-token test) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x18074cdc0`, output redirected to the file |
@@ -1025,5 +1066,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`), `pages.py` (lays a document page out and draws a preview; `page-layout.md`), `factpics.py` (the fact pictures and the picture operations; `fact-pictures.md`) |
-| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, `text_drawing_check.py` (fonts against the English texts, the font sheets' colours), `page_layout_check.py` (marker pixels of every page picture) and `fact_pictures_check.py` (every picture fact, its files and sizes); see its `README.md` for each script's arguments |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`), `pages.py` (lays a document page out and draws a preview; `page-layout.md`), `factpics.py` (the fact pictures and the picture operations; `fact-pictures.md`), `deskpics.py` (a paper's pictures on the desk, clipping, picking a mark, stamp ink, `Image.render`; `desk-pictures.md`) |
+| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, `text_drawing_check.py` (fonts against the English texts, the font sheets' colours), `page_layout_check.py` (marker pixels of every page picture), `fact_pictures_check.py` (every picture fact, its files and sizes) and `desk_pictures_check.py` (every paper's desk pictures); see its `README.md` for each script's arguments |

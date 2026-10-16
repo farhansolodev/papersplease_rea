@@ -361,11 +361,11 @@ only"). So on desktop `assets/HoverButton.png` and
 would stop the game ("Res asset not found", `language-pack.md`; `en.zip`
 has neither). **Inferred:** a desktop booth makes neither the carousel's
 hover buttons nor the criminal-poster pin. (The carousel makes its hover
-buttons only when the layout has a `carousel` rectangle. `Layout.carousel`
-is written once in the `Layout` constructor, at `0x180497c38`; which of
-the three blocks that write belongs to was not settled. So whether a
-desktop booth has a `Carousel` at all is still open; the evidence here is
-about its buttons and the pin.)
+buttons only when the layout has a `carousel` rectangle. Whether a
+desktop booth has a `Carousel` at all was open here; settled on
+2026-10-16 in `desk-pictures.md`: the `Booth` constructor makes one only
+for the shape `PORTRAIT_THIN`, so a desktop booth has none, and which
+`Layout` block writes `carousel` no longer matters for desktop.)
 
 `scripts/checks/button_pictures_check.py` confirms the three are absent
 from the main folder.
@@ -423,7 +423,9 @@ a ring.
   its looks (phone only, by the inference above).
 - `PlatformChangeButton.png`'s cut and the `LoadButtonNew.png` pictures
   of the root button (`newNormalImage`, `newPressedImage`).
-- Which block of the `Layout` constructor writes `carousel`.
+- Which block of the `Layout` constructor writes `carousel` (no longer
+  needed for desktop: a desktop booth makes no carousel,
+  `desk-pictures.md`).
 
 ## Things to watch in the game
 

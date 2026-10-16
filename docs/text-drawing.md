@@ -155,7 +155,8 @@ colour. `Image.paste` turns each coordinate into a whole pixel by
 **cutting toward zero** (`CVTTSD2SI`, checked in the instructions), so
 10.7 becomes 10 and -0.5 becomes 0. A stretched tile (the background, the
 missing-letter box) goes through `Quad.make` as above and then
-`Image.render(quad, paste mode)`, which was not read. (Corrected
+`Image.render(quad, paste mode)`: nearest pixel, tinted, the edges
+floored (read on 2026-10-16, `desk-pictures.md`). (Corrected
 2026-10-16: this said `Image.draw`. The call is by slot number 31, which is
 `render`; `draw` is slot 30. Found while reading `Image` for
 `fact-pictures.md`.)
@@ -262,10 +263,10 @@ draws the family names and the passport count with `text.py`.
 ## Not studied
 
 - (`Image.paste`'s blend and tint arithmetic was listed here; read on
-  2026-10-16, `fact-pictures.md`.) `Image.render` (how a stretched tile, a
-  background or a box, is filled into a picture; whether its edges are cut
-  the same way). This item named `Image.draw` until 2026-10-16; the call
-  is `render`.
+  2026-10-16, `fact-pictures.md`.) (`Image.render` was listed here, how a
+  stretched tile is filled into a picture: read on 2026-10-16,
+  `desk-pictures.md`. Its target edges are floored, not cut toward zero
+  as `paste` does.)
 - How the Unity side draws the quads on screen, so where a fractional
   position lands and how the colour is applied there.
 - How `Font.split` behaves at its edges (`fonts.md`, "Note on

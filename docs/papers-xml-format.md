@@ -58,9 +58,9 @@ parts of it before loading (`MogrifierPhone.mogrifyXml`); not studied.
 | `fromtraveler` | `fromTraveler` | false | |
 | `stampable` | `stampable` | false | |
 | `inspectable` | `inspectable` | **true** | |
-| `rotate` | `rotateOuter` | **true** | |
-| `oddshape` | `oddShape` | false | |
-| `dock` | `hasDockPoint` | false | |
+| `rotate` | `rotateOuter` | **true** | Tilts the closed picture (`desk-pictures.md`) |
+| `oddshape` | `oddShape` | false | Clicks on see-through pixels miss (`desk-pictures.md`) |
+| `dock` | `hasDockPoint` | false | Also keeps the closed picture full size and untilted (`desk-pictures.md`) |
 | `canpinch` | `canPinch` | false | |
 | `visacenter` | `visaCenter` | none | Point |
 | `sounds` | `sounds` | `paper` | Id of a `<sounds>` set |
@@ -168,7 +168,10 @@ object keyed by id.
 - `<forceorder id val>`: a whole number sort order per paper id. A paper
   with no entry uses the entry whose id is `DEFAULT`.
 
-What the carousel is in play is not studied.
+What the carousel is in play is not studied. It is the phone layout's
+tray of papers: the booth makes one only with the shape `PORTRAIT_THIN`,
+so a desktop booth has none and this section does not matter for
+desktop (found 2026-10-16, `desk-pictures.md`).
 
 ## Looking a paper up
 

@@ -17,7 +17,8 @@ makes are in `desk-drawing-draws.md`.
 In `decompiled/all/play_day.clean.c`: all of `play.day.PaperInnerVisuals`
 (static setup, constructor, `toImage`, `getMarkFromName`,
 `autoGetPageIndexForFactId`, `autoGetPageIndexWithLink`, and
-`compareProximity` in outline); all of `play.day.PaperNav`
+`compareProximity` in outline, read in full on 2026-10-16 in
+`desk-pictures.md`); all of `play.day.PaperNav`
 (`hasPage`, `hasPageFromId`, `getExistingPageId`, `getNextPageIndex`,
 `getPrevPageIndex`, constructor); `BoothEnv.getLocalizedText`. In
 `decompiled/all/data.clean.c`: `Page.getInnerImageAndMarkPositions`,
@@ -74,8 +75,9 @@ been missed.)
 
 1. The picture is `assets/papers/<image>` for the shape `LANDSCAPE`,
    `image_portrait_wide` or `image_portrait_thin` for the two portrait
-   shapes. Desktop is taken to be `LANDSCAPE` (**inferred** from the
-   names; the shape value was not traced). `Res.getImage` returns the
+   shapes. Desktop is taken to be `LANDSCAPE` (**inferred**: the desktop
+   layout's shape is `LANDSCAPE`, `border-view.md`, but that the page is
+   given the layout's shape was not traced). `Res.getImage` returns the
    shared loaded picture, and the page works on **a copy of the whole
    picture** (`Image.copy(null)`, checked in the instructions), so the
    changes below never reach the shared one.
@@ -227,8 +229,12 @@ more draws r1 and r2, and drawn at **half opacity** (its tile's alpha
 0.5). It does not move the flow edges. (The draws are those of
 `desk-drawing-draws.md`.)
 
-**Then, for any mark drawn:** `clipheight` not 0 cuts the visual to the
-rectangle (0, 0, 100000, `clipheight`) relative to it; the visual is named
+**Then, for any mark drawn:** `clipheight` not 0 gives the visual the
+clip rectangle (0, 0, 100000, `clipheight`), in the page's coordinates
+(the same as the visual's position, so from the page's top; corrected
+2026-10-16: this said "relative to it"). On the desk this clip is
+replaced by the page's own (`DeskItem.addInnerVisual`,
+`desk-pictures.md`), so it has no effect there. The visual is named
 `MARK#<index of the mark in the page>` and added in mark order.
 
 ## Finding marks and pages
@@ -245,10 +251,10 @@ rectangle (0, 0, 100000, `clipheight`) relative to it; the visual is named
   `autoGetPageIndexWithLink(link)`: the first page with a mark whose
   `link` is exactly the given one. Both are used by `BoothEnv` for
   inspection.
-- `compareProximity(point, ra, rb)` (read in outline): decides which of
-  two mark rectangles a point is nearer, for picking a mark under the
-  cursor (`DeskItem.getInnerVisualAt`, `Paper.getInspectable`). Not
-  needed for the layout; its constants were not read.
+- `compareProximity(point, ra, rb)`: decides which of two mark
+  rectangles is the better pick for a point, for picking a mark under the
+  cursor (`DeskItem.getInnerVisualAt`, `Paper.getInspectable`). Read in
+  full with its constants on 2026-10-16: `desk-pictures.md`.
 
 ## Preview and checks
 
@@ -284,9 +290,9 @@ documents, the Arstotzka token before and after the painting over.
   2026-10-13: `emblems-and-bodies.md`.)
 - What the day's rule table maps (`Rule0` ...) and where the page masks
   are set.
-- The desk side: `DeskItem.setInnerImage` and `addInnerVisual` (how the
-  page and its visuals are put on screen), and inspection.
-- `compareProximity` in detail.
+- Inspection (the inspect mode). (The desk side, `DeskItem.setInnerImage`
+  and `addInnerVisual`, and `compareProximity` in detail were listed here:
+  read on 2026-10-16, `desk-pictures.md`.)
 
 ## Things to watch in the game
 

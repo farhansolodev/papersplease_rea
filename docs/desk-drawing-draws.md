@@ -47,7 +47,10 @@ A missing paper never gets a picture. A hidden one gets it when revealed.
 ## The draws for one paper, in order
 
 1. **Tilt**: one draw, unless the paper has `rotate="false"` (only
-   `TimeBomb`). It turns the closed paper's picture slightly.
+   `TimeBomb`). It turns the closed paper's picture by (r × 60 − 30)
+   degrees, so up to 30° either way (read on 2026-10-16,
+   `desk-pictures.md`; this said "slightly"). Docked and hung papers
+   make the draw too, though their picture is not turned.
 2. **The first page is drawn** (`setPage`, then `PaperInnerVisuals`):
    1. **Mark positions**: for each mark in file order that has both `pos`
       and `pos2`, two draws (x, then y, between the two points).
