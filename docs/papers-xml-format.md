@@ -76,7 +76,11 @@ Derived fields:
   name; text starting with `ondesk` becomes `ONDESK(x, y)` from the pattern
   `ondesk:(\d+),(\d+)` (or `0, 0` if it does not match); anything else,
   including the `fromslot` used in the file, becomes `FROMSLOT`. Without the
-  attribute: `DOCKED` if `dock` is true, otherwise `FROMSLOT`.
+  attribute: `DOCKED` if `dock` is true, otherwise `FROMSLOT`. The
+  `Paper` constructor can replace it when the paper is made (`ONWALL`
+  for a hung paper with a saved place, `ONDESK` for papers kept from an
+  earlier day and for a paper with an `OpenToPage` fact); what each
+  reveal does is in `desk-movement.md`.
 - **`filerType`**: `ONLYFILER` if the id is exactly `FilerEnvelope`;
   otherwise `CANFILER` if `canconfiscate` is true; otherwise `NONE`.
 - **`stay`** (how long the paper is kept) does not come from this file. It is
@@ -154,7 +158,8 @@ otherwise true. In all cases a mark with a `link` is not inspectable.
 
 `id`, and five optional sound names: `dragstart`, `dragstop`, `drop`,
 `totop`, `turnpage`. Ids in the file: `banner`, `metal`, `paper`, `plaque`,
-`timebomb`.
+`timebomb`. When each plays is in `desk-movement.md` (`totop`, oddly,
+when a paper already on top is picked up).
 
 ## `<ink>`
 

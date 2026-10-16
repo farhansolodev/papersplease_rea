@@ -6,9 +6,9 @@ made by a `play.day.booth.Paper`. This part covers the item's pictures:
 which ones it has, how each is made, how they are clipped (cut to an area
 of the screen), drawn, and clicked, how the mark under the cursor is
 picked, how stamp ink lands on a page, and `Image.render`, the last picture
-operation not yet read. Dragging, the reveal and hide animations, the
-drawer's own logic and the inspect mode are **not** in this part (see
-"Not studied").
+operation not yet read. Dragging, the reveal and hide animations and the
+drawer's own logic are in part 5a (`desk-movement.md`), the inspect mode
+in part 5b.
 
 Everything here is from the code; **nothing was compared with the running
 game**.
@@ -81,11 +81,11 @@ within a layer):
 
 | Sprite | Picture | Layer | Shown when |
 |---|---|---|---|
-| inner shadow | the page in black, drawn at half opacity, 4 right and 4 down | 0 | the page is being dragged on the desk and has moved |
+| inner shadow | the page in black, drawn at half opacity, 4 right and 4 down | 0 | the page is being dragged on the desk and has moved, and while a printed or spat-out paper comes out (`desk-movement.md`; this row first gave only the drag) |
 | inner | the open page (`Paper.setPage`) | 0 | the paper is open on the desk (placement `INNER`) |
 | outer | the closed paper | 0 | the paper is closed on the counter (placement `OUTER`) |
 | filer | the paper in the drawer | `layerFiler` (1) | in the drawer (placement `FILER`) |
-| give icon | `assets/GiveIcon.png` (57 x 13) | 0 | while dragging, over the give area (the rule is in the drag code, not read here) |
+| give icon | `assets/GiveIcon.png` (57 x 13) | 0 | while dragging a closed paper that may be given now, with the cursor and the paper's bottom in the give area (`desk-movement.md`, "Dragging") |
 | mount (only papers with `mount`) | the paper on the wall | `layerMountedDeskItem` (−2) | on the wall (placement `MOUNT`) |
 
 The item also keeps two lists: the **inner visuals** (the page's texts,
@@ -434,16 +434,11 @@ shadow.
   here; read since, on 2026-10-16, `booth-layout.md`.)
 - How the drawer orders its layers, and how the quads reach the screen
   (the Unity side).
-- Where the item is and how it moves: dragging (`startCustomDrag`,
-  `updateCustomDrag`, `endCustomDrag`, `clampPlacementPos`), the reveal
-  and hide animations and their timings (`startRevealAnim`,
-  `animateReveal`, `animateHide`; the static times 1, 3, 3, 0.5 s), the
-  drawer (`Filer`), the dock points, the give area and the give icon's
-  rule, depth order (`moveDepthToTop`).
-- The inspect mode (`Paper.getInspectables`, `getInspectable`, the booth's
-  inspect code), which uses the picking above.
-- The reveal chosen in the `Paper` constructor (`ONWALL` for a hung paper
-  with a saved wall place, `ONDESK` for some others).
+- (Where the item is and how it moves, the drawer, the dock points, the
+  give area, the depth order and the reveal chosen in the `Paper`
+  constructor were listed here; read since, on 2026-10-16,
+  `desk-movement.md`. The inspect mode was listed here too; it is part
+  5b.)
 
 ## Things to watch in the game
 

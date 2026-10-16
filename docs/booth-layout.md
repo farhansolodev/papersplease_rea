@@ -109,12 +109,12 @@ y 0 +-------------+--------------------------------------+
 | `wall` | x 0, y 0, w 178, h 107 | The traveler's window; clip of a hung paper; the wall picture |
 | `counter` | x 0, y 105, w 178, h 73 | |
 | `console` | x 0, y 166, w 178, h 51 | The clock, date and weight console |
-| `desk` | x 178, y 0, w 392, h 217 | Where open pages lie; reveal positions (drawing part 5) |
-| `boothOuter` | x 0, y 0, w 178, h 217 | Clip of a closed paper (`desk-pictures.md`); where a paper going into the drawer ends up closed (drawing part 5) |
+| `desk` | x 178, y 0, w 392, h 217 | Where open pages lie; reveal positions (`desk-movement.md`) |
+| `boothOuter` | x 0, y 0, w 178, h 217 | Clip of a closed paper (`desk-pictures.md`); where a paper going into the drawer ends up closed (`desk-movement.md`) |
 | `boothOuterClamp` | x 0, y 0, w 178, h 145 | Where a closed paper may be dragged |
 | `boothInner` | x 178, y −5000, w 5392, h 10217 | "Is the cursor over the desk": in effect everything right of x 178 |
 | `boothInnerClip` | x 180, y 0, w 5390, h 217 | Clip of an open page and of the drawer: **2 pixels right of the desk's edge** |
-| `boothInnerClamp` | x 178, y 0, w 392, h 217 | Where an open page may be dragged (with margins; drawing part 5) |
+| `boothInnerClamp` | x 178, y 0, w 392, h 217 | Where an open page may be dragged (with margins, `desk-movement.md`) |
 | `wallMountArea` | x 0, y 0, w 178, h 107 | Where a hung paper may be placed |
 | `give` | x 39, y 0, w 100, h 107 | The give area: the middle of the traveler's window |
 | `slotCenter` | (89, 116) | The middle of the counter's slot |

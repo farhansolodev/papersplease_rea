@@ -650,9 +650,10 @@ The booth's part (`Booth.restoreFromStash`):
   constant is inferred). The traveler counter on the console is set. The
   criminal poster is shown if it was pinned.
 - `applyMountedPaperIdsOrder` goes through the ids in the story fact
-  `Game/MountedPapers` (separated by `;`) and makes one call on each paper
-  that is mounted. What the call does was not looked up; inferred from the
-  function's name: it puts the mounted papers back in their order.
+  `Game/MountedPapers` (separated by `;`) and moves each paper that is
+  mounted to the top of the drawing order (`moveDepthToTop`, slot 67), so
+  the hung papers are drawn in the saved order (read on 2026-10-16,
+  `desk-movement.md`; this was first inferred from the function's name).
 - The booth's state is set to `empty`.
 
 The border's part is in `border-scene.md` ("Saving and restoring"): the
