@@ -766,7 +766,9 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
   also listed, inferred from the name to be the button a back key
   presses. Read since, part 4: Escape presses it, on release.)
 - Whether a `newversion` button is made anywhere.
-- `Layout.notchHeight` on desktop (inferred 0: there is no notch).
+- (`Layout.notchHeight` on desktop was listed here, inferred 0; the
+  emulator run of the constructor gives 0, 2026-10-16,
+  `booth-layout.md`.)
 
 ## Things to watch in the game
 

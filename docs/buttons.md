@@ -286,8 +286,9 @@ for left, right and top, and 0 for the bottom. That value is written once
 in the `Layout` constructor, **6**, at `0x18049940b`, next to the first of
 the three writes of `borderOuterBoothButton`; the desktop block (the third,
 which writes the button's position at `0x18049d290`) does not write it, so
-**on desktop the margins are 0** (inferred from the missing write: a new
-object's number fields start at 0). The button also starts with input off
+**on desktop the margins are 0**. (This was inferred from the missing
+write; running the constructor in the emulator on 2026-10-16 gives 0,
+`booth-layout.md`.) The button also starts with input off
 (switch 4 cleared); `border-scene.md` says when it is turned on.
 
 ### The settings rows' pictures (`makeModeImages`)

@@ -250,10 +250,12 @@ For the outer sprite, its y is first set to 0, then by the item's state:
 - otherwise: cut by `clip` to the dock point's clip rectangle if the item
   has a dock point with one, else to `Layout.boothOuter`.
 
-The desktop values of `boothInnerClip`, `boothOuter`, `wall`,
-`slotCenter` and `counterTopEdgeY` were **not read**: the `Layout`
-constructor computes them from other values, and reading them from the
-instructions is a job of its own.
+The desktop values (read on 2026-10-16 by running the `Layout`
+constructor in the emulator, `booth-layout.md`): `boothInnerClip` x 180,
+y 0, w 5390, h 217 (so an open page is cut 2 pixels right of the desk's
+edge at 178); `boothOuter` x 0, y 0, w 178, h 217; `wall` x 0, y 0,
+w 178, h 107; `slotCenter` (89, 116); `counterTopEdgeY` 107. (This
+paragraph said they were not read.)
 
 Visuals added later share the clip rectangle object of their sprite, so
 they follow it when it is updated.
@@ -428,9 +430,8 @@ shadow.
 
 ## Not studied
 
-- The desktop values of the layout rectangles used here (`booth`,
-  `boothInnerClip`, `boothOuter`, `wall`, `slotCenter`,
-  `counterTopEdgeY`): computed in the `Layout` constructor, not read.
+- (The desktop values of the layout rectangles used here were listed
+  here; read since, on 2026-10-16, `booth-layout.md`.)
 - How the drawer orders its layers, and how the quads reach the screen
   (the Unity side).
 - Where the item is and how it moves: dragging (`startCustomDrag`,

@@ -178,6 +178,8 @@ Habits that paid off:
   `DumpAssembly.java` output instead: find the object's register (there
   `R13`), then search the listing for writes to the field offsets from
   `dump.cs` (`[R13 + 0x90]` and so on). The record is in `border-view.md`.
+  Since 2026-10-16 the whole constructor is run in the emulator instead
+  (`EmulateLayout.java`, below), which gives every field at once.
 
 ## Running the game's code in the emulator
 
@@ -197,6 +199,29 @@ not reach the one-time metadata setup block or any engine call.
 placed partway through to read values from registers. Breakpoints are the
 way to read an intermediate result without letting the code reach the
 allocator or an exception path.
+
+`EmulateLayout.java` (2026-10-16) is the third, and runs a whole
+constructor of about 5,400 instructions. Two ideas make that possible:
+
+- IL2CPP reads every class and string through a slot in the program's
+  data (the `..._TypeInfo` and `StringLiteral_N` symbols); in the file
+  these hold placeholder numbers, filled only when the game starts. The
+  script writes its own fake class records and strings into those slots
+  first. A fake class's static block holds fake enum values (index at
+  `+0x10`), and its method table points at stub addresses, so a call
+  through an object is caught.
+- When the emulated code enters a function other than the one being run,
+  the script looks at the function's name: the allocator, boxing, simple
+  constructors, casts, write barriers and class set-up are done by the
+  script itself (a stub) and the call returns; pure helpers can be
+  allowed to run; anything else is printed and returns 0, so nothing is
+  skipped silently. A null-reference error stops the run with its
+  address.
+
+The run's output is raw object memory; `scripts/reference/layout_dump.py`
+decodes it with the offsets from `dump.cs`. Check a run against values
+known by other means: `layout_check.py` compares 35 values read by hand
+earlier, and all match.
 
 ## Cleaning the output for reading
 

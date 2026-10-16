@@ -82,7 +82,10 @@ Fixed numbers set for every layout (`Layout`'s static values):
 `kBorderFullWidth` 570, `kBorderFullHeight` 103, `kEndlessScoreboardWidth`
 180, `kDesktopPixelWidth` 570, `kDesktopPixelHeight` 320.
 
-Not looked up: the tablet and phone values beyond the few named here.
+Every desktop value of `Layout` is now known: the constructor was run in
+Ghidra's emulator on 2026-10-16 (`booth-layout.md`); the run gives the
+values of this table too. Not looked up: the tablet and phone values
+beyond the few named here.
 
 ## Panning (`BorderPan`)
 
