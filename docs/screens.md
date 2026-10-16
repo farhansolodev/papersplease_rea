@@ -77,7 +77,8 @@ reused one variable for two things), the desktop rectangle, and the
 sleep button's height on screen. The rest of its pixel arithmetic was read
 from the decompiler only.
 
-**Not read:** `play.ui.DiagramLine`. (`app.vis.Text` was on this list;
+(`play.ui.DiagramLine` was not read here; read since, on 2026-10-16,
+`ui-parts.md`: it is a dotted line.) (`app.vis.Text` was on this list;
 read on 2026-10-16, `text-drawing.md`.) (`GameScreen.shake` was on this
 list; read since, in part 11.) (`play.ui.Button` was on this list;
 read since, on 2026-10-16, `buttons.md`.) (`GameScreen.addHeader` and
@@ -541,7 +542,8 @@ circles, a booklet picture marked "x5", and four dotted rectangles.
   the apartment, the tokens and the passports, were listed here; studied
   since, on 2026-10-16, as part 10: `night-pictures.md`.)
 - The exact placement of everything (see "Layout").
-- `play.ui.DiagramLine` (the rule). (`app.vis.Text` was listed here;
+- (`play.ui.DiagramLine`, the rule, was listed here; read since,
+  `ui-parts.md`.) (`app.vis.Text` was listed here;
   read on 2026-10-16, `text-drawing.md`.) (`play.ui.Button`'s
   modes were listed here; read since, on 2026-10-16, `buttons.md`.) (The tween helper behind `flashCheck` was
   listed here at first; it is read since, "Timed changes" above. Its
@@ -820,7 +822,7 @@ the instructions. What is said below about where things sit comes from
 
 **Not read:** `LoadButton.drawConnectingLine` (229 lines: the line from a
 save to the save it continues), the `Confirm` constructor (its frame),
-`play.ui.KineticScroll` (dragging with momentum), the two "passthrough"
+the two "passthrough"
 helper classes. (`play.ui.Button` was on this list; read since,
 `buttons.md`, which also gives the delete button's three bands.)
 
@@ -877,7 +879,8 @@ the constructor builds them:
 10. The confirm box, hidden. Then the mode is set to normal.
 
 Scrolling: pressing on the grid and dragging scrolls it, with momentum
-(`KineticScroll`, not read). In landscape only sideways: the vertical
+(`KineticScroll`, read on 2026-10-16 in `ui-parts.md`: a rubber band past
+the ends and a spring back). In landscape only sideways: the vertical
 limit is 0. The sideways limit is the width of the days in use plus the
 margins, minus the screen width.
 
@@ -1013,7 +1016,8 @@ That its value is "true" is still inferred.
   spacing are read since part 5.)
 - `drawConnectingLine`: the shape of the line between a save and its
   parent.
-- `KineticScroll`, the passthrough helpers, the `Confirm` constructor.
+- The passthrough helpers, the `Confirm` constructor. (`KineticScroll`
+  was listed here; read since, `ui-parts.md`.)
 - The portrait arrangement beyond what `LoadScreenDim` says.
 - Whether the root's header day is 1 (its place in the grid assumes it).
 
@@ -2542,8 +2546,9 @@ the four file values are exact.
   pixels from the button's left edge instead of being centred.)
 - `StringUtil.formatTime`, so the look of the time in the result box.
 - Whether the title's buttons can be clicked through the code box.
-- `play.ui.DiagramLine`'s drawing (dotted or solid, line width); only
-  its colour and corner radius were read.
+- (`play.ui.DiagramLine`'s drawing, dotted or solid, was listed here:
+  **dotted**, single pixels two apart; read on 2026-10-16,
+  `ui-parts.md`.)
 - Everything behind the platform calls named above (rule 4).
 
 ## Things to watch in the game

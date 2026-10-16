@@ -378,8 +378,9 @@ Three states (`app.Stater`, `border-scene.md`):
   sound `filer-open` and `whenOpened`;
 - `bumping` (asked by the phone's carousel only): lasts 0.5 s, then
   `closed`; on entering, `filer-close`; while in it, t = sin(2π x time) x
-  0.1 (the helper is read as the sine by its constant, `Math.PI`, and its
-  use; inferred).
+  0.1 (the helper `FUN_180130a00` is the sine, `fact-pictures.md`, and the
+  constant is Haxe's `Math.PI`, its static at `+0x8` in `dump.cs`; this was
+  first marked inferred, checked 2026-10-16 in `ui-parts.md`'s step).
 
 A click on the drawer (a press inside its rectangle, whose height is
 taken as 1,000 so it reaches below the screen) opens or closes it. Its

@@ -290,7 +290,8 @@ the label side for five pairs.
 ## Not studied
 
 - The surround lines' exact end points, the curved lines' shape and the
-  label's exact place next to the join; `play.ui.DiagramLine` itself.
+  label's exact place next to the join. (`play.ui.DiagramLine` itself was
+  listed here; read since, `ui-parts.md`.)
 - `app.Interp`'s default curve (taken as linear above).
 - The criminal poster's inspectables (phone by the earlier reading).
 

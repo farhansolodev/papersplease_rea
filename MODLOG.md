@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-16 Drawing, part 7: the rest of `play.ui`
+
+**Changed:** new `docs/ui-parts.md`; new `scripts/reference/ui.py` (`DiagramLine` dots, `DottedLine` tiles, the speech bubble's layout, wrapping, time and reveal, `KineticScroll`); new `scripts/checks/ui_check.py` (and its README row); `docs/PROGRESS.md` (state line, stage 4, docs table, next step 5, two open items, scripts tables); older docs corrected (below).
+**Why:** "the rest of `play.ui`" from the user's list of 2026-10-16. Without a plan, at the user's request.
+**Tested how:** code reading in `decompiled/all/play_ui.clean.c` (`DiagramLine`, `DottedLine`, `SpeechBubble`, `KineticScroll`, the rest of `RevealTextEnt`; `AchievementPopup` in outline) and `play.AlltimeStats.update` (who shows the popup); `CursorEnt` read and moved to the input step; Haxe's `Math` statics in `dump.cs`; four constants with `read_doubles.py`. `ui_check.py` and `ui.py` run (the speech lines measured with `fonts.py`). The game was not run.
+**Result:** `DiagramLine` is dotted: rounded pixels each more than 1 pixel from the last, quarter-circle corners of radius up to 10 in 2r steps, shown up to floor(dots x visibleT). `DottedLine`: even pixels only, pieces of up to 30. Speech bubble: `SpeechBubble.png` 20 x 20 nine-slice, middle (2, 2, 14, 14), `small_tight` `0xFF34353F`; wraps at 120 only above 160 px (12 of 296 written lines); stays 0.1 s per character; on 0.75 s / off 0.5 s with a sine bounce of up to 5 px. `KineticScroll`: ±100 px per frame, rubber band at a tenth past the ends, spring back by a fifth per frame, decay 0.75 per 1/60 s. The achievement popup appears when the platform's social service reports an award (out of scope). Check: `problems: none`.
+**Corrected in older docs:** `desk-movement.md` (the drawer bump's sine was marked inferred; the helper and `Math.PI` are confirmed), `screens.md` (`DiagramLine` "not read", three places, and whether it is dotted; `KineticScroll` "not read", three places), `inspect-mode.md` (`DiagramLine` "not studied"), `PROGRESS.md` (two open items). No reference script or check was built on a corrected statement. Docs searched for `DiagramLine`, `DottedLine`, `SpeechBubble`, `KineticScroll`, `RevealTextEnt`, `AchievementPopup`, `CursorEnt`, "dotted".
+**Still broken / not tested:** nothing compared with the game (four items at the end of `ui-parts.md`). The bubble's reveal is taken as linear in time (`app.Interp`'s default curve not read); `KineticScroll`'s axis choice read through some decompiler damage; `SpeechChat` and the achievement conditions not studied.
+
 ## 2026-10-16 Drawing, part 6: the rest of `app.vis`
 
 **Changed:** new `docs/vis-basics.md`; new `scripts/reference/vis.py` (colours, `Point.parse` and `Rect.parse`, nine-slice tiles, atlas tiles, `transform`, `distToSeg`); new `scripts/checks/vis_check.py` (and its README row); `docs/PROGRESS.md` (state line, stage 4, docs table, next step 5, scripts tables); older docs corrected (below).
