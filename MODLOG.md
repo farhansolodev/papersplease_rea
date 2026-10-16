@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-17 Correct what is left of the drawing step
+
+**Changed:** `docs/PROGRESS.md`, next step 5: the search photo removed from what is left (with a note that it was wrong), and the Unity side written out as a concrete step (the classes to read, the open questions it answers, the model); `docs/text-drawing.md`, its "rest of the drawing step" note.
+**Why:** the user asked whether `PROGRESS.md` covers what is next in drawing. It listed the search photo as left, which was wrong: it was read in part 3 (`fact-pictures.md`) and part 5a (`desk-movement.md`). The error was an old note in `text-drawing.md`, written before part 3 and never updated, which the input step copied into `PROGRESS.md` on 2026-10-16. The Unity side had no starting point.
+**Tested how:** not tested; doc change only. The class names and function counts come from the section headers of `decompiled/all/top.clean.c`; the open questions from a search of `docs/` for "Unity side", "change counter" and the search photo.
+**Result:** step 5 now names only the Unity side as left, with where to start.
+**Corrected in older docs:** `text-drawing.md` (the search photo listed as not done), `PROGRESS.md` (the same, copied from it). No reference script or check was built on it.
+**Still broken / not tested:** the Unity side itself is not studied.
+
 ## 2026-10-17 List the input step's open items in PROGRESS
 
 **Changed:** `docs/PROGRESS.md`, "Open questions and unconfirmed items": a new entry for `input-handling.md` (the watch list, the unsettled `phantomCursor`, the touch mode).

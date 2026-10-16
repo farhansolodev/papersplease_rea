@@ -273,11 +273,14 @@ draws the family names and the passport count with `text.py`.
   certainty"); this part only confirmed which width it returns.
 - Which texts use which font and settings, beyond the setter search above
   and the screens already written up.
-- The rest of the drawing step: the search photo. (`PaperInnerVisuals`,
-  the document pages, was listed here; read on 2026-10-16,
-  `page-layout.md`. The rest of `app.vis`, of `play.ui` and input
-  handling were listed too; read on 2026-10-16, `vis-basics.md`,
-  `ui-parts.md`, `input-handling.md`.)
+- (The rest of the drawing step was listed here. `PaperInnerVisuals`,
+  the document pages: read on 2026-10-16, `page-layout.md`. The search
+  photo: read on 2026-10-16 in part 3, `fact-pictures.md`, and its
+  printing in part 5a, `desk-movement.md`; this note was not updated
+  then, and still listed it until corrected on 2026-10-17. The rest of
+  `app.vis`, of `play.ui` and input handling: read on 2026-10-16,
+  `vis-basics.md`, `ui-parts.md`, `input-handling.md`. What is left, the
+  Unity side, is the item above and step 5 of `PROGRESS.md`.)
 
 ## Things to watch in the game
 

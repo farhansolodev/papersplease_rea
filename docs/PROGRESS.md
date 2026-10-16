@@ -435,10 +435,34 @@ the night screen's family pictures; part 11, the last screens.)
    2026-10-16, `inspect-mode.md`. Part 6, the rest of `app.vis`:
    **done** on 2026-10-16, `vis-basics.md`. Part 7, the rest of
    `play.ui`: **done** on 2026-10-16, `ui-parts.md`. Input handling:
-   **done** on 2026-10-16, `input-handling.md`. Left of drawing: the
-   Unity side (how the game's pictures reach the screen; not studied
-   yet), and the search photo
-   (`text-drawing.md`).
+   **done** on 2026-10-16, `input-handling.md`. (This said on 2026-10-16
+   that the search photo was also left; that was wrong, corrected on
+   2026-10-17: its pictures were read in part 3, `fact-pictures.md`, "The
+   search photo", and how it prints onto the desk in part 5a,
+   `desk-movement.md`, `PRINTTOP`. The sentence was copied from an old
+   note in `text-drawing.md`, corrected the same day.)
+   **Left of drawing: the Unity side**, how the game's draw list reaches
+   the screen. Not studied yet. Needs **Opus**. Where to start, in
+   `decompiled/all/top.clean.c`:
+   - `QuadBatcher` (4 functions), `QuadBatcher.QuadMesh` (5) and
+     `QuadMesh.Submesh` (2): turn the game's quads into Unity meshes;
+   - `HostUnity` (12): owns the screen quad (the one picture the game is
+     drawn onto) and the `phantomCursor`; its `Update` was read for
+     input only (`input-handling.md`);
+   - `HostUnity.TextureStats` (1).
+   The open questions it should answer:
+   - where a fractional position lands on screen, and how a text's colour
+     is applied there (`text-drawing.md`; also `buttons.md`, a button's
+     quads are not rounded by the game code);
+   - who reads a picture's change counter (`generation`), inferred to be
+     the Unity side re-sending the picture (`vis-basics.md`);
+   - how a page's quads and the desk's layers reach the screen, and the
+     drawing order inside one layer (`fact-pictures.md`,
+     `desk-pictures.md`, `desk-movement.md`);
+   - how the 570 x 320 screen quad is scaled to the window (inferred from
+     `input-handling.md`: the mouse is mapped back through it);
+   - what the `phantomCursor` shows (`input-handling.md`; open
+     questions, "From 2026-10-16 (`input-handling.md`)").
 6. **Audio extraction** (probably `sharedassets0.resource`; not checked).
    Independent of the steps above; may need a Unity asset tool (ask before
    downloading). (The language zips in `StreamingAssets/loc/` were also
