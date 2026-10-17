@@ -278,7 +278,9 @@ they follow it when it is updated.
 
 So on the desk the page picture is drawn first, then its texts, pictures
 and seals in mark order, then the ink. How the layers' quads reach the
-screen is the Unity side (not read; `text-drawing.md`).
+screen was read on 2026-10-17 (`screen-output.md`): layers lowest number
+first, and inside a layer in the order the visuals were added, which the
+host keeps exactly.
 
 **The item's rectangle** (`worldRect`): the shown sprite's hit rectangle
 (clipped), moved by the item's world position; for `OUTER` with a dock
@@ -434,8 +436,9 @@ shadow.
 
 - (The desktop values of the layout rectangles used here were listed
   here; read since, on 2026-10-16, `booth-layout.md`.)
-- How the drawer orders its layers, and how the quads reach the screen
-  (the Unity side).
+- (How the drawer orders its layers, and how the quads reach the
+  screen, was listed here: read on 2026-10-17, `screen-output.md`;
+  lowest layer number first, as inferred.)
 - (Where the item is and how it moves, the drawer, the dock points, the
   give area, the depth order and the reveal chosen in the `Paper`
   constructor were listed here; read since, on 2026-10-16,

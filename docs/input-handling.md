@@ -104,11 +104,13 @@ pointers that are never down, and the parts of the game pass over them
 For pointer 0 the host also passes on "the system wants a visible
 cursor" = "pointer 0 is from the mouse", and places a Unity object called
 `phantomCursor` at the mouse (shown while pointer 0 is from the mouse,
-hidden otherwise). What that object looks like on screen was not
-settled: the game has a picture `CursorPhantom.png` (19 x 26) and a
-function `Game.phantomCursorImage` that returns it, but the call from the
-host goes through the game's interface and was not followed. (Inferred:
-it is that picture.)
+hidden otherwise). What it shows was followed on 2026-10-17
+(`screen-output.md`, "The host's second cursor"): the host's call
+through the game's interface (slot 5) is `Game.phantomCursorImage`, so it
+shows `CursorPhantom.png` (19 x 26), as inferred here; that picture is
+exactly the white edge of the arrow cursor in grey-green, placed on the
+drawn arrow. Whether it can be seen is in the Unity scene, not the code:
+still not settled.
 
 ## A pointer's frame (`Pointer.update`)
 
@@ -272,8 +274,9 @@ tested).
 
 ## Not studied
 
-- What the `phantomCursor` object shows, and whether it is visible at
-  all next to the drawn cursor (above).
+- Whether the `phantomCursor` object is visible next to the drawn
+  cursor (above). (What it shows was listed here too: read on
+  2026-10-17, `screen-output.md`.)
 - Where the input mode becomes touch (mode 2), and the phone swipes.
 
 ## Things to watch in the game

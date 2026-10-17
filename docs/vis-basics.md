@@ -59,8 +59,10 @@ constants read as 32-bit floats (255 and 1).
   wraps them so.
 - Each picture has a number (`guid`) and a change counter
   (`generation`); `dirty()` and every drawing operation raise the
-  counter. Who reads it (inferred: the Unity side, to know when to send
-  the picture to the graphics card again) was not read.
+  counter. The Unity host reads it, as inferred here: when a quad uses
+  the picture and the counter differs from the one last sent, the whole
+  picture is sent to the graphics card again (read on 2026-10-17,
+  `screen-output.md`, "Pictures on the graphics card").
 - Fixed values: `white1x1`, a 1 x 1 white picture; the `OVERLAY` paste
   threshold 128 (`fact-pictures.md`); a fixed-point shift of 8 for
   `render`.
@@ -187,8 +189,8 @@ it.)
 
 ## Not studied
 
-- The Unity side: how tiles, quads and the change counter reach the
-  screen (`text-drawing.md`, `desk-pictures.md`).
+- (The Unity side, how tiles, quads and the change counter reach the
+  screen, was listed here: read on 2026-10-17, `screen-output.md`.)
 - `Frame.buildTiles`'s nine target rectangles in full, and the inspect
   frames' own `scale9Rect` values.
 - `app.vis.Affine` and `Image.transformed` were read for pictures

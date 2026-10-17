@@ -1,6 +1,23 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-10-16, after
+**Read this first in a new session.** Last updated 2026-10-17, after
+the last part of the drawing step, the Unity side (`screen-output.md`;
+code reading, a reference script `host.py` and a check; not run in the
+game). **The drawing step is done.** Main findings: layers are drawn
+lowest number first, and inside a layer in the order the visuals were
+added; the Unity host keeps that order exactly (no grouping by picture);
+everything is drawn into one 570 x 320 picture cleared to black, with
+nearest-pixel reads; quads are not rounded, so where a fractional one
+lands is the graphics card's rule; a picture is sent to the graphics card
+again when its change counter moves; a window is 570 x 320 doubled while
+the double stays under two thirds of the monitor (1140 x 640 on
+1920 x 1080); the host's `phantomCursor` shows `CursorPhantom.png`,
+which is exactly the arrow's white edge, placed on the drawn arrow.
+Not in the code, so still open: the quad shader's blending, the colour
+space, the full-screen fit and whether the phantom cursor is visible
+(they are in the Unity scene and shader files).
+
+Before it, on 2026-10-16,
 input handling (`input-handling.md`; code reading, a reference script
 `inputs.py` and a check; not run in the game). Main findings: on desktop
 only the mouse's left button counts, as one pointer in whole game
@@ -251,7 +268,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 1. Tools to read the code | 3% | Done |
 | 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
-| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). Not done: the Unity side of drawing |
+| 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; left of it only what is in the Unity scene and shader files, not the code |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
@@ -306,6 +323,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `desk-movement.md` | **Drawing, part 5a**: how a paper moves (`DeskItem`): the reveal chosen by the `Paper` constructor and every reveal animation with its timing and sounds (from the slot, printed from the bottom or top, spat from the right, the instant ones), the hide animations and who hides papers, dragging (which placement the cursor gives, offsets, the clamps), dropping (the drawer, the wall's saved place, giving, clicks and links), the give test, falling, sliding (the drag velocity), the dock points' drag clamp and return path, the drawing order, the drawer (`Filer`: size, states, slots) |
 | `input-handling.md` | **Input handling**: one frame's order; the mouse to game pixels; a pointer's frame (down, just down and up, held and unheld place, taking, double click); `getPointerOver` and `getPointerJustDown`; blocked areas and who sets them; keys and pointers masked until release; the cursor kinds, the drawn cursor and where each picture sits; the rifle scope cursor |
 | `ui-parts.md` | **Drawing, part 7**: the rest of `play.ui`: the dotted `DiagramLine` (dots, rounded corners, how much shows), `DottedLine`, the speech bubble (look, wrapping, place, time on screen, opening and closing), `KineticScroll` (rubber band, coasting), the rest of `RevealTextEnt`, the achievement popup in outline |
+| `screen-output.md` | **The Unity side of drawing** (the last part): the drawing order (layers lowest first, then the order visuals were added), the host's frame, the 570 x 320 screen picture and how it is fitted to the window (window size, full screen, the command-line words), how quads are batched, texture coordinates, pictures on the graphics card and the change counter, where a fractional position lands (the graphics card's rule, assumed), the phantom cursor, and what is in the Unity files instead of the code |
 | `vis-basics.md` | **Drawing, part 6**: the rest of `app.vis`: pictures in memory (0xAARRGGBB, byte order, change counter, `white1x1`), colours, `Fill`, the nine-slice `Frame`, the atlas of chips and its y order, `Point.parse` and `Rect.parse` with the data check, the geometry helpers the game uses, and the helpers it never calls |
 | `inspect-mode.md` | **Drawing, part 5b**: the inspect mode (`InspectUi`): opening and closing (button, Space, double click), its states and timings, the reveal of the hint and buttons, the overlay, the surround lines and the initial scan; what can be marked (papers topmost first, marks to fact paths, the paper itself, the booth's four things); the two selection slots; the pair's text; the diagram's timeline and label side; the interrogate button; when the mode is disabled |
 | `booth-layout.md` | **Every desktop value of `Layout`**, from the game's constructor run in Ghidra's emulator: the booth's rectangles (window, counter, console, desk, clips, clamps, give area, slot, counter edge, floor line), the dock points of the rulebook, bulletin and transcript, the inspect rectangles, and all other fields; how the run was made and checked (35 values read by hand earlier all match) |
@@ -441,28 +459,29 @@ the night screen's family pictures; part 11, the last screens.)
    search photo", and how it prints onto the desk in part 5a,
    `desk-movement.md`, `PRINTTOP`. The sentence was copied from an old
    note in `text-drawing.md`, corrected the same day.)
-   **Left of drawing: the Unity side**, how the game's draw list reaches
-   the screen. Not studied yet. Needs **Opus**. Where to start, in
-   `decompiled/all/top.clean.c`:
-   - `QuadBatcher` (4 functions), `QuadBatcher.QuadMesh` (5) and
-     `QuadMesh.Submesh` (2): turn the game's quads into Unity meshes;
-   - `HostUnity` (12): owns the screen quad (the one picture the game is
-     drawn onto) and the `phantomCursor`; its `Update` was read for
-     input only (`input-handling.md`);
-   - `HostUnity.TextureStats` (1).
-   The open questions it should answer:
-   - where a fractional position lands on screen, and how a text's colour
-     is applied there (`text-drawing.md`; also `buttons.md`, a button's
-     quads are not rounded by the game code);
-   - who reads a picture's change counter (`generation`), inferred to be
-     the Unity side re-sending the picture (`vis-basics.md`);
-   - how a page's quads and the desk's layers reach the screen, and the
-     drawing order inside one layer (`fact-pictures.md`,
-     `desk-pictures.md`, `desk-movement.md`);
-   - how the 570 x 320 screen quad is scaled to the window (inferred from
-     `input-handling.md`: the mouse is mapped back through it);
-   - what the `phantomCursor` shows (`input-handling.md`; open
-     questions, "From 2026-10-16 (`input-handling.md`)").
+   The Unity side, how the game's draw list reaches the screen:
+   **done** on 2026-10-17, `screen-output.md`. **The drawing step is
+   done.** It answered: the drawing order inside a layer (the order the
+   visuals were added) and between layers (lowest number first); who
+   reads the change counter (the host, re-sending the picture); how the
+   570 x 320 picture is fitted to the window; what the `phantomCursor`
+   shows. Not answered, because they are not in the code but in the
+   Unity scene and shader files: how the quad shader combines the colour
+   and blends, the colour space, the full-screen fit, whether the
+   phantom cursor is visible. Where a fractional position lands is the
+   graphics card's rule (assumed, the usual one). See step 5b.
+5b. **Read the Unity scene and shader settings** (added 2026-10-17):
+   the quad shader `Unlit/QuadShader` (colour and blending), the
+   project's colour space (in `globalgamemanagers`), the screen quad's
+   material, the camera's background colour and its Pixel Perfect
+   Camera settings, and the phantom cursor's depth and shader
+   (`screen-output.md`, "Not in the code"). They decide how
+   half-transparent pixels look and whether the phantom cursor shows.
+   Needs a Unity asset reader (for example the Python package UnityPy,
+   or AssetRipper): **ask before downloading**. The same tool may serve
+   step 6. Opus for reading the shader; Sonnet for listing settings.
+   Without it, the port assumes what `screen-output.md` says ("For the
+   port, meanwhile").
 6. **Audio extraction** (probably `sharedassets0.resource`; not checked).
    Independent of the steps above; may need a Unity asset tool (ask before
    downloading). (The language zips in `StreamingAssets/loc/` were also
@@ -506,21 +525,39 @@ Small jobs that fit anywhere:
 
 Collected from the docs, so they are not lost:
 
+**From 2026-10-17** (`screen-output.md`, the Unity side of drawing)
+
+- **Nothing of it has been watched in the game.** Four items at the end
+  of `screen-output.md` (the window size; the full-screen fit; the
+  phantom cursor over the hand; a half-transparent shadow).
+- **Not in the code** (step 5b): the quad shader's colour and blending
+  (assumed: multiplied colour, ordinary alpha blending), the colour
+  space (assumed: blending on the stored values), the full-screen fit
+  with `stretch` off (by the Pixel Perfect Camera's documentation: a
+  whole-number zoom with black bars), the camera's background colour,
+  whether the window can be resized.
+- **Assumed, not game code:** which pixels a fractional quad covers (the
+  usual graphics-card rule: the nearest pixel, a half rounding down).
+  A browser build that draws the same quads into a 570 x 320 picture
+  with WebGL should get the same pixels; not tested.
+- By the code, not expected to happen: a frame with no valid quad at
+  all would make the batcher fail.
+
 **From 2026-10-16** (`input-handling.md`, input handling)
 
 - **Nothing of it has been watched in the game.** Five items at the end
   of `input-handling.md` (the game's own cursor and the hand; no cursor
   before the mouse first moves; the double click; the rifle's scope
   cursor; the right button doing nothing).
-- **Not settled: the host's `phantomCursor`.** `HostUnity.Update` places a
-  Unity object called `phantomCursor` at the mouse and shows it while
-  pointer 0 is the mouse, hidden otherwise. What it shows, and whether it
-  can be seen next to the cursor the game draws itself, was not settled.
-  Inferred, not confirmed: it shows `CursorPhantom.png` (19 x 26), the
-  picture `Game.phantomCursorImage` returns; the host's call to that
-  function goes through the game's interface and was not followed.
-  Matters for the port only if it is visible: then the browser build
-  needs it too.
+- **Not settled: whether the host's `phantomCursor` is visible.**
+  `HostUnity.Update` places a Unity object called `phantomCursor` at the
+  mouse and shows it while pointer 0 is the mouse, hidden otherwise.
+  What it shows was followed on 2026-10-17 (`screen-output.md`): the
+  host's call is `Game.phantomCursorImage`, so `CursorPhantom.png`, as
+  inferred; that picture is exactly the arrow's white edge, grey-green,
+  placed on the drawn arrow. Whether it can be seen depends on the Unity
+  scene (step 5b) or a look at the game with the hand cursor. Matters for
+  the port only if it is visible: then the browser build needs it too.
 - Not followed: where the input mode becomes touch (mode 2), and the
   phone swipes. Will not matter for a desktop port.
 
@@ -532,8 +569,9 @@ Collected from the docs, so they are not lost:
   through see-through pixels; a long citation message).
 - (The desktop values of `Layout.booth`, `boothInnerClip`, `boothOuter`,
   `wall`, `slotCenter`, `counterTopEdgeY` were listed here as not read;
-  read since, on 2026-10-16, `booth-layout.md`.) Not read: how the
-  drawer orders its layers (inferred: lower numbers first). (The give
+  read since, on 2026-10-16, `booth-layout.md`.) (How the drawer orders
+  its layers was listed here as not read, inferred lower numbers first:
+  read on 2026-10-17, `screen-output.md`, and so it is.) (The give
   icon's rule, dragging and the animations were listed here; read since,
   on 2026-10-16, `desk-movement.md`.)
 - By the code, not seen: the `Citation`'s `clipheight="36"` is replaced
@@ -1194,5 +1232,5 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks, and `EmulateLayout.java`, which runs the whole `Layout` constructor), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`), `pages.py` (lays a document page out and draws a preview; `page-layout.md`), `factpics.py` (the fact pictures and the picture operations; `fact-pictures.md`), `deskpics.py` (a paper's pictures on the desk, clipping, picking a mark, stamp ink, `Image.render`; `desk-pictures.md`), `deskmove.py` (how a paper moves, frame by frame; `desk-movement.md`), `inspectmode.py` (the inspect mode's rules; `inspect-mode.md`), `vis.py` (colours, point and rectangle text, nine-slice frames, atlas tiles; `vis-basics.md`), `ui.py` (dotted lines, the speech bubble, the drag helper; `ui-parts.md`), `inputs.py` (the mouse, pointers, blocked areas, keys, the cursor's place; `input-handling.md`), `layout.py` (every desktop `Layout` value) and `layout_dump.py` (decodes an `EmulateLayout.java` run; `booth-layout.md`) |
-| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, `text_drawing_check.py` (fonts against the English texts, the font sheets' colours), `page_layout_check.py` (marker pixels of every page picture), `fact_pictures_check.py` (every picture fact, its files and sizes) `desk_pictures_check.py` (every paper's desk pictures) `ui_check.py` (dotted lines, the bubble and the speech lines, the drag helper), `input_check.py` (pointer and key sequences, the cursor pictures), `vis_check.py` (points and rectangles in the data files, colours, frames), `inspect_check.py` (marks per paper, booth things, texts, selection, the diagram), `desk_movement_check.py` (every paper's reveal, the docks, clamps, a fall, a throw, the drag placement) and `layout_check.py` (the emulated layout against `layout.py` and 35 values read by hand); see its `README.md` for each script's arguments |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`), `pages.py` (lays a document page out and draws a preview; `page-layout.md`), `factpics.py` (the fact pictures and the picture operations; `fact-pictures.md`), `deskpics.py` (a paper's pictures on the desk, clipping, picking a mark, stamp ink, `Image.render`; `desk-pictures.md`), `deskmove.py` (how a paper moves, frame by frame; `desk-movement.md`), `inspectmode.py` (the inspect mode's rules; `inspect-mode.md`), `vis.py` (colours, point and rectangle text, nine-slice frames, atlas tiles; `vis-basics.md`), `ui.py` (dotted lines, the speech bubble, the drag helper; `ui-parts.md`), `inputs.py` (the mouse, pointers, blocked areas, keys, the cursor's place; `input-handling.md`), `host.py` (the drawing order, the quad batcher, the texture table, the window size, the phantom cursor's place, the assumed pixel rule; `screen-output.md`), `layout.py` (every desktop `Layout` value) and `layout_dump.py` (decodes an `EmulateLayout.java` run; `booth-layout.md`) |
+| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, `text_drawing_check.py` (fonts against the English texts, the font sheets' colours), `page_layout_check.py` (marker pixels of every page picture), `fact_pictures_check.py` (every picture fact, its files and sizes) `desk_pictures_check.py` (every paper's desk pictures) `ui_check.py` (dotted lines, the bubble and the speech lines, the drag helper), `input_check.py` (pointer and key sequences, the cursor pictures), `host_check.py` (the drawing order, batching, the texture table, window sizes, the phantom cursor picture and place), `vis_check.py` (points and rectangles in the data files, colours, frames), `inspect_check.py` (marks per paper, booth things, texts, selection, the diagram), `desk_movement_check.py` (every paper's reveal, the docks, clamps, a fall, a throw, the drag placement) and `layout_check.py` (the emulated layout against `layout.py` and 35 values read by hand); see its `README.md` for each script's arguments |

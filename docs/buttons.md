@@ -416,8 +416,9 @@ a ring.
 - What a scaled picture answers for its width (`Sprite.width`). (Whether
   `Image.paste` rounds half-pixel positions was listed here: it cuts them
   toward zero, `text-drawing.md`. A button on screen is drawn as quads,
-  which the game code does not round; what the Unity side does with them
-  was not read.)
+  which the game code does not round; the Unity side does not round
+  them either, read on 2026-10-17, `screen-output.md`: the graphics
+  card's pixel rule decides, by the usual rule the nearest pixel.)
 - The shape of the `BOUNCEBACK` curve (`app.Interp.get`, case 6).
 - When the stamp bar drops its button and what the click does
   (`StampBar`, `DropRemote`); the criminal-poster pin's behaviour beyond

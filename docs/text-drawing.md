@@ -143,8 +143,14 @@ out, and hands it to the drawer's layer. The layer's quad walker
 - the picture coordinates are divided by the picture's size (0 to 1), and
   the colour is copied as four floats.
 
-What the Unity side then does with the quads (and so how a fractional
-position lands on a pixel) was not read.
+What the Unity side then does with the quads was read on 2026-10-17
+(`screen-output.md`): it does not round them either; they are drawn in
+order into a 570 x 320 picture with nearest-pixel reads, and which
+pixels a fractional quad covers is the graphics card's rule (by the
+usual rule, a position rounded to the nearest pixel, a half rounding
+down; an assumption, not game code). How the colour is combined with
+the letter sheet is in the quad shader, which is not in the code
+(inferred: multiplied).
 
 **Into a picture** (`Visual.renderToImage`; called three times, all in
 `play.day.booth`). A tile whose size equals its piece's size (within
@@ -230,7 +236,8 @@ widest line**.
 - **`Image.paste`** (`buttons.md`, `faces.md`): positions are cut toward
   zero, not rounded. This is the drawing-into-a-picture path; a button on
   screen is drawn as quads, whose positions are not rounded in the game
-  code (the Unity side not read).
+  code nor by the Unity side (`screen-output.md`, "Where a fractional
+  position lands").
 
 ## Cross-check
 
@@ -267,8 +274,10 @@ draws the family names and the passport count with `text.py`.
   stretched tile is filled into a picture: read on 2026-10-16,
   `desk-pictures.md`. Its target edges are floored, not cut toward zero
   as `paste` does.)
-- How the Unity side draws the quads on screen, so where a fractional
-  position lands and how the colour is applied there.
+- (How the Unity side draws the quads was listed here: read on
+  2026-10-17, `screen-output.md`. Where a fractional position lands is
+  the graphics card's rule there; how the colour is applied is in the
+  quad shader, which is in the Unity files, not the code: still open.)
 - How `Font.split` behaves at its edges (`fonts.md`, "Note on
   certainty"); this part only confirmed which width it returns.
 - Which texts use which font and settings, beyond the setter search above

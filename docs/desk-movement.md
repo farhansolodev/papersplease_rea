@@ -421,8 +421,10 @@ citation being printed.
 
 ## Not studied
 
-- The drawing order inside one layer when papers are drawn (the `Drawer`
-  and the Unity side; `desk-pictures.md`).
+- (The drawing order inside one layer was listed here: read on
+  2026-10-17, `screen-output.md`. Inside a layer the visuals are drawn
+  in the order they were added, so papers on one layer come out in the
+  order they draw, the drawing order above; the host keeps it.)
 - The engine side of giving, confiscating and the drawer
   (`player-actions.md` has the rules; the booth's state machine that
   calls `hideTransientPapers` was not named state by state).

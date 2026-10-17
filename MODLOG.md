@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-17 Document the Unity side of drawing (end of the drawing step)
+
+**Changed:** new `docs/screen-output.md`, `scripts/reference/host.py`, `scripts/checks/host_check.py`; `scripts/checks/README.md`; `docs/PROGRESS.md` (summary, status, docs list, step 5 done, new step 5b, open questions, scripts); older docs corrected (below).
+**Why:** the last open part of the drawing step: how the game's draw list reaches the screen.
+**Tested how:** code reading of `HostUnity` (12 functions), `QuadBatcher` and its mesh classes (11), `Game`'s interface functions, `Drawer`, `Layer`, `VisualIter`, `QuadIter`, `PagedArray`, `GroupEnt.draw`, `Quad.make`; five constants with `read_doubles.py`; `strings` on the Unity files for shader and object names; `python -I scripts\checks\host_check.py scripts\reference extracted\art`.
+**Result:** `0 problems`. Layers draw lowest number first, visuals in the order added, and the host keeps the order; one 570 x 320 picture, nearest-pixel reads, quads not rounded; the change counter is read by the host to re-send a picture; window 570 x 320 doubled while under two thirds of the monitor; `CursorPhantom.png` equals the arrow's 39 white pixels (grey-green) and sits on the drawn arrow. First check run had 2 failures from float noise in the phantom place (−1.0000000000000053); the check now rounds to 6 places. A first draft of the doc had the small-monitor threshold wrong (855 x 480; it is 1711 wide or 961 high) and the command-line words as `force1080p` / `force720p` (they are `1080p` / `720p`); both fixed before commit.
+**Corrected in older docs:** `text-drawing.md` (three "Unity side not read" notes), `buttons.md`, `desk-pictures.md` (two), `desk-movement.md`, `fact-pictures.md`, `vis-basics.md` (two; the change-counter inference confirmed), `input-handling.md` (two; what the phantom cursor shows), `run-and-seeds.md` (`stretch`, `720p`, `1080p` no longer "not studied"), `PROGRESS.md` (the layer-order inference confirmed). No reference script or check was built on a wrong statement.
+**Still broken / not tested:** nothing run in the game. Not in the code: the quad shader's blending, the colour space, the full-screen fit, the phantom cursor's visibility (step 5b). The pixel rule for fractional quads is the usual graphics-card rule, assumed, not tested.
+
 ## 2026-10-17 Correct what is left of the drawing step
 
 **Changed:** `docs/PROGRESS.md`, next step 5: the search photo removed from what is left (with a note that it was wrong), and the Unity side written out as a concrete step (the classes to read, the open questions it answers, the model); `docs/text-drawing.md`, its "rest of the drawing step" note.

@@ -468,7 +468,8 @@ Previews looked at:
 
 ## Not studied
 
-- How the page's visuals reach the screen (the Unity side). (`Image.render`
+- (How the page's visuals reach the screen was listed here: read on
+  2026-10-17, `screen-output.md`.) (`Image.render`
   was listed here: read on 2026-10-16, `desk-pictures.md`; so is how the
   page and its visuals are put on the desk item.)
 - `BoothEngine.applyUpdatedSettings` (what a change of the Nudity setting

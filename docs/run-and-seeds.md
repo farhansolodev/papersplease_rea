@@ -142,7 +142,8 @@ exact words, without dashes:
 | `savedir <path>` | where saves go (quotes are removed) |
 | `expo` | shows a pause button (exhibition mode). On the title screen it also leaves out the endless and quit buttons and switches the settings button off (`screens.md`, part 2) |
 | `nosync` | turns off matching the frame rate to the screen: no vertical sync, a target of 65 frames a second (`border-view.md`, "The frame rate"; read 2026-10-15) |
-| `fps`, `stretch`, `720p`, `1080p` | display options (not studied) |
+| `stretch`, `720p`, `1080p` | full-screen display options: `1080p` / `720p` pick that screen size (about 60 Hz) instead of the monitor's own, `stretch` lets the picture be scaled to fill the screen (`screen-output.md`, "The screen picture and the window"; read 2026-10-17) |
+| `fps` | a display option (not studied) |
 | `nosteam` | Steam-related; **out of scope** (online platform) |
 
 ### The debug log

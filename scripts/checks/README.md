@@ -47,6 +47,7 @@ Run from the project root with `python -I`. Paths below assume
 | `vis_check.py` | `scripts\reference extracted\art` | `vis-basics.md` (every point and rectangle attribute of the data files against the game's split rules; the colour round trip; nine-slice tiles) |
 | `ui_check.py` | `scripts\reference extracted\art` (needs Pillow) | `ui-parts.md` (dotted diagram lines, the dotted line's parity, the speech bubble picture and every line of `Speeches.txt` against the wrapping rule, the bubble's reveal, the drag helper) |
 | `input_check.py` | `scripts\reference extracted\art` (needs Pillow) | `input-handling.md` (the mouse to game pixels, press and release, double clicks, taking a pointer, blocked areas, keys and pointers masked until release, the cursor and its pictures' places) |
+| `host_check.py` | `scripts\reference extracted\art` (needs Pillow) | `screen-output.md` (the drawing order, the quad batcher's meshes and slots, the texture table, window sizes for common monitors and the full-screen choice, the phantom cursor picture against the arrow and its place, the assumed pixel rule; the reference script `host.py`) |
 | `nights_check.py` | `scripts\reference D dumps\il2cppdumper\stringliteral.json` | `nights-txt-format.md` (the reference script `nights.py`) |
 | `night_check.py` | `scripts\reference D` | `night.md` (the `Family` class in `nights.py`) |
 | `ends_check.py` | `scripts\reference <assets> dumps\il2cppdumper\stringliteral.json` (`<assets>` = `extracted\art\assets`) | `ends-xml-format.md` |
