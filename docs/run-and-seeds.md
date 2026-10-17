@@ -106,8 +106,9 @@ differ fits how the game plays; the mechanism is what is confirmed here.)
   original's own logs, or running both from a chosen master seed.
 - **For the port**: implement the same chain from a master seed: the two
   seed generators, the cyclers, a story seed per load, and day seeds from
-  it. How the port picks its master seed is a design choice for
-  `docs/DESIGN.md` (for tests it should be settable).
+  it. How the port picks its master seed was decided on 2026-10-17
+  (`docs/DESIGN.md`: a random one at start, settable from the page
+  address for tests).
 - `autoReapplyRandomSeed` (used by the automation) recreates the two seed
   generators, both cyclers and the story seed from the master seed, which
   is how the automation can replay deterministically. (The automation calls

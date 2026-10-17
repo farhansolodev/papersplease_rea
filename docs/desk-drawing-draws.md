@@ -127,8 +127,9 @@ spoken lines are needed.
 - The criminal photo draw and the invalid seal are from the code only.
 - A hidden paper shown later: modelled, but the one case in the log came
   after the last informative pick. Not tested.
-- Consequence for the port, to be decided in `DESIGN.md` when the booth is
-  built: to reproduce the original's travelers exactly for a seed, the port
-  must make these draws at the same moments, even where its own drawing
-  works differently. And because turning to some pages draws again, what
+- Consequence for the port, decided on 2026-10-17 (`DESIGN.md`, "Needed
+  before the first Rust code", item 2: copy the booth side exactly; this
+  said "to be decided" until then): to reproduce the original's travelers
+  exactly for a seed, the port must make these draws at the same moments,
+  even where its own drawing works differently. And because turning to some pages draws again, what
   the player looks at can change later travelers in the original.
