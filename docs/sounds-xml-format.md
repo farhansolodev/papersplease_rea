@@ -58,7 +58,10 @@ game's others, so sounds do not disturb the game's randomness.
   such sounds for the current frame.
 - Otherwise the chosen recording starts in the "effects" category with the
   sound's loop flag and volume, and is tracked with its volume and fade so
-  it can be faded or stopped later. The call returns a play number.
+  it can be faded or stopped later. The call returns a play number. The
+  recording is picked only at this point, so a skipped sound does not
+  move its recording order on (`audio-layer.md`, 2026-10-17). Who sets
+  the room and the ignore switch, and what a fade does, is there too.
 
 ## Songs (`Speaker.music`, `Music.play`)
 
@@ -107,9 +110,12 @@ were in screen code not yet read): `Theme` for most menu screens,
   it. The two never-played 4th recordings are stored too.)
 - (The Unity side that plays a recording, and the volume settings, were
   listed here; read on 2026-10-17, `audio.md`: at most 32 sounds at once,
-  volume as setting squared.) Still not studied: fading
-  (`SpeakerSound`), pausing, the speaker's "room" beyond what is above,
-  and the beat tracking in `Music` / `MusicBeat` (`app.aud`).
+  volume as setting squared.) (Fading (`SpeakerSound`), pausing, the
+  speaker's "room" and the beat tracking in `Music` / `MusicBeat` were
+  listed here as not studied; read on 2026-10-17, step 6b,
+  `audio-layer.md`: straight-line fades over the sound's `fade`, the
+  pause stops effects only, only the booth sets the room, and the beat
+  is a fixed tempo table that fits `Theme`.)
 - (The full list of song ids was listed here: `Theme`, `Death`,
   `Victory`, answered on 2026-10-17, `audio.md`.)
 - Nothing here has been compared with the running game.

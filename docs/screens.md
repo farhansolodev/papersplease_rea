@@ -630,7 +630,8 @@ Checked in the instructions: the two arguments the decompiler dropped in
 
 **Not read:** `UnlockConfirm` (the box that asks for the endless code;
 read since, part 7),
-`app.aud.Music` (what a "beat" is), the platform
+`app.aud.Music` (what a "beat" is; read since, 2026-10-17,
+`audio-layer.md`), the platform
 functions `canExit`, `osName` and `decoratedVersion`, the test tooling
 class `SoakTapper`. (`play.ui.Button` was on this list; read since,
 `buttons.md`.)
@@ -736,8 +737,11 @@ rise on the next frame. (Separately, taps in the top left 50 x 50 pixels
 are counted by the test tooling's `SoakTapper`; the right rhythm starts
 the soak test, `save-format.md`.)
 
-What a "beat" of the music is, and so how long the rise takes in seconds,
-was not read.
+What a "beat" of the music is was not read here; read on 2026-10-17
+(step 6b, `audio-layer.md`, "The beat"): a fixed tempo table that fits
+`Theme`, 100 beats a minute at first. So **the rise takes about 23.6 s**,
+in 20 steps about 1.2 s apart, and the logo bobs once a bar (2.4 s at
+first, 1.92 s at the fastest).
 
 ## The menu helper (`Menu`)
 
@@ -765,7 +769,9 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
 
 - (`UnlockConfirm`, how the code is typed and checked: read since, part 7,
   "The code box".)
-- The music's beat, so the rise's length in seconds and the bob's tempo.
+- (The music's beat, so the rise's length in seconds and the bob's
+  tempo, was listed here: read on 2026-10-17, `audio-layer.md`; the rise
+  takes about 23.6 s.)
 - (`play.ui.Button` beyond its key and mouse handling was listed here;
   read since, on 2026-10-16, `buttons.md`. What a "back button" is was
   also listed, inferred from the name to be the button a back key
@@ -777,7 +783,8 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
 
 ## Things to watch in the game
 
-1. At the first start the title rises in visible steps with the music;
+1. At the first start the title rises in visible steps with the music,
+   about 1.2 s apart, for about 24 s (`audio-layer.md`);
    a click or key makes it jump to its place. After going to another
    screen and back, it does not rise again.
 2. The buttons do not react until the title has arrived.
@@ -1157,7 +1164,8 @@ then).
 ## The pause screen (`PauseScreen`)
 
 It is made when the game enters `paused` and removed when it leaves
-(`save-format.md`, part 2: sound paused, the screen under it hidden, the
+(`save-format.md`, part 2: sound effects paused, a song playing on (this
+said "sound paused" until 2026-10-17, `audio-layer.md`), the screen under it hidden, the
 sound `button-drop`; on leaving, `hover-up`). It is built on `GameScreen`
 like every screen. In order:
 

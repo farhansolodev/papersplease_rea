@@ -432,7 +432,7 @@ In this order:
 | `off` | On entry two flags of the current screen are cleared (4 and 16) and the fade cover fades in. After 1 second the pending screen change is applied and the state goes back to `on` |
 | `off-instant` | The same with no fade and no wait |
 | `flashing-to-title` | The same two flags are cleared, and the screen flash runs; when it is over, the state goes to `off-instant` and "title" becomes the pending change (the target state was read in the instructions on 2026-10-16, `screens.md` part 11; this row first said the decompiler had dropped it) |
-| `paused` | On entry: all sound paused, the pause screen created, the current screen hidden, the sound `button-drop`. Every frame it tells the clock to pause for one frame. On exit: sound resumed, pause screen removed, screen shown again, the sound `hover-up` |
+| `paused` | On entry: the sound effects paused (only the effects: a song plays on; this row said "all sound" until 2026-10-17, corrected in step 6b, `audio-layer.md`), the pause screen created, the current screen hidden, the sound `button-drop`. Every frame it tells the clock to pause for one frame. On exit: effects resumed, pause screen removed, screen shown again, the sound `hover-up` |
 
 What the two flags mean was read on 2026-10-14 (`screens.md`, part 1):
 without 4 the screen and everything in it get no input, without 16 they
@@ -455,8 +455,12 @@ which also describes the pause screen).
 
 ## Building the screen (`Game.applyScreenChange`)
 
-1. All sound is stopped and the flash is cleared.
-2. The current screen is removed.
+1. Every sound effect fades out over its own fade time (songs are left
+   to step 5), and the flash is cleared. (This said "all sound is
+   stopped" until 2026-10-17; corrected in step 6b, `audio-layer.md`:
+   `stopAll` is called with a fade and its "effects only" default.)
+2. The current screen is removed. From here to the end of the frame,
+   sound effects that do not loop are ignored (`audio-layer.md`).
 3. Depending on the request that came with the screen change:
 
    | Request | Story state | The `Day` object |
@@ -474,7 +478,10 @@ which also describes the pause screen).
    drops the `Day` object. `news`, `day` and `night` are given the `Day`
    object through `getDaySafe`: the existing one, or, if there is none, a
    new one for the day number in `Game/Day`.
-5. The screen's music is started and the screen is shown.
+5. The screen's music is started and the screen is shown. (`Music.play`
+   with the screen's song: the same song plays on, another replaces the
+   current one after a 4-second fade-out, no song fades it out;
+   `audio-layer.md`, "Songs".)
 
 What follows from this:
 

@@ -81,6 +81,8 @@ Port my own copy of Papers, Please to run in the browser:
 - Python 3.12 is installed and used for the helper scripts (run with
   `python -I`). Pillow 11.1.0 is installed for it; the face scripts
   (`scripts/reference/faces.py` and everything built on it) need it.
+  numpy 2.4.6 is also installed for it (found 2026-10-17, not installed
+  by this project); `scripts/checks/music_beat_check.py` needs it.
 - UnityPy 1.25.4 (reads Unity's asset files) is installed only in the
   project's gitignored `.venv/` (2026-10-17); run scripts that need it
   with `.venv\Scripts\python -I`. It came with `fmod_toolkit` 0.1.3 and

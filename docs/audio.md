@@ -6,7 +6,8 @@ play, and the Unity side of playing them (`HostUnity.UnityPlatformAudio`
 and the scene's audio mixer). Which sound plays when, from the data
 files, is in `sounds-xml-format.md`. The game-side audio layer
 (`app.aud`: `Speaker`, `SpeakerSound`, `Music`, `MusicBeat`: fading,
-rooms, the music's beat) is **not** studied here.
+rooms, the music's beat) is not here but in `audio-layer.md` (step 6b,
+2026-10-17).
 
 Sources: the Unity files read with UnityPy 1.25.4 (`.venv/`); the sound
 data decoded with the FMOD library that UnityPy's `fmod_toolkit` 0.1.3
@@ -179,8 +180,10 @@ a search of the whole decompile for the names:
   attribute in `Ends.xml` (17 endings `Death`, 3 `Victory`).
 
 No other screen's constructor sets a song by that search (the day screen
-sets none). How a screen's song is started, faded and
-changed is in `app.aud.Music`, not studied.
+sets none). How a screen's song is started, faded and changed (this
+said "not studied" until step 6b): `audio-layer.md`, "Songs". In short,
+the same song plays on, another one replaces it after a 4-second
+fade-out, and no song (the day screen) fades it out.
 
 ## Check
 
@@ -220,16 +223,15 @@ it is what is stored. 12 files reach full scale.
 - Volume: gain = setting² held to 0.0001..1, per category, times the
   sound's own volume. Whether to keep "0 is −80 dB, not silent" is a
   detail for `DESIGN.md` (inaudible in practice).
-- At most 32 sounds at once; a 33rd is silently dropped. Whether the game
-  ever reaches 32 was not looked at.
+- At most 32 sounds at once; a 33rd is silently dropped (the game side
+  still counts it as playing for one update, `audio-layer.md`). Whether
+  the game ever reaches 32 was not looked at.
 - The mixer itself does nothing else, so the port needs no effects.
 
 ## Not studied
 
-- `app.aud`: `Speaker` (rooms, fading, the "ignore one-shot sounds this
-  frame" switch, pausing all, stopping all), `SpeakerSound`, `Music`
-  (how songs fade and change), `MusicBeat` (the beat the title screen's
-  rise follows, `screens.md`, part 2). The next audio step.
+- (`app.aud`, the game-side audio layer, was listed here as the next
+  audio step: studied on 2026-10-17, step 6b, `audio-layer.md`.)
 - Whether anything calls `SetPauseForAppLostFocus`, so whether sounds
   pause when the window loses focus.
 - Unity's own mixing (how it resamples the 22,050 Hz clips, clipping
