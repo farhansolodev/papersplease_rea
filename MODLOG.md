@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-17 Sort the open questions (step 7)
+
+**Changed:** `docs/PROGRESS.md` (the open-questions section rewritten from about 636 lines to about 170, in four parts; header, step 7 marked done, step 8 reworded, docs table row for `DESIGN.md`); new `docs/DESIGN.md` (decisions list only); `docs/screens.md` (four `canVibrate` sentences); `docs/comparing-with-the-game.md` (what the log holds of the border scene); `CLAUDE.md` (the `DESIGN.md` row of the file table, as the user approved).
+**Why:** step 7, before design work: every open item gets a kind and a reason, with a short list left.
+**Tested how:** no code run. Made a sheet of all 151 bullets (line number, kind, reason; scratch, not kept) and checked by script that every bullet is on it and none extra; searched `docs/` for the names of doubtful items (`NIGHTMSG`, `DIPLOMAT_FIRST`, `whenAddNews`, `borderRand`, `SetPauseForAppLostFocus`, the booth's state machine, `canVibrate`); counted the `border` lines of the route-20 log.
+**Result:** 151 items became 165 lines (a few items had two kinds): 28 answered and closed, 41 need the game, 21 the user's decisions (in `DESIGN.md`), 40 will not matter for a desktop port, 35 could bite during the build. Answered on the way: the log has no border-scene lines except 408 test-player `BusyWithBorder` lines; a desktop PC shows no Vibration row (`audio-layer.md`, by code, not seen). Nothing else was answered: the items that could bite got an assumption and a "settle when" instead. Biggest of them: the booth's state machine and who ends a day by the clock.
+**Docs corrected:** `screens.md` (`canVibrate` "not read", four sentences: the row table, the row list, and two watch-list notes), `comparing-with-the-game.md`. The older `PROGRESS.md` entries that said "not read" for `app.aud`, the quad shader, the phantom cursor, and similar were already marked answered; they were dropped from the list. Docs searched for `canVibrate`, `DESIGN.md`, `Open questions`.
+**Still broken / not tested:** the 28 "answered" items were closed on the strength of their own text in `PROGRESS.md` (each already carried an "answered" or "settled" note with a doc named), not re-checked in those docs one by one, except `canVibrate`, the border log and the sprite origin (`screen-output.md` line 362: probably answered, kept as a build check). `DESIGN.md`'s suggested defaults are mine, not confirmed. The sheet was not kept, so the mapping of old to new lines exists only in this entry's counts.
+
 ## 2026-10-17 Read the game-side audio layer (step 6b)
 
 **Changed:** new `docs/audio-layer.md`, `scripts/reference/aud.py`, `scripts/checks/aud_check.py`, `scripts/checks/music_beat_check.py`; `scripts/checks/README.md`; `CLAUDE.md` (tooling state: numpy in the system Python); `docs/PROGRESS.md` (header, summary, stage 4, docs table, steps 6 and 6b, open questions, files, scripts); older docs corrected (below).

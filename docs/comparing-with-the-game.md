@@ -255,6 +255,12 @@ would change the later picks. Later days' documents are not yet tested.
   game's code decides.
 - Running the game needs the user's go-ahead (`CLAUDE.md`).
 
+What the log holds of the border scene (answered 2026-10-17, step 7, by
+counting the lines of `extracted/autorun/Player.route20.seed12345.log`):
+only the test player's `[AutoQueue] BusyWithBorder` lines (408 of them),
+no line from the scene itself. So the log cannot be used to compare the
+border scene, and its random draws are not checked by any run.
+
 ## Dead ends: the booth's random numbers fell out of step with the game (resolved 2026-10-14)
 
 The full record of the problem met in the second run above, moved here on

@@ -174,7 +174,7 @@ Each kind of information lives in one place. Do not repeat it in another.
 | `docs/PROGRESS.md` | Where the project stands: current state, next steps, what is stuck, open questions, the list of docs | At the end of every step, without being asked: the next session starts from it |
 | `MODLOG.md` | Diary: what was changed and how it was tested | After every change, newest first, in the format at the top of that file |
 | `docs/<topic>.md` | What was learned about one topic (a format, a game rule, a class layout), including its dead ends | When something is confirmed, not on every change; and when a later step answers one of its open notes or shows one of its statements was wrong |
-| `docs/DESIGN.md` | How the port works (not written yet) | When the architecture changes |
+| `docs/DESIGN.md` | The port's decisions (decided, suggested, open); later also how the port works (the architecture is not written yet) | When I decide something, and when the architecture changes |
 
 - Rules live only in this file. When I give a new standing rule, propose the
   edit here. Do not save it as a Claude memory note and do not copy it into

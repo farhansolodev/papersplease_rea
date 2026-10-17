@@ -1417,7 +1417,7 @@ holds a list of rows and stacks them top to bottom.
 | `menu_fullscreen` "Fullscreen" | tick box | yes | yes | the layout is the desktop one |
 | `menu_nudity` "Nudity" | tick box | yes | yes | always |
 | `menu_easy` "Easy Mode" | tick box | no | yes | always |
-| `menu_vibration` "Vibration" | tick box | yes | yes | the platform says it can vibrate (`canVibrate`, not read; a desktop PC presumably cannot: inferred) |
+| `menu_vibration` "Vibration" | tick box | yes | yes | the platform says it can vibrate (`canVibrate`: the base answers false and the desktop host does not provide vibration, so **no row on desktop**; read in step 6b, `audio-layer.md`, corrected here 2026-10-17; not seen in the game) |
 | `menu_dateformat` "Date Format" | minus and plus | no | yes | always |
 | `menu_music` "Music" | bar, minus and plus | yes | yes | always |
 | `menu_sound` "Sound" | bar, minus and plus | yes | yes | always |
@@ -1428,7 +1428,7 @@ holds a list of rows and stacks them top to bottom.
 The rows appear in this order. So on a desktop PC in English the pause
 screen shows **Fullscreen, Nudity, Music, Sound**, and the settings screen
 **Fullscreen, Nudity, Easy Mode, Date Format, Music, Sound, Language**
-(plus Vibration in both if `canVibrate` says yes).
+(no Vibration row: `canVibrate` answers false on desktop, `audio-layer.md`; updated 2026-10-17).
 
 What each row does:
 
@@ -1643,7 +1643,7 @@ from it. The desktop values read for this part, from the same listing:
 - The `PlatformChangeConfirm` box. (`LangChooser`, `RatingPopup` and
   `RatingScreen` were listed here; they are left out of the port by the
   user's decision of 2026-10-16 and will not be studied.)
-- What `canVibrate` answers on desktop.
+- (What `canVibrate` answers on desktop was listed here: false, no Vibration row, read in step 6b, `audio-layer.md`; not seen in the game.)
 - What "rebuilds the game's standing objects" covers after a language
   change (`Game.createDefaultEnts`). Not needed for an English-only port.
   (`Bootstrap.setLanguage` was listed here; it is read since, on
@@ -1676,7 +1676,7 @@ Each takes under a minute.
    stays paused.
 4. The title's settings button shows seven rows: Fullscreen, Nudity, Easy
    Mode, Date Format, Music, Sound, Language, with DONE at the bottom and
-   two small picture buttons in the top corners. Whether a Vibration row
+   two small picture buttons in the top corners. Whether a Vibration row (by the code there is none, `audio-layer.md`)
    is there.
 5. Ticking Easy Mode shows "+ 20 credits per day" beside it for about 3
    seconds.

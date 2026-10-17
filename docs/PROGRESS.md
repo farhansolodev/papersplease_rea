@@ -1,7 +1,13 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-17, after
-step 6b, the game-side audio layer `app.aud` (`audio-layer.md`; code
+step 7, the sorting of the open questions: 151 items into five kinds
+(answered and closed, need the game, the user's decision, will not matter,
+could bite), the list below cut to four parts, and a new `docs/DESIGN.md`
+with the decisions only. Nothing was run and no code read. Next: step 8,
+beginning with the three decisions "needed before the first Rust code".
+
+Before it the same day, step 6b, the game-side audio layer `app.aud` (`audio-layer.md`; code
 reading of all of `app.aud` and its callers, two Ghidra runs, a
 reference script `aud.py`, a check, and a measurement of the songs'
 note starts; nothing listened to in the game). Main findings: one
@@ -336,6 +342,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `art-dat-format.md` | The encrypted archive |
 | `data-files.md` | Index of every data file, its loader and its write-up |
 | `port-requirements.md` | Exactness rules the Rust port must follow |
+| `DESIGN.md` | The port's decisions: decided by the user, suggested defaults, and the three needed before the first Rust code. The architecture is not written yet (step 8) |
 | **Base** | |
 | `rand.md` | The random generator, checked against the machine code |
 | `run-and-seeds.md` | Start-up: the master seed, story seeds (a new game uses the second one), cyclers, command-line words, the debug log switches |
@@ -570,21 +577,25 @@ the night screen's family pictures; part 11, the last screens.)
    Corrected: "all sound" paused and stopped in `save-format.md` and
    `screens.md`. Not from the code: which booth state a day starts in,
    so which ambient loop is heard at full level at first.
-7. **Sort the open questions** (added 2026-10-14 at the user's request),
-   before any design work. Go through every entry under "Open questions and
-   unconfirmed items" once and put it in one of five kinds:
-   answered by a step already done (then close it, in its doc too); needs
-   the game to run (collect these as the list for the comparison run or
-   for the user to watch); the user's decision (move to the list that
-   opens `docs/DESIGN.md`); will not matter for a desktop port (say why and
-   leave it); could bite during the build. Answer the last kind where it is
-   cheap, and for the rest write what the port should assume meanwhile.
-   Result: a shorter list in which every item says why it is still open.
-   Mostly sorting and doc work (Sonnet); a question that needs code reading
-   needs Opus.
-8. **Design and build the Rust port** (`docs/DESIGN.md` does not exist yet).
-   `Auto.txt` can serve as a test plan: it lists what to do to reach each
-   ending.
+7. **Sort the open questions: done** on 2026-10-17 (added 2026-10-14 at
+   the user's request). All 151 items were put in one of five kinds (28
+   answered and closed, 41 need the game, 21 are the user's decisions, 40
+   will not matter for a desktop port, 35 could bite during the build;
+   some items were split, so 165 lines in all; the sheet was a scratch
+   file, not kept). The result is the shorter list below, in four parts
+   (the answered ones are gone), and `docs/DESIGN.md`, which so far holds
+   only the decisions list. No code was read and nothing was run: an item
+   that could bite got "assume this, settle it when building that part",
+   not an answer. The few answered on the way: the game's log has nothing
+   of the border scene but the test player's `BusyWithBorder` queue lines;
+   a desktop PC's `canVibrate` is false (`audio-layer.md`).
+8. **Design and build the Rust port.** Start with the three decisions in
+   `DESIGN.md` under "Needed before the first Rust code" (frame time, the
+   random sequence, the English pack), then write the rest of `DESIGN.md`
+   (the architecture). The first thing to read when the booth is built is
+   its state machine (`decompiled/booth_ctor_asm.txt`; first item under
+   "Could bite during the build"). `Auto.txt` can serve as a test plan: it
+   lists what to do to reach each ending.
 
 Small jobs that fit anywhere:
 
@@ -606,640 +617,177 @@ Small jobs that fit anywhere:
 
 ## Open questions and unconfirmed items
 
-Collected from the docs, so they are not lost:
+Sorted on 2026-10-17 (step 7) from the older list of 151 items. The older
+list was grouped by session; this one is grouped by what has to happen next.
+Every item says why it is still open and where the detail is. Items that were
+answered are gone from here (their answers are in the docs named in
+`MODLOG.md`, step 7). Kinds:
 
-**From 2026-10-17** (`audio-layer.md`, step 6b)
+1. **Could bite during the build**: not known yet, and the port may need it.
+   Each says what the port assumes meanwhile and when to settle it.
+2. **The user's decision**: in `DESIGN.md`, not repeated here.
+3. **Needs the game to run**: one watch list per doc, below; none blocks the
+   build.
+4. **Will not matter for a desktop port**: left as they are, with the reason.
 
-- **Nothing of it has been heard in the game.** Six items at the end of
-  `audio-layer.md` (a song under the pause screen, `Theme` fading into
-  the day, both ambient loops at a day's start, the cross-fade when a
-  traveler comes in, `Theme` going on from the title to the load
-  screen, the title's 24-second rise on the beat).
-- **By the code, not heard:** the booth's constructor sets both ambient
-  loops to 0 without a fade, which never reaches the host, so the loop
-  whose first target is 0 plays at its full level until it is first
-  faded in. Which one that is depends on the booth's first state of a
-  day (not read; inferred from the state names: `booth-ambient`).
-  **A decision for `DESIGN.md`:** keep this or not.
-- Measured, not code: the beat table fits `Theme` (12.3 against at most
-  4.9 for a steady tempo), with the beats 0.05 s before the note starts
-  (the recording's first sound is at 0.045 s).
-- The six booth states that select the street noise are known by name
-  only (the booth's state machine is not fully read).
+(The fifth kind, answered by a step already done, has no list: those items
+were closed and the docs that still said "open" were fixed.)
 
-**From 2026-10-17** (`audio.md`, step 6)
+### 1. Could bite during the build
 
-- **Nothing of it has been heard in the game.** Five items at the end of
-  `audio.md` (the title's song, an ending's song, the never-played 4th
-  recordings, a volume of 0, the very quiet breathing-in sound).
-- **A decision for `DESIGN.md`: how the browser build gets the songs.**
-  As WAV they are 62 MB. Either rebuild the stored Vorbis data into
-  normal `.ogg` files without re-encoding, or re-encode the WAV files;
-  both need a tool that is not installed (the user's go-ahead for the
-  download). The effects are 21 MB as WAV.
-- Inferred, not tested: Unity plays the effects with the same samples
-  as FMOD's decode (Unity is built on FMOD). The songs' exact samples
-  depend on the Vorbis decoder; only their length was checked.
-- No caller of `SetPauseForAppLostFocus` was found by name, so whether
-  sounds pause when the window loses focus is open.
-- Observed, not explained: `traveler-breathein` peaks at −54 dB, far
-  below every other recording.
-- (`app.aud` was listed here as not studied: read on 2026-10-17, step
-  6b, `audio-layer.md`.)
+Read these in the order of the port's build. The first two matter most.
 
-**From 2026-10-17** (`screen-output.md`, the Unity side of drawing)
-
-- **Nothing of it has been watched in the game.** Five items at the end
-  of `screen-output.md` (the window size; the full-screen fit; no
-  phantom cursor over the picture, one over full-screen bars; a
-  half-opacity seal's colours against `host.quad_pixel`; resizing the
-  window).
-- (Not in the code, listed here as step 5b: the quad shader's colour
-  and blending, the colour space, the camera's background colour,
-  whether the window can be resized. All read on 2026-10-17 from the
-  Unity files, `screen-output.md`: multiplied colour and ordinary alpha
-  blending, as assumed; gamma colour space, so blending on the stored
-  values, as assumed (by Unity's documentation); black; resizable.)
-- Still from the package's documentation, not this game's files: the
-  full-screen fit with `stretch` off (a whole-number zoom with black
-  bars) and how a resized window is refitted.
-- Assumed, the graphics card's: how a value exactly between two 8-bit
-  steps is rounded when a blended pixel is stored.
-- **Assumed, not game code:** which pixels a fractional quad covers (the
-  usual graphics-card rule: the nearest pixel, a half rounding down).
-  A browser build that draws the same quads into a 570 x 320 picture
-  with WebGL should get the same pixels; not tested.
-- By the code, not expected to happen: a frame with no valid quad at
-  all would make the batcher fail.
-
-**From 2026-10-16** (`input-handling.md`, input handling)
-
-- **Nothing of it has been watched in the game.** Five items at the end
-  of `input-handling.md` (the game's own cursor and the hand; no cursor
-  before the mouse first moves; the double click; the rifle's scope
-  cursor; the right button doing nothing).
-- (Whether the host's `phantomCursor` is visible was not settled here.
-  Settled on 2026-10-17 from the Unity scene and shaders, step 5b,
-  `screen-output.md`; by the files, not seen: it shows
-  `CursorPhantom.png`, the arrow's white edge in grey-green, 1 unit
-  behind the screen quad, so the game's picture covers it completely.
-  It can show only over the black bars of a full-screen game without
-  `stretch`. The port leaves it out.)
-- Not followed: where the input mode becomes touch (mode 2), and the
-  phone swipes. Will not matter for a desktop port.
-
-**From 2026-10-16** (`desk-pictures.md`, drawing part 4)
-
-- **Nothing of it has been watched in the game.** Six items at the end
-  of `desk-pictures.md` (the closed paper's size, tilt and shadow; the
-  docked papers untilted; the drawer envelope; the drag shadow; clicks
-  through see-through pixels; a long citation message).
-- (The desktop values of `Layout.booth`, `boothInnerClip`, `boothOuter`,
-  `wall`, `slotCenter`, `counterTopEdgeY` were listed here as not read;
-  read since, on 2026-10-16, `booth-layout.md`.) (How the drawer orders
-  its layers was listed here as not read, inferred lower numbers first:
-  read on 2026-10-17, `screen-output.md`, and so it is.) (The give
-  icon's rule, dragging and the animations were listed here; read since,
-  on 2026-10-16, `desk-movement.md`.)
-- By the code, not seen: the `Citation`'s `clipheight="36"` is replaced
-  by the page's clip on the desk, so a long message is not cut. Whether
-  any citation message is taller than 36 pixels was not checked. For
-  `DESIGN.md`: whether the port keeps that.
-- By the code: the stamp ink layer stays when a page is turned and keeps
-  its first size. Every stampable paper has one page, so it cannot show.
-
-**From 2026-10-16** (`fact-pictures.md`, drawing part 3)
-
-- **Nothing of it has been watched in the game.** Six items at the end
-  of `fact-pictures.md`, among them the id card's mirrored photo, the
-  criminal photos' 32 x 39 size and the Ministry of Admission seal sheet's
-  one-pixel drop.
-- The fingerprint and thumbprint draws are in `desk.py` but untested by
-  the logs (they come after the last informative pick).
-- Inferred: the `BoothEnv.auto...` functions, which also call `getImage`
-  and so make its draws, serve only the test player. No caller was found
-  except the by-name dispatch.
-- Not read: `BoothEngine.applyUpdatedSettings`; the tablet and phone
-  upgrade pictures in full; whether anything reads the alpha-1 pixels of
-  a fingerprint picture. (`Image.render` was listed here: read on
-  2026-10-16, `desk-pictures.md`.)
-- For `DESIGN.md`: whether the port keeps the fingerprint picture's
-  alpha-1 background and the seal sheet's one-pixel drop (both what the
-  code does, neither visible in a normal look).
-
-**From 2026-10-16** (`text-drawing.md`, drawing part 1)
-
-- **Nothing of it has been watched in the game.** Three items at the end
-  of `text-drawing.md`: the settings header box (64 x 20), the intro
-  caption's left-aligned lines, a typing caption that does not move.
-- Not read: what the Unity side does with the quads (so where a
-  fractional position lands on screen, and how the colour is applied
-  there). (`Image.render`, which fills a stretched tile into a picture,
-  was listed here: read on 2026-10-16, `desk-pictures.md`.)
-  (`Image.paste`'s blend and tint arithmetic was listed here; read on
-  2026-10-16, `fact-pictures.md`: the tint multiplies, as `text.py`
-  assumed.)
-- Read but surprising, so worth a look in the game: a missing letter's
-  box starts one pixel before the next pen position (checked in the
-  instructions); a rounded background leaves one pixel more on the left
-  than on the right; a one-line text is as wide as the widest line of its
-  whole string.
-- `willDraw` has no caller in the game code (only the by-name helpers);
-  found by searching the whole decompile for its name and its slot.
-
-**From 2026-10-16** (`screens.md`, part 11)
-
-- **Nothing of part 11 has been watched in the game.** The four items at
-  the end of part 11: no tutorial on day 1, the border explosion's
-  shake, the time bomb's flash, the poison touch's shakes and flash.
-- Not read: `play.day.booth.Tutor` (phone only), how the Unity host uses
-  `Game.wantPlatformKind`, whether the flash is sized in game or window
-  pixels, the order inside one frame of a state's timed functions and the
-  screen's update (the reference script assumes the shake moves the
-  screen in the frame it starts), and what `setPaperPoisoned`'s argument
-  means when the poison is touched.
-- Inferred, not seen: during a flash to the title the screen is not
-  updated, so a running shake freezes at its last offset.
-
-**From 2026-10-16** (`night-pictures.md`, part 10)
-
-- **The family pictures have not been watched**, beyond the description
-  of the night-3 screenshot written in `screens.md`, part 1, which agrees
-  with the reading (no position was measured). The watch list at the end
-  of `night-pictures.md` (seven items) needs nights later in the story:
-  a token, an upgrade, a death, five members, the Obristan passports.
-- **Predicted from the code, not seen:** a member with four badges (the
-  son with a mood plus hungry, cold and sick) would have a row running 7
-  pixels past the right edge of the screen.
-- Not read: how a sprite is drawn from its position (the preview in
-  `nightpics.py` takes it as the top-left corner). (How
-  `Image.transformed` halves the passport covers was listed here: it keeps
-  the even pixels, `fact-pictures.md`, 2026-10-16; `nightpics.py` now
-  halves them the same way.) (Where `app.vis.Text`
-  puts the member names and the passport count, and whether a fixed
-  width of 0 turns wrapping off, were listed here; read on 2026-10-16,
-  `text-drawing.md`: the position is the box's top left, and 0 means no
-  wrapping.)
-
-**From 2026-10-16** (`buttons.md`, part 9)
-
-- **Nothing about buttons has been seen in the game.** The watch list at
-  the end of `buttons.md` (six items, a few seconds each on the title
-  screen; the last one in the booth) would test the reading: the pressed
-  look, sliding off and back, letting go outside, a press that starts
-  outside, the hand cursor, the stamp bar's blinking reason button.
-- **Inferred, not seen:** a desktop booth makes neither the carousel's
-  hover buttons nor the criminal-poster pin, because their pictures exist
-  only in `layout/phone/` and desktop never loads the layout folders
-  (`art-dat-format.md`). Whether a desktop booth has a `Carousel` object
-  at all was open here; settled on 2026-10-16 (`desk-pictures.md`): the
-  `Booth` constructor makes one only for the shape `PORTRAIT_THIN`, so a
-  desktop booth has none.
-- **Inferred from a missing write:** the border's booth button has no
-  extra click margin on desktop (the only write of the margin, 6, is in
-  another platform's block).
-- Not read: the `BOUNCEBACK` curve of the stamp bar's sliding button,
-  when the stamp bar drops it and what its click does,
-  `PlatformChangeButton.png`'s cut, the root save button's two pictures.
-  (`app.vis.Text`'s size and whether `Image.paste` rounds half pixels
-  were listed here; read on 2026-10-16, `text-drawing.md`: a button text
-  is one line high, and paste cuts toward zero.)
-- Found unused: the enum `ButtonReactResult`; no caller by name of
-  `Button.cycleMode` or `get_hasBackButtonId`.
-
-**From 2026-10-16** (`language-pack.md`, part 8)
-
-- **Nothing about the language pack has been seen in the game.** The
-  quickest checks: `WATCH_GIVER0` should say "All Arstotzkans are same."
-  and `KID_KILLER2` "Damn it." (both fixed by the pack); a fact named
-  `Gender` should be displayed as `Sex` (where it is displayed was not
-  followed).
-- **A design decision**: apply the English pack once when the assets are
-  prepared (suggested; simpler) or load it at run time as the original
-  does. Either must give the 23 changes listed in `language-pack.md` and
-  the picture `papers/BulletinInnerDiploTut.png`, which is only in the
-  pack.
-- (Keeping the script that applies the pack was suggested here; done the
-  same day at the user's request: `scripts/reference/locpack.py`.)
-- For the EZIC notes the pack's line breaks are probably invisible (the
-  page drawing turns `\n` into a line break too); for the endless
-  descriptions it was not followed. Not read: `Res.toAsset` for pictures,
-  `TabEntry.set_text` in full.
-
-**Also from 2026-10-16** (`screens.md`, part 7)
-
-- (**Watched on 2026-10-16**: the user ran the game with `savedir` set to
-  a new folder, `extracted/endlessrun`, went through the list at the end
-  of `screens.md`, part 7, and played one Perfection run. All six items
-  matched; the settings and statistics files agree with part 7. Still
-  unseen: whether a worse second run leaves the best score alone, and
-  how the result box writes the time. The game wrote its files into the
-  new folder, so by the code the user's real settings were not touched
-  and endless mode is still locked there; the real folder was not looked
-  at.)
-- **Decided by the user (2026-10-16): English only, no age rating.** No
-  Language row, no language chooser (`LangChooser`), no rating screen or
-  box (`RatingScreen`, `RatingPopup`; only Korean uses them). They will
-  not be studied. To go into `docs/DESIGN.md`'s list of decisions. What
-  English itself loads from its own pack is still needed
-  (`language-pack.md`).
-- **Decided by the user (2026-10-16): no leaderboards in the port**, since
-  it will not be published. To go into `docs/DESIGN.md`'s list of
-  decisions. The local best score per course and style is not a
-  leaderboard and is kept (`screens.md`, part 7, "For the port").
-- Suggested, still the user's to confirm: leave out the endless screen's
-  hidden "clear achievements" box and the `presskit_prep` helper.
-- Whether the title's buttons can be clicked through the code box (it
-  has no input handling of its own); some positions are formulas only
-  (`app.vis.Text`'s height, which they waited on, is read since
-  2026-10-16, `text-drawing.md`; the pixels were not worked out);
-  `StringUtil.formatTime` (the time in the result box). (`DiagramLine`'s
-  drawing was listed here; read since, on 2026-10-16, `ui-parts.md`.)
-- (Whether the GOG build's platform reports leaderboards: **no**, seen on
-  2026-10-16: the endless screen had no leaderboards button at all.)
-- A Perfection run with one traveler and one citation scored 0 (seen in
-  the statistics file). Inferred: the citation ended the run before the
-  traveler's points were added; the order of the two actions was not
-  read (`endless-mode.md`).
-
-**From the eleventh session** (`screens.md`, part 6; `border-view.md`,
-"The frame rate")
-
-- **The credits screen has not been watched.** The list is at the end of
-  `screens.md`, part 6; the title's "created by" text opens it.
-- **A decision for the port: the credits' speed.** The original scrolls
-  0.5 pixel a frame (2 while the mouse button is held), so the speed
-  follows the frame rate: 60 frames a second when the screen's refresh
-  is near 60, 120 or 180 Hz, otherwise a target of 65. Suggested: 30 and
-  120 pixels a second, by time. This joins the frame-time decision of
-  the sixth session (below).
-- The credits screen has the same `web` and `twitter` buttons as the
-  settings screen, which the user decided to leave out there; suggested:
-  leave them out here too (to confirm).
-- The header's bottom (77), the scroll area's top (79) and the stop
-  position (159) now follow from the code (`app.vis.Text`, read on
-  2026-10-16, `text-drawing.md`: the title is 20 high), with `title_tall`'s
-  line height from the reference script. The list's height (about 2,272)
-  rests on the same rule but was not recomputed. (This item said all four
-  were estimates waiting on `app.vis.Text`.)
-- Not followed: whether pressing DONE stops the fast scroll; which
-  platform the frame settings in `HostUnity.CreateGame` are for. (What
-  the LEFT alignment changes in `makePushButton` was listed here;
-  answered on 2026-10-16, `buttons.md`: the text sits 2 pixels from the
-  button's left edge instead of centred.)
-
-**From the tenth session** (`screens.md`, part 5)
-
-- **The intro and the endings have not been watched.** The list is at
-  the end of `screens.md`, part 5; a new game shows the intro.
-- Whether the first page's picture wipes in or appears at once rests on
-  what an empty picture holder's width is (not followed); item 1 of the
-  watch list settles it.
-- **Predicted from the code, not seen:** a second click on NEXT's spot
-  within 4 seconds of an ending's last page restarts the fade to black
-  and adds a second STATS header. Item 9 of the watch list.
-- The caption's left edge is floor(285 - width / 2) with `width` the
-  widest of its wrapped lines, so it depends on the text (`app.vis.Text`,
-  read on 2026-10-16, `text-drawing.md`; this item said it waited on
-  it). The picture's top (y 32) uses `title_tall`'s line height from the
-  reference script, not from the game.
-
-**From the tenth session** (`screens.md`, part 4)
-
-- **The pause and settings screens have not been watched.** The list is
-  at the end of `screens.md`, part 4; each item takes under a minute.
-- (Answered later the same session, `screens.md` part 4, "Escape on the
-  pause screen": Escape pressed again resumes, on release, because RESUME
-  is a back button and a back button's shortcut key is Escape; with a
-  confirm box open, Escape presses its CANCEL. Not watched in the game.)
-- **No code that reads `platover` was found in this build** (a search of
-  the whole program for callers of the reader found none; the same
-  search finds the writer's one caller). On desktop it is not written
-  either. Suggested for the port: leave the forced layout out.
-- **Decided by the user on 2026-10-14** (for the list that will open
-  `docs/DESIGN.md`): the settings screen's `web` and `twitter` buttons
-  are left out, and there is **no quit option** (neither the pause
-  screen's QUIT nor the title's quit button). Still open: the title's
-  `version` button (suggested: leave out), and how "fullscreen follows
-  the window both ways" maps to a browser, where Escape is also the
-  browser's own key for leaving fullscreen.
-- Key O saves a screenshot to the platform's documents folder, with no
-  condition seen around it. Where that folder is was not read. (What the
-  other keys do is answered the same session from a search of the whole
-  game: `screens.md` part 4, "Every key the game reads". In short: Space,
-  Tab/Enter and the arrows work in the booth, two of them only with an
-  upgrade; T and the developer key are never tested; every other use of
-  Escape is a "back button".)
-- **Predicted from the code, worth one look in the game**: on the first
-  title screen of a run, pressing Escape to skip the rising title should
-  also quit the game when the key is let go (the skip masks the mouse,
-  not the key). Escape on the finished title quits at once in any case.
-  Irrelevant to the port (no quit option), but it tests the reading.
-- (Which stamp bar a desktop booth has was listed here. Settled on
-  2026-10-16, `desk-pictures.md`: the booth has a carousel only with the
-  shape `PORTRAIT_THIN`, so a desktop booth has a `StampBar`.)
-- Whether a desktop PC shows a Vibration row (`canVibrate`, not read).
-- What the nudity setting changes: looked up on 2026-10-16
-  (`fact-pictures.md`). It picks the search photo's body picture
-  (unclothed or clothed), and `Booth.update` calls
-  `BoothEngine.applyUpdatedSettings` when it changes. What that call
-  redraws was not read.
-- **A mistake of the ninth session, found and corrected**: `screens.md`
-  part 2 said the gap between menu buttons (`menuItemPaddingY`) is 0 on
-  desktop. It is 10; the write was in the listing and was missed. No
-  position had been computed from it. The other seven layout values of
-  that table were checked again and hold.
-- The pause screen's click handler knows an id `credit` (it would open
-  the Twitter address) for which no button is made.
-
-**From the ninth session** (`screens.md`, part 1)
-
-- **The night screen was compared with one screenshot of the real game**
-  (the user's, of night 3 of the replay; `screens.md`, part 1, "Compared
-  with a screenshot"). Nothing that moves or needs a click has been
-  watched; that list is at the end of `screens.md`, part 1.
-- **The order of the budget lines on screen: confirmed for one night.**
-  The reference predicted eight lines in an odd-looking order (salary
-  above savings, heat between the medicine lines) and the screenshot shows
-  exactly that order and the same total. This entry first said the
-  prediction "looks doubtful"; that doubt was wrong (corrected
-  2026-10-14). It is the first check of the game's sort against the
-  screen, and so also supports the order in which balancing unticks
-  lines. Still predictions: the orders for none, one and two sick members
-  (heat above food with no one sick), and nights with penalties or
-  bribes.
-- **The lines start ticked: seen on that night.** The user confirmed the
-  screenshot shows the screen as it opened, with nothing clicked: food,
-  heat and three medicine lines ticked. Also reported by the user: the
-  cursor turns into a hand anywhere on an optional row, which fits the
-  whole row being the click area (the click itself was not reported).
-- **Watching the rest is optional.** The user asked whether the animation
-  must be seen to rebuild it: no. The code is the source and the timings
-  are read from it; watching only guards against a misreading, and is
-  cheapest once the port's night screen can be put next to the game's.
-- By the code, ticking a line that cannot be afforded can untick a lower
-  line and leave the clicked one ticked. Not watched.
-- By the code, nothing disables the sleep button while the screen is
-  still appearing. Not watched.
-- (Answered the same day, in part 2: desktop shows no pause button, and
-  night messages wrap at 520 pixels. The desktop block of the `Layout`
-  constructor is the one that does not write `showPauseButton`.)
-- **The title screen (part 2) has not been watched either**, beyond the
-  user having seen "story" and "endless" on it. Its list of things to
-  watch is at the end of `screens.md`, part 2.
-- **A decision for the port**: the title's `version` button opens the
-  developer's "check for updates" web page. Suggested: leave it out or
-  show plain text. Not studied further.
-- Whether a `newversion` button is made anywhere. (What a "beat" of the
-  music is, so how long the title's rise takes in seconds, was listed
-  here: read on 2026-10-17, `audio-layer.md`; about 23.6 s.) (`UnlockConfirm`, how the endless code is typed and checked,
-  was on this list: read on 2026-10-16, `screens.md`, part 7.)
-- **The load screen (part 3) has not been watched.** Its list is at the
-  end of `screens.md`, part 3; the save folder with a branch
-  (`extracted/saverun`, used through a copy) would show most of it.
-- The load screen's positions were not read (heading, ending marks, day
-  headers, drag hints), nor the line drawn between a save and its parent
-  (`LoadButton.drawConnectingLine`), nor dragging with momentum
-  (`KineticScroll`).
-- (Answered in the tenth session, `screens.md` part 5: the ending
-  screen sets `EndBits`, bit `num` - 1 per ending; the load screen shows
-  its row of marks only once at least one ending is reached.)
-- **A point for the port**: a save button shows the save's real date and
-  time, so the browser build needs a clock for it.
-- The summary box before continuing a save builds that day's news with a
-  generator of its own seeded 0; the headline it shows need not be the
-  day's real first headline. Not followed further.
-- `Days.csv` has no `NIGHTMSG`, which `DayLib.getNightMessages` asks for;
-  what the table reader returns for a missing name was not read.
-- Not read: what the "instant" option of `Stater.go` changes.
-  (`DiagramLine` was listed here; read since, on 2026-10-16,
-  `ui-parts.md`.) (`FamilyVisuals`, the family pictures, was on this list; read
-  on 2026-10-16, `night-pictures.md`.)
-  (`play.ui.Button` was on this list; read on 2026-10-16, `buttons.md`.)
-  (The tween helper was on this list; it is read since: a timed change
-  lasts its number in seconds, so the tick circles blink for 2 seconds.
-  `screens.md`, part 1, "Timed changes".)
-- Entity switches 8 ("the parts inside get input") and 16 have no name in
-  the code seen; switch 2 is tested nowhere in the three tree walks.
-
-**From the eighth session** (`save-format.md`, part 2)
-
-- **The stash was tested once in the running game** (`save-format.md`,
-  "The stash test in the running game"). Seen on desktop: a day stash
-  written after the day's first traveler had left; the title screen at
-  the next start with the file untouched; the file deleted by a click on
-  "Story"; a content that matches the description. Still from the code
-  only: the night and ending stashes, the blocker (bomb, poison, special
-  exit), the days that need two travelers, the rewrite at each later
-  empty booth, and a restore. The serializer's code was not studied; its
-  text is read by `hxserial.py`, which covers only what a stash uses.
-- A design point for the port: the desktop original loses the current day
-  when the game is closed. Whether the browser port should do better (a
-  tab is closed easily) is the user's decision.
-- (Answered in the ninth session, from the code: without flag 4 a screen
-  and everything in it get no input, without 16 they are not updated;
-  they are still drawn. `screens.md`, part 1.)
-- (Answered in the tenth session: key number 5 is Escape. `screens.md`,
-  part 4.)
-- (The fade, 0.125 s each way, and the 1-second wait of a screen change
-  were listed here as read from the decompiler only. Checked in the
-  instructions on 2026-10-16, `save-format.md` part 2 and `screens.md`
-  part 11.)
-- Who handles the error an invalid stash raises at start-up (phone and
-  tablet only). Whether anything in `play.ui` or `app` asks for a restore.
-- After a stash restore a new `Day` is built and no random generator is
-  put back, so the rest of the day would differ (inferred, not followed;
-  does not arise on desktop).
-
-**From the seventh session** (`save-format.md`)
-
-- **The first night 3 of the hand-played game: probably explained, not
-  confirmed.** Its save says nothing was bought (savings 60, the son
-  dead); the user remembered buying everything. The user then replayed
-  that day from the day-3 save and did tick everything: that save has
-  savings 25 and nobody dead, and the night model follows it exactly. So
-  the rules are not in doubt. The user's explanation for the first time:
-  they probably unticked everything by mistake. **The night screen was
-  read in the ninth session and agrees**: food, heat and medicine start
-  ticked, a click flips a line, and that night the money was enough, so
-  a save with nothing bought needs one click on each of the five lines
-  (`screens.md`, part 1). What was actually clicked cannot be read from a
-  save.
-- The save format is confirmed on one folder: four saves, one branch,
-  three launches, two loads. Not exercised: deleting, the `stash` and
-  `platover` entries. (Answered in the eighth session: the second sitting
-  resumed by loading the save; desktop never reads a stash at start-up.)
-- (Answered in the tenth session, `screens.md`, part 4: the settings
-  file is written by `Game.applySettings`, which `Game.update` runs on
-  the frame after any setting changes; no code that reads `platover` was
-  found.) ("Read the tree" is answered since the ninth session: the
-  load screen calls it each time it makes its buttons, `screens.md`,
-  part 3.) (Known since the
-  eighth session: delete is `LoadScreen.confirm_onClick`; `platover` is
-  written on a `REQUEST_PLATFORM_CHANGE` request from the settings menu.)
-- (Answered in the eighth session: nothing saves the story outside
-  `ADVANCE_TO_NEXTDAY`, in everything decompiled so far.)
-- When "the saved day is not later than the parent's day" (the save then
-  hangs under the root) applies in play.
-- Who sets `Game/Stat/Day`.
-- By the code, the first number in `names.sav` is the master seed of the
-  launch that created the file (here 11240598). Not tested. If true, a
-  hand-played game's first travelers could be predicted from it; how far
-  that holds once the player's page turns add draws
-  (`desk-drawing-draws.md`) is unknown.
-- `play.AlltimeStats` beyond its local file talks to the platform's
-  achievements and leaderboards service. Not read: out of scope (rule 4).
-  The port needs only local statistics, which include the endless best
-  scores (`_Leaderboard:<style> <course>`, read on 2026-10-16,
-  `screens.md`, part 7, and `save-format.md`).
-- Characters above 255 would be damaged by the save encryption (the code
-  does not cut character codes to 8 bits). Nothing above 127 was seen in a
-  real English save; other languages were not looked at (not needed: the
-  port is English only, the user's decision of 2026-10-16).
-
-**From the sixth session** (`border-figures.md`, `border-scene.md`,
-`border-shooting.md`, `border-view.md`)
-
-- The border generator's draws follow real time after the scene is built
-  (standing figures draw every 2 to 4 seconds). So the original does not
-  play the border scene the same way twice. One thing the player can feel
-  draws from it: the delay before an attack starts (`6 + 4 x r` seconds).
-  How closely the port copies this is a design decision.
-- **Frame time is a design decision too.** The original steps by real
-  elapsed time (capped at 0.1 s a frame); its own test player uses a fixed
-  1/20 s (`border-view.md`). The port must pick one. (Known since the
-  eleventh session: the original runs at 60 frames a second on most
-  screens, 65 on the others, never above 70; `border-view.md`, "The frame
-  rate". A few things move by frame, such as the credits.)
-- "The desktop game has no panning, no cameras and no slow motion" comes
-  from the layout values in the code only; it was not watched in the game.
-  The user can confirm it by eye in a normal play session (day 2 has the
-  first attack).
-- The tablet and phone layout values were not looked up (not needed for a
-  desktop port).
-- Who changes the clock's global speed and who forces a frame's `dt`
-  (`app.Clock`). ("Pause for one frame" has two known users since the
-  eighth session: the game's `paused` state and the stash resume overlay.)
-- What the rifle key paper does after unlocking, and whether an unlocked
-  rifle stays unlocked on later days.
-- Who sends the scene to `waiting-to-fade-to-night` on a day that ends by
-  the clock. (When the scene is stashed and restored: answered in the
-  eighth session, `save-format.md` part 2.)
-- The booth's own state machine (`empty`, `entering`, `intro`,
-  `busy-with-border`, `detaining`...) is only known where `Border` touches
-  it, plus: the day stash is taken on entering `empty`. The decompiler
-  times out on the `Booth` constructor, where the states are set up; its
-  instructions are in `decompiled/booth_ctor_asm.txt` and list the state
-  names and their callbacks in order.
-- `trucke1-decide`: by the code, the truck's second attacker skips his
-  throwing animation in one of three ways of reaching it
-  (`border-scene.md`, "One oddity"). Not watched in the game.
-- Whether anything outside the border classes uses `Day.borderRand`.
-- `Endless.csv` leaves `LINE` blank in four columns; the line length that
-  gives was not followed.
-- Whether the game's log has anything about the border scene that could be
-  compared.
-
-**From the fourth session**
-
-- Drawing a page again repeats its random draws (`desk-drawing-draws.md`).
-  So in the original, which pages the player looks at can change later
-  travelers. Whether the port copies this exactly is a design decision.
-- The draws inside the fingerprint, thumbprint and contraband pictures:
-  read on 2026-10-16 (`fact-pictures.md`), and `desk.py` counts the
-  fingerprint ones. Not tested: in the logged runs they all come after
-  the last pick the log can show.
-- The evidence that the reference matches the game is one seed, days 1 to 4
-  (36 travelers), plus day 1 of a second route.
-- `Paths.xml`: the number in automatic path names (`auto-<number>`) was not
-  recovered; nothing refers to those names.
-- `BorderAnim.xml`: five animation prefixes also collect another group's
-  frames (for example `Guard0-Idle` and `Guard0-IdleB`); whether that shows
-  in the game is not known.
-- `Fonts`: the order of steps in line breaking was reconstructed from
-  scrambled decompiler output; edge cases untested.
-- `TestScenarios.xml`: what starts a scenario. `Auto.txt`: the order in
-  which instruction blocks are consulted, and how each action is carried
-  out.
-- (Where user-added languages come from and how a language pack is loaded
-  were listed here. Answered: a user-added language is another `.zip` in
-  `StreamingAssets/loc/`, `languages-list.md` (2026-10-15); loading,
-  `language-pack.md` (2026-10-16).)
-- The test player's audit pictures come out empty in this build, and its
-  frame capture needs files that only existed on the developer's Mac
-  (`comparing-with-the-game.md`, "Dead ends"). Neither is usable.
-
-**Older**
-
-- (Answered in the eighth session, from the code: in normal play one
-  `Day` object is made per played day, when the news screen is built, and
-  the day and night screens reuse it. A load, the title and going on to
-  the next day drop it; a stash restore builds another. `save-format.md`,
-  part 2.)
-- The newspaper (`newspaper-picture.md`): nothing in it has been compared
-  with the running game; which headlines fall back to the regular font or
-  lose their subtitle has not been worked out (`app.vis.Text`, which it
-  waited on, is read since 2026-10-16, `text-drawing.md`); the
-  stamp's angle (the number appears to be used as radians); whether a stamp
-  needs a title. (Whether anything else uses the news generator was
-  answered on 2026-10-16: nothing does, `newspaper-picture.md`.) (The news
-  screen is built on going to the next day and after a load:
-  `save-format.md`, part 2.)
-- The news entry `DIPLOMAT_FIRST` is named by nothing found; who sets
-  `Day.whenAddNews`; whether endless mode has news (by the code an
-  endless day is queued straight as the day screen, with no news screen;
-  its bulletin was not checked).
-- Other callers of `Array.sort` (an unstable quicksort) have not been
-  listed. Known users: the news list, the night's budget and the children
-  of a save in the save tree. (The reference's copy of this sort was
-  confirmed against the screen for one budget of eight lines on
-  2026-10-14: `screens.md`, part 1.)
-- A wrong `Purpose` for an Arstotzkan never ends in the reference
-  (`fact-values.md`); the data never asks for it.
-- Face sheet `M6` has artwork for one face only (piece 24); face `F1:0` has
-  its shoulder dots in reverse order (`faces.md`).
-- A saved name-cycler position and the non-English alias swap sets are not
-  modelled in the reference scripts. (The swap sets are not needed: the
-  port is English only, the user's decision of 2026-10-16.)
-- `FilerEnvelope/Title`, `Citation/Message` and `Citation/Penalty` have no
-  fact definitions in `Facts.xml` (`player-actions.md`).
-- `Facts.xml` `<cite when="*...">`: whether the `*` is stripped before the
-  "contains" test (one entry, `*bomb`).
-- `Error.requiredPaperIds` appears never to be filled. Not searched: whether
-  anything else calls `collectPaperIds`.
-- Whether there is exactly one `BoothEngine` (and so one `BoothEnv` and one
-  "recent error groups" memory) per day. (The comparison runs are consistent
-  with one per day.)
-- `Game/Visitor<n>`: `n` is probably the day number.
-- `DURATION_SLOW` applies when the platform is `PHONE`; fine for a desktop
-  port.
-- Who uses `TabParser.expandParams` besides `ErrorLib`.
-- The seeds of 6 minor generators (`rand.md`; `BorderCam`'s is now known).
-- 20 traveler entries nothing refers to (`travelers-txt-format.md`).
-- Six speech responses named nowhere found (`speech.md`). `[m]`/`[f]` gender
-  switches are unused in English; the language packs were not checked
-  (not needed: English only, 2026-10-16).
-- What `canDetain`, `forceDeny`, `slow` and `special` do in play beyond what
-  `responses-and-events.md` shows. (`leaveDir` is known since part 2 of the
-  border scene: it picks the exit path, `border-scene.md`.)
-- What the day's token list (filled by `Token...` papers) and
-  `Bulletin/PageMask` are used for; which classes outside `BoothEnv` call
-  `addPaper`.
-- The night: the screen itself is read since the ninth session
-  (`screens.md`, part 1; its family pictures since 2026-10-16,
-  `night-pictures.md`). Still open:
-  anything the night does that is not in `night.md`'s list. The night's numbers were compared with the game on
-  2026-10-14 for four nights of one hand-played game: three with nothing
-  bought and one, a replay, with food, heat and three medicines bought
-  (`night.md`, "Not studied"). Penalties, bribes, attacks, the scheduled
-  events and the endings were not exercised.
-- Data slips recorded (not questions): `ask-forgery-asylumgrant` reads a
-  fact that does not exist (`speech.md`); `=!` in `EZIC_DIPLO` makes a group
+- **The booth's own state machine** (`empty`, `entering`, `intro`,
+  `busy-with-border`, `detaining`...) is known only where `Border` touches it.
+  The decompiler times out on the `Booth` constructor, where the states are
+  set up; its instructions are in `decompiled/booth_ctor_asm.txt` and list the
+  state names and callbacks in order. It also decides which ambient loop is
+  heard at a day's start and which six states select the street noise
+  (`audio-layer.md`). *Settle first when the booth is built.* Assume nothing;
+  read it.
+- **Who sends the scene to `waiting-to-fade-to-night` on a day that ends by
+  the clock** (`border-scene.md`). *Settle when the day's end is built.*
+- **What `canDetain`, `forceDeny`, `slow` and `special` do in play** beyond
+  what `responses-and-events.md` shows; what the day's token list and
+  `Bulletin/PageMask` are for; which classes besides `BoothEnv` call
+  `addPaper`. *Settle when the booth's rules are ported.*
+- **`Auto.txt`**: the order in which instruction blocks are consulted, and how
+  each action is carried out (`test-tooling-files.md`). Needed for step 8's
+  test plan.
+- **Whether there is exactly one `BoothEngine` per day** (one "recent error
+  groups" memory). Assume yes (the comparison runs agree).
+- **`Facts.xml` `<cite when="*bomb">`**: whether the `*` is stripped before
+  the "contains" test. One entry. Assume it is stripped; check when the bomb is
+  ported.
+- **A saved name-cycler position** is not modelled in the reference. Settle
+  when loading a game is built (the names must go on where they were).
+- **Other users of the random generators**: `Day.borderRand` outside the
+  border classes (`border-figures.md`); the seeds of 6 minor generators
+  (`rand.md`); other callers of `Array.sort`, an unstable quicksort (known
+  users: the news list, the night's budget, the save tree's children). Assume
+  none touches the booth's sequence; the comparison run would show it.
+- **The data slips the port must reproduce**: `ask-forgery-asylumgrant` reads
+  a fact that does not exist (`speech.md`); `=!` in `EZIC_DIPLO` makes a group
   that never runs (`responses-and-events.md`); the 4th recording of a sound
-  with more than three never plays (`sounds-xml-format.md`); one test
-  scenario names a traveler `BOSS` that does not exist.
-- Two Ghidra analysis errors and 36 functions without a typed signature
-  (`ghidra-workflow.md`); neither has mattered so far.
+  with more than three never plays (`sounds-xml-format.md`).
+- **Border scene**: what the rifle key paper does after unlocking, and whether
+  an unlocked rifle stays unlocked on later days (`border-shooting.md`);
+  `Endless.csv` leaves `LINE` blank in four columns (`endless-mode.md`).
+- **News**: who sets `Day.whenAddNews`; whether endless mode has news and a
+  bulletin (by the code an endless day is queued straight as the day screen).
+  `news-txt-format.md`.
+- **Endless scoring**: a Perfection run with one traveler and one citation
+  scored 0 (seen in the statistics file); inferred: the citation ended the
+  run before the traveler's points were added; the order of the two actions
+  was not read (`endless-mode.md`). `StringUtil.formatTime` (the result
+  box's time) is not read.
+- **Load screen**: positions not read (heading, ending marks, day headers,
+  drag hints) and the line between a save and its parent
+  (`LoadButton.drawConnectingLine`); the summary box builds that day's news
+  with a generator seeded 0, so its headline need not be the day's real first
+  one; when "the saved day is not later than the parent's day" applies
+  (`save-format.md`); the save button's date and time use the browser's clock.
+- **The night's messages**: `DayLib.getNightMessages` asks `Days.csv` for a
+  cell `NIGHTMSG` that the file does not have; what the table reader returns
+  for a missing name was not read. Assume no messages (the reference passes
+  none; `night.md`, `screens.md` part 1).
+- **Screens**: the stamp bar's `BOUNCEBACK` curve, when the bar drops its
+  sliding button, and what its click does (`buttons.md`); the flash's size
+  (game or window pixels), the order inside one frame of a state's timed
+  functions and the screen's update, and what `setPaperPoisoned`'s argument
+  means when the poison is touched (`screens.md` part 11); what the "instant"
+  option of `Stater.go` changes; how the endless descriptions' line breaks
+  (from the English pack) come out; the credits list's height (about 2,272,
+  not recomputed).
+- **Drawing**: `BoothEngine.applyUpdatedSettings` (what the nudity setting
+  redraws); whether anything reads the alpha-1 pixels of a fingerprint
+  picture; the sprite origin (a quad's top left sits at the given pixel,
+  `screen-output.md`; the night preview takes it that way, so probably
+  answered: confirm when the first sprite is drawn); which pixels a
+  fractional quad covers (assumed: the nearest pixel, a half rounding down;
+  a WebGL draw into a 570 x 320 picture should match; not tested).
+- **Line breaking** (`Font.split`): reconstructed from scrambled decompiler
+  output; checked against the English texts (`text-drawing.md`), edge cases
+  untested.
+
+### 2. The user's decision
+
+All of these are in `DESIGN.md` (decided, suggested or open), with a
+suggested default for each. Three come before the first Rust code: frame
+time, how exactly to copy the random sequence, and when to apply the English
+pack. Not repeated here.
+
+### 3. Needs the game to run
+
+Collected so the user can watch them in one go, or the longer comparison run
+(step 1 of "Next steps", postponed by the user) can cover them. **Nothing
+below blocks the build.** The watch lists are at the end of each doc (items
+and time are in the doc):
+
+| Doc | Items | What |
+|---|---|---|
+| `audio-layer.md` | 6 | a song under the pause screen, `Theme` fading into the day, both ambient loops at a day's start, the cross-fade when a traveler comes in, `Theme` going on to the load screen, the title's 24-second rise |
+| `audio.md` | 5 | the title's song, an ending's song, the never-played 4th recordings, a volume of 0, the very quiet breathing-in sound; also whether sounds pause when the window loses focus (no caller of `SetPauseForAppLostFocus` found; the port assumes no pause) |
+| `screen-output.md` | 5 | window size, full-screen fit, the phantom cursor over bars, a half-opacity seal's colours, resizing |
+| `input-handling.md` | 5 | the game's cursor and the hand, no cursor before the first move, the double click, the rifle's scope, the right button |
+| `desk-pictures.md` | 6 | closed paper size, tilt and shadow; docked papers untilted; the drawer envelope; the drag shadow; clicks through see-through pixels; a long citation message |
+| `fact-pictures.md` | 6 | the id card's mirrored photo, the criminal photos' size, the seal sheet's one-pixel drop and others |
+| `text-drawing.md` | 3 + 3 | the settings header box, the intro caption's lines, a typing caption; and the surprising ones: a missing letter's box, the rounded background's extra pixel, a one-line text as wide as the widest line |
+| `screens.md` part 11 | 4 | no tutorial on day 1, the border explosion's shake, the time bomb's flash, the poison touch; and a flash to the title freezing a running shake |
+| `night-pictures.md` | 7 + 1 | a token, an upgrade, a death, five members, the Obristan passports; a member with four badges would run 7 pixels past the right edge |
+| `buttons.md` | 6 | the pressed look, sliding off and back, letting go outside, a press that starts outside, the hand cursor, the stamp bar's blinking reason button; no hover buttons in a desktop booth; the border button's click margin |
+| `language-pack.md` | 2 | `WATCH_GIVER0` says "All Arstotzkans are same."; `KID_KILLER2` says "Damn it."; `Gender` shows as `Sex` |
+| `screens.md` part 7 | 3 | the title's buttons through the code box; a worse second endless run leaves the best score; how the result box writes the time |
+| `screens.md` part 6 | list | the credits screen |
+| `screens.md` part 5 | list | the intro and endings, whether the first picture wipes in, the second click on NEXT restarting the fade |
+| `screens.md` part 4 | list | the pause and settings screens |
+| `screens.md` part 1 and 2 | lists | the night screen's moving parts (a tick that cannot be afforded, the sleep button while appearing, the orders of budget lines for none, one and two sick members, penalties and bribes), the title screen |
+| `screens.md` part 3 | list | the load screen (a copy of `extracted/saverun` shows most of it) |
+| `save-format.md` | - | deleting a save; whether the first number in `names.sav` is the launch's master seed (a hand-played game's first travelers could then be predicted) |
+| `border-scene.md` / `border-view.md` | - | `trucke1-decide` (the second attacker skips his throwing animation, one of three ways); no panning, no cameras, no slow motion on desktop (day 2 has the first attack) |
+| `borderanim-xml-format.md` | - | five animation prefixes that also collect another group's frames |
+| `newspaper-picture.md` | - | nothing in it compared with the game; the stamp's angle (used as radians?) |
+| `night.md` | - | penalties, bribes, attacks, the scheduled events and the endings were not exercised |
+| `comparing-with-the-game.md` | - | the reference matches one seed, days 1 to 4 (36 travelers) plus day 1 of a second route. The fingerprint, thumbprint and contraband draws (`desk.py`) come after the last pick the log can show, so they are untested; the same for the inference that `BoothEnv.auto...` serve only the test player. A longer run covers these |
+
+### 4. Will not matter for a desktop port
+
+Left as they are, with the reason. Do not spend time on them.
+
+- **Phone, tablet and platform code**: the input mode becoming touch and the
+  phone swipes; `Tutor`; `wantPlatformKind`; the tablet and phone layouts and
+  upgrade pictures; `PlatformChangeButton.png`'s cut and the root save
+  button's two pictures; `DURATION_SLOW`; an invalid stash's error at
+  start-up; the update-check buttons (`newversion`); the platform side of
+  `play.AlltimeStats` (achievements, leaderboards; rule 4).
+- **Out by the user's decisions**: other languages (the alias swap sets,
+  `[m]`/`[f]` gender switches, characters above 255 in saves, the Language
+  row), the age rating, the quit option, leaderboards.
+- **Never called or never reached**: `willDraw`; `ButtonReactResult`,
+  `Button.cycleMode`, `get_hasBackButtonId`; `Error.requiredPaperIds`; the
+  pause screen's `credit` id; the stamp ink layer's first size (every
+  stampable paper has one page); a frame with no valid quad; entity switches
+  8 and 16 (no name; the port makes its own); the unused data files, 20
+  traveler entries nothing refers to, six speech responses named nowhere,
+  `DIPLOMAT_FIRST`, who uses `TabParser.expandParams` besides `ErrorLib` (the
+  port reads the data its own way), whether DONE stops the credits' fast scroll,
+  which platform the frame settings in `HostUnity.CreateGame` are for, facts without definitions (`FilerEnvelope/Title`,
+  `Citation/Message`, `Citation/Penalty`); the test scenarios' start,
+  the test player's audit pictures and frame capture (`comparing-with-the-game.md`
+  "Dead ends"); `Paths.xml` automatic path numbers.
+- **Cannot show or be told apart in a port**: the graphics card's blend
+  rounding; Unity's samples against FMOD's (the port decodes the WAV files
+  from `extracted/audio/`); the quiet `traveler-breathein`; face sheet `M6`'s
+  one face and `F1:0`'s dot order; a wrong `Purpose` for an Arstotzkan (the
+  data never asks); `Game/Visitor<n>`, `Game/Stat/Day`; who changes the
+  clock's global speed (desktop has no slow motion, so 1); the first night 3 of
+  the hand-played game (what was clicked cannot be read from a save; the
+  rules are not in doubt).
+- **Predictions that only test the reading**: on the first title screen,
+  Escape to skip the rising title should also quit when the key is let go
+  (the port has no quit).
+- **Tooling**: two Ghidra analysis errors and 36 functions without a typed
+  signature (`ghidra-workflow.md`); neither has mattered.
 
 ## Verification against the original
 
