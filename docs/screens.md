@@ -1469,7 +1469,8 @@ the question `save-format.md` left open.
      objects, and asks for the settings screen to be built again (through
      the rating screen first if that language needs one);
   2. sets the music volume and the sound volume in the audio layer, each
-     as **the setting squared** (a setting of 0.5 plays at 0.25);
+     as **the setting squared** (a setting of 0.5 plays at 0.25; the host
+     turns it into decibels on the mixer, `audio.md`);
   3. sets fullscreen;
   4. calls `Settings.save` (which writes the `settings` entry if the
      counter differs from its value at the last load, `save-format.md`);
@@ -1950,7 +1951,9 @@ starts a fade, and a fade stops the screen's input (part 1).
 - Draw order between the page player and the ending's black rectangle.
 - `AlltimeStats.or` after the read-back, and how the all-time record is
   saved.
-- Where the songs `Theme`, `Death` and `Victory` are defined.
+- (Where the songs `Theme`, `Death` and `Victory` are defined: answered
+  on 2026-10-17, `audio.md`: they are the three songs stored in the Unity
+  files, played by file name `<song>.ogg`.)
 
 ## Things to watch in the game
 
@@ -2167,7 +2170,8 @@ fast throughout: about 22 seconds.
   button is the size of its picture's half, 129 x 38 / 2 = **129 x 19**.)
 - Whether pressing DONE stops the fast scroll.
 - The test player's `ClickThroughCredits` step beyond its name.
-- Where the song `Victory` is defined (as in part 5).
+- (Where the song `Victory` is defined: answered on 2026-10-17,
+  `audio.md`, as in part 5.)
 
 ## Things to watch in the game
 

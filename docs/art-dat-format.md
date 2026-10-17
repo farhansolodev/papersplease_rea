@@ -109,8 +109,10 @@ Three of them exist only there and are asked for by phone-only code
 there have been studied since; `data-files.md` lists each one with its
 write-up.
 
-There is no audio in `Art.dat`. `Sounds.xml` exists, so the audio is
-elsewhere, most likely `sharedassets0.resource` (12 MB). Not verified.
+There is no audio in `Art.dat`. The audio is in `sharedassets0.resource`
+(12 MB), which holds nothing else: 111 sound clips end to end, extracted
+on 2026-10-17 (`audio.md`; this said until then "most likely ... Not
+verified").
 
 ## Commands
 

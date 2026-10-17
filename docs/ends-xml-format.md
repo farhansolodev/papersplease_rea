@@ -90,8 +90,10 @@ last page, a 2-second fade to black and 2 seconds of black.)
   conditions test (`End/FamilyTakeCount`) are all set by the `Escape`
   command.
 - One sound is used, `stamp-down`, defined in `Sounds.xml`. The song names
-  `Death` and `Victory` are not ids in `Sounds.xml`; where songs are defined
-  is not studied.
+  `Death` and `Victory` are not ids in `Sounds.xml`: a song is the stored
+  clip `<name>.ogg`, and `Death.ogg` and `Victory.ogg` are two of the
+  three stored songs (`audio.md`, 2026-10-17; this said until then that
+  where songs are defined was not studied).
 - Two colours are used: `0xb19600` (the Obristan inspector speaking) and
   `0xd3ecd3` (the player speaking).
 - `escape` / `flee`: taking 0 to 5 family members shows 16, 19, 20, 21, 22
@@ -119,5 +121,5 @@ last page, a 2-second fade to black and 2 seconds of black.)
   rest of the `EndScreen` constructor, and how `EndBits` stores the
   endings seen. Where the six shooting endings are asked for was
   answered by the border-scene step, `border-shooting.md`.)
-- Where songs are defined.
+- (Where songs are defined: answered on 2026-10-17, `audio.md`.)
 - Nothing here has been compared with the running game.

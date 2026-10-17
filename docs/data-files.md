@@ -23,7 +23,7 @@ cross-checked, with a write-up in `docs/`.
 | `Emblems.xml` | `data.EmblemLib` | Studied: `emblems-and-bodies.md`; the seal on a page in `page-layout.md`, the rulebook's seal sheets and the bulletin seal in `fact-pictures.md` |
 | `Fonts.xml` | `data.FontLib` | Studied: `fonts.md` (the file, the `.fnt` files, measurements, line breaking); drawing text in `text-drawing.md` |
 | `Paths.xml` | `data.PathLib` | Studied: `paths-xml-format.md` (the file, building a path, points along it) and `border-figures.md` (how a figure follows a path, the waiting line), `border-scene.md` (what each event does, which paths the code starts) |
-| `Sounds.xml` | `data.SoundDefLib` | Studied: `sounds-xml-format.md` (the file, which recording plays, how songs are named; the audio files are not extracted yet) |
+| `Sounds.xml` | `data.SoundDefLib` | Studied: `sounds-xml-format.md` (the file, which recording plays, how songs are named); the recordings and songs themselves: `audio.md` (extracted 2026-10-17) |
 | `BorderAnim.xml` | `data.AtlasLib` (asked for by `play.day.border.Border`) | Studied: `borderanim-xml-format.md` (the atlas and how an animation finds its frames). Of the border scene itself, the figures and the waiting line (`border-figures.md`) `Border` (`border-scene.md`), shooting (`border-shooting.md`) and the cameras and panning (`border-view.md`) are studied |
 | `Text.xml` | `data.Lang` | Studied: `text-xml-format.md` (the loader, placeholders, the long date); aliases and typos in `value-helpers.md` |
 | `UpperCase.txt` | `data.Uppercaser` | Studied: `value-helpers.md` |

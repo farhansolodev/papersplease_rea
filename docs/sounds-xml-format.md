@@ -66,8 +66,11 @@ A song id is turned into the file name `<id>.ogg` and played looping at full
 volume in the "music" category. There is no list of songs in the data files.
 Asking for the song that is already playing does nothing; asking for a
 different one fades the current one out and then starts the new one.
-The song ids found so far are `Death` and `Victory` (`ends-xml-format.md`);
-the others are in screen code that has not been read.
+The song ids are `Theme`, `Death` and `Victory`, the only three songs
+stored (`audio.md`, 2026-10-17; this said until then that the others
+were in screen code not yet read): `Theme` for most menu screens,
+`Victory` for the credits, `Death` or `Victory` for the endings
+(`ends-xml-format.md`).
 
 ## Check against the data file
 
@@ -98,11 +101,15 @@ the others are in screen code that has not been read.
 
 ## Not studied
 
-- **The audio files themselves are not extracted yet** (step 5 of
-  `PROGRESS.md`), so the check cannot confirm that the 108 recordings and
-  the song files exist.
-- The platform layer that actually plays audio, volume settings, fading
-  (`SpeakerSound`), pausing, the speaker's "room", and the beat tracking in
-  `Music` / `MusicBeat`.
-- The full list of song ids.
+- (The audio files were listed here as not extracted. Extracted on
+  2026-10-17, `audio.md`: all 108 recordings named here and the 3 songs
+  are stored, and nothing else; `scripts/checks/audio_check.py` confirms
+  it. The two never-played 4th recordings are stored too.)
+- (The Unity side that plays a recording, and the volume settings, were
+  listed here; read on 2026-10-17, `audio.md`: at most 32 sounds at once,
+  volume as setting squared.) Still not studied: fading
+  (`SpeakerSound`), pausing, the speaker's "room" beyond what is above,
+  and the beat tracking in `Music` / `MusicBeat` (`app.aud`).
+- (The full list of song ids was listed here: `Theme`, `Death`,
+  `Victory`, answered on 2026-10-17, `audio.md`.)
 - Nothing here has been compared with the running game.

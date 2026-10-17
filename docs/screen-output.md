@@ -473,7 +473,8 @@ How it was read:
   (64 and 3,980 bytes), and `HostUnity`'s references point at the
   objects its names say (`screenQuad` the "Quad" renderer,
   `phantomCursor` the "Phantom Cursor" renderer, `quadShader`
-  `Unlit/QuadShader`, 111 sound paths and 111 sound clips).
+  `Unlit/QuadShader`, 111 sound paths and 111 sound clips; the sounds
+  themselves are in `audio.md`).
 - **A trap**: UnityPy's own shader export prints no `Blend` line at all,
   because its blend export is an empty placeholder in its code. The
   blend settings were read from the pass state fields themselves.

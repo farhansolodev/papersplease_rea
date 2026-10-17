@@ -13,6 +13,9 @@ order (docs/screen-output.md), as the desktop game runs them.
   pixel (read from the shader's DirectX 11 program and pass state,
   scripts/unity/scene_dump.py); the 8-bit rounding is an assumption.
 - paused_pixel: Unlit/ScreenPausedShader (no game code uses it).
+- AudioHost, category_attenuation_db: HostUnity.UnityPlatformAudio, how
+  a sound file name becomes a playing clip and what a category volume
+  does to the mixer (docs/audio.md).
 Pure Python.
 """
 
@@ -186,3 +189,55 @@ def paused_pixel(rgb):
     no game code switches to this one."""
     y = (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114) / 255.0
     return (to_byte(y * 0.75),) * 3
+
+
+# ---- sound (HostUnity.UnityPlatformAudio; docs/audio.md) -------------------
+
+AUDIO_SOURCES = 32             # the constructor adds 0x20 AudioSources
+VOLUME_MIN, VOLUME_MAX = 0.0001, 1.0   # setCategoryVolume's Mathf.Clamp
+MIXER_GROUPS = {"music": "Master/Music", "effects": "Master/Effects"}
+
+
+def category_attenuation_db(volume):
+    """setCategoryVolume: the value written to the mixer's exposed
+    parameter "<group>Atten" (EffectsAtten or MusicAtten), in decibels:
+    20 x log10 of the volume held to 0.0001..1. So 1 is 0 dB, 0.5 about
+    -6 dB, 0 (held to 0.0001) -80 dB. As a plain gain that is the held
+    volume itself."""
+    v = min(max(volume, VOLUME_MIN), VOLUME_MAX)
+    return 20.0 * math.log10(v)
+
+
+class AudioHost:
+    """UnityPlatformAudio's book-keeping. names: HostUnity.audioPaths, the
+    file names the game asks for ("stamp-down.wav", "Theme.ogg"), each
+    standing for the clip at the same place in audioClips."""
+
+    def __init__(self, names):
+        self.clips = {}
+        for i, name in enumerate(names):   # a later repeat would win (none)
+            self.clips[name] = i
+        self.free = AUDIO_SOURCES
+        self.playing = {}                   # play id -> (clip, category, loop, volume)
+
+    def start(self, play_id, category, filename, loop, volume):
+        """start(): an unknown file name, or no free source, plays nothing
+        and says nothing. Otherwise a free source gets the clip, volume,
+        loop flag and the category's mixer group, and plays."""
+        clip = self.clips.get(filename)
+        if clip is None or self.free < 1:
+            return False
+        self.free -= 1
+        self.playing[play_id] = (clip, category, loop, volume)
+        return True
+
+    def stop(self, play_id):
+        if self.playing.pop(play_id, None) is not None:
+            self.free += 1
+
+    def update(self, finished):
+        """Update(): a source that is not playing, does not loop and is at
+        sample 0 is stopped and freed. finished: the play ids whose sound
+        has ended (a looping sound never ends)."""
+        for play_id in [p for p in self.playing if p in finished and not self.playing[p][2]]:
+            self.stop(play_id)

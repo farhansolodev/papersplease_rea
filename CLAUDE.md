@@ -83,7 +83,9 @@ Port my own copy of Papers, Please to run in the browser:
   (`scripts/reference/faces.py` and everything built on it) need it.
 - UnityPy 1.25.4 (reads Unity's asset files) is installed only in the
   project's gitignored `.venv/` (2026-10-17); run scripts that need it
-  with `.venv\Scripts\python -I`. Shader byte code is disassembled with
+  with `.venv\Scripts\python -I`. It came with `fmod_toolkit` 0.1.3 and
+  its FMOD library (`fmod.dll`), which decodes the game's sounds
+  (`docs/audio.md`). Shader byte code is disassembled with
   Windows' own `D3DCompiler_47.dll`. See `docs/screen-output.md`, "The
   Unity files".
 - Rust 1.99 and the `wasm32-unknown-unknown` target are installed (checked

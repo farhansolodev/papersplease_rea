@@ -1,7 +1,23 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-17, after
-step 5b, the Unity scene and shader files (`screen-output.md`, "The
+step 6, the audio (`audio.md`; the clips read with UnityPy and decoded
+with the FMOD library that came with it, a second decoder of my own for
+the effects, code reading of the host's sound player, one Ghidra run; an
+extraction script and a check; nothing listened to in the game). Main
+findings: all sounds are 111 clips in `sharedassets0.resource` (and
+nothing else is in it), named by the file names the game asks for; the
+108 effects are IMA ADPCM, the 3 songs (`Theme`, `Death`, `Victory`)
+Vorbis; all 111 are now WAV files in `extracted/audio/` (80 MB), and two
+independent decoders agree sample for sample on every effect; every
+recording `Sounds.xml` names is there; the host plays at most 32 sounds
+at once and drops the rest silently; the mixer does nothing but the two
+volume settings, applied as setting squared in decibels (so 0 is
+−80 dB, not silent). Open: how to ship the songs to a browser (62 MB as
+WAV; a tool download either way) and the game-side audio layer
+`app.aud` (fading, the music's beat).
+
+Before it the same day, step 5b, the Unity scene and shader files (`screen-output.md`, "The
 Unity files" and "The quad shader"; read with UnityPy 1.25.4, newly
 installed in the project's `.venv/`, the shaders disassembled with
 Windows' own `D3DCompiler_47.dll`; a dump script, a reference function
@@ -198,7 +214,8 @@ since the tenth session **all of the game's own code is decompiled once**
 into `decompiled/all/` (6,856 functions), so any question can start with
 a search. The
 content archive (`Art.dat`) is decrypted and unpacked: 614 images, fonts and
-plain-text data files. The game is strongly data-driven. **Every data file
+plain-text data files. The 111 sounds and songs, stored elsewhere, are
+decoded to WAV (`audio.md`). The game is strongly data-driven. **Every data file
 now has a write-up.** Traced from the code: the seed chain from launch to
 each day; how a traveler is chosen, built and given documents with right or
 deliberately wrong values; how errors are chosen and applied; speech; the
@@ -282,7 +299,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | Stage | Share | State |
 |---|---|---|
 | 1. Tools to read the code | 3% | Done |
-| 2. Getting assets out | 5% | About half: images, fonts, data done; the English language pack compared with the archive (`language-pack.md`; other packs not needed); audio, scripted `Art.dat` cut-out not done |
+| 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out; the browser formats (the songs are too big as WAV, a decision for `DESIGN.md`) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files") |
 | 5. Building the browser game in Rust | 40% | Not started. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not; Bevy not tried |
@@ -331,6 +348,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `endless-mode.md` | `Endlesses.xml`, `Endless.csv`: styles, courses, scoring (the endless screen is in `screens.md`, part 7) |
 | `text-xml-format.md` | `Text.xml`: texts, placeholders, the long date |
 | `sounds-xml-format.md` | `Sounds.xml`: which recording plays, song names |
+| `audio.md` | **Step 6**: where the sounds are (111 clips in `sharedassets0.resource`, keyed by the file names the game asks for), their stored formats (IMA ADPCM effects with the block layout, Vorbis songs), the extraction to WAV and how far it is exact, the host's sound player (`UnityPlatformAudio`: 32 sources, start, stop, pausing, the volume in decibels), the mixer, which screens ask for which song, the check, the port's song-format decision |
 | `fonts.md` | `Fonts.xml` and the `.fnt` files: measurements, text width, line breaking |
 | `text-drawing.md` | **Drawing, part 1**: `app.vis.Text`: its settings, how it is laid out (lines, alignment, padding, line spacing, the background and its cut corners, the box for a missing letter), its size, where its position puts it, how it is drawn on screen (quads, the 0.001 alpha test) and into a picture (`Image.paste` cuts positions toward zero), letters revealed one by one, which code sets padding, spacing or a background |
 | `page-layout.md` | **Drawing, part 2**: `PaperInnerVisuals`: who builds a page, the page picture and its marker pixels (black side 0, red side 1, painted over), the positions, which marks a link leaves out (`PaperNav` and the page mask), text marks (flow, the base line, boxes, link buttons, wrap, touch padding), picture marks, seal marks (half opacity), clipping; finding marks and pages |
@@ -500,14 +518,26 @@ the night screen's family pictures; part 11, the last screens.)
    behind the picture. Not from the files: the Pixel Perfect Camera's
    full-screen and resized-window fit (its documentation), the
    graphics card's rounding.
-6. **Audio extraction** (probably `sharedassets0.resource`; not checked).
-   Independent of the steps above. UnityPy, installed in `.venv/` for
-   step 5b, reads these files: `sharedassets0.assets` holds 111
-   `AudioClip` objects, and `HostUnity` in the scene lists 111 sound
-   paths (the first `Death.ogg`, `Theme.ogg`) with 111 clip references
-   (seen in step 5b; the clips themselves were not opened). (The language zips in `StreamingAssets/loc/` were also
-   here: only `en.zip` is needed, and it is a plain zip that Python reads;
-   compared with the archive on 2026-10-16, `language-pack.md`.)
+6. **Audio extraction: done** on 2026-10-17 (`audio.md`). It was in
+   `sharedassets0.resource`, as guessed (now checked: 111 clips, nothing
+   else). `scripts/unity/audio_extract.py` writes 111 WAV files and an
+   index into `extracted/audio/`; `scripts/checks/audio_check.py`
+   (`0 problems`) checks them against the stored data (a second ADPCM
+   decoder agrees on all 108 effects), `Sounds.xml`, `Ends.xml` and the
+   mixer. The host's sound player is read and in `host.py`. Left: the
+   songs' browser format (a decision, and a tool download, below) and
+   `app.aud` (step 6b). (The language zips in `StreamingAssets/loc/`
+   were also here: only `en.zip` is needed, and it is a plain zip that
+   Python reads; compared with the archive on 2026-10-16,
+   `language-pack.md`.)
+6b. **The game-side audio layer** (`app.aud`, 71 functions in
+   `decompiled/all/app_aud.clean.c`, 26 of them Haxe's field-access
+   plumbing; added 2026-10-17): `Speaker` (rooms,
+   the "ignore one-shot sounds this frame" switch, pause, resume and stop
+   all), `SpeakerSound` (fading and stopping), `Music` (how a song starts,
+   fades out and changes), `MusicBeat` (the beat the title screen's rise
+   follows, `screens.md` part 2, still open). Code reading with a
+   reference script, like the drawing parts. Opus.
 7. **Sort the open questions** (added 2026-10-14 at the user's request),
    before any design work. Go through every entry under "Open questions and
    unconfirmed items" once and put it in one of five kinds:
@@ -545,6 +575,25 @@ Small jobs that fit anywhere:
 ## Open questions and unconfirmed items
 
 Collected from the docs, so they are not lost:
+
+**From 2026-10-17** (`audio.md`, step 6)
+
+- **Nothing of it has been heard in the game.** Five items at the end of
+  `audio.md` (the title's song, an ending's song, the never-played 4th
+  recordings, a volume of 0, the very quiet breathing-in sound).
+- **A decision for `DESIGN.md`: how the browser build gets the songs.**
+  As WAV they are 62 MB. Either rebuild the stored Vorbis data into
+  normal `.ogg` files without re-encoding, or re-encode the WAV files;
+  both need a tool that is not installed (the user's go-ahead for the
+  download). The effects are 21 MB as WAV.
+- Inferred, not tested: Unity plays the effects with the same samples
+  as FMOD's decode (Unity is built on FMOD). The songs' exact samples
+  depend on the Vorbis decoder; only their length was checked.
+- No caller of `SetPauseForAppLostFocus` was found by name, so whether
+  sounds pause when the window loses focus is open.
+- Observed, not explained: `traveler-breathein` peaks at −54 dB, far
+  below every other recording.
+- Not studied: `app.aud` (step 6b).
 
 **From 2026-10-17** (`screen-output.md`, the Unity side of drawing)
 
@@ -1244,6 +1293,8 @@ All gitignored. Nothing below is in git.
 | `decompiled/settingsmenu_music_asm.txt`, `part4_run1.txt` to `part4_run3.txt` | small | For `screens.md`, part 4: the instructions of `SettingsMenu.musicButton_whenClick`, and the Ghidra output of three runs (string lists of four functions in machine-code order, three caller searches). (The key, `InputWrapper` and `HostUnity.Update` functions read for that part are in `decompiled/all/top.clean.c` and `app_ent.clean.c`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x180714b30`; `ListStringUses.java` with `0x180710150`, `0x180869f50`, `0x18086a9b0`, `0x1808035e0`; `FindReferences.java` with `0x18086FAF0`, `0x180870B30`, `0x1804AA120`, `0x180870210` |
 | `decompiled/budgetent_ctor_asm.txt`, `budgetent_ctor_strings.txt`, `asm_family_buildmessage.txt` | small | For `screens.md`, part 1: the instructions of the `BudgetEnt` constructor and of `Family.buildMessage`; the `BudgetEnt` constructor's strings in machine-code order. (The `play.night`, `RevealTextEnt` and `GameScreen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1806c2a70` and `0x180757930`; `ListStringUses.java 0x1806c2a70` |
 | `.venv/` | about 53 MB | Python virtual environment with UnityPy 1.25.4 and its libraries (installed 2026-10-17 for step 5b) | `python -m venv .venv`, then `.venv\Scripts\python -m pip install --only-binary=:all: --no-binary=tpk_ar UnityPy==1.25.4` (`tpk_ar` has no pre-built package; it is built from its 10 KB source) |
+| `extracted/audio/` | about 80 MB | Step 6's extraction: the 111 sounds and songs as 16-bit WAV, named by the game's file names (songs `.ogg` made `.wav`), and `audio_index.json` | `.venv\Scripts\python -I scripts\unity\audio_extract.py game\PapersPlease_Data extracted\audio` (about 5 seconds) |
+| `decompiled/audio_run1.txt` | small | For `audio.md`: the instructions of `UnityPlatformAudio.setCategoryVolume` and of the `log10` it calls | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1809a7c10 0x180131510`, output redirected to the file |
 | `extracted/unity/` | under 1 MB | Step 5b's dump of the Unity files: every scene, material and settings object as JSON, the four shaders' programs disassembled, `summary.txt` | `.venv\Scripts\python -I scripts\unity\scene_dump.py game\PapersPlease_Data extracted\unity` |
 | `extracted/autorun/` | 2 MB | The test player's folder: `auto.plan`, `auto.log`, copies of three `Player.log` runs, and scratch scripts from the fourth session (`show.sh` prints one decompiled function with the noise removed; `rand_uses2.py` lists functions matching a pattern; `log_step.py`; several experiments) | The logs: run the game as above (needs the go-ahead). The scratch scripts are conveniences, not needed |
 
@@ -1260,6 +1311,6 @@ Running the game writes Unity's `Player.log` under
 |---|---|
 | `scripts/ghidra/` | `game_function_lists.py` (address lists of all the game's own functions, for the whole-game decompile); Ghidra scripts (names, types, decompile with `@` list files, references, static writes, string uses, assembly dump, the two emulator checks, and `EmulateLayout.java`, which runs the whole `Layout` constructor), `clean_decompile.py`, `condense_decompile.py` (a shorter view of a cleaned file, for long classes), and `read_doubles.py` (reads the number constants the decompiler shows only as addresses) |
 | `scripts/extract/` | `decrypt_art.py`, `unpack_art.py` |
-| `scripts/unity/` | `scene_dump.py`: dumps the Unity scene, materials, shaders (disassembled) and project settings with UnityPy; run it with `.venv\Scripts\python` (`screen-output.md`, "The Unity files") |
-| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`), `pages.py` (lays a document page out and draws a preview; `page-layout.md`), `factpics.py` (the fact pictures and the picture operations; `fact-pictures.md`), `deskpics.py` (a paper's pictures on the desk, clipping, picking a mark, stamp ink, `Image.render`; `desk-pictures.md`), `deskmove.py` (how a paper moves, frame by frame; `desk-movement.md`), `inspectmode.py` (the inspect mode's rules; `inspect-mode.md`), `vis.py` (colours, point and rectangle text, nine-slice frames, atlas tiles; `vis-basics.md`), `ui.py` (dotted lines, the speech bubble, the drag helper; `ui-parts.md`), `inputs.py` (the mouse, pointers, blocked areas, keys, the cursor's place; `input-handling.md`), `host.py` (the drawing order, the quad batcher, the texture table, the window size, the phantom cursor's place, the assumed pixel rule, the quad shader's colour and blending as `quad_pixel`; `screen-output.md`), `layout.py` (every desktop `Layout` value) and `layout_dump.py` (decodes an `EmulateLayout.java` run; `booth-layout.md`) |
-| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, `text_drawing_check.py` (fonts against the English texts, the font sheets' colours), `page_layout_check.py` (marker pixels of every page picture), `fact_pictures_check.py` (every picture fact, its files and sizes) `desk_pictures_check.py` (every paper's desk pictures) `ui_check.py` (dotted lines, the bubble and the speech lines, the drag helper), `input_check.py` (pointer and key sequences, the cursor pictures), `host_check.py` (the drawing order, batching, the texture table, window sizes, the phantom cursor picture and place), `unity_scene_check.py` (the Unity scene, shaders and settings against step 5b's dump, and `host.quad_pixel`), `vis_check.py` (points and rectangles in the data files, colours, frames), `inspect_check.py` (marks per paper, booth things, texts, selection, the diagram), `desk_movement_check.py` (every paper's reveal, the docks, clamps, a fall, a throw, the drag placement) and `layout_check.py` (the emulated layout against `layout.py` and 35 values read by hand); see its `README.md` for each script's arguments |
+| `scripts/unity/` | `scene_dump.py`: dumps the Unity scene, materials, shaders (disassembled) and project settings with UnityPy (`screen-output.md`, "The Unity files"); `audio_extract.py`: decodes the 111 sounds and songs to WAV with FMOD (`audio.md`). Run both with `.venv\Scripts\python` |
+| `scripts/reference/` | Reference implementations. Base: `rand.py`, `tabtree.py`, `seeds.py`, `gdate.py`, `haxemap.py`. Traveler answer key, in layers: `cyclers.py`, `faces.py` (needs Pillow), `person.py`, `travspec.py`, `errormaker.py`, `values.py`, `factlib.py`, `booth.py` (everything chained), plus what happens between travelers: `desk.py` (draws when papers are drawn) and `speech.py` (spoken lines). Others: `news.py` (headlines), `newsimage.py` (newspaper layout and draws; needs Pillow), `nights.py` (night events, budget, the family), `fonts.py`, `paths.py`, `savefile.py` (reads and decrypts a save folder; can also encrypt), `hxserial.py` (reads the text of Haxe's general serializer, as far as a stash needs), `locpack.py` (applies a language pack to the data files and lists what changes; `language-pack.md`), `nightpics.py` (the night screen's family pictures: every picture and text with its desktop position; renders the pictures and texts; needs Pillow to render; `night-pictures.md`), `screenfx.py` (the screen shake frame by frame and the flash to the title; `screens.md` part 11), `text.py` (`app.vis.Text`: lays a text out tile by tile, gives its size, draws a preview with Pillow; `text-drawing.md`), `pages.py` (lays a document page out and draws a preview; `page-layout.md`), `factpics.py` (the fact pictures and the picture operations; `fact-pictures.md`), `deskpics.py` (a paper's pictures on the desk, clipping, picking a mark, stamp ink, `Image.render`; `desk-pictures.md`), `deskmove.py` (how a paper moves, frame by frame; `desk-movement.md`), `inspectmode.py` (the inspect mode's rules; `inspect-mode.md`), `vis.py` (colours, point and rectangle text, nine-slice frames, atlas tiles; `vis-basics.md`), `ui.py` (dotted lines, the speech bubble, the drag helper; `ui-parts.md`), `inputs.py` (the mouse, pointers, blocked areas, keys, the cursor's place; `input-handling.md`), `host.py` (the drawing order, the quad batcher, the texture table, the window size, the phantom cursor's place, the assumed pixel rule, the quad shader's colour and blending as `quad_pixel`; `screen-output.md`; and the sound player and the category volume in decibels, `audio.md`), `layout.py` (every desktop `Layout` value) and `layout_dump.py` (decodes an `EmulateLayout.java` run; `booth-layout.md`) |
+| `scripts/checks/` | Checks against the real data files, `compare_with_log.py` against the running game's log, `save_check.py` and `save_night_check.py` against a real save folder, `stash_check.py` against a real stash, `button_pictures_check.py` against the button pictures, `night_pictures_check.py` against the night screen's family pictures, `text_drawing_check.py` (fonts against the English texts, the font sheets' colours), `page_layout_check.py` (marker pixels of every page picture), `fact_pictures_check.py` (every picture fact, its files and sizes) `desk_pictures_check.py` (every paper's desk pictures) `ui_check.py` (dotted lines, the bubble and the speech lines, the drag helper), `input_check.py` (pointer and key sequences, the cursor pictures), `host_check.py` (the drawing order, batching, the texture table, window sizes, the phantom cursor picture and place), `unity_scene_check.py` (the Unity scene, shaders and settings against step 5b's dump, and `host.quad_pixel`), `audio_check.py` (the extracted sounds against the stored data with a second ADPCM decoder, `Sounds.xml`, `Ends.xml`, the mixer, the host's sound rules), `vis_check.py` (points and rectangles in the data files, colours, frames), `inspect_check.py` (marks per paper, booth things, texts, selection, the diagram), `desk_movement_check.py` (every paper's reveal, the docks, clamps, a fall, a throw, the drag placement) and `layout_check.py` (the emulated layout against `layout.py` and 35 values read by hand); see its `README.md` for each script's arguments |
