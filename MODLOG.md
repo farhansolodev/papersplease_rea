@@ -14,6 +14,14 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-17 Record the accepted defaults in DESIGN.md
+
+**Changed:** `docs/DESIGN.md` (suggested defaults now marked decided on 2026-10-17; the songs' format and fullscreen in a browser marked open), `docs/PROGRESS.md` (header, step 8, kind 2 of the open questions).
+**Why:** the user answered "the suggested actions are fine with me" to step 7's result.
+**Tested how:** doc edits only; not tested. I read the answer as accepting every suggested default in `DESIGN.md`.
+**Result:** the three decisions needed before the first Rust code are decided. Not read as a go-ahead for any download, so the songs' tool download stays a separate question (`CLAUDE.md` rule 6).
+**Still broken / not tested:** if the user meant only the commit button, the "decided" marks should be undone. Not committed.
+
 ## 2026-10-17 Sort the open questions (step 7)
 
 **Changed:** `docs/PROGRESS.md` (the open-questions section rewritten from about 636 lines to about 170, in four parts; header, step 7 marked done, step 8 reworded, docs table row for `DESIGN.md`); new `docs/DESIGN.md` (decisions list only); `docs/screens.md` (four `canVibrate` sentences); `docs/comparing-with-the-game.md` (what the log holds of the border scene); `CLAUDE.md` (the `DESIGN.md` row of the file table, as the user approved).

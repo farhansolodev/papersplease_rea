@@ -4,8 +4,13 @@
 step 7, the sorting of the open questions: 151 items into five kinds
 (answered and closed, need the game, the user's decision, will not matter,
 could bite), the list below cut to four parts, and a new `docs/DESIGN.md`
-with the decisions only. Nothing was run and no code read. Next: step 8,
-beginning with the three decisions "needed before the first Rust code".
+with the decisions only. Nothing was run and no code read. The same day
+the user accepted every suggested default in `DESIGN.md`, among them the
+three "needed before the first Rust code" (a fixed 1/60 s step; booth draws
+copied exactly; the English pack applied once at asset preparation). Two
+stay open there: the songs' format (a tool download needs its own
+go-ahead) and fullscreen in a browser. Next: step 8, writing the rest of
+`DESIGN.md` (the architecture).
 
 Before it the same day, step 6b, the game-side audio layer `app.aud` (`audio-layer.md`; code
 reading of all of `app.aud` and its callers, two Ghidra runs, a
@@ -589,10 +594,10 @@ the night screen's family pictures; part 11, the last screens.)
    not an answer. The few answered on the way: the game's log has nothing
    of the border scene but the test player's `BusyWithBorder` queue lines;
    a desktop PC's `canVibrate` is false (`audio-layer.md`).
-8. **Design and build the Rust port.** Start with the three decisions in
-   `DESIGN.md` under "Needed before the first Rust code" (frame time, the
-   random sequence, the English pack), then write the rest of `DESIGN.md`
-   (the architecture). The first thing to read when the booth is built is
+8. **Design and build the Rust port.** The three decisions "needed before
+   the first Rust code" in `DESIGN.md` are decided (2026-10-17: frame time,
+   the random sequence, the English pack). Next: write the rest of
+   `DESIGN.md` (the architecture). The first thing to read when the booth is built is
    its state machine (`decompiled/booth_ctor_asm.txt`; first item under
    "Could bite during the build"). `Auto.txt` can serve as a test plan: it
    lists what to do to reach each ending.
@@ -625,7 +630,8 @@ answered are gone from here (their answers are in the docs named in
 
 1. **Could bite during the build**: not known yet, and the port may need it.
    Each says what the port assumes meanwhile and when to settle it.
-2. **The user's decision**: in `DESIGN.md`, not repeated here.
+2. **The user's decision**: in `DESIGN.md`, not repeated here. All decided
+   on 2026-10-17 except the songs' format and fullscreen in a browser.
 3. **Needs the game to run**: one watch list per doc, below; none blocks the
    build.
 4. **Will not matter for a desktop port**: left as they are, with the reason.
