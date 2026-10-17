@@ -81,6 +81,11 @@ Port my own copy of Papers, Please to run in the browser:
 - Python 3.12 is installed and used for the helper scripts (run with
   `python -I`). Pillow 11.1.0 is installed for it; the face scripts
   (`scripts/reference/faces.py` and everything built on it) need it.
+- UnityPy 1.25.4 (reads Unity's asset files) is installed only in the
+  project's gitignored `.venv/` (2026-10-17); run scripts that need it
+  with `.venv\Scripts\python -I`. Shader byte code is disassembled with
+  Windows' own `D3DCompiler_47.dll`. See `docs/screen-output.md`, "The
+  Unity files".
 - Rust 1.99 and the `wasm32-unknown-unknown` target are installed (checked
   2026-10-12). `trunk`, `wasm-pack` and `wasm-bindgen` are not installed, and
   Bevy has not been set up or tried.

@@ -109,8 +109,12 @@ hidden otherwise). What it shows was followed on 2026-10-17
 through the game's interface (slot 5) is `Game.phantomCursorImage`, so it
 shows `CursorPhantom.png` (19 x 26), as inferred here; that picture is
 exactly the white edge of the arrow cursor in grey-green, placed on the
-drawn arrow. Whether it can be seen is in the Unity scene, not the code:
-still not settled.
+drawn arrow. Whether it can be seen was settled from the Unity scene and
+shaders on 2026-10-17 (`screen-output.md`, "The host's second cursor";
+by the files, not seen in the game): it lies behind the screen picture,
+so it is hidden wherever the game's picture is, and can show only
+where the camera draws around the picture (full screen with black
+bars).
 
 ## A pointer's frame (`Pointer.update`)
 
@@ -274,9 +278,10 @@ tested).
 
 ## Not studied
 
-- Whether the `phantomCursor` object is visible next to the drawn
-  cursor (above). (What it shows was listed here too: read on
-  2026-10-17, `screen-output.md`.)
+- (Whether the `phantomCursor` object is visible next to the drawn
+  cursor, and what it shows, were listed here: read on 2026-10-17,
+  `screen-output.md`. It is hidden behind the game's picture and can
+  show only in full-screen black bars.)
 - Where the input mode becomes touch (mode 2), and the phone swipes.
 
 ## Things to watch in the game

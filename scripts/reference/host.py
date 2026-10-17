@@ -9,6 +9,10 @@ order (docs/screen-output.md), as the desktop game runs them.
 - phantom_top_left: where HostUnity.Update puts the phantom cursor;
 - covered_pixels, texel_at: the graphics card's usual pixel rule.
   NOT game code: an assumption about Direct3D 11 / OpenGL, see the doc.
+- quad_pixel: what Unlit/QuadShader and its blend state make of one
+  pixel (read from the shader's DirectX 11 program and pass state,
+  scripts/unity/scene_dump.py); the 8-bit rounding is an assumption.
+- paused_pixel: Unlit/ScreenPausedShader (no game code uses it).
 Pure Python.
 """
 
@@ -131,8 +135,9 @@ def fullscreen_mode(resolutions, force1080p=False, force720p=False, stretch=Fals
 
 def phantom_top_left(gx, gy, tex_w=19, tex_h=26, w=GAME_W, h=GAME_H):
     """HostUnity.Update: the phantom cursor's place, worked back from the
-    screen quad's coordinates to game pixels. Assumes the object's mesh is
-    centred on its position (Unity's stock quad; inferred)."""
+    screen quad's coordinates to game pixels. The object's mesh is Unity's
+    built-in 'Quad', corners at -0.5 and 0.5, so centred on its position
+    (read from the scene, 2026-10-17)."""
     lx = ((tex_w * 0.5 + gx) - 1.0) / w - 0.5
     ly = 0.5 - ((tex_h * 0.5 + gy) - 1.0) / h
     cx = (lx + 0.5) * w             # centre in game pixels
@@ -154,3 +159,30 @@ def texel_at(i, p0, p1, u0, u1, size):
     inside the picture (clamped edges)."""
     u = u0 + (i + 0.5 - p0) / (p1 - p0) * (u1 - u0)
     return min(max(int(math.floor(u * size)), 0), size - 1)
+
+
+def to_byte(f):
+    """ASSUMPTION (graphics card): a 0..1 value stored in an 8-bit channel
+    is rounded to the nearest of the 256 steps."""
+    return int(math.floor(min(max(f, 0.0), 1.0) * 255.0 + 0.5))
+
+
+def quad_pixel(texel, colour, under):
+    """One pixel of a quad drawn into the screen picture.
+    texel: the picture's (r, g, b, a) bytes; colour: the quad's colour as
+    four floats; under: the screen picture's (r, g, b) bytes there.
+    The fragment program: c = texel / 255 * colour; out = (c.rgb * c.a, c.a).
+    The pass: Blend One OneMinusSrcAlpha, so
+    new = out.rgb + under * (1 - c.a). The project is in gamma colour
+    space, so no sRGB conversion is made (Unity's documentation)."""
+    c = [texel[i] / 255.0 * colour[i] for i in range(4)]
+    a = c[3]
+    return tuple(to_byte(c[i] * a + under[i] / 255.0 * (1.0 - a)) for i in range(3))
+
+
+def paused_pixel(rgb):
+    """Unlit/ScreenPausedShader: grey by (0.299, 0.587, 0.114), times 0.75.
+    The scene's screen material uses Unlit/ScreenShader (a plain copy), and
+    no game code switches to this one."""
+    y = (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114) / 255.0
+    return (to_byte(y * 0.75),) * 3

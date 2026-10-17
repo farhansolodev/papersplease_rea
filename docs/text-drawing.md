@@ -149,8 +149,9 @@ order into a 570 x 320 picture with nearest-pixel reads, and which
 pixels a fractional quad covers is the graphics card's rule (by the
 usual rule, a position rounded to the nearest pixel, a half rounding
 down; an assumption, not game code). How the colour is combined with
-the letter sheet is in the quad shader, which is not in the code
-(inferred: multiplied).
+the letter sheet was inferred here as multiplied; the quad shader was
+read on 2026-10-17 (step 5b, `screen-output.md`, "The quad shader"):
+it is, all four channels, followed by ordinary alpha blending.
 
 **Into a picture** (`Visual.renderToImage`; called three times, all in
 `play.day.booth`). A tile whose size equals its piece's size (within
@@ -276,8 +277,10 @@ draws the family names and the passport count with `text.py`.
   as `paste` does.)
 - (How the Unity side draws the quads was listed here: read on
   2026-10-17, `screen-output.md`. Where a fractional position lands is
-  the graphics card's rule there; how the colour is applied is in the
-  quad shader, which is in the Unity files, not the code: still open.)
+  the graphics card's rule there. How the colour is applied, in the
+  quad shader in the Unity files, was open here; read on 2026-10-17 in
+  step 5b, `screen-output.md`, "The quad shader": multiplied, then
+  ordinary alpha blending.)
 - How `Font.split` behaves at its edges (`fonts.md`, "Note on
   certainty"); this part only confirmed which width it returns.
 - Which texts use which font and settings, beyond the setter search above
