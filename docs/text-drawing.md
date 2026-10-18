@@ -267,6 +267,10 @@ draws the family names and the passport count with `text.py`.
 - Skip any tile whose alpha is below 0.001.
 - Keep the one-line width rule (widest line before the cut) and the
   rounded background's extra pixel on the left.
+- **Ported** (milestone 1a, 2026-10-18): `port/core/src/text.rs` follows
+  `text.py`; the font test pages drawn from it are identical to the
+  reference's pixel for pixel (`milestone-1.md`). Equal to the reference,
+  not compared with the game.
 
 ## Not studied
 

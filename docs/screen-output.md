@@ -300,7 +300,18 @@ scaled, that makes the picture land at its position rounded to the
 nearest whole pixel, a half rounding **down** (a quad starting at 10.3
 or 10.5 starts at pixel 10, one at 10.7 at pixel 11). The reference script
 `host.py` has this rule as `covered_pixels` and `texel_at`, marked as
-an assumption.
+an assumption. The port's software drawing (`port/core/src/raster.rs`,
+milestone 1a) follows these two functions and `quad_pixel` exactly, in
+`f64`.
+
+What the rule does to a quad at a **half-pixel** position, seen on the
+font test page in milestone 1a (the text "Fractional 0.5" placed at
+x + 0.5, y + 0.5): each pixel centre then maps exactly onto the boundary
+between two texels, so which texel is read depends on floating-point
+rounding, and some letter rows come out wrong (an "r" looks like a
+hyphen). A real graphics card may decide such ties differently. Whether
+the game places anything at a half-pixel position is not known; if it
+does, this is one to compare with the running game (milestone 10).
 
 How the colour is applied there, and how a see-through pixel mixes with
 what is under it, is in the quad shader (next).

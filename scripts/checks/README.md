@@ -77,6 +77,9 @@ Run from the project root with `python -I`. Paths below assume
 | `button_pictures_check.py` | `<assets>` (`<assets>` = `extracted\art\assets`; needs Pillow) | `buttons.md` (each button picture is where the code asks for it and divides exactly into the bands or columns the code cuts; the three phone-only pictures are absent from the main folder) |
 | `text_drawing_check.py` | `scripts\reference <assets>` (needs Pillow) | `text-drawing.md` (which characters of `Text.xml` and of each data file a font lacks; every font sheet is white with alpha 0 or 255) |
 | `night_pictures_check.py` | `<assets>` (needs Pillow) | `night-pictures.md` (the six family pictures of the night screen divide exactly into the pieces the code cuts; the passport covers halve to 30 x 40; every `tokenOrder` name has a piece in `Tokens.png`) |
+| `web_offline_check.mjs` | `[port]` (Node 24; the local server running, `scripts\serve.py`; drives headless Edge or Chrome; with `extracted\previews\m1` present it also compares font pages byte for byte; about 1 minute) | `milestone-0.md`, `milestone-1.md` (picture size and place, pixel values, resizes, service worker, font pages against the reference, offline start) |
+| `port\core\tests\fontpage.rs` | `cargo test -p pp_core` (needs `build\assets\start.pack` from `scripts\build_assets\build_pack.py` and `extracted\previews\m1` from `scripts\reference\fontpage.py <assets> extracted\previews\m1`; skips itself without them) | `milestone-1.md` (the Rust font pages against the Python reference, all 35 byte for byte) |
+eferenceontpage.py \<assets> extracted\previews\m1`; skips itself without them) | `milestone-1.md` (the Rust font pages against the Python reference, all 35 byte for byte) |
 
 The ones taking `scripts\reference` as their first argument import
 `tabtree.py` from there.

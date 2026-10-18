@@ -22,6 +22,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "build_assets"))
+import build_pack  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 CARGO_HOME = ROOT / ".cargo-home"
 PORT = ROOT / "port"
@@ -75,6 +78,9 @@ def main():
 
     app_js = add_fingerprinted(glue / "pp_web.js", "pp_web", "js")
     app_wasm = add_fingerprinted(glue / "pp_web_bg.wasm", "pp_web_bg", "wasm")
+    pack = glue / "start.pack"
+    pack.write_bytes(build_pack.build())
+    start_pack = add_fingerprinted(pack, "start", "pack")
     files["index.html"] = (PORT / "www" / "index.html").read_bytes()
 
     # The build code covers every file the page loads, by name and content.
@@ -85,6 +91,7 @@ def main():
         "build": build,
         "app_js": app_js,
         "app_wasm": app_wasm,
+        "pack": start_pack,
         "fingerprinted": fingerprinted,
         "files": ["index.html", "files.json", *fingerprinted],
     }
@@ -100,7 +107,7 @@ def main():
 
     print(f"\nbuild {build} in {OUT}")
     import gzip
-    for name in (app_wasm, app_js, "index.html", "sw.js"):
+    for name in (app_wasm, start_pack, app_js, "index.html", "sw.js"):
         raw = len(files[name])
         packed = len(gzip.compress(files[name], 9))
         print(f"  {name:<28} {raw:>10,} bytes   gzip {packed:>10,}")

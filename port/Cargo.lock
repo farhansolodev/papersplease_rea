@@ -4076,13 +4076,18 @@ dependencies = [
 [[package]]
 name = "pp_core"
 version = "0.0.0"
+dependencies = [
+ "png",
+]
 
 [[package]]
 name = "pp_web"
 version = "0.0.0"
 dependencies = [
  "bevy",
+ "js-sys",
  "pp_core",
+ "wasm-bindgen",
 ]
 
 [[package]]

@@ -1,16 +1,21 @@
-// Milestone 0 check: drives a real browser (headless Edge or Chrome, with a
-// throwaway profile in build/) against the local server and reports:
+// Milestone 0 and 1a check: drives a real browser (headless Edge or Chrome,
+// with a throwaway profile in build/) against the local server and reports:
 //   1. the picture's size and place on the canvas, from the canvas pixels;
 //   2. exact pixel values of the test card (grey 128, ramp step, red);
 //   3. whether the service worker installed, and what it stored;
-//   4. whether the page still starts with the network switched off.
+//   4. the font pages (milestone 1a): the whole canvas compared byte for byte
+//      with the Python reference's page, for several pages, and the arrow
+//      keys changing the page (needs extracted/previews/m1, made by
+//      scripts/reference/fontpage.py; skipped without it);
+//   5. whether the page still starts with the network switched off, showing
+//      the same font page.
 //
 //   node scripts/checks/web_offline_check.mjs [port]     (server running)
 //
 // Nothing is changed outside build/_browser_profile, which is deleted.
 
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, rmSync, mkdirSync } from 'node:fs';
+import { existsSync, rmSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,6 +23,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const PORT = process.argv[2] || '8080';
 const URL = `http://localhost:${PORT}/`;
 const DEBUG_PORT = 9333;
+const REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1');
 const PROFILE = path.join(ROOT, 'build', '_browser_profile');
 const BROWSERS = [
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -96,6 +102,45 @@ const PIXELS = `(async () => {
            grey128: at(30, 100), ramp7: at(20 + 24 * 7 + 5, 55), red: at(30, 75), build: window.ppBuild };
 })()`;
 
+// The whole canvas as 570 x 320 x 4 bytes (rows top to bottom), base64.
+const READ = `(async () => {
+  const c = document.getElementById('game');
+  const gl = c.getContext('webgl2');
+  const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
+  await frame(); await frame();
+  const W = c.width, H = c.height;
+  const raw = new Uint8Array(W * H * 4);
+  gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, raw);
+  const out = new Uint8Array(W * H * 4);
+  for (let y = 0; y < H; y++) out.set(raw.subarray((H - 1 - y) * W * 4, (H - y) * W * 4), y * W * 4);
+  let s = '';
+  for (let i = 0; i < out.length; i += 32768) s += String.fromCharCode.apply(null, out.subarray(i, i + 32768));
+  return { W, H, data: btoa(s) };
+})()`;
+
+// Waits until the canvas (at 570 x 320) equals the reference's page n.
+async function expectPage(n, what) {
+  const want = readFileSync(path.join(REFERENCE, `page_${String(n).padStart(3, '0')}.rgba`));
+  let last = 'nothing read';
+  for (let i = 0; i < 60; i++) {
+    const r = await evaluate(READ, 40000);
+    if (r.W === 570 && r.H === 320) {
+      const got = Buffer.from(r.data, 'base64');
+      const differ = got.reduce((k, b, j) => k + (b !== want[j] ? 1 : 0), 0);
+      if (differ === 0) { console.log(`   page ${n}: identical to the reference (${what})`); return; }
+      last = `${differ} bytes differ`;
+    } else last = `canvas is ${r.W} x ${r.H}, not 570 x 320`;
+    await sleep(500);
+  }
+  throw new Error(`page ${n} (${what}): ${last}`);
+}
+
+async function key(code, keyCode) {
+  for (const type of ['rawKeyDown', 'keyUp']) {
+    await send('Input.dispatchKeyEvent', { type, key: code, code, windowsVirtualKeyCode: keyCode, nativeVirtualKeyCode: keyCode });
+  }
+}
+
 const WORKER = `(async () => {
   const regs = await navigator.serviceWorker.getRegistrations();
   const out = { registrations: regs.length, active: regs.some((r) => r.active), controlled: !!navigator.serviceWorker.controller, caches: {} };
@@ -139,8 +184,8 @@ try {
   await send('Emulation.setFocusEmulationEnabled', { enabled: true });  // a headless page counts as focused and visible
   await send('Emulation.setDeviceMetricsOverride', { width: 1400, height: 900, deviceScaleFactor: 1, mobile: false });
 
-  console.log('1. first visit', URL);
-  await send('Page.navigate', { url: URL });
+  console.log('1. first visit, the milestone 0 test card', URL);
+  await send('Page.navigate', { url: URL + '?page=testcard' });
   await waitFor('!!window.ppBuild', 'the game to start');
   console.log('   picture:', JSON.stringify(await evaluate(PIXELS, 40000)));
   // Window sizes and the zoom the core's fit rule gives for each.
@@ -158,6 +203,33 @@ try {
   await waitFor(`(async()=>{const r=await navigator.serviceWorker.getRegistration(); return !!(r&&r.active)})()`, 'the service worker');
   console.log('   worker :', JSON.stringify(await evaluate(WORKER)));
 
+  const haveReference = existsSync(path.join(REFERENCE, 'pages.json'));
+  if (haveReference) {
+    console.log('1b. font pages against the Python reference');
+    await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
+    await send('Page.navigate', { url: URL + '?page=fonts&p=4' });
+    await waitFor('!!window.ppBuild', 'the font pages to start');
+    await expectPage(4, 'regular');
+    // A click gives the canvas the keyboard focus; then the arrow keys.
+    for (const type of ['mousePressed', 'mouseReleased']) {
+      await send('Input.dispatchMouseEvent', { type, x: 100, y: 100, button: 'left', clickCount: 1 });
+    }
+    await key('ArrowRight', 39);
+    await expectPage(5, 'after ArrowRight');
+    // One key at a time: two presses inside one frame count as one.
+    await key('ArrowLeft', 37);
+    await expectPage(4, 'after ArrowLeft');
+    await key('ArrowLeft', 37);
+    await expectPage(3, 'after another ArrowLeft: digits');
+    for (const n of [16, 34]) {
+      await send('Page.navigate', { url: URL + `?page=fonts&p=${n}` });
+      await waitFor('!!window.ppBuild', 'the font pages to start');
+      await expectPage(n, n < 16 ? 'text page' : 'font sheet part');
+    }
+  } else {
+    console.log('1b. SKIPPED: no reference pages in extracted/previews/m1');
+  }
+
   console.log('2. reload (now controlled by the worker)');
   await send('Page.reload');
   await waitFor('!!window.ppBuild', 'the game to start again');
@@ -171,7 +243,8 @@ try {
   await send('Page.reload');
   await send('Page.bringToFront');
   await waitFor('!!window.ppBuild', 'the game to start offline');
-  console.log('   picture:', JSON.stringify(await evaluate(PIXELS, 40000)));
+  if (haveReference) await expectPage(34, 'offline, from the service worker');
+  else console.log('   picture:', JSON.stringify(await evaluate(PIXELS, 40000)));
   console.log('   RESULT: starts offline');
 } catch (e) {
   console.log('   RESULT: FAILED -', e.message);

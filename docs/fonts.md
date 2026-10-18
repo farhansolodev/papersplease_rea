@@ -96,6 +96,20 @@ reconstruction. The pieces and their conditions are from the code; the
 exact behaviour at the edges (an empty word from two spaces in a row, a
 paragraph ending exactly at the limit) is **not tested against the game**.
 
+One more edge, found when the port was written (milestone 1a, 2026-10-18):
+when a word is as wide as the limit and not even one letter plus the
+hyphen fits (for example a limit equal to the widest advance, with a
+hyphen of 3 pixels), `fonts.py` flushes an empty line and starts over with
+the same word for ever. Whether the game does the same is not known. The
+Rust version (`port/core/src/font.rs`) takes one letter after two empty
+lines instead; no data file or game text is known to reach this.
+
+**Ported:** `port/core/src/font.rs` follows `fonts.py` and gives the same
+lines (all 35 font test pages of milestone 1a are identical to the
+reference's, `milestone-1.md`). That shows the port equals the reference,
+not the game: the reference itself has not been compared with the running
+game.
+
 ## Cross-check with the files
 
 `fonts_check.py` (run 2026-10-14):

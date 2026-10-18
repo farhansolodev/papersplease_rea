@@ -10,6 +10,10 @@ publish.workspace = true
 # and WebGL2; nothing else is compiled in.
 [dependencies]
 pp_core = { path = "../core" }
+# The loader script (port/www/index.html) hands the start pack and the
+# address's settings to the game through `window.ppConfig`; these two read it.
+js-sys = "0.3"
+wasm-bindgen = "0.2"
 
 [dependencies.bevy]
 version = "=0.20.0"

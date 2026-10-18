@@ -53,6 +53,16 @@ async function main() {
   }
 
   const files = await (await fetch('files.json', { cache: 'no-cache' })).json();
+  // What the game is told: which page to show (?page=fonts, ?page=testcard;
+  // &p=N starts the font pages on page N) and the start pack's bytes.
+  const page = params.get('page') || 'fonts';
+  let pack = null;
+  if (page !== 'testcard') {
+    const res = await fetch(files.pack);
+    if (!res.ok) throw new Error('start pack: ' + res.status);
+    pack = new Uint8Array(await res.arrayBuffer());
+  }
+  window.ppConfig = { page, p: parseInt(params.get('p') || '0', 10) || 0, pack };
   const app = await import('./' + files.app_js);
   try {
     await app.default({ module_or_path: './' + files.app_wasm });

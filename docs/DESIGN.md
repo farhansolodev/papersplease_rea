@@ -26,6 +26,7 @@ changed later: say so and this file is edited with the date.
 | The build goes in milestones, each one a browser build the user can open and try, to judge the look and feel as the project moves | 2026-10-17 | "Milestones", below |
 | On a player's first visit the audio is streamed (it plays while it downloads) and saved to the browser's storage in the background, so the player does not wait for it before playing | 2026-10-17 | "Loading and caching", below |
 | The game itself is kept in the browser's storage, so a later visit to the same address starts without downloading it again | 2026-10-17 | "Loading and caching", below |
+| **The quads are drawn by software in `pp_core`, not by the graphics card.** The core draws each frame's quads into its own 570 x 320 picture (`port/core/src/raster.rs`); the host only shows that picture, as in milestone 0. Why: the pixels are exact and testable with `cargo test` against the Python reference on any machine, and no custom shader is needed. The cost is processor time per frame, to be measured when screens get busy (milestone 4); the quad list stays the interface, so the drawing can move to the graphics card later without touching the game. This replaces the first draft's "the host draws the quads on the graphics card" | 2026-10-18 (milestone 1 plan, recommended by me, accepted by the user) | "One frame", below; `milestone-1.md` |
 
 ## Needed before the first Rust code (all three decided 2026-10-17)
 
@@ -179,8 +180,8 @@ files and the asset preparation:
 
 | Part | Folder | What it is | Knows about |
 |---|---|---|---|
-| The game core | `port/core` (crate `pp_core`) | All of the game: the random generators, the data file readers, travelers, the booth's rules, the desk, speech, the border scene, the night, news, screens, buttons, text and page layout, pictures and their operations, the game-side audio layer (`app.aud`), saves as fact lists, screen changes. Each frame it takes the input and returns three lists: the quads to draw, the pictures that changed, the sound commands | Nothing outside itself: no Bevy, no browser |
-| The host | `port/web` (crate `pp_web`) | The Bevy app: the canvas and its fit to the window, the mouse and keys turned into the core's input, drawing the quad list, the sound player (32 sources, like `UnityPlatformAudio`), saves and settings in browser storage, loading the packs | Bevy, the browser (through Rust's `web-sys` bindings) |
+| The game core | `port/core` (crate `pp_core`) | All of the game: the random generators, the data file readers, travelers, the booth's rules, the desk, speech, the border scene, the night, news, screens, buttons, text and page layout, pictures and their operations, the game-side audio layer (`app.aud`), saves as fact lists, screen changes. Each frame it takes the input and returns the finished 570 x 320 picture (it draws its own quads by software, decided 2026-10-18) and the sound commands | Nothing outside itself: no Bevy, no browser |
+| The host | `port/web` (crate `pp_web`) | The Bevy app: the canvas and its fit to the window, the mouse and keys turned into the core's input, showing the core's picture, the sound player (32 sources, like `UnityPlatformAudio`), saves and settings in browser storage, loading the packs | Bevy, the browser (through Rust's `web-sys` bindings) |
 | The page | `port/www` | `index.html`, the loader script (the start screen: load progress, "click to start", the player's options) and the service worker (below). Our own, small, plain JavaScript | The browser |
 | Asset preparation | `scripts/build_assets/` (Python) | Turns this machine's game files into the packs the page loads: pictures, fonts, data files with the English pack applied (decision 3 above), effects and songs in the browser's formats, and a list of every file with its content fingerprint. Builds on the extraction scripts that already work (`scripts/extract`, `scripts/unity`, `locpack.py`) | The game files |
 
@@ -204,13 +205,15 @@ picture is written into the Rust code.
    screen refresh, which can be 60, 144 or another rate). The speaker's
    real-time clock gets the real elapsed time, uncapped
    (`audio-layer.md`).
-3. The core returns the quad list in drawing order (layers lowest first,
-   then the order visuals were added), the pictures whose change counter
-   moved, and the sound commands (start, stop, volume, pause).
-4. The host sends changed pictures to the graphics card, draws the quads
-   into one 570 x 320 picture cleared to black with nearest-pixel reads
-   and ordinary alpha blending (`screen-output.md`, "For the port"), then
-   shows that picture at a whole-number zoom on black.
+3. The core builds the quad list in drawing order (layers lowest first,
+   then the order visuals were added) and draws it into one 570 x 320
+   picture cleared to black, with nearest-pixel reads and ordinary alpha
+   blending (`screen-output.md`, "For the port"; `port/core/src/raster.rs`,
+   decided 2026-10-18; the first draft had the host do this on the
+   graphics card). It also returns the sound commands (start, stop,
+   volume, pause).
+4. The host copies the picture to the graphics card and shows it at a
+   whole-number zoom on black.
 5. The host carries out the sound commands and reports each sound's
    position back for the next frame (the music's beat comes from the
    song's position; `audio-layer.md`).
@@ -330,7 +333,7 @@ day").
 | # | Name | What you can try | What it builds | Rests on |
 |---|---|---|---|---|
 | 0 | An empty page | The page opens on a black 570 x 320 picture at a whole-number zoom, with a test pattern and a frame counter; resizing the window keeps the zoom whole. Reload with the network switched off in the browser's developer tools: it still opens | The workspace, the build script, the local server, the service worker, the canvas fit, the fixed step | `screen-output.md` |
-| 1 | Pictures and text | A still of the title screen (logo and buttons, not clickable yet) and a test page of the game's font; the same pixels as the Python reference's preview of the same screen | The asset preparation, the start pack, the quad list drawn exactly, `app.vis` text and pictures | `text-drawing.md`, `vis-basics.md`, `screens.md` part 2, `fonts.md` |
+| 1 (split into 1a and 1b, 2026-10-18) | Pictures and text | **1a:** font test pages (every font id and every font sheet, 35 pages, arrow keys change page), identical to the Python reference. **1b:** a still of the title screen (logo and buttons, not clickable yet), the same pixels as the Python reference's preview of the same screen; the quit and version buttons are left out (quit is already decided against; the version text is unread) | The asset preparation, the start pack, the quad list drawn exactly, `app.vis` text and pictures | `text-drawing.md`, `vis-basics.md`, `screens.md` part 2, `fonts.md` |
 | 2 | Sound | The start screen with its options and "click to start"; `Theme` plays at once on a first visit, while the developer tools show it still downloading; afterwards it is in Cache Storage, and an offline reload plays it. A test page plays any effect | The sound player, the effects, the song stream and background save, the volume rule | `audio.md`, `audio-layer.md` |
 | 3 | The title screen alive | The game's own cursor; buttons with their pressed look and sounds; the title rising with the music; the settings and pause screens with working volumes; the intro pages; fades between screens | Input, buttons, `Menu`, screen changes, the settings file | `input-handling.md`, `buttons.md`, `screens.md` parts 1 to 5, `save-format.md` part 2 |
 | 4 | The booth, no travelers | Day 1's screen: the booth, the desk and console, the border scene's still picture; dragging a passport and the rulebook, docking, the stamp bar, the clock; their sounds and the ambient loops | The desk, desk movement, the stamp bar, the booth's ambient | `booth-layout.md`, `desk-pictures.md`, `desk-movement.md`, `page-layout.md` |
