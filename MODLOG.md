@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-18 Record that the user tried 1b
+
+**Changed:** `docs/PROGRESS.md` (header, stage 5, steps 9 to 11), `docs/milestone-1.md` (1b's "Not tested", the fix's last lines).
+**Why:** the user tried milestone 1b and the browser-keys fix.
+**Tested how:** doc change only; not tested.
+**Result:** 1b and the fix marked tried (which browser was not recorded). Steps 9 and 10 still said "awaiting the user's trial", although both were tried earlier (the header and the 1a commit say so): now "tried by the user". Stage 5 said "Milestones 1 to 10 not started": now 2 to 10.
+**Docs corrected:** the three above. Searched `docs/PROGRESS.md` for "awaiting".
+**Still broken / not tested:** Firefox; nothing compared with the running game.
+
 ## 2026-10-18 Milestone 1b: the title screen as a still (step 11)
 
 **Changed:** new: `scripts/reference/titlescreen.py`, `port/core/src/title.rs`, `port/core/tests/title.rs`. Edited: `scripts/build_assets/build_pack.py` (three pictures under `pictures/`, three more texts), `port/core/src/pages.rs` (the gallery loads `pictures/` and keeps the strings; `Builder` shared, with `part`), `port/core/src/pack.rs` (`names`), `port/core/src/lib.rs`, `port/web/src/main.rs` and `port/www/index.html` (`?page=title`, now the default), `scripts/checks/web_offline_check.mjs` (step 1a, the title), `scripts/checks/README.md` (also removes a broken leftover line, a cut copy of the `fontpage.rs` row with a form-feed character, committed with 1a), `docs/milestone-1.md`, `docs/screens.md`, `docs/PROGRESS.md`.

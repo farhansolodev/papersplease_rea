@@ -144,7 +144,8 @@ wheel and context-menu events while it is set. Now `false`
 (`port/web/src/main.rs`). Check 1c in `web_offline_check.mjs` sends F5,
 F12, Ctrl+R and a context-menu event to the canvas and reads
 `defaultPrevented`: all four `true` with the old setting (check failed),
-all four `false` with the new one. Not tried by hand in a visible window.
+all four `false` with the new one. The user tried the page after the fix
+(2026-10-18).
 For later: when the game takes keys (Space, arrows, Tab), the browser's
 own action for them (scrolling, moving focus) may need stopping for those
 keys only, in the page's script, not for all keys.
@@ -275,7 +276,8 @@ more than after 1a; release build 1 min 43 s after the change.
 
 - Anything against the running game: the positions are from code reading
   only, and the 5-pixel gap above rests on the decompiler's output.
-- Firefox, and Edge or Chrome by hand in a visible window.
+- Firefox. (The user tried 1b and the fix above on 2026-10-18; which
+  browser was not recorded.)
 - Whether the game's own PNG reader gives the same pixels for the three
   palette pictures (`Title.png`, `PushButton.png`, `SettingsButton.png`):
   the reference (Pillow) and the port (the `png` crate) agree, as for the

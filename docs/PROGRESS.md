@@ -39,8 +39,8 @@ shortcuts and right click (`milestone-1.md`, "Fix after 1a"). The title's
 pixels are identical to a new Python reference (`titlescreen.py`), in
 `cargo test` and in headless Edge; nothing compared with the game. A
 finding: two menu buttons sit 5 pixels apart, not 10 (`screens.md`,
-"The menu helper"; decompiler output only). Next: the user tries 1b, then
-the plan for milestone 2. Details in step 11 below.
+"The menu helper"; decompiler output only). The user tried 1b and the
+fix the same day. Next: the plan for milestone 2. Details in step 11 below.
 
 Before it the same day,
 step 7, the sorting of the open questions: 151 items into five kinds
@@ -377,7 +377,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out; the browser formats (the songs are too big as WAV, a decision for `DESIGN.md`) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files"). Step 6b, the game-side audio layer (`audio-layer.md`) |
-| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; awaiting the user's trial. The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 1 to 10 not started |
+| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 2 to 10 not started |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
@@ -652,7 +652,7 @@ the night screen's family pictures; part 11, the last screens.)
    its state machine (`decompiled/booth_ctor_asm.txt`; first item under
    "Could bite during the build"). `Auto.txt` can serve as a test plan: it
    lists what to do to reach each ending.
-9. **Milestone 0, an empty page: built, awaiting the user's trial**
+9. **Milestone 0, an empty page: built and tried by the user**
    (2026-10-17, `milestone-0.md`). The workspace (`port/`), the test card,
    the fixed step, the service worker, `scripts/build_web.py`,
    `scripts/serve.py` and a browser check. Checked in headless Edge
@@ -663,8 +663,8 @@ the night screen's family pictures; part 11, the last screens.)
    **milestone 1, pictures and text**. The WebAssembly is 26 MB (5.4 MB
    gzip), larger than hoped: no smaller-build work was done yet.
 
-10. **Milestone 1a, the font test pages: built, awaiting the user's
-   trial** (2026-10-18, `milestone-1.md`). New: the start pack builder
+10. **Milestone 1a, the font test pages: built and tried by the
+   user** (2026-10-18, `milestone-1.md`). New: the start pack builder
    (`scripts/build_assets/`), the Python reference
    (`scripts/reference/fontpage.py`), in `pp_core` the pack reader, PNG
    decoding, fonts, text layout and the software drawing, the 35 pages,
@@ -679,8 +679,8 @@ the night screen's family pictures; part 11, the last screens.)
    `milestone-1.md`), then the plan for **1b, the title screen as a
    still** (done since, step 11).
 
-11. **Milestone 1b, the title screen as a still: built, awaiting the
-   user's trial** (2026-10-18, `milestone-1.md`, "1b"). Before it, the
+11. **Milestone 1b, the title screen as a still: built and tried by
+   the user** (2026-10-18, `milestone-1.md`, "1b"). Before it, the
    fix for the page swallowing F5, F12, Ctrl+R and right click (Bevy's
    `prevent_default_event_handling`, now off; a check for it in the
    browser check). New: `scripts/reference/titlescreen.py`, the title's
@@ -690,8 +690,8 @@ the night screen's family pictures; part 11, the last screens.)
    byte for byte in `cargo test` and in headless Edge, a look in the
    app's browser pane. **Not tested**: against the running game (a
    screenshot of the real title would test the 5-pixel menu gap),
-   Firefox, by hand in a visible window. Next: the user tries it, then
-   the plan for **milestone 2** (`DESIGN.md`, "Milestones").
+   Firefox. The user tried it, with the fix, on 2026-10-18 (which
+   browser was not recorded). Next: the plan for **milestone 2** (`DESIGN.md`, "Milestones").
 
 Small jobs that fit anywhere:
 
