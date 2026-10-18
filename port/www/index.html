@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Papers, Please (browser port)</title>
+<link rel="icon" href="data:,">
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #stage { position: fixed; inset: 0; }
+  #game { width: 100%; height: 100%; display: block; outline: none; }
+  #status { position: fixed; left: 12px; bottom: 12px; color: #888;
+            font: 14px monospace; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="game"></canvas></div>
+<div id="status">Loading...</div>
+<script type="module">
+// The loader. It is plain JavaScript on purpose: it has to run before any
+// of the game's own code exists.
+const status = document.getElementById('status');
+const params = new URLSearchParams(location.search);
+
+// Development switch: open the page as ?nosw to remove the service worker
+// and everything it stored. Loading again without it starts them afresh.
+async function removeWorker() {
+  for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+  for (const k of await caches.keys()) await caches.delete(k);
+}
+
+async function main() {
+  if ('serviceWorker' in navigator) {
+    if (params.has('nosw')) {
+      const wasControlled = !!navigator.serviceWorker.controller;
+      await removeWorker();
+      if (wasControlled) { location.reload(); return; }   // reload uncontrolled
+      status.textContent = 'Loading (service worker removed)...';
+    } else {
+      navigator.serviceWorker.register('sw.js').then((reg) => {
+        reg.addEventListener('updatefound', () => {
+          const next = reg.installing;
+          next && next.addEventListener('statechange', () => {
+            if (next.state === 'installed' && navigator.serviceWorker.controller) {
+              console.info('A new version is stored; it starts on the next visit.');
+            }
+          });
+        });
+      }).catch((e) => console.warn('Service worker not registered:', e));
+    }
+  } else {
+    console.warn('No service worker here (needs https or localhost): nothing is kept for offline use.');
+  }
+
+  const files = await (await fetch('files.json', { cache: 'no-cache' })).json();
+  const app = await import('./' + files.app_js);
+  try {
+    await app.default({ module_or_path: './' + files.app_wasm });
+  } catch (e) {
+    // The window library ends its start-up with an exception on purpose
+    // ("Using exceptions for control flow"); anything else is a real error.
+    if (!String(e && (e.message || e)).includes('control flow')) throw e;
+  }
+  status.textContent = '';
+  window.ppBuild = files.build;
+}
+
+main().catch((e) => {
+  status.textContent = 'Failed to start: ' + e;
+  console.error(e);
+});
+</script>
+</body>
+</html>

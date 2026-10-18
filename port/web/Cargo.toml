@@ -1,0 +1,32 @@
+[package]
+name = "pp_web"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+# The host: the Bevy app that owns the window (in a browser, the canvas),
+# reads the input and draws what the core returns (docs/DESIGN.md, "The
+# parts"). Bevy's features are cut to the window, rendering, sprites, PNG
+# and WebGL2; nothing else is compiled in.
+[dependencies]
+pp_core = { path = "../core" }
+
+[dependencies.bevy]
+version = "=0.20.0"
+default-features = false
+features = [
+    "std",
+    "async_executor",
+    "bevy_log",
+    "bevy_asset",
+    "bevy_window",
+    "bevy_winit",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_image",
+    "bevy_sprite",
+    "bevy_sprite_render",
+    "png",
+    "webgl2",
+    "web",
+]

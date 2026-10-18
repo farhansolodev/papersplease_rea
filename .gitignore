@@ -6,6 +6,10 @@
 
 # Rust
 /target/
+# Rust libraries downloaded by cargo (kept inside the project, CLAUDE.md rule 3)
+/.cargo-home/
+# Browser build output: holds converted game assets (rule 1)
+/build/
 # Local Claude Code settings
 /.claude/settings.local.json
 

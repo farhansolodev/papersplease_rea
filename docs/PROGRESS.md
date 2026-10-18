@@ -1,7 +1,8 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-10-17, after
-step 8, the architecture and milestones in `DESIGN.md`. The user asked
+step 9, milestone 0 (`milestone-0.md`); before it step 8, the architecture
+and milestones in `DESIGN.md`. The user asked
 the same day for three things, now in `DESIGN.md` as decided: the build
 goes in milestones, each a browser build to try; the audio is streamed on
 a first visit and kept in the browser; the game is kept in the browser so
@@ -14,9 +15,13 @@ milestone 0 (`DESIGN.md`, "Answered before milestone 0"): served from the
 user's own local web server, Chrome, Edge and Firefox, a start screen with
 player options, Bevy left to me, and the go-ahead for Bevy's download.
 **Bevy 0.20.0 is downloaded** (503 packages, into the project's
-gitignored `.cargo-home/`); nothing is built or tested yet. Next:
-**milestone 0, an empty page**, once the user accepts its plan and the
-`wasm-bindgen-cli` download.
+gitignored `.cargo-home/`).
+
+**Update, later the same day (step 9): milestone 0, an empty page, is
+built** (`milestone-0.md`; the user gave the go-ahead for the plan and
+the `wasm-bindgen-cli` download). It was checked in a headless browser,
+not in a real window; next is the user's trial, then the plan for
+milestone 1. Details in step 9 below.
 
 Before it the same day,
 step 7, the sorting of the open questions: 151 items into five kinds
@@ -353,7 +358,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out; the browser formats (the songs are too big as WAV, a decision for `DESIGN.md`) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files"). Step 6b, the game-side audio layer (`audio-layer.md`) |
-| 5. Building the browser game in Rust | 40% | Not started. The architecture and milestones are in `DESIGN.md` (step 8, 2026-10-17); Bevy 0.20.0 downloaded into `.cargo-home/`. Rust 1.99 and `wasm32-unknown-unknown` are installed; `trunk`, `wasm-pack`, `wasm-bindgen` are not (the suggestion needs `wasm-bindgen-cli`, not `trunk`); Bevy not tried |
+| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts; awaiting the user's trial. The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 1 to 10 not started |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
@@ -365,6 +370,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `art-dat-format.md` | The encrypted archive |
 | `data-files.md` | Index of every data file, its loader and its write-up |
 | `port-requirements.md` | Exactness rules the Rust port must follow |
+| `milestone-0.md` | Milestone 0, an empty page: how to try it, what was built, what was measured (WebAssembly 26 MB, `target/` 2.3 GB), what was checked, what is not tested, dead ends |
 | `DESIGN.md` | The port's decisions: decided by the user, suggested defaults, the three needed before the first Rust code, the five answered before milestone 0 (hosting, browsers, start screen, Bevy as a thin host, downloads); the architecture (core, host, page, asset preparation; one frame; exactness checks; loading and caching) and the 11 milestones (step 8) |
 | **Base** | |
 | `rand.md` | The random generator, checked against the machine code |
@@ -618,18 +624,24 @@ the night screen's family pictures; part 11, the last screens.)
    milestones are written in `DESIGN.md`, with the user's three requests
    of the same day (milestones to try, streamed and kept audio, a game
    kept in the browser) and the user's answers to the five questions
-   before milestone 0. Bevy 0.20.0 is downloaded into `.cargo-home/`. No
-   code yet; no browser behaviour tested; the caching design (service
-   worker, one download per song split between the player and the cache,
-   partial requests answered from storage) is unproven until milestones 0
-   and 2. Next: **milestone 0, an empty page**, after the user accepts its
-   plan and the `wasm-bindgen-cli` download. Each milestone is planned
+   before milestone 0. Bevy 0.20.0 is downloaded into `.cargo-home/`.
+   Each milestone is planned
    and accepted on its own. Still open in `DESIGN.md`: the songs' and
    effects' format (before milestone 2) and fullscreen (milestone 3).
    The first thing to read when the booth is built is
    its state machine (`decompiled/booth_ctor_asm.txt`; first item under
    "Could bite during the build"). `Auto.txt` can serve as a test plan: it
    lists what to do to reach each ending.
+9. **Milestone 0, an empty page: built, awaiting the user's trial**
+   (2026-10-17, `milestone-0.md`). The workspace (`port/`), the test card,
+   the fixed step, the service worker, `scripts/build_web.py`,
+   `scripts/serve.py` and a browser check. Checked in headless Edge
+   (picture size and place, exact pixel values, four window sizes, offline
+   start); **not tested**: the frame rate and a smooth step in a real
+   window, Firefox, a service worker update, a second device. Next:
+   the user tries it (two commands in `milestone-0.md`), then the plan for
+   **milestone 1, pictures and text**. The WebAssembly is 26 MB (5.4 MB
+   gzip), larger than hoped: no smaller-build work was done yet.
 
 Small jobs that fit anywhere:
 

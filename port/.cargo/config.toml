@@ -1,0 +1,4 @@
+# One build folder for the whole project, at the project root, where
+# .gitignore already ignores it (relative to the folder holding .cargo).
+[build]
+target-dir = "../target"

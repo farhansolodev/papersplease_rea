@@ -144,18 +144,23 @@ architecture; the user answered all five the same day.
      not the usual `C:\Users\farha\.cargo`, so nothing is written outside
      the project (`CLAUDE.md` rule 3); every `cargo` command of the port
      sets `CARGO_HOME` to that folder. Features chosen: no defaults; the
-     window, input, rendering, sprites, meshes, PNG and WebGL2 only. The
-     build folder (several GB, estimated) will be the gitignored
-     `/target/`.
-   - **Still needs a go-ahead:** `wasm-bindgen-cli` 0.2.129 from
+     window, rendering, sprites, PNG and WebGL2 only (the final list is in
+     `port/web/Cargo.toml`; meshes and input are not compiled in yet).
+     The build folder is the gitignored `/target/`: 2.3 GB after
+     milestone 0 (measured; the "several GB" first written here was an
+     estimate).
+   - **Installed 2026-10-17 with the user's go-ahead (milestone 0):**
+     `wasm-bindgen-cli` 0.2.129 from
      crates.io (the version must equal the `wasm-bindgen` library that
      came with Bevy, 0.2.129). It turns the compiled WebAssembly (the
      browser's own machine-code format) into a file plus the JavaScript
      glue a page needs. Built from source by `cargo install` into
-     `.cargo-home/bin`: a download of a few MB, a build of a few minutes.
+     `.cargo-home/bin`: a few minutes to build; three programs of 4 to 9 MB,
+     of which the port uses `wasm-bindgen.exe`.
    - Optional, later: `wasm-opt` from the Binaryen project on GitHub
      (about 10 to 20 MB, estimated), which makes the WebAssembly file
-     smaller. Only if the measured size calls for it.
+     smaller. The measured size is 26 MB (`milestone-0.md`), so this is
+     now a real question for the user; nothing is downloaded.
    - Not needed: `trunk` (a build helper): a short build script of our
      own does the same and shows what it does. Python's own web server
      cannot answer partial requests ("Range" requests, below), so the
@@ -238,7 +243,9 @@ pictures, fonts and data are 3.2 MB as the game stores them (`Art.dat`);
 the three songs are 6.5 MB as the game stores them (Vorbis, 1.7 to
 2.8 MB each); the 108 effects are 21 MB as WAV, smaller once compressed
 (their compressed size depends on the format decision). The WebAssembly's
-size is not known yet (measured in milestone 0).
+size was measured in milestone 0: 26.3 MB as built (5.4 MB compressed
+with gzip), after the 37 MB of debugging names were removed from a 63.5
+MB first build (`milestone-0.md`).
 
 What the page loads:
 

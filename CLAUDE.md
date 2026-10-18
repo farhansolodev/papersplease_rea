@@ -91,8 +91,19 @@ Port my own copy of Papers, Please to run in the browser:
   Windows' own `D3DCompiler_47.dll`. See `docs/screen-output.md`, "The
   Unity files".
 - Rust 1.99 and the `wasm32-unknown-unknown` target are installed (checked
-  2026-10-12). `trunk`, `wasm-pack` and `wasm-bindgen` are not installed, and
-  Bevy has not been set up or tried.
+  2026-10-12). `trunk` and `wasm-pack` are not installed and not needed.
+  Bevy 0.20.0 and the libraries the browser build needs (`wasm-bindgen`
+  0.2.129) were downloaded on 2026-10-17 into the project's gitignored
+  `.cargo-home/`, not the usual `C:\Users\farha\.cargo`: run every
+  `cargo` command with `CARGO_HOME` set to `<project>\.cargo-home`.
+  `wasm-bindgen-cli` 0.2.129 is installed in `.cargo-home\bin`
+  (2026-10-17). The port is in `port/` (`pp_core`, `pp_web`, the page);
+  build it with `python -I scripts/build_web.py`, serve it with
+  `python -I scripts/serve.py 8080`; milestone 0 is in
+  `docs/milestone-0.md`. Node 24 and the installed Edge or Chrome run
+  `scripts/checks/web_offline_check.mjs`.
+- `ffmpeg` 7.1.1 (with Vorbis and Opus encoders) is on the `PATH` through
+  scoop; found 2026-10-17, not installed by this project.
 - Write docs and multi-line scripts with the file tools, not shell
   here-documents: quotes in the text have broken those repeatedly.
 - Setup references, only if a problem comes up:

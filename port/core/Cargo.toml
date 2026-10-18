@@ -1,0 +1,9 @@
+[package]
+name = "pp_core"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+# The game core knows nothing of Bevy or the browser (docs/DESIGN.md, "The
+# parts"), so it has no dependencies.
+[dependencies]
