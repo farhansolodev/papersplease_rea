@@ -2,9 +2,10 @@
 //! 570 x 320 picture at the largest whole-number zoom, on black.
 //!
 //! What it shows depends on the address (docs/milestone-1.md):
-//! `?page=fonts` (default; arrow keys change the page, `&p=N` starts on page
-//! N, counting from 0) is the font test pages; `?page=testcard` is
-//! milestone 0's test card.
+//! `?page=title` (default) is the title screen as a still (milestone 1b);
+//! `?page=fonts` is the font test pages (arrow keys change the page, `&p=N`
+//! starts on page N, counting from 0); `?page=testcard` is milestone 0's
+//! test card.
 
 use bevy::asset::RenderAssetUsages;
 use bevy::image::ImageSampler;
@@ -19,6 +20,7 @@ use pp_core::raster::Screen;
 use pp_core::screen::{self, HEIGHT, WIDTH};
 use pp_core::stepper::Stepper;
 use pp_core::testcard;
+use pp_core::title;
 
 /// Settings the loader script passes in (`window.ppConfig`).
 struct Config {
@@ -38,7 +40,7 @@ fn read_config() -> Config {
         .ok()
         .map(|a| a.to_vec());
     Config {
-        page: get(&cfg, "page").as_string().unwrap_or_else(|| "fonts".into()),
+        page: get(&cfg, "page").as_string().unwrap_or_else(|| "title".into()),
         index: get(&cfg, "p").as_f64().map_or(0, |n| n.max(0.0) as usize),
         pack,
     }
@@ -52,6 +54,8 @@ fn read_config() -> Config {
 enum Mode {
     /// Milestone 0's test card.
     TestCard,
+    /// The title screen, drawn once.
+    Title { gallery: Gallery, screen: Screen, dirty: bool },
     /// The font test pages.
     Pages { gallery: Gallery, count: usize, index: usize, screen: Screen, dirty: bool },
     /// Something could not be loaded; the screen stays black.
@@ -102,6 +106,10 @@ fn start_mode(config: Config) -> Mode {
     };
     let gallery = Pack::parse(bytes).and_then(|pack| Gallery::from_pack(&pack));
     match gallery {
+        Ok(gallery) if config.page == "title" => {
+            info!("start pack loaded: {} fonts, {} pictures", gallery.fonts.len(), gallery.pictures.len());
+            Mode::Title { gallery, screen: Screen::new(), dirty: true }
+        }
         Ok(gallery) => {
             let count = gallery.pages().len();
             info!("start pack loaded: {} fonts, {} pictures, {} pages", gallery.fonts.len(), gallery.pictures.len(), count);
@@ -159,6 +167,15 @@ fn step_and_draw(
     let Some(data) = image.data.as_mut() else { return };
     match &mut host.mode {
         Mode::TestCard => testcard::render(steps, frames, data),
+        Mode::Title { gallery, screen, dirty } => {
+            if *dirty {
+                *dirty = false;
+                match title::draw(gallery, screen) {
+                    Ok(()) => data.copy_from_slice(&screen.pixels),
+                    Err(e) => error!("title screen: {e}"),
+                }
+            }
+        }
         Mode::Pages { gallery, count, index, screen, dirty } => {
             let count = *count;
             if keys.just_pressed(KeyCode::ArrowRight) {

@@ -1,4 +1,4 @@
-// Milestone 0 and 1a check: drives a real browser (headless Edge or Chrome,
+// Milestone 0, 1a and 1b check: drives a real browser (headless Edge or Chrome,
 // with a throwaway profile in build/) against the local server and reports:
 //   1. the picture's size and place on the canvas, from the canvas pixels;
 //   2. exact pixel values of the test card (grey 128, ramp step, red);
@@ -7,6 +7,9 @@
 //      with the Python reference's page, for several pages, and the arrow
 //      keys changing the page (needs extracted/previews/m1, made by
 //      scripts/reference/fontpage.py; skipped without it);
+//   4a. the title screen (milestone 1b): the whole canvas compared byte for
+//      byte with the Python reference's (needs extracted/previews/m1b, made
+//      by scripts/reference/titlescreen.py; skipped without it);
 //   4b. that F5, F12, Ctrl+R and the right-click menu are not blocked
 //      (defaultPrevented stays false on events sent to the canvas);
 //   5. whether the page still starts with the network switched off, showing
@@ -26,6 +29,7 @@ const PORT = process.argv[2] || '8080';
 const URL = `http://localhost:${PORT}/`;
 const DEBUG_PORT = 9333;
 const REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1');
+const TITLE_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1b', 'title.rgba');
 const PROFILE = path.join(ROOT, 'build', '_browser_profile');
 const BROWSERS = [
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -122,19 +126,24 @@ const READ = `(async () => {
 
 // Waits until the canvas (at 570 x 320) equals the reference's page n.
 async function expectPage(n, what) {
-  const want = readFileSync(path.join(REFERENCE, `page_${String(n).padStart(3, '0')}.rgba`));
+  await expectPicture(path.join(REFERENCE, `page_${String(n).padStart(3, '0')}.rgba`), `page ${n}`, what);
+}
+
+// Waits until the canvas (at 570 x 320) equals a reference picture.
+async function expectPicture(file, name, what) {
+  const want = readFileSync(file);
   let last = 'nothing read';
   for (let i = 0; i < 60; i++) {
     const r = await evaluate(READ, 40000);
     if (r.W === 570 && r.H === 320) {
       const got = Buffer.from(r.data, 'base64');
       const differ = got.reduce((k, b, j) => k + (b !== want[j] ? 1 : 0), 0);
-      if (differ === 0) { console.log(`   page ${n}: identical to the reference (${what})`); return; }
+      if (differ === 0) { console.log(`   ${name}: identical to the reference (${what})`); return; }
       last = `${differ} bytes differ`;
     } else last = `canvas is ${r.W} x ${r.H}, not 570 x 320`;
     await sleep(500);
   }
-  throw new Error(`page ${n} (${what}): ${last}`);
+  throw new Error(`${name} (${what}): ${last}`);
 }
 
 async function key(code, keyCode) {
@@ -204,6 +213,16 @@ try {
   await sleep(1000);
   await waitFor(`(async()=>{const r=await navigator.serviceWorker.getRegistration(); return !!(r&&r.active)})()`, 'the service worker');
   console.log('   worker :', JSON.stringify(await evaluate(WORKER)));
+
+  if (existsSync(TITLE_REFERENCE)) {
+    console.log('1a. the title screen against the Python reference');
+    await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
+    await send('Page.navigate', { url: URL });
+    await waitFor('!!window.ppBuild', 'the title screen to start');
+    await expectPicture(TITLE_REFERENCE, 'title', 'the default page');
+  } else {
+    console.log('1a. SKIPPED: no reference title in extracted/previews/m1b');
+  }
 
   const haveReference = existsSync(path.join(REFERENCE, 'pages.json'));
   if (haveReference) {

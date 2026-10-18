@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-18 Milestone 1b: the title screen as a still (step 11)
+
+**Changed:** new: `scripts/reference/titlescreen.py`, `port/core/src/title.rs`, `port/core/tests/title.rs`. Edited: `scripts/build_assets/build_pack.py` (three pictures under `pictures/`, three more texts), `port/core/src/pages.rs` (the gallery loads `pictures/` and keeps the strings; `Builder` shared, with `part`), `port/core/src/pack.rs` (`names`), `port/core/src/lib.rs`, `port/web/src/main.rs` and `port/www/index.html` (`?page=title`, now the default), `scripts/checks/web_offline_check.mjs` (step 1a, the title), `scripts/checks/README.md` (also removes a broken leftover line, a cut copy of the `fontpage.rs` row with a form-feed character, committed with 1a), `docs/milestone-1.md`, `docs/screens.md`, `docs/PROGRESS.md`.
+**Why:** milestone 1b, with the user's go-ahead for the plan.
+**Tested how:** read the `TitleScreen` constructor, `update` and `draw`, `Menu.addButton`, `addImageButton`, `addPushButton`, `applyCenterY` and `GameScreen.makePushButton`; `python -I scripts/reference/titlescreen.py extracted/art/assets extracted/previews/m1b` and a look at `title_x3.png`; `cargo test -p pp_core` (with `--nocapture` for the title test); `python -I scripts/build_web.py`; `node scripts/checks/web_offline_check.mjs 8080` in headless Edge; a look in the app's browser pane.
+**Result:** all pass. The core's title equals the reference byte for byte in `cargo test` and read back from the canvas; 36 quads. Finding: `Menu.applyCenterY` divides the spare room by the number of buttons, so STORY and ENDLESS are 5 pixels apart, not 10 (decompiler output only). Pack 2,030,052 bytes; WebAssembly 26,401,987 bytes (5.47 MB gzip).
+**Docs corrected:** `screens.md` ("The menu helper" said the buttons are spread evenly with `menuItemPaddingY` between them, now the exact rule and the 5-pixel gap; part 4's correction section now points to it; part 4's pause menu said its buttons run from y 231 to 308 with gaps of 10, now tops 231, 256, 281 with gaps of 6, ending at 300); `milestone-1.md` (1b "not started"; the font pages "are the default", now `?page=fonts`); `PROGRESS.md` (header, stage 5, docs table, step 10's "next"). Searched `docs/` for "1b", "title still", "applyCenterY", "menuItemPaddingY", "fontpage.py".
+**Still broken / not tested:** nothing compared with the running game (a screenshot of the real title would test the gap); Firefox; by hand in a visible window; the version button left out (its text is not read). Not committed.
+
 ## 2026-10-18 Fix: the page no longer blocks browser shortcuts and right click
 
 **Changed:** `port/web/src/main.rs` (`prevent_default_event_handling: false`, was `true`), `scripts/checks/web_offline_check.mjs` (new check 1c), `scripts/checks/README.md`, `docs/milestone-1.md` ("Fix after 1a").

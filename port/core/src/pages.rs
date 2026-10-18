@@ -4,7 +4,8 @@
 //! 570 x 320 at a time.
 //!
 //! The pictures a page needs live in a [`Gallery`], loaded from the start
-//! pack.
+//! pack. The gallery also holds the title screen's pictures and texts
+//! (milestone 1b, `title.rs`).
 
 use std::collections::HashMap;
 
@@ -15,11 +16,15 @@ use crate::raster::{Quad, Screen};
 use crate::screen::{HEIGHT, WIDTH};
 use crate::text::{Align, Text};
 
-/// Fonts and pictures, loaded once. Picture 0 is the 1 x 1 white one.
+/// Fonts, pictures and texts, loaded once. Picture 0 is the 1 x 1 white one.
 pub struct Gallery {
     /// Fonts by id, in the order of `Fonts.xml`.
     pub fonts: Vec<(String, Font)>,
     pub pictures: Vec<Picture>,
+    /// The pack's `strings.json`: texts of `Text.xml` by id.
+    pub strings: HashMap<String, String>,
+    /// Picture index by name: a font sheet by its file name, any other
+    /// picture as `pictures/<file name>`.
     names: HashMap<String, usize>,
     sheet_files: Vec<String>,
 }
@@ -80,6 +85,7 @@ impl Gallery {
         let mut gallery = Gallery {
             fonts: Vec::new(),
             pictures: vec![Picture::white()],
+            strings,
             names: HashMap::new(),
             sheet_files: Vec::new(),
         };
@@ -95,11 +101,22 @@ impl Gallery {
             }
             gallery.fonts.push((entry.id, font));
         }
+        for name in pack.names().into_iter().filter(|n| n.starts_with("pictures/")) {
+            let picture = Picture::from_png(get(name)?).map_err(|e| format!("{name}: {e}"))?;
+            gallery.names.insert(name.to_string(), gallery.pictures.len());
+            gallery.pictures.push(picture);
+        }
         Ok(gallery)
     }
 
     pub fn font(&self, id: &str) -> Option<&Font> {
         self.fonts.iter().find(|(i, _)| i == id).map(|(_, f)| f)
+    }
+
+    /// The index of a picture of the pack's `pictures/` folder, by its file
+    /// name (`Title.png`).
+    pub fn picture(&self, file: &str) -> Option<usize> {
+        self.names.get(&format!("pictures/{file}")).copied()
     }
 
     fn sheet(&self, index: usize) -> (&str, &Picture) {
@@ -238,19 +255,20 @@ fn sheet_parts(width: u32, height: u32) -> Vec<(i32, i32)> {
         .collect()
 }
 
-struct Builder<'a> {
-    gallery: &'a Gallery,
-    quads: Vec<Quad>,
+/// Collects the quads of one picture, in drawing order.
+pub(crate) struct Builder<'a> {
+    pub(crate) gallery: &'a Gallery,
+    pub(crate) quads: Vec<Quad>,
 }
 
 impl Builder<'_> {
-    fn fill(&mut self, x: f64, y: f64, w: f64, h: f64, color: u32) {
+    pub(crate) fn fill(&mut self, x: f64, y: f64, w: f64, h: f64, color: u32) {
         self.quads.push(Quad { image: 0, x0: x, y0: y, x1: x + w, y1: y + h, src: [0, 0, 1, 1], color });
     }
 
     /// Draws a text at (x, y) and returns its height. `set` changes the
     /// settings of a new text whose colour starts white.
-    fn text(&mut self, font: &Font, string: &str, x: f64, y: f64, set: impl FnOnce(&mut Text)) -> i32 {
+    pub(crate) fn text(&mut self, font: &Font, string: &str, x: f64, y: f64, set: impl FnOnce(&mut Text)) -> i32 {
         let mut t = Text::new(string);
         t.color = 0xFFFFFFFF;
         set(&mut t);
@@ -266,6 +284,13 @@ impl Builder<'_> {
             self.quads.push(Quad { image, x0, y0, x1: x0 + w, y1: y0 + h, src: tile.src, color: tile.color });
         }
         built.height
+    }
+
+    /// A sprite of the piece `src` (x, y, width, height) of picture `image`,
+    /// drawn at (x, y) at its own size.
+    pub(crate) fn part(&mut self, image: usize, x: f64, y: f64, src: [i32; 4]) {
+        let (x1, y1) = (x + src[2] as f64, y + src[3] as f64);
+        self.quads.push(Quad { image, x0: x, y0: y, x1, y1, src, color: 0xFFFFFFFF });
     }
 }
 

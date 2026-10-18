@@ -1,8 +1,8 @@
 # Milestone 1: pictures and text
 
 Split in two on 2026-10-18 (the user accepted the plan): **1a, the font test
-pages** (built, below) and **1b, the title screen as a still** (not
-started). The plan is the milestone's row in `DESIGN.md` ("Milestones").
+pages** (built, below) and **1b, the title screen as a still** (built
+2026-10-18, at the end of this doc). The plan is the milestone's row in `DESIGN.md` ("Milestones").
 
 ## 1a: the font test pages
 
@@ -24,8 +24,8 @@ python -I scripts/build_web.py
 python -I scripts/serve.py 8080
 ```
 
-Then open `http://localhost:8080` (the font pages are the default). You
-should see:
+Then open `http://localhost:8080/?page=fonts` (the font pages were the
+default page until 1b; now the title screen is). You should see:
 
 - **35 pages.** The first 16 are one per font id, in `Fonts.xml` order
   (`tiny`, `small_harsh`, ..., `title_news`). The other 19 show each of
@@ -172,4 +172,111 @@ keys only, in the page's script, not for all keys.
 
 ## 1b: the title screen as a still
 
-Not started. Waits for the user to try 1a.
+Built 2026-10-18. The page shows the title screen as it rests once the
+title has risen: logo, STORY, ENDLESS, the settings button and the credit
+line, nothing clickable yet. **Its pixels are identical to the new Python
+reference's**, which is built from the code reading. Like 1a, that proves
+the port equals the reference, not the game: nothing here was compared
+with the running game.
+
+### How to try it
+
+```
+python -I scripts/build_web.py
+python -I scripts/serve.py 8080
+```
+
+Then open `http://localhost:8080` (the title is now the default page;
+`?page=fonts` and `?page=testcard` still work). You should see, on black:
+
+- the "PAPERS, PLEASE" logo with the eagle, centred, near the top;
+- **STORY** and **ENDLESS** in grey-green, each over a dotted line,
+  centred, one under the other low on the screen;
+- a round wrench button in the bottom left corner;
+- "created by Lucas Pope" in small letters, centred at the bottom.
+
+Clicking does nothing yet, and there is no music or rising animation
+(milestone 2 and later). The reference picture, enlarged three times, is
+`extracted/previews/m1b/title_x3.png` (made by the reference script,
+below; gitignored).
+
+### What was built
+
+| Part | Where | Notes |
+|---|---|---|
+| Reference | `scripts/reference/titlescreen.py` | Builds the screen's 36 quads from the code reading and draws them with `fontpage.py`'s rules; writes `extracted/previews/m1b/title.rgba`, `title.png` and `title_x3.png` (gitignored); about 2 seconds |
+| Pack | `scripts/build_assets/build_pack.py` | Adds `pictures/Title.png`, `pictures/PushButton.png`, `pictures/SettingsButton.png` and the texts `menu_story`, `menu_endless`, `created_by` to `strings.json`; the pack is now 2,030,052 bytes (29 files) |
+| Core | `port/core/src/title.rs`, `pages.rs`, `pack.rs` | The title's quads (`title::build`) and drawing (`title::draw`); the gallery now also loads the pack's `pictures/` and keeps `strings.json`; the pack can list its files |
+| Host and page | `port/web/src/main.rs`, `port/www/index.html` | `?page=title`, the default, drawn once |
+| Checks | `port/core/tests/title.rs`, `scripts/checks/web_offline_check.mjs` (step 1a) | The core's title against the reference, byte for byte, in `cargo test` and in headless Edge |
+
+### Where everything sits (desktop, from the code)
+
+All read from the `TitleScreen` constructor (`0x180673be0`), its `update`
+(`0x180676bc0`), `Menu.addPushButton`, `Menu.addImageButton`,
+`Menu.applyCenterY` and `GameScreen.makePushButton` in
+`decompiled/all/play_screen.clean.c`; the button rules are in
+`buttons.md`, the layout values in `booth-layout.md`.
+
+| Thing | Picture | Place (x, y) | Text |
+|---|---|---|---|
+| Screen fill | white pixel, black | whole screen (size inferred; it changes no pixel) | |
+| Logo | `Title.png`, 315 x 197 | (127, 28): floor(285 - 157.5), `titleLogoTop` | |
+| STORY | `PushButton.png` rows 0-18 | (220, 236) | `ui_large`, 0xff556855, centred: floor(64.5 - width / 2), floor(9.5 - 20 / 2) = -1 |
+| ENDLESS | the same | (220, 260) | the same |
+| Settings | `SettingsButton.png` rows 0-28 | (10, 281): 10, 320 - 10 - 29 | |
+| Credit | a 140 x 12 black picture | (215, 298): floor(285 - 70), 320 - 12 - 10 | `regular`, 0xff556855, centred in 140 x 12 |
+
+At rest the container that holds all of this is at y 0 (`update` puts it
+there when the music is not playing, and after the rise), and the logo at
+`titleLogoTop` (with music it bobs 5 pixels lower once a bar; not shown).
+
+**The gap between STORY and ENDLESS is 5 pixels, not 10.**
+`Menu.applyCenterY` makes the column (n - 1) x `menuItemPaddingY` plus the
+buttons' heights high (here 10 + 38 = 48), but then shares the spare room
+out by the number of buttons, n, not n - 1: floor((48 - 38) / 2) = 5. The
+first button's top is (int)(260 - 48 / 2) = 236, the second 236 + 19 + 5 =
+260. Read from the decompiler's output only (not checked in the
+instructions); a screenshot of the real title screen would settle it (the
+two dotted lines would be 24 pixels apart, top to top).
+
+The ui_large font's line is 20 pixels high, one more than the button's
+19-row picture, so the button text's box starts one pixel above the
+button.
+
+### Decisions
+
+- No quit button (decided by the user on 2026-10-14) and no version
+  button (its text, `Platform.decoratedVersion`, is not read; the plan
+  for 1b left it out).
+- The drawing order is the order the game adds the visuals: the screen's
+  fill, the logo (`TitleScreen.draw`, after the screen's own visuals),
+  then the buttons, each picture before its text. Whether the game draws
+  the logo before or after the container's buttons was not read; nothing
+  on this screen overlaps, so the pixels are the same either way.
+
+### What was measured
+
+2026-10-18: WebAssembly 26,401,987 bytes (5.47 MB gzip), 12,936 bytes
+more than after 1a; release build 1 min 43 s after the change.
+
+### What was checked
+
+- `cargo test -p pp_core`: 46 unit tests (two new ones for the menu
+  column), the 35 font pages and the title, all pass; the title test
+  printed "the title is identical to the reference" (it did not skip).
+- `node scripts/checks/web_offline_check.mjs 8080` in headless Edge: the
+  title read back from the canvas is identical to the reference; the
+  font pages, the browser-keys check and the offline start still pass.
+- A look in the app's browser pane at `http://localhost:8080`: the title
+  screen as described above.
+
+### Not tested
+
+- Anything against the running game: the positions are from code reading
+  only, and the 5-pixel gap above rests on the decompiler's output.
+- Firefox, and Edge or Chrome by hand in a visible window.
+- Whether the game's own PNG reader gives the same pixels for the three
+  palette pictures (`Title.png`, `PushButton.png`, `SettingsButton.png`):
+  the reference (Pillow) and the port (the `png` crate) agree, as for the
+  font sheets in 1a.

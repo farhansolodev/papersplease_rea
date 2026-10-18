@@ -53,9 +53,10 @@ async function main() {
   }
 
   const files = await (await fetch('files.json', { cache: 'no-cache' })).json();
-  // What the game is told: which page to show (?page=fonts, ?page=testcard;
-  // &p=N starts the font pages on page N) and the start pack's bytes.
-  const page = params.get('page') || 'fonts';
+  // What the game is told: which page to show (?page=title, the default;
+  // ?page=fonts, where &p=N starts on page N; ?page=testcard) and the start
+  // pack's bytes.
+  const page = params.get('page') || 'title';
   let pack = null;
   if (page !== 'testcard') {
     const res = await fetch(files.pack);

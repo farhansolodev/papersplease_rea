@@ -762,6 +762,14 @@ A `Menu` belongs to one entity (the host) and keeps its buttons by id.
   `centerY`. Its height is the buttons' heights plus `menuItemPaddingY`
   between them, but at most the screen height minus the notch height
   minus 40; the buttons are then spread evenly over that height.
+  Exactly (read again on 2026-10-18 for milestone 1b, `milestone-1.md`):
+  the spare room (height minus the buttons' heights) is divided by the
+  **number of buttons**, not the number of gaps, and rounded down, and
+  that is the gap after each button; the first top is centerY minus half
+  the height, cut toward zero. So the column is not quite centred, and on
+  the desktop title the gap between STORY and ENDLESS is **5**, not
+  `menuItemPaddingY`'s 10 (tops 236 and 260). From the decompiler's
+  output, not checked in the instructions or in the game.
 - `setAllButtonsActive(on)` switches every button of the menu on or off;
   `getCenterButtonsBounds` gives the rectangle around the column.
 
@@ -1195,10 +1203,14 @@ like every screen. In order:
 
 The standard button is 19 high (part 3; confirmed from the code on
 2026-10-16: a button is as high as its picture, here half of the 38-row
-`PushButton.png`, `buttons.md`). With the gap of 10 (the layout
-table below), the three buttons take 77 pixels, so on desktop they run
-from about y 231 to 308. This sum was done by hand; `applyCenterY`'s own
-rounding was not re-read.
+`PushButton.png`, `buttons.md`). The column counts 77 pixels (three
+buttons and two gaps of 10, the layout table below), but `applyCenterY`
+then shares the spare 20 out per button: a gap of floor(20 / 3) = 6. So
+on desktop the tops are y 231, 256 and 281, and the column ends at 300.
+**Corrected 2026-10-18** (milestone 1b, when `applyCenterY` was re-read,
+part 2 "The menu helper"): this said the buttons run from about y 231 to
+308, a sum by hand with gaps of 10. From the decompiler's output; not
+seen in the game.
 
 **The confirm boxes.** `mainmenu` and `quit` each open the confirm box of
 part 3 with an empty message and two options: the action itself (id
@@ -1594,7 +1606,9 @@ corrected. The identification of the desktop block does not depend on it:
 also the only one that writes `titleShowVersion`.
 
 Nothing else was built on the 0: no position in parts 2 or 3 was computed
-from it. The desktop values read for this part, from the same listing:
+from it. (The gap between two menu buttons is not `menuItemPaddingY`
+itself: `applyCenterY` shares the spare room out per button, so two
+buttons on desktop are 5 apart; part 2, "The menu helper", 2026-10-18.) The desktop values read for this part, from the same listing:
 
 | Value | Desktop | Where it comes from |
 |---|---|---|

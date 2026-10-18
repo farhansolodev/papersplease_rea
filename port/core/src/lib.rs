@@ -3,7 +3,7 @@
 //! Milestone 0: the screen size and its whole-number fit to a window, the
 //! fixed time step, and a test card. Milestone 1a: the start pack, pictures,
 //! fonts, text layout, the software drawing of quads, and the font test
-//! pages.
+//! pages. Milestone 1b: the title screen as a still.
 
 pub mod font;
 pub mod pack;
@@ -14,4 +14,5 @@ pub mod screen;
 pub mod stepper;
 pub mod testcard;
 pub mod text;
+pub mod title;
 mod xmlscan;

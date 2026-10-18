@@ -55,6 +55,13 @@ impl Pack {
         self.index.get(name).map(|&(a, b)| &self.bytes[a..b])
     }
 
+    /// Every file's name, sorted.
+    pub fn names(&self) -> Vec<&str> {
+        let mut names: Vec<&str> = self.index.keys().map(String::as_str).collect();
+        names.sort();
+        names
+    }
+
     pub fn len(&self) -> usize {
         self.index.len()
     }
