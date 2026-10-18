@@ -7,6 +7,8 @@
 //      with the Python reference's page, for several pages, and the arrow
 //      keys changing the page (needs extracted/previews/m1, made by
 //      scripts/reference/fontpage.py; skipped without it);
+//   4b. that F5, F12, Ctrl+R and the right-click menu are not blocked
+//      (defaultPrevented stays false on events sent to the canvas);
 //   5. whether the page still starts with the network switched off, showing
 //      the same font page.
 //
@@ -229,6 +231,27 @@ try {
   } else {
     console.log('1b. SKIPPED: no reference pages in extracted/previews/m1');
   }
+
+  // The game must not swallow the browser's own keys (F5, F12, Ctrl+R) or
+  // the right-click menu. A cancelable event is sent to the canvas; if the
+  // game called preventDefault, defaultPrevented is true afterwards.
+  console.log('1c. browser keys and right click are left alone');
+  const swallowed = await evaluate(`(() => {
+    const c = document.querySelector('#game');
+    const out = {};
+    const keys = [['F5', {}], ['F12', {}], ['r', { ctrlKey: true }]];
+    for (const [k, extra] of keys) {
+      const e = new KeyboardEvent('keydown', { key: k, code: k === 'r' ? 'KeyR' : k, bubbles: true, cancelable: true, ...extra });
+      c.dispatchEvent(e);
+      out[(extra.ctrlKey ? 'Ctrl+' : '') + k] = e.defaultPrevented;
+    }
+    const m = new MouseEvent('contextmenu', { button: 2, bubbles: true, cancelable: true });
+    c.dispatchEvent(m);
+    out.contextmenu = m.defaultPrevented;
+    return out;
+  })()`);
+  console.log('   defaultPrevented:', JSON.stringify(swallowed));
+  if (Object.values(swallowed).some(Boolean)) throw new Error('the game blocks a browser key or the right-click menu');
 
   console.log('2. reload (now controlled by the worker)');
   await send('Page.reload');

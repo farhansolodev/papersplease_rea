@@ -79,7 +79,9 @@ fn main() {
                 title: "Papers, Please (browser port)".into(),
                 canvas: Some("#game".into()),
                 fit_canvas_to_parent: true,
-                prevent_default_event_handling: true,
+                // false: true makes the page swallow F5, F12, Ctrl+R and the
+                // right-click menu while the game has focus.
+                prevent_default_event_handling: false,
                 ..default()
             }),
             ..default()

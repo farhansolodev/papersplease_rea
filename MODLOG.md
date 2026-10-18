@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-18 Fix: the page no longer blocks browser shortcuts and right click
+
+**Changed:** `port/web/src/main.rs` (`prevent_default_event_handling: false`, was `true`), `scripts/checks/web_offline_check.mjs` (new check 1c), `scripts/checks/README.md`, `docs/milestone-1.md` ("Fix after 1a").
+**Why:** the user could not use hotkeys (F5, F12, Ctrl+R) or the right-click menu on the page.
+**Tested how:** read Bevy 0.20.0 and winit sources for the setting; `python -I scripts/build_web.py`; `node scripts/checks/web_offline_check.mjs 8080` in headless Edge, with the old setting (rebuilt on purpose) and the new one.
+**Result:** old setting: F5, F12, Ctrl+R, context menu all `defaultPrevented: true`, check fails. New setting: all `false`, whole check passes (font pages still identical to the reference, offline start works). New build `b48cc96f2100`.
+**Docs corrected:** none found to be wrong; searched `docs/` for prevent_default, preventDefault, right click, context menu, hotkey.
+**Still broken / not tested:** not tried by hand in a visible window or in Firefox; with the setting off, keys the game will use later may trigger the browser's own action (noted in `milestone-1.md`). Not committed.
+
 ## 2026-10-18 Milestone 1a: the font test pages (step 10)
 
 **Changed:** new: `scripts/build_assets/build_pack.py`, `scripts/reference/fontpage.py`, `port/core/src/{pack,picture,xmlscan,font,text,raster,pages}.rs`, `port/core/tests/fontpage.rs`, `docs/milestone-1.md`. Edited: `port/core/Cargo.toml` (the `png` crate), `port/core/src/lib.rs`, `port/web/Cargo.toml` (`js-sys`, `wasm-bindgen`), `port/web/src/main.rs` (font pages, arrow keys, the settings from `window.ppConfig`), `port/www/index.html` (fetches the pack, sets `ppConfig`), `scripts/build_web.py` (builds the pack, `files.json` has `pack`), `scripts/checks/web_offline_check.mjs` (font pages byte for byte, arrow keys, offline font page), `scripts/checks/README.md`, `docs/DESIGN.md` (software drawing decided, "One frame", the parts, milestone 1 split), `docs/PROGRESS.md`, `docs/fonts.md`, `docs/text-drawing.md`, `docs/screen-output.md`. No new download (the `png` crate was already in `.cargo-home/`).

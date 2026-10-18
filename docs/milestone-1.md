@@ -133,6 +133,22 @@ All on this machine, 2026-10-18.
   `just_pressed`). The game's own input rules (`input-handling.md`) are a
   later milestone; this only affected the test.
 
+### Fix after 1a: browser keys and right click (2026-10-18)
+
+The user could not use browser shortcuts (F5, F12, Ctrl+R) or right-click
+on the page. Cause, from Bevy 0.20.0's source: the window setting
+`prevent_default_event_handling` was `true` (Bevy's default, which
+milestone 0 had copied), and Bevy documents it as blocking exactly those
+hotkeys; winit's web code calls `preventDefault` on the canvas's key,
+wheel and context-menu events while it is set. Now `false`
+(`port/web/src/main.rs`). Check 1c in `web_offline_check.mjs` sends F5,
+F12, Ctrl+R and a context-menu event to the canvas and reads
+`defaultPrevented`: all four `true` with the old setting (check failed),
+all four `false` with the new one. Not tried by hand in a visible window.
+For later: when the game takes keys (Space, arrows, Tab), the browser's
+own action for them (scrolling, moving focus) may need stopping for those
+keys only, in the page's script, not for all keys.
+
 ### Not tested
 
 - Anything against the running game (the references are built from the
