@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-10-29 Jev evidence report for one doc
+
+**Changed:** new: `scripts/checks/jev_evidence_report.py`. Edited: `.gitignore` (`/reports/`), `scripts/checks/README.md` (one row). Generated, not committed: `reports/jev-evidence-comparing-with-the-game.html`, `reports/jev-cache.json`.
+**Why:** the user wanted to see how many sentences of the docs cite evidence and how many do not. Jev (TypeSafe's classifier API, outside service) labels each sentence; the script draws the result.
+**Tested how:** an offline parse of `docs/comparing-with-the-game.md` first (51 blocks, 162 sentences, no command lines leaked in); then one real run on that doc with the user's go-ahead. The doc quotes game identifiers (error and stock-line names) but no game text or art. By the user's choice the labels were not checked by hand.
+**Result:** 162 sentences judged in 49 calls; 55,665 input tokens, 8,668 output (output is free). Labels: 65 backed, 17 not backed, 9 marked as unsure, 13 not a claim, 58 where Jev's confidence was under 60%. About a third unsure is a lot; whether Jev's labels are right is not known.
+**Docs corrected:** none; nothing in `docs/` mentions this script. The "which stuck entries are solved" chart is not built (`docs/PROGRESS.md` says "Currently stuck: Nothing").
+**Still broken / not tested:** accuracy of the labels; the other docs; the unsure/open-notes chart. `docs/PROGRESS.md` not changed (a side tool, not a port step). Not committed.
+
 ## 2026-10-18 Record that the user tried 1b
 
 **Changed:** `docs/PROGRESS.md` (header, stage 5, steps 9 to 11), `docs/milestone-1.md` (1b's "Not tested", the fix's last lines).

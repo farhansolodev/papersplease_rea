@@ -13,6 +13,9 @@
 # Local Claude Code settings
 /.claude/settings.local.json
 
+# Generated reports: they hold the text of the docs sent to Jev
+/reports/
+
 # Python virtual environment (UnityPy for the Unity asset files)
 /.venv/
 
