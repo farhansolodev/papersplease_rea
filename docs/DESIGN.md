@@ -11,8 +11,9 @@ The decisions list started from the sorting of the open questions
 
 On 2026-10-17 the user accepted every suggested default below ("the suggested
 actions are fine"). So each is **decided**, except two that were never a plain
-suggestion and are marked **open** (the songs' format, which still needs a tool
-download with its own go-ahead, and fullscreen in a browser). A decision can be
+suggestion and were marked **open**: the songs' format (settled on
+2026-10-29 in milestone 2 by the suggested way, which needs no download;
+its row below) and fullscreen in a browser (still open). A decision can be
 changed later: say so and this file is edited with the date.
 
 ## Decided by the user
@@ -56,7 +57,7 @@ These change how the first code is written, so they come first.
 
 | Decision | Decided 2026-10-17 (suggested default accepted), unless marked open | Where from |
 |---|---|---|
-| How the browser build gets the songs (62 MB as WAV) and the effects (21 MB as WAV) | **Open; settle before milestone 2.** Since step 8 the songs are streamed and kept in the browser ("Loading and caching"); the stored Vorbis data is 6.5 MB for the three songs. Chrome, Edge and Firefox (the chosen browsers) all play Ogg Vorbis by their documentation (not tested). Ways: (1) re-encode the WAV files to Ogg Vorbis at a high quality with the `ffmpeg` already on this machine (no download; a small, probably inaudible loss); (2) rebuild the stored Vorbis data into `.ogg` files without re-encoding (exact, but needs a tool download, `CLAUDE.md` rule 6). For the effects a third way: ship the game's own ADPCM data (about 5.5 MB) and decode it in the port, exact and with no tool, since a second decoder is already written and checked (`audio.md`). *Suggested:* (1) for the songs, the ADPCM way for the effects | `audio.md` |
+| How the browser build gets the songs (62 MB as WAV) and the effects (21 MB as WAV) | **Settled 2026-10-29 (milestone 2, `milestone-2.md`) by the suggested way below, chosen by me after the user said "just start on the work"; reversible:** the songs re-encoded to Ogg Vorbis by ffmpeg at quality 6 (6.7 MB for the three; lengths exactly the game's), the effects shipped as the game's ADPCM data (5.8 MB) and decoded by the port (all 108 identical to FMOD's decode, `cargo test`). What was written before it: *Open; settle before milestone 2.* Since step 8 the songs are streamed and kept in the browser ("Loading and caching"); the stored Vorbis data is 6.5 MB for the three songs. Chrome, Edge and Firefox (the chosen browsers) all play Ogg Vorbis by their documentation (not tested). Ways: (1) re-encode the WAV files to Ogg Vorbis at a high quality with the `ffmpeg` already on this machine (no download; a small, probably inaudible loss); (2) rebuild the stored Vorbis data into `.ogg` files without re-encoding (exact, but needs a tool download, `CLAUDE.md` rule 6). For the effects a third way: ship the game's own ADPCM data (about 5.5 MB) and decode it in the port, exact and with no tool, since a second decoder is already written and checked (`audio.md`). *Suggested:* (1) for the songs, the ADPCM way for the effects | `audio.md` |
 | The ambient loop that plays at full level at a day's start, until first faded in (by the code; not heard) | Keep it, since it is what the code does. Hear it in the game first if you want to be sure | `audio-layer.md` |
 | How the canvas fits the browser window, and its size in a window | Whole-number zoom with black bars, as the original's Pixel Perfect Camera is documented to do; a window of 570 x 320 doubled while the double stays under two thirds of the screen | `screen-output.md` |
 | How the port picks its master seed | A random one at start, settable (for example from the page address) so a test can fix it | `run-and-seeds.md` |
@@ -100,7 +101,9 @@ architecture; the user answered all five the same day.
    title's rise follows the song's beat (`audio-layer.md`), so the game
    starts on that click. It is a page of our own, shown while the start
    pack loads, not one of the game's screens. *Suggested contents*
-   (settle in milestone 2):
+   (settled in milestone 2, 2026-10-29: all four built as suggested,
+   `milestone-2.md`; the settings are kept in local storage under
+   `pp.settings` with the game's own names):
    - the load progress, then a "click to start" button;
    - music and effects volume (the same two settings as the game's own
      settings screen, stored in the same place, so both always agree);
@@ -130,8 +133,9 @@ architecture; the user answered all five the same day.
    - **Upgrades.** Bevy changes its interface with every release (0.20 is
      current). Keeping Bevy to the host keeps those changes to one part.
    - **Sound.** Bevy's sound player loads a whole file before playing,
-     so it cannot stream a song; the port's own sound player (in the
-     host, through the browser's Web Audio) is needed anyway.
+     so it cannot stream a song; the port's own sound player (through
+     the browser's Web Audio; in the page's JavaScript since milestone 2)
+     is needed anyway.
    What this gives up: Bevy's own object system goes unused, and the
    download carries more of Bevy than the port needs (size measured in
    milestone 0). Not chosen either: no Bevy at all (drawing with WebGL
@@ -181,9 +185,9 @@ files and the asset preparation:
 | Part | Folder | What it is | Knows about |
 |---|---|---|---|
 | The game core | `port/core` (crate `pp_core`) | All of the game: the random generators, the data file readers, travelers, the booth's rules, the desk, speech, the border scene, the night, news, screens, buttons, text and page layout, pictures and their operations, the game-side audio layer (`app.aud`), saves as fact lists, screen changes. Each frame it takes the input and returns the finished 570 x 320 picture (it draws its own quads by software, decided 2026-10-18) and the sound commands | Nothing outside itself: no Bevy, no browser |
-| The host | `port/web` (crate `pp_web`) | The Bevy app: the canvas and its fit to the window, the mouse and keys turned into the core's input, showing the core's picture, the sound player (32 sources, like `UnityPlatformAudio`), saves and settings in browser storage, loading the packs | Bevy, the browser (through Rust's `web-sys` bindings) |
-| The page | `port/www` | `index.html`, the loader script (the start screen: load progress, "click to start", the player's options) and the service worker (below). Our own, small, plain JavaScript | The browser |
-| Asset preparation | `scripts/build_assets/` (Python) | Turns this machine's game files into the packs the page loads: pictures, fonts, data files with the English pack applied (decision 3 above), effects and songs in the browser's formats, and a list of every file with its content fingerprint. Builds on the extraction scripts that already work (`scripts/extract`, `scripts/unity`, `locpack.py`) | The game files |
+| The host | `port/web` (crate `pp_web`) | The Bevy app: the canvas and its fit to the window, the mouse and keys turned into the core's input, showing the core's picture, passing the sound commands to the page's sound player, saves and settings in browser storage, loading the packs | Bevy, the browser (through Rust's `js-sys` bindings) |
+| The page | `port/www` | `index.html`, the loader script (the start screen: load progress, "click to start", the player's options), the sound player `audio.js` (32 sources, like `UnityPlatformAudio`; moved here from the host in milestone 2, 2026-10-29, `milestone-2.md`, "Decisions") and the service worker (below). Our own, small, plain JavaScript | The browser |
+| Asset preparation | `scripts/build_assets/` (Python) | Turns this machine's game files into the packs the page loads: pictures, fonts, data files with the English pack applied (decision 3 above), effects and songs in the browser's formats (`build_audio.py`, milestone 2), and a list of every file with its content fingerprint. Builds on the extraction scripts that already work (`scripts/extract`, `scripts/unity`, `locpack.py`) | The game files |
 
 The output of the build (the WebAssembly, the page, the packs) goes into
 `build/`, which holds game assets and is **added to `.gitignore`** before
@@ -300,18 +304,26 @@ What is kept, and for how long:
   `http://localhost`. Testing from another device at this machine's
   network address (`http://192.168...`) would run without it.
 
-Risks, to be checked in milestone 2 (not tested):
+Risks, to be checked in milestone 2 (as checked on 2026-10-29,
+`milestone-2.md`):
 
 - Whether each browser's sound player accepts the whole-file answer on a
-  first visit (item 3 above). Checked with the developer tools' network
-  panel: one request per song, and the song in Cache Storage afterwards.
+  first visit (item 3 above). **Edge (headless): yes**: the server sent
+  the song whole once and it was then in Cache Storage. Chrome refuses a
+  song whose parts come partly from the worker and partly straight from
+  the network, so the worker makes every answer itself. Chrome by hand
+  and Firefox: not tested.
 - A song loop needs the song's start again. On a first visit the loop
   comes after the whole song has played, so after the download has ended
   (`Theme` is 2 MB and 104 s long), and the service worker answers it
   from storage.
 - A song loop in the browser's sound player may have a short gap at the
   loop point. If it is audible: once a song is in storage, decode it in
-  full and loop it without a gap.
+  full and loop it without a gap. (Not listened to yet.)
+- Found in milestone 2: the browser may stop the service worker at any
+  time, and 2 of the browser check's 13 runs on early builds lost the
+  song's copy for reasons not found (`milestone-2.md`, "Dead ends"); the
+  fallback is the next visit streaming the song again.
 - The music's beat follows the song's reported position. On a slow first
   visit the song can pause to wait for data; the title's rise then waits
   with it, which is the same rule the original follows.

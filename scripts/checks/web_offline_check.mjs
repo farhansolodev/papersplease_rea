@@ -1,6 +1,9 @@
-// Milestone 0, 1a and 1b check: drives a real browser (headless Edge or Chrome,
-// with a throwaway profile in build/) against the local server and reports:
-//   1. the picture's size and place on the canvas, from the canvas pixels;
+// Milestone 0, 1a, 1b and 2 check: drives a real browser (headless Edge or
+// Chrome, with a throwaway profile in build/) against the local server and
+// reports (every page opens on the start screen; the check clicks its button
+// with a real mouse click, as a player would):
+//   1. the picture's size and place on the canvas, from the canvas pixels,
+//      at a whole-number zoom and with the start screen's "fill the window";
 //   2. exact pixel values of the test card (grey 128, ramp step, red);
 //   3. whether the service worker installed, and what it stored;
 //   4. the font pages (milestone 1a): the whole canvas compared byte for byte
@@ -12,8 +15,13 @@
 //      by scripts/reference/titlescreen.py; skipped without it);
 //   4b. that F5, F12, Ctrl+R and the right-click menu are not blocked
 //      (defaultPrevented stays false on events sent to the canvas);
+//   4c. sound (milestone 2): on the title, Theme plays, is downloaded once by
+//      the service worker and is then in Cache Storage; the sound test page
+//      gets all 108 effects, three of them compared sample for sample with
+//      extracted/audio (skipped without it); a looping effect plays and
+//      stops; a volume key gives the setting squared as the gain;
 //   5. whether the page still starts with the network switched off, showing
-//      the same font page.
+//      the same font page, and the title's Theme plays from the cache.
 //
 //   node scripts/checks/web_offline_check.mjs [port]     (server running)
 //
@@ -30,6 +38,7 @@ const URL = `http://localhost:${PORT}/`;
 const DEBUG_PORT = 9333;
 const REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1');
 const TITLE_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1b', 'title.rgba');
+const AUDIO = path.join(ROOT, 'extracted', 'audio');
 const PROFILE = path.join(ROOT, 'build', '_browser_profile');
 const BROWSERS = [
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -146,9 +155,9 @@ async function expectPicture(file, name, what) {
   throw new Error(`${name} (${what}): ${last}`);
 }
 
-async function key(code, keyCode) {
+async function key(code, keyCode, name = code) {
   for (const type of ['rawKeyDown', 'keyUp']) {
-    await send('Input.dispatchKeyEvent', { type, key: code, code, windowsVirtualKeyCode: keyCode, nativeVirtualKeyCode: keyCode });
+    await send('Input.dispatchKeyEvent', { type, key: name, code, windowsVirtualKeyCode: keyCode, nativeVirtualKeyCode: keyCode });
   }
 }
 
@@ -160,6 +169,42 @@ const WORKER = `(async () => {
   }
   return out;
 })()`;
+
+// Waits for the start screen's button, clicks it with the mouse (a real
+// click, which is what lets the page play sound), then waits for the game.
+async function start(what) {
+  // The start screen is hidden once a page has started, so this waits for
+  // the new page rather than the one being left.
+  await waitFor(`(() => { const b = document.getElementById('go');
+    return !!b && !b.disabled && !document.getElementById('start').hidden; })()`, 'the start button: ' + what);
+  const r = await evaluate(`(() => { const b = document.getElementById('go').getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2]; })()`);
+  for (const type of ['mousePressed', 'mouseReleased']) {
+    await send('Input.dispatchMouseEvent', { type, x: r[0], y: r[1], button: 'left', clickCount: 1 });
+  }
+  await waitFor('!!window.ppBuild', what);
+}
+
+// The title's song: its position in seconds, or null while it is not playing.
+const THEME_AT = `(() => { const p = window.ppAudio; if (!p) return null;
+  for (const [id, s] of p.playing) if (s.filename === 'Theme.ogg') return p.position(id); return null; })()`;
+
+// Waits until Theme has played for more than a second.
+async function expectTheme(what) {
+  await waitFor(`(${THEME_AT}) > 1`, 'Theme to play: ' + what, 30000);
+  console.log(`   Theme plays (${what}), at ${(await evaluate(THEME_AT)).toFixed(2)} s`);
+}
+
+// A WAV file's samples as the browser holds them (sample / 32768), per channel.
+function wavChannels(file) {
+  const b = readFileSync(file);
+  const channels = b.readUInt16LE(22);
+  const frames = (b.length - 44) / 2 / channels;
+  const out = Array.from({ length: channels }, () => new Float32Array(frames));
+  for (let i = 0; i < frames; i++) {
+    for (let c = 0; c < channels; c++) out[c][i] = b.readInt16LE(44 + 2 * (i * channels + c)) / 32768;
+  }
+  return out;
+}
 
 async function waitFor(expression, what, ms = 60000) {
   const t0 = Date.now();
@@ -197,7 +242,7 @@ try {
 
   console.log('1. first visit, the milestone 0 test card', URL);
   await send('Page.navigate', { url: URL + '?page=testcard' });
-  await waitFor('!!window.ppBuild', 'the game to start');
+  await start('the game to start');
   console.log('   picture:', JSON.stringify(await evaluate(PIXELS, 40000)));
   // Window sizes and the zoom the core's fit rule gives for each.
   for (const [w, h, zoom] of [[1800, 1000, 3], [1000, 700, 1], [1200, 1500, 2], [1710, 960, 3]]) {
@@ -214,22 +259,116 @@ try {
   await waitFor(`(async()=>{const r=await navigator.serviceWorker.getRegistration(); return !!(r&&r.active)})()`, 'the service worker');
   console.log('   worker :', JSON.stringify(await evaluate(WORKER)));
 
+  // The start screen's "fill the window": the picture keeps its shape and
+  // fills the window's width here (1400 x 900: 1400 x 786 at y 57).
+  await evaluate(`localStorage.setItem('pp.settings', JSON.stringify({ stretch: true })), 1`);
+  await send('Page.navigate', { url: URL + '?page=testcard' });
+  await start('the test card, stretched');
+  await sleep(1000);
+  {
+    const r = await evaluate(PIXELS, 40000);
+    const ok = Math.abs(r.width - 1400) <= 1 && Math.abs(r.height - 786) <= 1 && Math.abs(r.top - 57) <= 1 && r.left <= 1;
+    console.log(`   stretched 1400x900: ${r.width} x ${r.height} at (${r.left},${r.top}) expected 1400 x 786 at (0,57) ->`, ok ? 'ok' : 'WRONG');
+    if (!ok) throw new Error('stretch check failed');
+  }
+  await evaluate(`localStorage.removeItem('pp.settings'), 1`);
+
+  // What the server has sent so far (scripts/serve.py), to count the song's
+  // downloads during the title's first visit.
+  const served = async () => (await fetch(URL + '_served.json')).json();
+  const servedBefore = await served();
+
   if (existsSync(TITLE_REFERENCE)) {
     console.log('1a. the title screen against the Python reference');
     await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
     await send('Page.navigate', { url: URL });
-    await waitFor('!!window.ppBuild', 'the title screen to start');
+    await start('the title screen to start');
     await expectPicture(TITLE_REFERENCE, 'title', 'the default page');
   } else {
     console.log('1a. SKIPPED: no reference title in extracted/previews/m1b');
+    await send('Page.navigate', { url: URL });
+    await start('the title screen to start');
   }
+
+  console.log('1d. sound: Theme on the title, kept by the service worker');
+  await expectTheme('first visit, streamed');
+  const songPath = await evaluate(`fetch('files.json').then((r) => r.json()).then((f) => '/' + f.songs['Theme.ogg'])`);
+  const askWorker = `new Promise((r) => {
+    const answer = (e) => { if (e.data && e.data.songDownloads) { navigator.serviceWorker.removeEventListener('message', answer); r(e.data); } };
+    navigator.serviceWorker.addEventListener('message', answer);
+    navigator.serviceWorker.controller.postMessage('song-downloads');
+  })`;
+  const sent = async () => {
+    const now = (await served())[songPath] || {}, then = servedBefore[songPath] || {};
+    return { whole: (now['200'] || 0) - (then['200'] || 0), parts: (now['206'] || 0) - (then['206'] || 0) };
+  };
+  try {
+    await waitFor(`caches.keys().then(async (ks) => { for (const k of ks) if (await (await caches.open(k)).match('${songPath}')) return true; return false; })`,
+      'Theme in Cache Storage', 30000);
+  } catch (e) {
+    console.log('   the worker says:', JSON.stringify(await evaluate(askWorker)));
+    console.log('   the server sent:', JSON.stringify(await sent()));
+    throw e;
+  }
+  const counts = await sent();
+  console.log(`   ${songPath} is in Cache Storage; the server sent it whole ${counts.whole} time(s), in parts ${counts.parts} time(s);`,
+    'the worker says:', JSON.stringify(await evaluate(askWorker)));
+  if (counts.whole !== 1) throw new Error('Theme was not downloaded whole exactly once');
+  const groups = await evaluate('window.ppAudio.groupVolume');
+  console.log('   category volumes (settings 1.0):', JSON.stringify(groups));
+  if (groups[0] !== 1 || groups[1] !== 1) throw new Error('category volumes are not 1');
+
+  console.log('1e. the sound test page');
+  await send('Emulation.setDeviceMetricsOverride', { width: 1400, height: 900, deviceScaleFactor: 1, mobile: false });
+  await send('Page.navigate', { url: URL + '?page=sounds' });
+  await start('the sound test page to start');
+  await waitFor('window.ppAudio.clips.size === 108', 'the 108 effects', 30000);
+  console.log('   108 effects handed to the sound player');
+  if (existsSync(path.join(AUDIO, 'audio_index.json'))) {
+    // The shortest effect of each kind: stereo 44.1 kHz, mono 44.1 kHz, mono 22.05 kHz.
+    const rows = JSON.parse(readFileSync(path.join(AUDIO, 'audio_index.json'), 'utf-8')).filter((r) => r.fsb_codec === 'IMAADPCM');
+    for (const [ch, rate] of [[2, 44100], [1, 44100], [1, 22050]]) {
+      const r = rows.filter((x) => x.channels === ch && x.rate === rate).sort((a, b) => a.samples - b.samples)[0];
+      const want = wavChannels(path.join(AUDIO, r.file));
+      const got = await evaluate(`(() => { const b = window.ppAudio.clips.get('${r.path}'); const out = { rate: b.sampleRate, data: [] };
+        for (let c = 0; c < b.numberOfChannels; c++) { const u = new Uint8Array(b.getChannelData(c).buffer.slice(0));
+          let s = ''; for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode.apply(null, u.subarray(i, i + 32768)); out.data.push(btoa(s)); }
+        return out; })()`, 20000);
+      let differ = got.rate === rate && got.data.length === ch ? 0 : 1;
+      got.data.forEach((b64, c) => {
+        const f = new Float32Array(new Uint8Array(Buffer.from(b64, 'base64')).buffer);
+        if (f.length !== want[c].length) differ++;
+        else for (let i = 0; i < f.length; i++) if (f[i] !== want[c][i]) differ++;
+      });
+      console.log(`   ${r.path} (${ch} ch, ${rate} Hz, ${r.samples} samples): ${differ ? differ + ' samples DIFFER' : 'identical to the WAV'}`);
+      if (differ) throw new Error('an effect differs from the WAV');
+    }
+  } else {
+    console.log('   SKIPPED the sample comparison: no extracted/audio');
+  }
+  // A click gives the canvas the keyboard focus; L plays the chosen (first)
+  // effect looping, S stops everything, 1 lowers the sound setting.
+  for (const type of ['mousePressed', 'mouseReleased']) {
+    await send('Input.dispatchMouseEvent', { type, x: 700, y: 450, button: 'left', clickCount: 1 });
+  }
+  await key('KeyL', 76, 'l');
+  await waitFor(`(() => { const p = window.ppAudio; const [id] = [...p.playing.keys()]; return id !== undefined && p.position(id) > 0.5; })()`,
+    'a looping effect to play', 10000);
+  const looping = await evaluate(`[...window.ppAudio.playing.values()].map((s) => s.filename + (s.loop ? ' (loop)' : ''))`);
+  console.log('   L plays:', JSON.stringify(looping));
+  await key('KeyS', 83, 's');
+  await waitFor('window.ppAudio.playing.size === 0', 'S to stop it', 10000);
+  console.log('   S stopped it');
+  await key('Digit1', 49, '1');
+  await waitFor('Math.abs(window.ppAudio.groupVolume[0] - 0.81) < 1e-9', 'the sound setting 0.9 to give 0.81', 10000);
+  console.log('   key 1: sound setting 0.9, effects gain', await evaluate('window.ppAudio.groupVolume[0]'));
 
   const haveReference = existsSync(path.join(REFERENCE, 'pages.json'));
   if (haveReference) {
     console.log('1b. font pages against the Python reference');
     await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
     await send('Page.navigate', { url: URL + '?page=fonts&p=4' });
-    await waitFor('!!window.ppBuild', 'the font pages to start');
+    await start('the font pages to start');
     await expectPage(4, 'regular');
     // A click gives the canvas the keyboard focus; then the arrow keys.
     for (const type of ['mousePressed', 'mouseReleased']) {
@@ -244,7 +383,7 @@ try {
     await expectPage(3, 'after another ArrowLeft: digits');
     for (const n of [16, 34]) {
       await send('Page.navigate', { url: URL + `?page=fonts&p=${n}` });
-      await waitFor('!!window.ppBuild', 'the font pages to start');
+      await start('the font pages to start');
       await expectPage(n, n < 16 ? 'text page' : 'font sheet part');
     }
   } else {
@@ -274,7 +413,7 @@ try {
 
   console.log('2. reload (now controlled by the worker)');
   await send('Page.reload');
-  await waitFor('!!window.ppBuild', 'the game to start again');
+  await start('the game to start again');
   console.log('   worker :', JSON.stringify(await evaluate(WORKER)));
 
   console.log('3. network switched off, reload');
@@ -284,9 +423,12 @@ try {
     await evaluate(`fetch('files.json', {cache: 'no-cache'}).then((r) => 'status ' + r.status).catch((e) => 'FAILED ' + e)`));
   await send('Page.reload');
   await send('Page.bringToFront');
-  await waitFor('!!window.ppBuild', 'the game to start offline');
+  await start('the game to start offline');
   if (haveReference) await expectPage(34, 'offline, from the service worker');
   else console.log('   picture:', JSON.stringify(await evaluate(PIXELS, 40000)));
+  await send('Page.navigate', { url: URL });
+  await start('the title to start offline');
+  await expectTheme('offline, from Cache Storage');
   console.log('   RESULT: starts offline');
 } catch (e) {
   console.log('   RESULT: FAILED -', e.message);

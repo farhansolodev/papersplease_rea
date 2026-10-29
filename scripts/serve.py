@@ -7,7 +7,13 @@ so nothing outside this computer can reach the converted game files
 (CLAUDE.md rule 1). Python's own server cannot answer "Range" requests (a
 request for part of a file, which a browser's sound player makes), so this
 one does, and it sends WebAssembly with its proper type.
+
+For the checks, /_served.json counts what was sent since the server
+started: per path, whole files (200) and parts (206).
 """
+
+import json
+import threading
 
 import mimetypes
 import re
@@ -20,8 +26,11 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = (Path(__file__).resolve().parent.parent / "build" / "web").resolve()
 TYPES = {".wasm": "application/wasm", ".js": "text/javascript",
-         ".json": "application/json", ".html": "text/html; charset=utf-8"}
+         ".json": "application/json", ".html": "text/html; charset=utf-8",
+         ".ogg": "audio/ogg"}
 FINGERPRINTED = re.compile(r"\.[0-9a-f]{12}\.[a-z0-9]+$")
+SERVED = {}                     # path -> {"200": n, "206": n}
+SERVED_LOCK = threading.Lock()
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -43,6 +52,17 @@ class Handler(BaseHTTPRequestHandler):
         return target
 
     def send_file(self, head_only):
+        if urlsplit(self.path).path == "/_served.json":
+            with SERVED_LOCK:
+                body = json.dumps(SERVED).encode()
+            self.send_response(HTTPStatus.OK)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            if not head_only:
+                self.wfile.write(body)
+            return
         target = self.find()
         if target is None:
             self.send_error(HTTPStatus.NOT_FOUND)
@@ -84,6 +104,9 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         if head_only:
             return
+        with SERVED_LOCK:
+            counts = SERVED.setdefault(unquote(urlsplit(self.path).path), {})
+            counts[str(int(status))] = counts.get(str(int(status)), 0) + 1
         with target.open("rb") as f:
             f.seek(start)
             left = end - start + 1

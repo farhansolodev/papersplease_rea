@@ -212,14 +212,17 @@ it is what is stored. 12 files reach full scale.
   names with `.wav` for all.
 - Effects: the WAV files are the game's samples; any browser plays them
   (Web Audio resamples the 22,050 Hz ones).
-- **A decision for `DESIGN.md`: how to ship the songs.** As WAV they are
-  62 MB, too much for a page that loads them. Two ways, both needing a
-  tool not installed (so the user's go-ahead for a download): rebuild
-  the original Vorbis data into normal `.ogg` files without re-encoding
-  (FSB5 removes Vorbis set-up headers, which tools such as vgmstream
-  restore from a table), or re-encode the WAV files (to Ogg Vorbis or
-  Opus, which loses a little quality again). The effects could stay WAV
-  (21 MB) or be compressed the same way.
+- **How to ship the songs and effects: settled in milestone 2
+  (2026-10-29, `milestone-2.md`, `DESIGN.md`).** The songs are re-encoded
+  from the WAV files to Ogg Vorbis with ffmpeg; the effects ship as the
+  game's own ADPCM data and the port decodes them (all 108 identical to
+  the WAV files, `port/core/tests/adpcm.rs`). The other way for the
+  songs, rebuilding the original Vorbis data into `.ogg` files without
+  re-encoding (FSB5 removes Vorbis set-up headers, which tools such as
+  vgmstream restore from a table), would need a tool download. (This
+  said on 2026-10-17 that both ways needed a tool not installed; that
+  was wrong, corrected 2026-10-29: ffmpeg, with a Vorbis encoder, was
+  already on this machine, as `DESIGN.md` noted the same day.)
 - Volume: gain = setting² held to 0.0001..1, per category, times the
   sound's own volume. Whether to keep "0 is −80 dB, not silent" is a
   detail for `DESIGN.md` (inaudible in practice).

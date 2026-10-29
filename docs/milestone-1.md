@@ -196,8 +196,9 @@ Then open `http://localhost:8080` (the title is now the default page;
 - a round wrench button in the bottom left corner;
 - "created by Lucas Pope" in small letters, centred at the bottom.
 
-Clicking does nothing yet, and there is no music or rising animation
-(milestone 2 and later). The reference picture, enlarged three times, is
+Clicking does nothing yet, and there is no rising animation (milestone
+3). Since milestone 2 the page opens on a start screen first and `Theme`
+plays on the title (`milestone-2.md`). The reference picture, enlarged three times, is
 `extracted/previews/m1b/title_x3.png` (made by the reference script,
 below; gitignored).
 

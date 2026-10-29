@@ -47,9 +47,36 @@ pub fn fit(window_width: u32, window_height: u32) -> Fit {
     }
 }
 
+/// The start screen's other picture size: as large as the window allows,
+/// keeping the picture's shape, so the zoom need not be a whole number (like
+/// the original's `stretch` launch word, docs/screen-output.md; game pixels
+/// are then not all the same size). Returns (x, y, width, height) in the
+/// window's physical pixels, rounded to whole pixels.
+pub fn stretch(window_width: u32, window_height: u32) -> (i32, i32, u32, u32) {
+    let zoom = (window_width as f64 / WIDTH as f64).min(window_height as f64 / HEIGHT as f64);
+    let width = ((WIDTH as f64 * zoom).round() as u32).max(1);
+    let height = ((HEIGHT as f64 * zoom).round() as u32).max(1);
+    (
+        (window_width as i32 - width as i32).div_euclid(2),
+        (window_height as i32 - height as i32).div_euclid(2),
+        width,
+        height,
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn stretch_fills_one_direction_and_keeps_the_shape() {
+        // 1920 x 1080: the width decides (3.37 against 3.375).
+        assert_eq!(stretch(1920, 1080), (0, 1, 1920, 1078));
+        assert_eq!(stretch(1140, 640), (0, 0, 1140, 640));
+        // A tall window: full width, centred vertically.
+        assert_eq!(stretch(570, 1000), (0, 340, 570, 320));
+        assert_eq!(stretch(1000, 320), (215, 0, 570, 320));
+    }
 
     #[test]
     fn exact_multiples_fill_the_window() {

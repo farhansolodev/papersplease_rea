@@ -3,14 +3,18 @@
 //! Milestone 0: the screen size and its whole-number fit to a window, the
 //! fixed time step, and a test card. Milestone 1a: the start pack, pictures,
 //! fonts, text layout, the software drawing of quads, and the font test
-//! pages. Milestone 1b: the title screen as a still.
+//! pages. Milestone 1b: the title screen as a still. Milestone 2: the
+//! effects' ADPCM decoding, the volume rule and the sound test page.
 
+pub mod adpcm;
 pub mod font;
 pub mod pack;
 pub mod pages;
 pub mod picture;
 pub mod raster;
 pub mod screen;
+pub mod sound;
+pub mod soundtest;
 pub mod stepper;
 pub mod testcard;
 pub mod text;

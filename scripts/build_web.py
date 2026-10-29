@@ -5,13 +5,19 @@
     python -I scripts/build_web.py --debug-names  # keep function names
 
 Steps: cargo builds the WebAssembly (release); wasm-bindgen turns it into a
-file plus the JavaScript glue the page needs; every built file gets its
-content fingerprint in its name; the page and service worker are copied
-from port/www; files.json lists everything. The build code (a short hash of
-the file list and fingerprints) is baked into sw.js, so a new build makes
-the browser install a new service worker.
+file plus the JavaScript glue the page needs; the start pack, the effects
+pack and the songs are made (build_assets/); every built file gets its
+content fingerprint in its name; the page, its sound player and the service
+worker are copied from port/www; files.json lists everything. The build
+code (a short hash of the file list and fingerprints) is baked into sw.js,
+so a new build makes the browser install a new service worker.
 
-Needs wasm-bindgen-cli in .cargo-home/bin (docs/milestone-0.md).
+The songs go into songs/ and are listed apart ("songs" in files.json): the
+service worker keeps them when they first play, not when it installs
+(docs/milestone-2.md).
+
+Needs wasm-bindgen-cli in .cargo-home/bin (docs/milestone-0.md) and ffmpeg
+on the PATH for the songs (docs/milestone-2.md).
 """
 
 import hashlib
@@ -23,6 +29,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "build_assets"))
+import build_audio  # noqa: E402
 import build_pack  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -81,10 +88,23 @@ def main():
     pack = glue / "start.pack"
     pack.write_bytes(build_pack.build())
     start_pack = add_fingerprinted(pack, "start", "pack")
+    effects = glue / "effects.pack"
+    effects.write_bytes(build_audio.effects_pack())
+    effects_pack = add_fingerprinted(effects, "effects", "pack")
+    songs = {}
+    for name, src in build_audio.songs().items():
+        data = Path(src).read_bytes()
+        stem = Path(name).stem
+        songs[name] = f"songs/{stem}.{fingerprint(data)}.ogg"
+        files[songs[name]] = data
     files["index.html"] = (PORT / "www" / "index.html").read_bytes()
+    files["audio.js"] = (PORT / "www" / "audio.js").read_bytes()
 
-    # The build code covers every file the page loads, by name and content.
+    # The build code covers every file the page loads, by name and content,
+    # and the service worker's own text (before the code is put into it).
+    sw = (PORT / "www" / "sw.js").read_text(encoding="utf-8")
     listing = sorted((n, fingerprint(d)) for n, d in files.items())
+    listing.append(("sw.js", fingerprint(sw.encode())))
     build = fingerprint(json.dumps(listing).encode())
 
     manifest = {
@@ -92,22 +112,24 @@ def main():
         "app_js": app_js,
         "app_wasm": app_wasm,
         "pack": start_pack,
+        "effects": effects_pack,
+        "songs": songs,
         "fingerprinted": fingerprinted,
-        "files": ["index.html", "files.json", *fingerprinted],
+        "files": ["index.html", "audio.js", "files.json", *fingerprinted],
     }
     files["files.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
-    sw = (PORT / "www" / "sw.js").read_text(encoding="utf-8")
     if "__BUILD__" not in sw:
         sys.exit("sw.js lost its __BUILD__ marker")
     files["sw.js"] = sw.replace("__BUILD__", build).encode()
 
     for name, data in files.items():
+        (OUT / name).parent.mkdir(parents=True, exist_ok=True)
         (OUT / name).write_bytes(data)
     shutil.rmtree(glue)
 
     print(f"\nbuild {build} in {OUT}")
     import gzip
-    for name in (app_wasm, start_pack, app_js, "index.html", "sw.js"):
+    for name in (app_wasm, start_pack, effects_pack, *songs.values(), app_js, "index.html", "audio.js", "sw.js"):
         raw = len(files[name])
         packed = len(gzip.compress(files[name], 9))
         print(f"  {name:<28} {raw:>10,} bytes   gzip {packed:>10,}")

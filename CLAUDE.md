@@ -103,7 +103,9 @@ Port my own copy of Papers, Please to run in the browser:
   `docs/milestone-0.md`. Node 24 and the installed Edge or Chrome run
   `scripts/checks/web_offline_check.mjs`.
 - `ffmpeg` 7.1.1 (with Vorbis and Opus encoders) is on the `PATH` through
-  scoop; found 2026-10-17, not installed by this project.
+  scoop; found 2026-10-17, not installed by this project. The build needs
+  it since milestone 2 (2026-10-29): `scripts/build_assets/build_audio.py`
+  encodes the songs with it.
 - Write docs and multi-line scripts with the file tools, not shell
   here-documents: quotes in the text have broken those repeatedly.
 - Setup references, only if a problem comes up:

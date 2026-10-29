@@ -6,21 +6,112 @@
 <title>Papers, Please (browser port)</title>
 <link rel="icon" href="data:,">
 <style>
+  :root { color-scheme: dark; }
   html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
   #stage { position: fixed; inset: 0; }
   #game { width: 100%; height: 100%; display: block; outline: none; }
   #status { position: fixed; left: 12px; bottom: 12px; color: #888;
             font: 14px monospace; pointer-events: none; }
+
+  /* The start screen (docs/milestone-2.md): our own page, not a game screen. */
+  #start { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+           background: #000; color: #c8c8c8; font: 15px/1.4 monospace; padding: 16px; box-sizing: border-box; }
+  #start[hidden] { display: none; }
+  #start .box { width: 100%; max-width: 440px; border: 1px solid #3a4a3a; background: #101410;
+                padding: 20px 24px; box-sizing: border-box; }
+  #start h1 { margin: 0 0 4px; font-size: 20px; color: #e8e0c8; letter-spacing: 1px; }
+  #start .sub { margin: 0 0 16px; color: #7a8a7a; font-size: 13px; }
+  #start .row { display: grid; grid-template-columns: 9em 1fr 3.5em; align-items: center; gap: 8px; margin: 10px 0; }
+  #start .row output { text-align: right; color: #e8e0c8; }
+  #start input[type=range] { width: 100%; accent-color: #556855; }
+  #start fieldset { border: 0; margin: 10px 0; padding: 0; }
+  #start legend { padding: 0; margin-bottom: 4px; }
+  #start label.choice { display: block; margin: 2px 0 2px 1em; cursor: pointer; }
+  #start input[type=checkbox], #start input[type=radio] { accent-color: #556855; }
+  #progress { margin: 16px 0 8px; height: 6px; background: #222; }
+  #progress div { height: 100%; width: 0; background: #556855; transition: width 0.1s; }
+  #loadtext { min-height: 1.4em; color: #7a8a7a; font-size: 13px; }
+  #go { margin-top: 12px; width: 100%; padding: 10px; font: bold 16px monospace; letter-spacing: 1px;
+        color: #101410; background: #c8c8b0; border: 0; cursor: pointer; }
+  #go:disabled { background: #333; color: #777; cursor: default; }
+  #go:not(:disabled):hover { background: #e8e0c8; }
 </style>
 </head>
 <body>
 <div id="stage"><canvas id="game"></canvas></div>
-<div id="status">Loading...</div>
+<div id="status"></div>
+<div id="start">
+  <form class="box" id="options" onsubmit="return false">
+    <h1>PAPERS, PLEASE</h1>
+    <p class="sub">Browser port, a local build of your own copy</p>
+    <div class="row"><label for="music">Music volume</label>
+      <input id="music" type="range" min="0" max="10" step="1"><output id="musicOut"></output></div>
+    <div class="row"><label for="sound">Sound volume</label>
+      <input id="sound" type="range" min="0" max="10" step="1"><output id="soundOut"></output></div>
+    <div class="row"><label for="fullscreen">Full screen</label>
+      <input id="fullscreen" type="checkbox"><span></span></div>
+    <fieldset>
+      <legend>Picture size</legend>
+      <label class="choice"><input type="radio" name="size" value="sharp"> Sharp pixels (whole-number zoom)</label>
+      <label class="choice"><input type="radio" name="size" value="stretch"> Fill the window (stretched)</label>
+    </fieldset>
+    <div id="progress"><div></div></div>
+    <div id="loadtext">Loading...</div>
+    <button id="go" type="button" disabled>Click to start</button>
+  </form>
+</div>
 <script type="module">
-// The loader. It is plain JavaScript on purpose: it has to run before any
-// of the game's own code exists.
+// The loader and the start screen. It is plain JavaScript on purpose: it has
+// to run before any of the game's own code exists. It downloads the game
+// while the player sets the options, then starts it on the click (a browser
+// lets a page play sound only after a click or key press on it).
+import { SoundPlayer } from './audio.js';
+
 const status = document.getElementById('status');
+const loadtext = document.getElementById('loadtext');
+const bar = document.querySelector('#progress div');
+const go = document.getElementById('go');
 const params = new URLSearchParams(location.search);
+
+// The player's settings, kept in the browser's local storage under the same
+// names as the game's own settings file (docs/save-format.md, "Settings"):
+// volumes in tenths from 0 to 1. `stretch` is the start screen's own.
+const SETTINGS = 'pp.settings';
+function loadSettings() {
+  const s = { musicVolume: 1, soundVolume: 1, fullscreen: false, stretch: false };
+  try { Object.assign(s, JSON.parse(localStorage.getItem(SETTINGS) || '{}')); } catch { /* none kept */ }
+  for (const k of ['musicVolume', 'soundVolume']) {
+    const v = Number(s[k]);
+    s[k] = Number.isFinite(v) ? Math.min(1, Math.max(0, Math.round(v * 10) / 10)) : 1;
+  }
+  s.fullscreen = !!s.fullscreen;
+  s.stretch = !!s.stretch;
+  return s;
+}
+function saveSettings(s) {
+  try { localStorage.setItem(SETTINGS, JSON.stringify(s)); } catch { /* storage blocked: not kept */ }
+}
+
+const settings = loadSettings();
+const music = document.getElementById('music'), sound = document.getElementById('sound');
+const fullscreen = document.getElementById('fullscreen');
+function showSettings() {
+  music.value = Math.round(settings.musicVolume * 10);
+  sound.value = Math.round(settings.soundVolume * 10);
+  document.getElementById('musicOut').textContent = settings.musicVolume.toFixed(1);
+  document.getElementById('soundOut').textContent = settings.soundVolume.toFixed(1);
+  fullscreen.checked = settings.fullscreen;
+  document.querySelector(`input[name=size][value=${settings.stretch ? 'stretch' : 'sharp'}]`).checked = true;
+}
+document.getElementById('options').addEventListener('input', () => {
+  settings.musicVolume = music.value / 10;
+  settings.soundVolume = sound.value / 10;
+  settings.fullscreen = fullscreen.checked;
+  settings.stretch = document.querySelector('input[name=size]:checked').value === 'stretch';
+  saveSettings(settings);
+  showSettings();
+});
+showSettings();
 
 // Development switch: open the page as ?nosw to remove the service worker
 // and everything it stored. Loading again without it starts them afresh.
@@ -29,44 +120,128 @@ async function removeWorker() {
   for (const k of await caches.keys()) await caches.delete(k);
 }
 
+// Downloads a file, reporting bytes as they arrive.
+async function download(path, progress) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(path + ': ' + res.status);
+  const size = Number(res.headers.get('Content-Length')) || 0;
+  progress.total += size;
+  const reader = res.body.getReader();
+  const parts = [];
+  let got = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    parts.push(value);
+    got += value.length;
+    progress.done += value.length;
+    if (!size) progress.total += value.length;
+    progress.show();
+  }
+  const out = new Uint8Array(got);
+  let at = 0;
+  for (const p of parts) { out.set(p, at); at += p.length; }
+  return out;
+}
+
+// On a first visit the service worker installs after the game downloads; a
+// song is kept only when the worker is in charge of the page, so the start
+// waits for that (at most 15 s; without it the songs are not kept this
+// visit). No wait when no worker is installing (a forced reload, Shift+F5,
+// leaves an installed worker out of charge on purpose).
+async function workerInCharge(reg) {
+  if (navigator.serviceWorker.controller || !(reg.installing || reg.waiting)) return;
+  loadtext.textContent = 'Keeping a copy for offline use...';
+  await Promise.race([
+    new Promise((r) => navigator.serviceWorker.addEventListener('controllerchange', r, { once: true })),
+    new Promise((r) => setTimeout(r, 15000)),
+  ]);
+}
+
 async function main() {
-  if ('serviceWorker' in navigator) {
-    if (params.has('nosw')) {
-      const wasControlled = !!navigator.serviceWorker.controller;
-      await removeWorker();
-      if (wasControlled) { location.reload(); return; }   // reload uncontrolled
-      status.textContent = 'Loading (service worker removed)...';
-    } else {
-      navigator.serviceWorker.register('sw.js').then((reg) => {
-        reg.addEventListener('updatefound', () => {
-          const next = reg.installing;
-          next && next.addEventListener('statechange', () => {
-            if (next.state === 'installed' && navigator.serviceWorker.controller) {
-              console.info('A new version is stored; it starts on the next visit.');
-            }
-          });
-        });
-      }).catch((e) => console.warn('Service worker not registered:', e));
-    }
-  } else {
+  const worker = 'serviceWorker' in navigator && !params.has('nosw');
+  if ('serviceWorker' in navigator && params.has('nosw')) {
+    const wasControlled = !!navigator.serviceWorker.controller;
+    await removeWorker();
+    if (wasControlled) { location.reload(); return; }   // reload uncontrolled
+    loadtext.textContent = 'Loading (service worker removed)...';
+  } else if (!('serviceWorker' in navigator)) {
     console.warn('No service worker here (needs https or localhost): nothing is kept for offline use.');
+  }
+  if (worker) {
+    navigator.serviceWorker.addEventListener('message', (e) => {
+      if (e.data && e.data.swLog) console.warn('[service worker]', e.data.swLog);
+    });
   }
 
   const files = await (await fetch('files.json', { cache: 'no-cache' })).json();
   // What the game is told: which page to show (?page=title, the default;
-  // ?page=fonts, where &p=N starts on page N; ?page=testcard) and the start
-  // pack's bytes.
+  // ?page=fonts, where &p=N starts on page N; ?page=sounds; ?page=testcard),
+  // the start pack's bytes, the songs' addresses and the settings.
   const page = params.get('page') || 'title';
-  let pack = null;
-  if (page !== 'testcard') {
-    const res = await fetch(files.pack);
-    if (!res.ok) throw new Error('start pack: ' + res.status);
-    pack = new Uint8Array(await res.arrayBuffer());
-  }
-  window.ppConfig = { page, p: parseInt(params.get('p') || '0', 10) || 0, pack };
+  const progress = {
+    done: 0, total: 0,
+    show() {
+      const mb = (n) => (n / 1e6).toFixed(1);
+      bar.style.width = (this.total ? Math.min(100, 100 * this.done / this.total) : 0) + '%';
+      loadtext.textContent = `Loading ${mb(this.done)} of ${mb(this.total)} MB`;
+    },
+  };
+  const [wasm, pack] = await Promise.all([
+    download(files.app_wasm, progress),
+    page === 'testcard' ? null : download(files.pack, progress),
+  ]);
+  loadtext.textContent = 'Preparing...';
+  const module = await WebAssembly.compile(wasm);
   const app = await import('./' + files.app_js);
+
+  if (worker) {
+    // Registered once the game is downloaded, so the worker's own copy comes
+    // from the browser's download cache instead of the network.
+    try {
+      const reg = await navigator.serviceWorker.register('sw.js');
+      reg.addEventListener('updatefound', () => {
+        const next = reg.installing;
+        next && next.addEventListener('statechange', () => {
+          if (next.state === 'installed' && navigator.serviceWorker.controller) {
+            console.info('A new version is stored; it starts on the next visit.');
+          }
+        });
+      });
+      await workerInCharge(reg);
+    } catch (e) {
+      console.warn('Service worker not registered (nothing is kept for offline use):', e);
+    }
+  }
+
+  bar.style.width = '100%';
+  loadtext.textContent = 'Ready.';
+  go.disabled = false;
+  go.focus();
+  await new Promise((r) => go.addEventListener('click', r, { once: true }));
+
+  // Everything below runs inside the click, which is what lets sound start.
+  const context = new AudioContext();
+  context.resume();
+  const songs = {};
+  for (const [name, path] of Object.entries(files.songs || {})) songs[name] = path;
+  window.ppAudio = new SoundPlayer(context, songs);
+  if (settings.fullscreen) document.documentElement.requestFullscreen().catch(() => {});
+  document.getElementById('start').hidden = true;
+  status.textContent = 'Starting...';
+
+  window.ppConfig = {
+    page,
+    p: parseInt(params.get('p') || '0', 10) || 0,
+    pack,
+    songs: Object.keys(songs).sort(),
+    musicVolume: settings.musicVolume,
+    soundVolume: settings.soundVolume,
+    stretch: settings.stretch,
+    effects: null,      // the effects pack, filled in when it arrives
+  };
   try {
-    await app.default({ module_or_path: './' + files.app_wasm });
+    await app.default({ module_or_path: module });
   } catch (e) {
     // The window library ends its start-up with an exception on purpose
     // ("Using exceptions for control flow"); anything else is a real error.
@@ -74,9 +249,17 @@ async function main() {
   }
   status.textContent = '';
   window.ppBuild = files.build;
+
+  // The effects, in the background (docs/DESIGN.md, "Loading and caching").
+  if (files.effects) {
+    const res = await fetch(files.effects);
+    if (!res.ok) throw new Error('effects: ' + res.status);
+    window.ppConfig.effects = new Uint8Array(await res.arrayBuffer());
+  }
 }
 
 main().catch((e) => {
+  document.getElementById('start').hidden = true;
   status.textContent = 'Failed to start: ' + e;
   console.error(e);
 });
