@@ -5,12 +5,19 @@
 //! fonts, text layout, the software drawing of quads, and the font test
 //! pages. Milestone 1b: the title screen as a still. Milestone 2: the
 //! effects' ADPCM decoding, the volume rule and the sound test page.
+//! Milestone 3a: the random generator, the audio layer (`app.aud`), input,
+//! buttons, the drawn cursor and the title screen alive.
 
 pub mod adpcm;
+pub mod aud;
+pub mod button;
 pub mod font;
+pub mod input;
+pub mod num;
 pub mod pack;
 pub mod pages;
 pub mod picture;
+pub mod rand;
 pub mod raster;
 pub mod screen;
 pub mod sound;

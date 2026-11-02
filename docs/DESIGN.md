@@ -203,12 +203,17 @@ picture is written into the Rust code.
 
 1. The host collects the input since the last frame (the left mouse
    button, the pointer in game pixels, the keys the game reads;
-   `input-handling.md`).
+   `input-handling.md`). A press is kept until a step has seen it, so a
+   press and release within one browser frame, or in a frame with no
+   step, is not lost (milestone 3a, `milestone-3.md`).
 2. The host runs the core's fixed step of 1/60 s as many times as real
    time asks (decision 1 above; the browser calls the page once per
    screen refresh, which can be 60, 144 or another rate). The speaker's
-   real-time clock gets the real elapsed time, uncapped
-   (`audio-layer.md`).
+   clock gets the fixed step too (milestone 3a, my choice, reversible).
+   This first said "the real elapsed time, uncapped", as in the original
+   (`audio-layer.md`); changed 2026-11-03: the two differ only when the
+   browser falls behind by more than 0.1 s a frame, and then the port's
+   fades slow down with the game.
 3. The core builds the quad list in drawing order (layers lowest first,
    then the order visuals were added) and draws it into one 570 x 320
    picture cleared to black, with nearest-pixel reads and ordinary alpha
@@ -347,7 +352,7 @@ day").
 | 0 | An empty page | The page opens on a black 570 x 320 picture at a whole-number zoom, with a test pattern and a frame counter; resizing the window keeps the zoom whole. Reload with the network switched off in the browser's developer tools: it still opens | The workspace, the build script, the local server, the service worker, the canvas fit, the fixed step | `screen-output.md` |
 | 1 (split into 1a and 1b, 2026-10-18) | Pictures and text | **1a:** font test pages (every font id and every font sheet, 35 pages, arrow keys change page), identical to the Python reference. **1b:** a still of the title screen (logo and buttons, not clickable yet), the same pixels as the Python reference's preview of the same screen; the quit and version buttons are left out (quit is already decided against; the version text is unread) | The asset preparation, the start pack, the quad list drawn exactly, `app.vis` text and pictures | `text-drawing.md`, `vis-basics.md`, `screens.md` part 2, `fonts.md` |
 | 2 | Sound | The start screen with its options and "click to start"; `Theme` plays at once on a first visit, while the developer tools show it still downloading; afterwards it is in Cache Storage, and an offline reload plays it. A test page plays any effect | The sound player, the effects, the song stream and background save, the volume rule | `audio.md`, `audio-layer.md` |
-| 3 | The title screen alive | The game's own cursor; buttons with their pressed look and sounds; the title rising with the music; the settings and pause screens with working volumes; the intro pages; fades between screens | Input, buttons, `Menu`, screen changes, the settings file | `input-handling.md`, `buttons.md`, `screens.md` parts 1 to 5, `save-format.md` part 2 |
+| 3 (split into 3a, 3b, 3c, 2026-11-03, `milestone-3.md`) | The title screen alive | **3a** (built 2026-11-03): the cursor, buttons, the rise and bob, the audio layer. **3b**: screen changes and fades, settings, pause. **3c**: the intro pages. In all: the game's own cursor; buttons with their pressed look and sounds; the title rising with the music; the settings and pause screens with working volumes; the intro pages; fades between screens | Input, buttons, `Menu`, screen changes, the settings file | `input-handling.md`, `buttons.md`, `screens.md` parts 1 to 5, `save-format.md` part 2 |
 | 4 | The booth, no travelers | Day 1's screen: the booth, the desk and console, the border scene's still picture; dragging a passport and the rulebook, docking, the stamp bar, the clock; their sounds and the ambient loops | The desk, desk movement, the stamp bar, the booth's ambient | `booth-layout.md`, `desk-pictures.md`, `desk-movement.md`, `page-layout.md` |
 | 5 | The first travelers | Day 1 played with the booth's rules: travelers come in, speak, hand papers; stamping, giving back, the citation slip. For a fixed seed the same travelers as the reference (and so as the game) | Traveler creation, the booth's state machine (read first), speech, judging | `traveler-creation.md` and its neighbours, `speech.md`, `player-actions.md`, `responses-and-events.md` |
 | 6 | A whole day and night | The border scene's line walking and calling in; the day ending; the news, the night screen and its budget; saving; the load screen; the next day | The border scene's normal cycle, news, night, saves | `border-figures.md`, `border-scene.md`, `newspaper-picture.md`, `night.md`, `save-format.md` |

@@ -27,7 +27,8 @@ Then open `http://localhost:8080`. You should see:
    "Fill the window"), a loading bar, then **Click to start**. The options
    are kept in the browser, so they are as you left them on the next visit.
 2. After the click, the title screen as in milestone 1b, with **`Theme`
-   playing** and looping. The title does not rise yet (milestone 3).
+   playing** and looping. (Since milestone 3a the title also rises with
+   it, `milestone-3.md`.)
 3. `http://localhost:8080/?page=sounds` is the **sound test page**: every
    effect (108) and song (3) in four columns, the chosen one boxed in blue,
    playing ones green. The keys (click the picture first if they do
@@ -91,9 +92,10 @@ plays a sound"), with the browser's Web Audio:
   the game, `audio.md`).
 
 The game side (`app.aud`: the speaker's fades, rooms, song changes, the
-beat) is not built yet: it comes with milestone 3, which needs it for the
-title's rise. For now the host starts `Theme` itself on the title page, as
-`Speaker.music` would (looping, volume 1).
+beat) was not built in milestone 2, and the host started `Theme` itself
+on the title page, as `Speaker.music` would (looping, volume 1). Built
+since in milestone 3a (`port/core/src/aud.rs`, `milestone-3.md`): the
+game's own music player now starts it.
 
 ### Songs: streamed once and kept (`port/www/sw.js`)
 
@@ -122,7 +124,10 @@ The start pack still holds only the pictures, fonts and texts. The effects
 pack (all 108) is downloaded after the click; the host decodes it when it
 arrives and hands every effect to the player. Splitting out the effects
 the title and menus need into the start pack (`DESIGN.md`, item 1) waits
-for milestone 3, which is when those screens first make a sound.
+for milestone 3, which is when those screens first make a sound. (Still
+not done after 3a: the title's button sounds come from the effects pack,
+so a press in the first moments can be silent; left for 3b,
+`milestone-3.md`.)
 
 ## Decisions
 

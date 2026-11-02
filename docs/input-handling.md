@@ -192,8 +192,11 @@ changed or a key changed).
 Which parts block areas themselves (`maskAreaUntilFrameEnd`), found by
 name: the inspect mode (`InspectUi`), the stamp desk, the key desk, the
 rack, the drop remote, the tutorial cover, and the two "passthrough"
-parts (`screens.md`). The buttons block through `getPointerJustDown`
-and their own code (`buttons.md`).
+parts (`screens.md`). **Buttons do not block**: `ButtonHelper.react`
+asks only `getPointerOver` and never blocks an area (read in full on
+2026-11-03 for milestone 3a, `milestone-3.md`). This sentence said
+before that the buttons block "through `getPointerJustDown` and their
+own code"; that was wrong, corrected 2026-11-03.
 
 ## Keys
 

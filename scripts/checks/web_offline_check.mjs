@@ -1,4 +1,4 @@
-// Milestone 0, 1a, 1b and 2 check: drives a real browser (headless Edge or
+// Milestone 0, 1a, 1b, 2 and 3a check: drives a real browser (headless Edge or
 // Chrome, with a throwaway profile in build/) against the local server and
 // reports (every page opens on the start screen; the check clicks its button
 // with a real mouse click, as a player would):
@@ -10,9 +10,12 @@
 //      with the Python reference's page, for several pages, and the arrow
 //      keys changing the page (needs extracted/previews/m1, made by
 //      scripts/reference/fontpage.py; skipped without it);
-//   4a. the title screen (milestone 1b): the whole canvas compared byte for
-//      byte with the Python reference's (needs extracted/previews/m1b, made
-//      by scripts/reference/titlescreen.py; skipped without it);
+//   4a. the title screen (milestone 1b, alive since 3a): it differs from the
+//      Python reference's still while rising; after a key skips the rise the
+//      whole canvas is byte for byte the reference's; the mouse over STORY
+//      draws the hand cursor, a press shows STORY pressed and plays
+//      button-down, the release plays button-up (needs extracted/previews/m1b,
+//      made by scripts/reference/titlescreen.py; skipped without it);
 //   4b. that F5, F12, Ctrl+R and the right-click menu are not blocked
 //      (defaultPrevented stays false on events sent to the canvas);
 //   4c. sound (milestone 2): on the title, Theme plays, is downloaded once by
@@ -206,6 +209,77 @@ function wavChannels(file) {
   return out;
 }
 
+// The bytes of the canvas (at 570 x 320) that differ from a reference
+// picture, counted from row `fromRow` down, and the box around them.
+async function differences(want, fromRow = 0) {
+  const r = await evaluate(READ, 40000);
+  if (r.W !== 570 || r.H !== 320) throw new Error(`canvas is ${r.W} x ${r.H}, not 570 x 320`);
+  const got = Buffer.from(r.data, 'base64');
+  let n = 0;
+  const box = [570, 320, -1, -1];
+  for (let j = fromRow * 570 * 4; j < got.length; j++) {
+    if (got[j] === want[j]) continue;
+    n++;
+    const p = j >> 2, x = p % 570, y = Math.floor(p / 570);
+    box[0] = Math.min(box[0], x); box[1] = Math.min(box[1], y);
+    box[2] = Math.max(box[2], x); box[3] = Math.max(box[3], y);
+  }
+  return { n, box };
+}
+
+const within = (box, r) => box[0] >= r[0] && box[1] >= r[1] && box[2] < r[0] + r[2] && box[3] < r[1] + r[3];
+
+// Milestone 3a on the title (docs/milestone-3.md): the title rises, a key
+// skips the rise, then the screen at rest is the 1b still; the game's own
+// cursor; a button's pressed look and its two sounds. The logo bobs with the
+// music, so the cursor and button checks look only below row 230 (the
+// buttons are at 236 and below).
+async function titleAlive() {
+  const want = readFileSync(TITLE_REFERENCE);
+  await evaluate(`(() => { window.ppStarts = []; const p = window.ppAudio, s = p.start.bind(p);
+    p.start = (...a) => { window.ppStarts.push(a[2]); return s(...a); }; return 1; })()`);
+  await waitFor(`(${THEME_AT}) > 0.5`, 'Theme to start', 30000);
+  const rising = await differences(want);
+  console.log(`   rising: ${rising.n} bytes differ from the title at rest, Theme at ${(await evaluate(THEME_AT)).toFixed(2)} s`);
+  if (rising.n === 0) throw new Error('the title is not rising');
+  // A key skips the rise; the logo is up 40% of each bar (about 1 s), so the
+  // still shows within a few seconds, long before the rise would end (23.6 s).
+  await key('Space', 32, ' ');
+  const t0 = Date.now();
+  for (;;) {
+    if ((await differences(want)).n === 0) break;
+    if (Date.now() - t0 > 8000) throw new Error('the key did not skip the rise (no still within 8 s)');
+    await sleep(100);
+  }
+  console.log(`   a key skipped the rise: identical to the reference ${((Date.now() - t0) / 1000).toFixed(1)} s later, Theme at ${(await evaluate(THEME_AT)).toFixed(2)} s`);
+
+  // STORY: 129 x 19 at (220, 236). The hand's picture sits at (-6, -2).
+  const story = [220, 236, 129, 19];
+  const [mx, my] = [284, 245];
+  const hand = [mx - 6, my - 2, 19, 26];
+  const mouse = (type) => send('Input.dispatchMouseEvent', { type, x: mx, y: my, button: 'left', clickCount: 1 });
+  const settle = async (test, what) => {
+    for (let i = 0; i < 40; i++) { const d = await differences(want, 230); if (test(d)) return d; await sleep(100); }
+    throw new Error(what);
+  };
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: mx, y: my });
+  const over = await settle((d) => d.n > 0 && within(d.box, hand), 'no hand cursor over STORY');
+  console.log(`   the hand cursor over STORY: ${over.n} bytes differ, all inside the hand's picture`, JSON.stringify(over.box));
+  await mouse('mousePressed');
+  const pressed = await settle((d) => d.n > over.n * 2 && d.box[0] <= story[0] + 2 && d.box[2] >= story[0] + story[2] - 3,
+    'STORY does not show pressed');
+  const union = [story[0], story[1], story[2], hand[1] + hand[3] - story[1]];
+  if (!within(pressed.box, union)) throw new Error('pressing changed pixels outside STORY and the cursor');
+  console.log(`   STORY pressed: ${pressed.n} bytes differ, inside the button and the cursor`, JSON.stringify(pressed.box));
+  await mouse('mouseReleased');
+  await settle((d) => d.n === over.n && within(d.box, hand), 'STORY does not come back up after the click');
+  await waitFor(`window.ppStarts.includes('button-up.wav')`, 'the click sound', 5000);
+  const starts = await evaluate('window.ppStarts');
+  console.log('   sounds started:', JSON.stringify(starts));
+  const down = starts.indexOf('button-down.wav'), up = starts.indexOf('button-up.wav');
+  if (down < 0 || up < down) throw new Error('button-down then button-up were not played');
+}
+
 async function waitFor(expression, what, ms = 60000) {
   const t0 = Date.now();
   while (Date.now() - t0 < ms) {
@@ -279,11 +353,11 @@ try {
   const servedBefore = await served();
 
   if (existsSync(TITLE_REFERENCE)) {
-    console.log('1a. the title screen against the Python reference');
+    console.log('1a. the title screen alive (milestone 3a), against the Python reference at rest');
     await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
     await send('Page.navigate', { url: URL });
     await start('the title screen to start');
-    await expectPicture(TITLE_REFERENCE, 'title', 'the default page');
+    await titleAlive();
   } else {
     console.log('1a. SKIPPED: no reference title in extracted/previews/m1b');
     await send('Page.navigate', { url: URL });

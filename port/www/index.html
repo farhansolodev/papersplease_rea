@@ -250,6 +250,16 @@ async function main() {
   status.textContent = '';
   window.ppBuild = files.build;
 
+  // The game reads Tab, Space, Enter and the arrows (docs/screens.md part 4):
+  // over the game the browser's own action for them (moving the focus off
+  // the game, scrolling) is stopped, for those keys only, so F5, F12 and the
+  // rest still work (docs/milestone-1.md, "Fix after 1a"). The game gets the
+  // keys without a click on it first.
+  const canvas = document.getElementById('game');
+  const GAME_KEYS = new Set(['Tab', 'Space', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']);
+  canvas.addEventListener('keydown', (e) => { if (GAME_KEYS.has(e.code)) e.preventDefault(); });
+  canvas.focus();
+
   // The effects, in the background (docs/DESIGN.md, "Loading and caching").
   if (files.effects) {
     const res = await fetch(files.effects);

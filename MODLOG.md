@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-03 Milestone 3a: the title screen alive (step 13)
+
+**Changed:** new: `port/core/src/{rand,aud,input,button,num}.rs`, `docs/milestone-3.md`. Edited: `port/core/src/title.rs` (a live screen: rise, skip, bob, buttons; the still is its resting state), `port/core/src/{lib,screen}.rs` (`game_pixel`), `port/web/src/sound.rs` (`setVolume`; the player is the core's `AudioHost`), `port/web/src/main.rs` (the title run per step, mouse and game keys, presses kept until a step sees them, the drawn cursor, the system cursor hidden), `port/www/index.html` (the canvas gets the focus; Tab, Space, Enter, arrows not acted on by the browser over the game), `scripts/build_assets/build_pack.py` (two cursor pictures, `data/Sounds.xml`), `scripts/checks/web_offline_check.mjs` (step 1a rewritten for 3a), `scripts/checks/README.md`, docs below. No download.
+**Why:** milestone 3, split into 3a, 3b, 3c; the user said to plan and go ahead without waiting.
+**Tested how:** `cargo test -p pp_core` (81 unit tests, 27 new, and the three reference comparisons); `python -I scripts/build_web.py`; `node scripts/checks/web_offline_check.mjs 8080` in headless Edge, 3 runs; a look in the app's browser pane.
+**Result:** the game's `Sounds.xml` reads as `aud.py` reads it (94 sounds, same picks for the 9 with several recordings); generator, beat and a 238-frame song change match the references; the title at rest is still identical to `titlescreen.py`. Browser check: run 1 FAILED ("the key did not skip the rise"): the check's key press and release land in one browser frame and the host passed on only "held". Fixed by keeping a press until a step sees it; runs 2 and 3 passed everything (rising, Space skips, still identical 3.6 s / 5.4 s later, hand cursor, STORY pressed, button-down then button-up, milestones 0 to 2, offline). Pane: the title rises in steps and arrives after about 24 s; hand over STORY. WebAssembly 26,447,590 bytes.
+**Docs corrected:** `input-handling.md` (buttons block their rectangle: wrong, corrected; `ButtonHelper.react` read in full); `DESIGN.md` ("One frame": the speaker's clock and kept presses; milestone 3 split); `milestone-2.md` (the title "does not rise yet"; `app.aud` "not built yet"; the effects split still not done); `milestone-1.md` (the browser keys note, done); `PROGRESS.md` (header, stage 5, docs table, stuck entry, steps 12 and 13). Searched `docs/` for "milestone 3", "does not rise", "block through", "real-time clock", "may need stopping".
+**Still broken / not tested:** not tried by the user; nothing against the running game; Firefox; whether the system cursor is really hidden (screenshots do not show it); a release outside the window; the title's effects still arrive with the effects pack (a press in the first moments can be silent). Not committed.
+
 ## 2026-11-03 Record that the user tried milestone 2
 
 **Changed:** `docs/PROGRESS.md` (header, stage 5, step 12), `docs/milestone-2.md` ("Not tested", listening).

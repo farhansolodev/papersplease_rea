@@ -19,7 +19,9 @@ Milestone 1a puts in: the twelve font files and their sheets (PNG kept as
 PNG; the core decodes them), data/Fonts.xml, and strings.json with the one
 text the font code needs, wrap_hyphen. Milestone 1b adds the title screen's
 pictures as pictures/<file name> (PICTURES) and its three texts to
-strings.json (STRINGS). The English language pack is NOT
+strings.json (STRINGS). Milestone 3a adds the two cursor pictures and
+data/Sounds.xml (DATA), which the game's speaker reads (Sounds.xml is not
+changed by the English pack). The English language pack is NOT
 applied here: of the 23 texts it changes none is in Text.xml, so Text.xml
 strings are the same with or without it (docs/milestone-1.md). Files it does
 change (Travelers.txt, Facts.xml, Endlesses.xml) need it applied
@@ -36,8 +38,9 @@ import xml.etree.ElementTree as ET
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ASSETS = os.path.join(ROOT, "extracted", "art", "assets")
 DEFAULT_OUT = os.path.join(ROOT, "build", "assets", "start.pack")
-PICTURES = ["Title.png", "PushButton.png", "SettingsButton.png"]
+PICTURES = ["Title.png", "PushButton.png", "SettingsButton.png", "CursorArrow.png", "CursorHand.png"]
 STRINGS = ["wrap_hyphen", "menu_story", "menu_endless", "created_by"]
+DATA = ["Sounds.xml"]
 
 
 def text_item(text_xml, item_id):
@@ -68,6 +71,8 @@ def files():
             unique.append((name, data))
     for name in PICTURES:
         unique.append(("pictures/" + name, open(os.path.join(ASSETS, name), "rb").read()))
+    for name in DATA:
+        unique.append(("data/" + name, open(os.path.join(ASSETS, "data", name), "rb").read()))
     text_xml = open(os.path.join(ASSETS, "data", "Text.xml"), encoding="utf-8").read()
     strings = {key: text_item(text_xml, key) for key in STRINGS}
     unique.append(("strings.json", json.dumps(strings, ensure_ascii=False).encode("utf-8")))

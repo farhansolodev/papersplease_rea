@@ -2,6 +2,7 @@
 //! player (`window.ppAudio`, port/www/audio.js), which plays them with the
 //! browser's Web Audio. Outside a browser every call does nothing.
 
+use pp_core::aud::AudioHost;
 use pp_core::sound::Category;
 
 #[cfg(target_arch = "wasm32")]
@@ -64,6 +65,11 @@ impl Player {
         js::call("stop", &[id.into()]);
     }
 
+    #[cfg(target_arch = "wasm32")]
+    pub fn set_volume(&self, id: u32, volume: f64) {
+        js::call("setVolume", &[id.into(), volume.into()]);
+    }
+
     /// The sound's position in seconds, or -1 when the player does not have it.
     #[cfg(target_arch = "wasm32")]
     pub fn position(&self, id: u32) -> f64 {
@@ -104,6 +110,8 @@ impl Player {
     #[cfg(not(target_arch = "wasm32"))]
     pub fn stop(&self, _: u32) {}
     #[cfg(not(target_arch = "wasm32"))]
+    pub fn set_volume(&self, _: u32, _: f64) {}
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn position(&self, _: u32) -> f64 {
         -1.0
     }
@@ -115,6 +123,27 @@ impl Player {
     pub fn update(&self) {}
     #[cfg(not(target_arch = "wasm32"))]
     pub fn add_clip(&self, _: &pp_core::adpcm::Clip) {}
+}
+
+/// The game's audio layer (`pp_core::aud`) talks to the player through this,
+/// as the original's talks to `UnityPlatformAudio`. The volume crosses as a
+/// 4-byte float, as in the original.
+impl AudioHost for Player {
+    fn start(&mut self, id: u32, category: Category, file: &str, looping: bool, volume: f32) {
+        Player::start(self, id, category, file, looping, volume as f64);
+    }
+    fn stop(&mut self, id: u32) {
+        Player::stop(self, id);
+    }
+    fn set_volume(&mut self, id: u32, volume: f32) {
+        Player::set_volume(self, id, volume as f64);
+    }
+    fn position(&mut self, id: u32) -> f64 {
+        Player::position(self, id)
+    }
+    fn set_category_pause(&mut self, category: Category, paused: bool) {
+        Player::set_category_pause(self, category, paused);
+    }
 }
 
 /// The effects pack, once the page has downloaded it (`ppConfig.effects`);

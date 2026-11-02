@@ -64,9 +64,33 @@ pub fn stretch(window_width: u32, window_height: u32) -> (i32, i32, u32, u32) {
     )
 }
 
+/// `HostUnity.Update`: a point in the window (physical pixels from its top
+/// left) to whole game pixels, for a picture drawn at `rect` (x, y, width,
+/// height): x = floor((qx + 0.5) x 570), y = floor(320 - (qy + 0.5) x 320),
+/// with qx + 0.5 and qy + 0.5 the point's place across the picture, the
+/// second counted upward (docs/input-handling.md). Not held inside the
+/// screen.
+pub fn game_pixel(px: f64, py: f64, rect: (i32, i32, u32, u32)) -> (f64, f64) {
+    let across = (px - rect.0 as f64) / rect.2 as f64;
+    let up = 1.0 - (py - rect.1 as f64) / rect.3 as f64;
+    ((across * WIDTH as f64).floor(), (HEIGHT as f64 - up * HEIGHT as f64).floor())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn window_points_become_whole_game_pixels() {
+        // Zoom 3 on 1920 x 1080: the picture at (105, 60).
+        let rect = (105, 60, 1710, 960);
+        assert_eq!(game_pixel(105.0, 60.0, rect), (0.0, 0.0));
+        assert_eq!(game_pixel(107.9, 62.9, rect), (0.0, 0.0));
+        assert_eq!(game_pixel(108.0, 63.0, rect), (1.0, 1.0));
+        assert_eq!(game_pixel(105.0 + 1709.5, 60.0 + 959.5, rect), (569.0, 319.0));
+        // Over the black bars: outside the screen.
+        assert_eq!(game_pixel(0.0, 1079.0, rect), (-35.0, 339.0));
+    }
 
     #[test]
     fn stretch_fills_one_direction_and_keeps_the_shape() {

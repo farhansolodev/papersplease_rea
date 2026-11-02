@@ -148,7 +148,9 @@ all four `false` with the new one. The user tried the page after the fix
 (2026-10-18).
 For later: when the game takes keys (Space, arrows, Tab), the browser's
 own action for them (scrolling, moving focus) may need stopping for those
-keys only, in the page's script, not for all keys.
+keys only, in the page's script, not for all keys. (Done in milestone 3a,
+2026-11-03: the page stops it for Tab, Space, Enter and the arrows over
+the game, `milestone-3.md`; check 1c still passes.)
 
 ### Not tested
 
