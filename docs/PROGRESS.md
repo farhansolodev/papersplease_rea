@@ -88,7 +88,7 @@ Checked: the settings screen identical to a new Python reference
 (`settingsscreen.py`) in two cases, a frame-by-frame game test, and the
 browser check's new step (1 run, passed); full screen itself only refused
 by headless Edge, not seen working by me. The user tried it the same day
-and said "lgtm" (which browser, and whether full screen was tried, not
+and said "lgtm", and that full screen works well (which browser not
 recorded). Findings: a
 screen change takes 70 frames (the second's wait starts once the screen is
 black); the settings are saved on the first frame when there are none,
@@ -817,11 +817,12 @@ the night screen's family pictures; part 11, the last screens.)
    identical to the reference in two cases; `tests/game.rs` (the change on
    the 70th frame, the volume buttons and bar, saving, full screen
    following the window, Escape back to a title that does not rise); the
-   browser check's step 1f, 1 run passed. **Not tested**: real full screen
-   (headless Edge refuses it), the Escape that leaves full screen, a
-   visible window, Firefox, against the game. The user tried it the same
-   day and said "lgtm" (which browser, and what was looked at, not
-   recorded).
+   browser check's step 1f, 1 run passed. The user tried it the same day
+   and said "lgtm", full screen included ("it all works well"; which
+   browser not recorded); in full screen the first Escape only leaves full
+   screen and a second presses DONE (seen by the user; for pausable
+   screens, a point for 3c's plan). **Not tested**: Firefox, against the
+   game.
    Corrected: `save-format.md` and `screens.md` (the settings file is
    written on the first frame when there is none; the change's timing).
    Next: the plan for **3c, the intro pages and the pause screen** (its

@@ -1645,9 +1645,11 @@ buttons on desktop are 5 apart; part 2, "The menu helper", 2026-10-18.) The desk
   are left out, and there is no quit option** (neither the pause screen's
   QUIT, made on desktop without any check, nor the title's `quit`
   button, part 2).
-- Escape is also the browser's own "leave fullscreen" key; in fullscreen
-  the browser may take the first press for itself. Not tested; for the
-  design.
+- Escape is also the browser's own "leave fullscreen" key. Seen by the
+  user on 2026-11-03 (milestone 3b, `milestone-3.md`; this said "not
+  tested" before): the first press only leaves full screen, the game does
+  not get it; a second press reaches the game (on the settings screen it
+  presses DONE). Full screen in a browser is decided in `DESIGN.md`.
 - Not needed for desktop: the Device row, `platover`, vibration.
 - **Decided by the user (2026-10-16): English only.** No Language row,
   no language chooser, and no age rating (the rating row, `RatingPopup`

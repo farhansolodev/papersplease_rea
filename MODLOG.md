@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-03 Record that the user tried full screen in 3b
+
+**Changed:** `docs/milestone-3.md` ("3b: Not tested"), `docs/DESIGN.md` (the fullscreen row), `docs/PROGRESS.md` (header, step 14), `docs/screens.md` part 4 ("For the port": the Escape that leaves full screen, "not tested" before).
+**Why:** the user tried the Fullscreen row and said "it all works well", then described Escape in full screen.
+**Tested how:** doc change only; seen by the user, not by me.
+**Result:** real full screen marked tried by the user (which browser not recorded). In full screen the first Escape only leaves full screen and stays on the settings screen; a second Escape presses DONE. I first wrote the opposite (one Escape doing both), from misreading the user's "the page does see it"; the user corrected it and these docs were fixed before any commit. Noted for 3c: the first Escape in full screen will not pause, unlike the original.
+**Docs corrected:** the four above. Searched `docs/` for "Real full screen", "only the refusal", "whether full screen", "sees the Escape", "leave fullscreen".
+**Still broken / not tested:** Firefox; against the game.
+
 ## 2026-11-03 Record that the user tried milestone 3b
 
 **Changed:** `docs/PROGRESS.md` (header, stage 5, step 14), `docs/milestone-3.md` (the parts table, "3b: Not tested").

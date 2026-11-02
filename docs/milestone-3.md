@@ -400,10 +400,17 @@ From the code, read for this step; nothing compared with the running game.
 - **By the user, in detail.** The user tried 3b on 2026-11-03 and said
   "lgtm"; which browser, and which items under "How to try it" were looked
   at (full screen among them), was not recorded.
-- **Real full screen**: headless Edge refused it, so only the refusal was
-  seen. Entering and leaving full screen in a visible browser, and whether
-  the page sees the Escape that leaves full screen (if it does, Escape on the
-  settings screen also presses DONE), are not tested.
+- **Real full screen**: headless Edge refused it, so I saw only the
+  refusal. The user tried the Fullscreen row in a visible browser on
+  2026-11-03 and said "it all works well" (which browser, and which ways of
+  leaving full screen were used, not recorded). The user also checked
+  Escape in full screen: **the first press only leaves full screen** (the
+  settings screen stays, the Fullscreen box unticks); a second press
+  presses DONE. So the browser keeps that first press for itself. (Written
+  wrongly the same day as "one Escape both leaves full screen and presses
+  DONE", from a misread answer; corrected on the user's report.) For 3c:
+  in full screen the first Escape will leave full screen without pausing,
+  where the original pauses and its window stays in full screen.
 - The look in a visible window (the app's pane was hidden); the fade's
   smoothness at a real 60 frames a second.
 - The easy tip's 3 seconds, and the bar drag, in a browser (only in
