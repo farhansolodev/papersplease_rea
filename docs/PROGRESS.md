@@ -50,8 +50,9 @@ start"); `Theme` plays on the title, streamed on a first visit and kept by
 the service worker, and plays offline; `?page=sounds` plays any effect.
 The songs' format is settled (ffmpeg, Ogg Vorbis; no download); the
 effects ship as the game's ADPCM and are decoded by the port, all 108
-identical to FMOD's decode. Not yet tried by the user, and nothing heard
-by a person. One open problem: the browser check's song part failed 3
+identical to FMOD's decode. The user tried it on 2026-11-03 and said
+everything looks fine (which browser, and what was listened to, not
+recorded). One open problem: the browser check's song part failed 3
 times in 13 runs on earlier builds for reasons not found, then passed 4
 of 4 ("Currently stuck"). Details in step 12 below.
 
@@ -392,7 +393,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out. The browser formats of the sounds: done in milestone 2 (2026-10-29, `milestone-2.md`: songs as Ogg Vorbis from ffmpeg, effects as the game's ADPCM) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files"). Step 6b, the game-side audio layer (`audio-layer.md`) |
-| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; not yet tried by the user. The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3 to 10 not started |
+| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3 to 10 not started |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
@@ -715,7 +716,7 @@ the night screen's family pictures; part 11, the last screens.)
    Firefox. The user tried it, with the fix, on 2026-10-18 (which
    browser was not recorded). Next: the plan for **milestone 2** (`DESIGN.md`, "Milestones"; built since, step 12).
 
-12. **Milestone 2, sound: built, not yet tried by the user**
+12. **Milestone 2, sound: built and tried by the user**
    (2026-10-29, `milestone-2.md`; the user said "just start on the
    work", so no plan was put first). New: `scripts/build_assets/build_audio.py`
    (the effects pack, the songs re-encoded by ffmpeg), in `pp_core` the
@@ -734,8 +735,9 @@ the night screen's family pictures; part 11, the last screens.)
    screen, against the game. Open: the check's unexplained failures
    ("Currently stuck"). The `app.aud` layer (fades, song changes, the
    beat) is not built: it belongs to milestone 3 with the title's rise.
-   Next: the user tries milestone 2 (`milestone-2.md`, "How to try it"),
-   then the plan for **milestone 3, the title screen alive**.
+   The user tried it on 2026-11-03 and said everything looks fine (which
+   browser, and what was listened to, not recorded). Next: the plan for
+   **milestone 3, the title screen alive**.
 
 Small jobs that fit anywhere:
 

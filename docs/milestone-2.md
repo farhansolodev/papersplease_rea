@@ -244,10 +244,12 @@ All on this machine, 2026-10-29.
 
 ## Not tested
 
-- **Listening.** Nothing here was heard by a person: no one has checked
-  that the songs, re-encoded, sound like the game's, that the effects
-  sound right, or that `Theme`'s loop point has no gap. The checks
-  measure positions and samples only.
+- **Listening, in detail.** The user tried the milestone on 2026-11-03
+  and said everything looks fine; which browser, and which sounds were
+  listened to, was not recorded. So not checked one by one: that the
+  re-encoded songs sound like the game's, that every effect sounds
+  right, that `Theme`'s loop point has no gap. The checks measure
+  positions and samples only.
 - **Streaming on a slow connection**, that a song really starts before
   its download ends. Locally the whole song arrives in milliseconds.
   (How to watch it is in "How to try it", item 4.)

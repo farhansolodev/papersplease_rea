@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-03 Record that the user tried milestone 2
+
+**Changed:** `docs/PROGRESS.md` (header, stage 5, step 12), `docs/milestone-2.md` ("Not tested", listening).
+**Why:** the user tried milestone 2 and said everything looks fine.
+**Tested how:** doc change only; not tested.
+**Result:** milestone 2 marked tried (which browser, and what was listened to, not recorded).
+**Docs corrected:** the two above. Searched `docs/` for "not yet tried", "nothing heard", "awaiting".
+**Still broken / not tested:** as in the milestone 2 entry, except that a person has now tried it.
+
 ## 2026-10-29 Milestone 2: sound (step 12)
 
 **Changed:** new: `scripts/build_assets/build_audio.py`, `port/core/src/{adpcm,sound,soundtest}.rs`, `port/core/tests/adpcm.rs`, `port/web/src/sound.rs`, `port/www/audio.js`, `docs/milestone-2.md`. Edited: `port/core/src/{lib,screen}.rs` (`stretch`), `port/web/src/main.rs` (settings, category volumes, `Theme` on the title, `?page=sounds`, the effects, the stretched picture), `port/web/Cargo.toml` (comment), `port/www/index.html` (the start screen, download progress, the click, the effects in the background, the worker registered after the download and not waited for when it fails), `port/www/sw.js` (songs streamed once and kept, parts from the cache, errors reported to the page, counts for the checks), `scripts/build_web.py` (effects pack, songs, `audio.js`; the build code now covers `sw.js`), `scripts/serve.py` (`.ogg` type, `/_served.json`), `scripts/checks/web_offline_check.mjs` (clicks the start button; stretch; the sound part; `Theme` offline), `scripts/checks/README.md`, `CLAUDE.md` (the build needs ffmpeg), docs below. No download.
