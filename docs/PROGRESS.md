@@ -66,8 +66,9 @@ the logo bobs, the game draws its own cursor, and the buttons press and
 click with their sounds; the core has the game's random generator, the
 audio layer `app.aud`, input and buttons. Checked with `cargo test` (the
 real `Sounds.xml` read as `aud.py` reads it; the title at rest still
-identical to its reference) and in headless Edge (2 runs passed). Not yet
-tried by the user; nothing compared with the game. A correction: buttons
+identical to its reference) and in headless Edge (2 runs passed). The
+user tried it the same day and said everything works quite well;
+nothing compared with the game. A correction: buttons
 do not block their rectangle (`input-handling.md`). Details in step 13
 below.
 
@@ -408,7 +409,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out. The browser formats of the sounds: done in milestone 2 (2026-10-29, `milestone-2.md`: songs as Ogg Vorbis from ffmpeg, effects as the game's ADPCM) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files"). Step 6b, the game-side audio layer (`audio-layer.md`) |
-| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; not yet tried by the user. The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3b, 3c and 4 to 10 not started |
+| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3b, 3c and 4 to 10 not started |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
@@ -757,7 +758,7 @@ the night screen's family pictures; part 11, the last screens.)
    browser, and what was listened to, not recorded). Next: the plan for
    **milestone 3, the title screen alive** (3a built since, step 13).
 
-13. **Milestone 3a, the title screen alive: built, not yet tried by the
+13. **Milestone 3a, the title screen alive: built and tried by the
    user** (2026-11-03, `milestone-3.md`; the user said to plan and go
    ahead without waiting). Milestone 3 split into 3a, 3b and 3c. New in
    `pp_core`: `rand.rs`, `aud.rs` (`app.aud`), `input.rs`, `button.rs`,
@@ -771,10 +772,10 @@ the night screen's family pictures; part 11, the last screens.)
    step (the rise, a key skipping it, the hand cursor, a pressed button,
    both sounds), 2 runs passed; a look in the app's pane. Decided by me
    (reversible, `DESIGN.md`): the speaker on the fixed step; presses kept
-   until a step sees them. **Not tested**: by the user, against the game,
-   Firefox. Next: the user tries 3a (`milestone-3.md`, "How to try it"),
-   then the plan for **3b, screens** (its reading list is at the end of
-   `milestone-3.md`).
+   until a step sees them. The user tried it the same day and said
+   everything works quite well (which browser not recorded). **Not
+   tested**: against the game, Firefox. Next: the plan for **3b,
+   screens** (its reading list is at the end of `milestone-3.md`).
 
 Small jobs that fit anywhere:
 

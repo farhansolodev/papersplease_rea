@@ -9,7 +9,7 @@ plan and go ahead without waiting):
 
 | Part | What you can try | State |
 |---|---|---|
-| **3a** | The title alive: the game's own cursor, the title rising with `Theme`, a click or key skipping the rise, the logo bobbing, the buttons pressing and clicking with their sounds | **Built 2026-11-03** (below) |
+| **3a** | The title alive: the game's own cursor, the title rising with `Theme`, a click or key skipping the rise, the logo bobbing, the buttons pressing and clicking with their sounds | **Built 2026-11-03** (below), tried by the user the same day |
 | 3b | Screens: the fade between screens, the settings screen with working volumes (kept in the browser), the pause screen on Escape, Escape and the browser's full screen | Not started |
 | 3c | The intro pages (the page player) | Not started |
 
@@ -178,8 +178,9 @@ and `language-pack.md` lists no change to it).
 
 ## 3a: Not tested
 
-- **By the user.** Nothing of 3a has been tried by a person except my look
-  in the app's pane, which has no sound.
+- **By the user, in detail.** The user tried 3a on 2026-11-03 and said
+  "everything actually works quite well"; which browser, and which of the
+  items under "How to try it" were looked at, was not recorded.
 - **Against the running game**: the rise's timing and steps, the bob, the
   buttons and the cursor are from code reading only (`screens.md` part 2,
   "Things to watch in the game", and `buttons.md`'s list are still open).

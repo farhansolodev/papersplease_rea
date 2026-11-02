@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-03 Record that the user tried milestone 3a
+
+**Changed:** `docs/PROGRESS.md` (header, stage 5, step 13), `docs/milestone-3.md` (the parts table, "Not tested").
+**Why:** the user tried 3a and said "everything actually works quite well".
+**Tested how:** doc change only; not tested.
+**Result:** 3a marked tried (which browser, and which items were looked at, not recorded).
+**Docs corrected:** the two above. Searched `docs/` for "not yet tried by the user" and "By the user".
+**Still broken / not tested:** as in the 3a entry, except that a person has now tried it.
+
 ## 2026-11-03 Milestone 3a: the title screen alive (step 13)
 
 **Changed:** new: `port/core/src/{rand,aud,input,button,num}.rs`, `docs/milestone-3.md`. Edited: `port/core/src/title.rs` (a live screen: rise, skip, bob, buttons; the still is its resting state), `port/core/src/{lib,screen}.rs` (`game_pixel`), `port/web/src/sound.rs` (`setVolume`; the player is the core's `AudioHost`), `port/web/src/main.rs` (the title run per step, mouse and game keys, presses kept until a step sees them, the drawn cursor, the system cursor hidden), `port/www/index.html` (the canvas gets the focus; Tab, Space, Enter, arrows not acted on by the browser over the game), `scripts/build_assets/build_pack.py` (two cursor pictures, `data/Sounds.xml`), `scripts/checks/web_offline_check.mjs` (step 1a rewritten for 3a), `scripts/checks/README.md`, docs below. No download.
