@@ -144,6 +144,9 @@ impl AudioHost for Player {
     fn set_category_pause(&mut self, category: Category, paused: bool) {
         Player::set_category_pause(self, category, paused);
     }
+    fn set_category_volume(&mut self, category: Category, volume: f32) {
+        Player::set_category_volume(self, category, volume as f64);
+    }
 }
 
 /// The effects pack, once the page has downloaded it (`ppConfig.effects`);

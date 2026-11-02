@@ -1,7 +1,9 @@
 # Where the project stands
 
 **Read this first in a new session.** Last updated 2026-11-03, after
-step 13, milestone 3a, the title screen alive (`milestone-3.md`); before
+step 14, milestone 3b, screen changes and the settings screen
+(`milestone-3.md`); before it step 13, milestone 3a, the title screen
+alive (`milestone-3.md`); before
 it step 12, milestone 2, sound (`milestone-2.md`); before it step 11,
 milestone 1b, the title screen as a still (`milestone-1.md`);
 before it step 10, milestone 1a, the font test pages; before it
@@ -60,7 +62,8 @@ of 4 ("Currently stuck"). Details in step 12 below.
 **Update 2026-11-03 (step 13): milestone 3a, the title screen alive, is
 built** (`milestone-3.md`); the user tried milestone 2 the same day and
 said to plan and go ahead without waiting. Milestone 3 is split into 3a
-(this), 3b (screen changes, settings, pause) and 3c (the intro pages).
+(this), 3b (screen changes, settings) and 3c (the intro pages and, since
+step 14, the pause screen).
 The title now rises with `Theme`'s beat, a click or key skips the rise,
 the logo bobs, the game draws its own cursor, and the buttons press and
 click with their sounds; the core has the game's random generator, the
@@ -70,6 +73,26 @@ identical to its reference) and in headless Edge (2 runs passed). The
 user tried it the same day and said everything works quite well;
 nothing compared with the game. A correction: buttons
 do not block their rectangle (`input-handling.md`). Details in step 13
+below.
+
+**Update 2026-11-03 (step 14): milestone 3b, screen changes and the
+settings screen, is built** (`milestone-3.md`, "3b"), with the user's
+go-ahead for the plan; the 5 commits before it were pushed to GitHub at
+the user's request (no game files in them, checked). The title's settings
+button fades to black and opens the settings screen (Fullscreen, Nudity,
+Easy Mode, Date Format, Music, Sound; DONE or Escape back to a title that
+does not rise); the settings are kept in the page's `pp.settings`, the
+volumes heard at once, the Fullscreen row switches the browser's full
+screen and follows it. The pause screen moved to 3c (the user agreed).
+Checked: the settings screen identical to a new Python reference
+(`settingsscreen.py`) in two cases, a frame-by-frame game test, and the
+browser check's new step (1 run, passed); full screen itself only refused
+by headless Edge, not seen working by me. The user tried it the same day
+and said "lgtm" (which browser, and whether full screen was tried, not
+recorded). Findings: a
+screen change takes 70 frames (the second's wait starts once the screen is
+black); the settings are saved on the first frame when there are none,
+which corrects `save-format.md` and `screens.md`. Details in step 14
 below.
 
 Before it the same day,
@@ -82,7 +105,7 @@ three "needed before the first Rust code" (a fixed 1/60 s step; booth draws
 copied exactly; the English pack applied once at asset preparation). Two
 stayed open there: the songs' format (settled in milestone 2, step 12,
 without a download: ffmpeg was already on this machine) and fullscreen in
-a browser. Next: step 8, writing the rest of
+a browser (decided in milestone 3b, step 14). Next: step 8, writing the rest of
 `DESIGN.md` (the architecture).
 
 Before it the same day, step 6b, the game-side audio layer `app.aud` (`audio-layer.md`; code
@@ -409,7 +432,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out. The browser formats of the sounds: done in milestone 2 (2026-10-29, `milestone-2.md`: songs as Ogg Vorbis from ffmpeg, effects as the game's ADPCM) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files"). Step 6b, the game-side audio layer (`audio-layer.md`) |
-| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3b, 3c and 4 to 10 not started |
+| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). **Milestone 3b built** (2026-11-03): screen changes with their fade, the settings and the settings screen, full screen; tried by the user (2026-11-03). The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3c and 4 to 10 not started |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
@@ -424,7 +447,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `milestone-0.md` | Milestone 0, an empty page: how to try it, what was built, what was measured (WebAssembly 26 MB, `target/` 2.3 GB), what was checked, what is not tested, dead ends |
 | `milestone-1.md` | Milestone 1a, the font test pages, and 1b, the title screen as a still (with where everything on it sits and the 5-pixel menu gap); the fix for blocked browser keys: how to try each, what was built, the decisions, measurements, checks, findings (half-pixel positions, a line-breaker edge), what is not tested |
 | `milestone-2.md` | Milestone 2, sound: how to try it (the start screen, `Theme`, the sound test page, watching the song streamed and kept), what was built (the sound files, the ADPCM decoder, the sound player `audio.js`, the service worker's song handling, effects in the background), the decisions (the songs' format, the player in the page), measurements, checks, findings (Chrome and mixed song parts, the worker restarted, no service workers in the app's pane), dead ends (the check's unexplained failures), what is not tested |
-| `milestone-3.md` | Milestone 3, split into 3a, 3b, 3c; 3a, the title screen alive: how to try it, what was built (the generator, `app.aud`, input, buttons, the live title), the decisions (the speaker on the fixed step, presses kept until a step sees them), the checks, findings (buttons do not block), what is not tested, the failure on the way, the reading list for 3b |
+| `milestone-3.md` | Milestone 3, split into 3a, 3b, 3c; 3a, the title screen alive: how to try it, what was built (the generator, `app.aud`, input, buttons, the live title), the decisions (the speaker on the fixed step, presses kept until a step sees them), the checks, findings (buttons do not block), what is not tested, the failure on the way; 3b, screen changes and the settings screen: how to try it, what was built (the fade states, the settings, the settings screen, `Game`, the page's `ppPlatform`), the decisions (pause moved to 3c, full screen in a browser), the checks, findings (a change takes 70 frames; the settings saved on the first frame; the layout), what is not tested, the reading list for 3c |
 | `DESIGN.md` | The port's decisions: decided by the user, suggested defaults, the three needed before the first Rust code, the five answered before milestone 0 (hosting, browsers, start screen, Bevy as a thin host, downloads); the architecture (core, host, page, asset preparation; one frame; exactness checks; loading and caching) and the 11 milestones (step 8) |
 | **Base** | |
 | `rand.md` | The random generator, checked against the machine code |
@@ -778,7 +801,31 @@ the night screen's family pictures; part 11, the last screens.)
    a frame counter: `?fps` shows the browser's frames per second top left,
    a box of the page that leaves the game's picture alone
    (`milestone-3.md`, "After 3a: the frame counter"). Next: the plan for
-   **3b, screens** (its reading list is at the end of `milestone-3.md`).
+   **3b, screens** (built since, step 14).
+
+14. **Milestone 3b, screen changes and the settings screen: built**
+   (2026-11-03, `milestone-3.md`, "3b"; the user gave the go-ahead for the
+   plan, and asked first for the local commits to be pushed: 5 commits
+   pushed to `origin/master`, checked for game files first, none). The
+   pause screen moved to 3c (the user agreed). New in `pp_core`: `fade.rs`
+   (the screen-change states from `app.Stater`), `settings.rs`,
+   `settings_screen.rs`, `game.rs` (`Game.update`'s frame, screen changes,
+   settings applied and saved); the host runs a `Game`, and the page keeps
+   the settings and switches full screen (`window.ppPlatform`). New
+   reference `scripts/reference/settingsscreen.py`. Decided: full screen in
+   a browser (`DESIGN.md`). Checked: 88 unit tests; the settings screen
+   identical to the reference in two cases; `tests/game.rs` (the change on
+   the 70th frame, the volume buttons and bar, saving, full screen
+   following the window, Escape back to a title that does not rise); the
+   browser check's step 1f, 1 run passed. **Not tested**: real full screen
+   (headless Edge refuses it), the Escape that leaves full screen, a
+   visible window, Firefox, against the game. The user tried it the same
+   day and said "lgtm" (which browser, and what was looked at, not
+   recorded).
+   Corrected: `save-format.md` and `screens.md` (the settings file is
+   written on the first frame when there is none; the change's timing).
+   Next: the plan for **3c, the intro pages and the pause screen** (its
+   reading list is at the end of `milestone-3.md`).
 
 Small jobs that fit anywhere:
 
@@ -810,7 +857,8 @@ answered are gone from here (their answers are in the docs named in
    Each says what the port assumes meanwhile and when to settle it.
 2. **The user's decision**: in `DESIGN.md`, not repeated here. All decided
    on 2026-10-17 except the songs' format (settled 2026-10-29 in
-   milestone 2) and fullscreen in a browser (still open).
+   milestone 2) and fullscreen in a browser (decided 2026-11-03 in
+   milestone 3b).
 3. **Needs the game to run**: one watch list per doc, below; none blocks the
    build.
 4. **Will not matter for a desktop port**: left as they are, with the reason.

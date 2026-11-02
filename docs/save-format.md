@@ -284,8 +284,13 @@ current one when missing. This is where the saved date format comes from
 settings' change counter differs from its value at the last load. Who
 calls it is known since 2026-10-14 (`screens.md`, part 4, "Who writes the
 settings file"): `Game.applySettings`, which `Game.update` runs on the
-frame after any setter has changed a value. (That fits the real folder:
-the file appeared when the user changed a volume, not at start-up.)
+frame after any setter has changed a value, and on the very first frame
+(`Game`'s copy of the counter starts at 0, the settings' at 1), so with no
+`settings` entry the defaults are written at start-up (code reading,
+2026-11-03, milestone 3b). This sentence said until 2026-11-03 that the
+real folder showed the file was written when the user changed a volume,
+not at start-up; corrected: the folder's file time shows only the last
+write, which an earlier one would not leave a trace of.
 
 **Statistics.** `stats` is the all-time table: names to values, whole
 numbers for the counters and texts for the two kinds of entry below
@@ -429,8 +434,8 @@ In this order:
 | State | What it does |
 |---|---|
 | `on` | Normal running. On entry the fade cover (`screenFlash`) fades out (its alpha to 0; `off` and `off-instant` take it to 1; `screens.md` part 11) |
-| `off` | On entry two flags of the current screen are cleared (4 and 16) and the fade cover fades in. After 1 second the pending screen change is applied and the state goes back to `on` |
-| `off-instant` | The same with no fade and no wait |
+| `off` | On entry two flags of the current screen are cleared (4 and 16) and the fade cover fades in. 1 second after the cover is black (the state's clock does not run while it blends), the state goes back to `on`, and leaving `off` applies the pending screen change and sets `on`'s fade back to 0.125 s. At 60 frames a second the change comes on the 70th frame after the request (read in `app.State` and `app.Stater` on 2026-11-03, milestone 3b, `milestone-3.md`; this row said "after 1 second" before) |
+| `off-instant` | The same with no fade and no wait; leaving it sets `on`'s fade to 0, so the new screen appears without a fade-in too, and so does the next screen after it until an `off` change sets the fade back (2026-11-03) |
 | `flashing-to-title` | The same two flags are cleared, and the screen flash runs; when it is over, the state goes to `off-instant` and "title" becomes the pending change (the target state was read in the instructions on 2026-10-16, `screens.md` part 11; this row first said the decompiler had dropped it) |
 | `paused` | On entry: the sound effects paused (only the effects: a song plays on; this row said "all sound" until 2026-10-17, corrected in step 6b, `audio-layer.md`), the pause screen created, the current screen hidden, the sound `button-drop`. Every frame it tells the clock to pause for one frame. On exit: effects resumed, pause screen removed, screen shown again, the sound `hover-up` |
 

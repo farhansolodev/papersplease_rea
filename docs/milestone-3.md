@@ -10,8 +10,14 @@ plan and go ahead without waiting):
 | Part | What you can try | State |
 |---|---|---|
 | **3a** | The title alive: the game's own cursor, the title rising with `Theme`, a click or key skipping the rise, the logo bobbing, the buttons pressing and clicking with their sounds | **Built 2026-11-03** (below), tried by the user the same day |
-| 3b | Screens: the fade between screens, the settings screen with working volumes (kept in the browser), the pause screen on Escape, Escape and the browser's full screen | Not started |
-| 3c | The intro pages (the page player) | Not started |
+| **3b** | Screens: the fade between screens, the settings screen with working settings (kept in the browser), Escape and the browser's full screen | **Built 2026-11-03** (below), tried by the user the same day |
+| 3c | The intro pages (the page player) and the pause screen on Escape | Not started |
+
+The pause screen was in 3b at first. It moved to 3c on 2026-11-03 (my
+suggestion, the user agreed): only the day, night, news and intro screens
+can be paused (`screens.md` part 4), and the intro, in 3c, is the first of
+them the port has, so in 3b the pause screen could only have been reached
+from a test page.
 
 ## 3a: How to try it
 
@@ -41,9 +47,10 @@ see:
    "created by" line): pressing one shows it filled with black text and
    plays a click; letting go over it plays the release click. Slide off
    while holding: it goes back to its outline; let go off it: nothing.
-   Nothing happens after a click yet: the screens they lead to come in 3b
-   and later milestones. (The browser's console shows "title: story
-   clicked" and so on.)
+   After a click on STORY, ENDLESS or the "created by" line nothing happens
+   yet: their screens come in later milestones (the browser's console shows
+   "title: story clicked" and so on). The settings button opens the
+   settings screen since 3b.
 6. A reload shows the rise again (every start of the page is a new run).
 
 The button sounds come from the effects pack, which arrives a moment after
@@ -191,7 +198,8 @@ and `language-pack.md` lists no change to it).
 - Firefox, Chrome by hand.
 - The title's rise when `Theme` stalls on a slow first download (it
   should wait with the song).
-- A second title screen of the run (no rise): needs screen changes (3b).
+- (A second title screen of the run, with no rise, was listed here: built
+  in 3b and checked, below.)
 
 ## 3a: Dead ends and failures
 
@@ -229,13 +237,201 @@ development aid, off by default.
   in a visible window the same day and said it looks right (the number
   shown was not recorded).
 
-## Next: 3b
+## 3b: How to try it
 
-The plan for 3b, to be read before it is built: `save-format.md` part 2
-(the screen change: `GameTransition`, `queueScreenChange`,
-`applyScreenChange`, the fade), `screens.md` parts 1 and 4 (`GameScreen`,
-`enablePause`, the pause screen, the settings screen and its rows, who
-writes the settings), and `audio-layer.md` (a screen change fades the
-effects out; the pause screen pauses effects only). Still open for it:
-`DESIGN.md`'s fullscreen and Escape row, and splitting the title's and
-menus' effects into the start pack (`milestone-2.md`).
+Built 2026-11-03, with the user's go-ahead for the plan. From the project
+folder:
+
+```
+python -I scripts/build_web.py
+python -I scripts/serve.py 8080
+```
+
+Close any tab still showing an older build first (a reload keeps the old
+one: "Dead ends" below). Open `http://localhost:8080`, click "Click to
+start", press Space to skip the title's rise, then:
+
+1. **Click the settings button** (bottom left). The screen goes black in
+   about an eighth of a second, stays black for a second, and the settings
+   screen fades in: the red header with SETTINGS, then the rows Fullscreen,
+   Nudity, Easy Mode, Date Format, Music and Sound, and DONE at the bottom.
+   `Theme` plays on without a break.
+2. **Music and Sound**: minus and plus move the bar in tenths, and you hear
+   the change at once; holding the mouse down on a bar and moving sets it
+   directly (keep holding and you can drag past its ends). The values are
+   kept: reload the page and the start screen's sliders show them.
+3. **Fullscreen**: ticking it puts the browser in full screen; leaving full
+   screen any way (the browser's Escape, F11) unticks it.
+4. **Easy Mode**: ticking it shows "+ 20 credits per day" beside it for 3
+   seconds. Nudity, Easy Mode and Date Format are kept but change nothing
+   yet: what they affect comes with the day.
+5. **DONE or Escape** (Escape presses DONE when you let go of the key)
+   fades back to the title, already in place: a second title does not rise.
+
+## 3b: What was built
+
+In the core (`port/core/src/`), tested with `cargo test`:
+
+- `fade.rs`: the game's own states for a screen change (`Game.createStater`
+  run by `app.Stater`): `on`, `off`, `off-instant`, and the fade cover's
+  alpha. Read again in full for this step: `app.State` (`apply`, `enter`,
+  `exit`, `step`, `getSnapshot`), `app.Stater` (`go`, `step`), the five
+  functions `createStater` hands the states, and `app.Interp.lerp`.
+- `settings.rs`: `play.Settings` (the setters and their change counter, the
+  load, `save`), the three date formats, the volume steps.
+- `settings_screen.rs`: the settings screen (`SettingsScreen`,
+  `SettingsMenu`, `SettingRow`, `SettingDim`, `GameScreen.addHeader`), with
+  the button pictures made as `SettingRow.makeModeImages` makes them.
+- `game.rs`: `Game`: the current screen, the frame in `Game.update`'s order,
+  the change (`queueScreenChange`, `applyScreenChange`: effects fade out,
+  one-shots ignored for the frame, the new screen and its song), the
+  settings applied and saved (`applySettings`), the full screen copied from
+  the window when it differs.
+- Smaller: `AudioHost` gained the category volume; `Button::set_look`;
+  `Picture` gained `fill_rect`, `paste_blend` (the `BLEND` paste) and
+  `clone`; `Gallery::made_picture` keeps pictures made at run time;
+  `Screen::cover` draws the fade cover with its alpha as a float, as the
+  game's colour holds it; `lerp_scale` moved to `num.rs`.
+
+In the host (`port/web/src/`): `main.rs` runs a `Game` instead of a bare
+title screen; `platform.rs` is the platform (full screen, keeping the
+settings) through the page's `window.ppPlatform`; `sound.rs` passes the
+category volume on.
+
+In the page (`port/www/index.html`): `pp.settings` in local storage keeps
+the game's settings under their own names (new: `nudity`, on by default as
+in a desktop game, `easyMode`, `dateFormatIndex`) and hands them to the game
+as `ppConfig.settings`; `window.ppPlatform` answers `getFullscreen`,
+`setFullscreen` and `saveSettings`.
+
+In the start pack: `ScreenHeader.png`, the four `SettingButton*.png` icons
+and the screen's ten texts.
+
+A new reference, `scripts/reference/settingsscreen.py`, draws the settings
+screen as a still in two cases (a new player's settings; changed settings
+with the easy tip showing), written from the code before the Rust.
+
+## 3b: Decisions
+
+- **The pause screen moved to 3c** (above; the user agreed).
+- **Fullscreen in a browser** (`DESIGN.md`, decided with the plan): the row
+  asks the browser for full screen, or to leave it; when the browser leaves
+  full screen by its own means the setting follows, as the original's does
+  with its window. While a request is on its way the page answers with what
+  was asked; a refused request (a browser allows full screen only just
+  after a click or a key) leaves the window as it was, and the game then
+  unticks the box.
+- **The settings live in the page's `pp.settings`** with the game's own
+  names, the same place the start screen uses, so both always agree.
+- **Left out**: the Language row and the `web` and `twitter` buttons (the
+  user's decisions; without the Language row the list is shorter than the
+  original's, so it sits lower: see "Findings").
+
+## 3b: Checks
+
+- `cargo test -p pp_core`: 88 unit tests (7 new: the fade's timeline and the
+  instant change, the settings' counter and load, the volume steps, the
+  button pictures) and the test files in `port/core/tests/`. New ones:
+  - **The settings screen is identical, byte for byte, to the Python
+    reference** in both of its cases (`tests/settings_screen.rs`).
+  - `tests/game.rs` drives the game frame by frame: the first frame applies
+    the settings (both gains 1) and saves once; the settings button changes
+    the screen on the 70th frame after the click, under a black cover gone 9
+    frames later, with `Theme` started only once; Music plus at 1.0 changes
+    nothing, minus gives 0.9 applied squared and saved; the Sound bar held a
+    fifth of the way gives 0.2 and dragged past its end 0; the Fullscreen box
+    sets the window and follows it back; Escape, on release, goes back to a
+    title that does not rise.
+  - The title at rest is still identical to `titlescreen.py`.
+- `node scripts/checks/web_offline_check.mjs 8080` in headless Edge, new step
+  1f (**1 run, passed**, with all of milestones 0 to 3a): the settings button
+  turned the screen black, then the settings screen was identical to the
+  reference but for the cursor; `Theme` kept its play id (not started
+  again); Music minus was kept in `pp.settings` as 0.9 and the music gain
+  became 0.81; the Fullscreen box: headless Edge refused full screen ("not
+  granted") and the box and the kept setting went back to off, as designed;
+  Escape brought the title at rest; after a reload the music gain was 0.81.
+  The hidden headless page is drawn about once a second, 0.1 s of game time
+  each, so the change took 10 to 15 s there.
+- Not looked at in a visible window: the app's browser pane was hidden
+  during this step.
+
+## 3b: Measurements
+
+- WebAssembly 26,470,695 bytes (26,447,590 after 3a).
+- Start pack 2,046,977 bytes (2,040,820).
+
+## 3b: Findings
+
+From the code, read for this step; nothing compared with the running game.
+
+- **A screen change takes 70 frames** at 60 a second (1.17 s), not the
+  1.125 s the fade and the wait add up to: the `off` state's own clock does
+  not run while it blends, so its second starts only once the screen is
+  black. Frame by frame after the click: the cover's alpha 0, 2/15, 4/15 ...
+  14/15, black on the 9th frame; the 1 s wait (60 frames of 1/60 s add up to
+  1.0 exactly); the new screen built on the 70th frame under the black cover,
+  and it gets its update and input that same frame; the cover gone 9 frames
+  later. `save-format.md` part 2 is corrected.
+- **After an instant change, the next fade-in is instant too**:
+  `off-instant`'s exit sets `on`'s blend time to 0, and only `off`'s exit
+  sets it back to 0.125 s.
+- The fade cover is a black fill on layer 10, its alpha a float; the game's
+  cursor (layer 100) stays over it.
+- **The settings file is written on the first frame when there is none**:
+  `Game`'s copy of the settings counter starts at 0 and the settings' own
+  at 1, so the first frame applies and saves. `save-format.md` and
+  `screens.md` said the real folder showed the file was written only when
+  the user changed a volume; the folder shows only the last write, so that
+  was an over-reading (corrected 2026-11-03).
+- The "off" tick box's icon (`SettingButtonOff.png`, 5 x 5) is fully
+  transparent: an unticked box is the dotted outline alone. The "on" icon
+  is 13 x 13 and has no inner padding; every button picture is 15 x 15.
+- Desktop, English, without the Language row: the header's title box is
+  64 x 20 at y 57 (its bottom at 77); the list is 214 x 110 at (178, 123),
+  rows 19 apart; DONE at (220, 280). In the original the Language row makes
+  the list one row (or more, by the language button's icon, not looked up)
+  taller, so it sits higher.
+- A volume of 0.3 stepped down is 0.19999999999999998 (the game's own double
+  arithmetic, kept as it is); the next step gives 0.1 exactly.
+
+## 3b: Not tested
+
+- **By the user, in detail.** The user tried 3b on 2026-11-03 and said
+  "lgtm"; which browser, and which items under "How to try it" were looked
+  at (full screen among them), was not recorded.
+- **Real full screen**: headless Edge refused it, so only the refusal was
+  seen. Entering and leaving full screen in a visible browser, and whether
+  the page sees the Escape that leaves full screen (if it does, Escape on the
+  settings screen also presses DONE), are not tested.
+- The look in a visible window (the app's pane was hidden); the fade's
+  smoothness at a real 60 frames a second.
+- The easy tip's 3 seconds, and the bar drag, in a browser (only in
+  `tests/game.rs`).
+- Against the running game: everything here is code reading
+  (`screens.md` part 4, "Things to watch in the game").
+- Firefox, Chrome by hand.
+
+## 3b: Dead ends and failures
+
+- The first browser-check run failed ("the settings screen did not
+  appear"): the check waited 8 s, but the hidden headless page runs about
+  0.1 s of game time a second. The waits were made longer (40 s); the next
+  run passed. Not a fault of the port.
+- **The user's first try ran the old build**: the settings button did
+  nothing, as in 3a. A new build's service worker serves only once every
+  tab of the old build is closed; a reload is not enough (by design, `sw.js`
+  and `milestone-0.md`). Closing the tab and opening a new one fixed it.
+  "How to try it" did not say so; it applies to every build: close the old
+  tab, or open `?nosw` once.
+
+## Next: 3c
+
+The intro pages and the pause screen. To read before it is built:
+`screens.md` part 5 (the page player, the intro screen) and part 4 (the
+pause screen, `enablePause`, Escape and its key mask), `save-format.md` part
+2 (the `paused` state: effects paused, the song plays on, `button-drop` and
+`hover-up`), `ends-xml-format.md` (`Intro.xml`). STORY leads to the load
+screen first (`screens.md` part 3), so 3c needs a way in: the load screen
+itself, or a test page; to settle in its plan. Still open from milestone 2:
+splitting the title's and menus' effects into the start pack.

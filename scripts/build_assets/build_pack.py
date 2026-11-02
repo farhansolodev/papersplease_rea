@@ -21,7 +21,8 @@ text the font code needs, wrap_hyphen. Milestone 1b adds the title screen's
 pictures as pictures/<file name> (PICTURES) and its three texts to
 strings.json (STRINGS). Milestone 3a adds the two cursor pictures and
 data/Sounds.xml (DATA), which the game's speaker reads (Sounds.xml is not
-changed by the English pack). The English language pack is NOT
+changed by the English pack). Milestone 3b adds the settings screen's
+header and button icons and its texts. The English language pack is NOT
 applied here: of the 23 texts it changes none is in Text.xml, so Text.xml
 strings are the same with or without it (docs/milestone-1.md). Files it does
 change (Travelers.txt, Facts.xml, Endlesses.xml) need it applied
@@ -38,8 +39,12 @@ import xml.etree.ElementTree as ET
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ASSETS = os.path.join(ROOT, "extracted", "art", "assets")
 DEFAULT_OUT = os.path.join(ROOT, "build", "assets", "start.pack")
-PICTURES = ["Title.png", "PushButton.png", "SettingsButton.png", "CursorArrow.png", "CursorHand.png"]
-STRINGS = ["wrap_hyphen", "menu_story", "menu_endless", "created_by"]
+PICTURES = ["Title.png", "PushButton.png", "SettingsButton.png", "CursorArrow.png", "CursorHand.png",
+            "ScreenHeader.png", "SettingButtonOn.png", "SettingButtonOff.png", "SettingButtonPlus.png",
+            "SettingButtonMinus.png"]
+STRINGS = ["wrap_hyphen", "menu_story", "menu_endless", "created_by",
+           "menu_settings", "menu_done", "menu_fullscreen", "menu_nudity", "menu_easy", "menu_easytip",
+           "menu_dateformat", "menu_music", "menu_sound"]
 DATA = ["Sounds.xml"]
 
 

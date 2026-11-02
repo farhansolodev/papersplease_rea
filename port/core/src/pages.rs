@@ -119,6 +119,20 @@ impl Gallery {
         self.names.get(&format!("pictures/{file}")).copied()
     }
 
+    /// The index of a picture the game makes at run time (the settings
+    /// buttons' pictures), made by `make` the first time it is asked for
+    /// and kept under `made/<name>`.
+    pub fn made_picture(&mut self, name: &str, make: impl FnOnce(&Gallery) -> Result<Picture, String>) -> Result<usize, String> {
+        let key = format!("made/{name}");
+        if let Some(&i) = self.names.get(&key) {
+            return Ok(i);
+        }
+        let picture = make(self)?;
+        self.names.insert(key, self.pictures.len());
+        self.pictures.push(picture);
+        Ok(self.pictures.len() - 1)
+    }
+
     fn sheet(&self, index: usize) -> (&str, &Picture) {
         let name = &self.sheet_files[index];
         (name, &self.pictures[self.names[name]])

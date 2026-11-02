@@ -17,6 +17,12 @@ pub fn math_round(x: f64) -> i32 {
     }
 }
 
+/// `app.Num.lerpScale`: `x` held to `in0..in1`, mapped onto `out0..out1`.
+pub fn lerp_scale(x: f64, in0: f64, in1: f64, out0: f64, out1: f64) -> f64 {
+    let x = x.min(in1).max(in0);
+    (x - in0) / (in1 - in0) * (out1 - out0) + out0
+}
+
 /// `app.Num.smoothstep`: 0 below `edge0`, 1 above `edge1`, an S-curve between.
 pub fn smoothstep(edge0: f64, edge1: f64, x: f64) -> f64 {
     let t = f64::max(0.0, f64::min(1.0, (x - edge0) / (edge1 - edge0)));

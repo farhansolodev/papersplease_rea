@@ -99,17 +99,20 @@ if (params.has('fps')) {
 
 // The player's settings, kept in the browser's local storage under the same
 // names as the game's own settings file (docs/save-format.md, "Settings"):
-// volumes in tenths from 0 to 1. `stretch` is the start screen's own.
+// volumes in tenths from 0 to 1; nudity starts on, as in a desktop game.
+// The game's settings screen changes them too (window.ppPlatform below).
+// `stretch` is the start screen's own.
 const SETTINGS = 'pp.settings';
 function loadSettings() {
-  const s = { musicVolume: 1, soundVolume: 1, fullscreen: false, stretch: false };
+  const s = { musicVolume: 1, soundVolume: 1, fullscreen: false, nudity: true, easyMode: false,
+              dateFormatIndex: 0, stretch: false };
   try { Object.assign(s, JSON.parse(localStorage.getItem(SETTINGS) || '{}')); } catch { /* none kept */ }
   for (const k of ['musicVolume', 'soundVolume']) {
     const v = Number(s[k]);
     s[k] = Number.isFinite(v) ? Math.min(1, Math.max(0, Math.round(v * 10) / 10)) : 1;
   }
-  s.fullscreen = !!s.fullscreen;
-  s.stretch = !!s.stretch;
+  for (const k of ['fullscreen', 'nudity', 'easyMode', 'stretch']) s[k] = !!s[k];
+  s.dateFormatIndex = Math.min(2, Math.max(0, Math.trunc(Number(s.dateFormatIndex)) || 0));
   return s;
 }
 function saveSettings(s) {
@@ -136,6 +139,29 @@ document.getElementById('options').addEventListener('input', () => {
   showSettings();
 });
 showSettings();
+
+// What the game asks of the page besides sound (port/web/src/platform.rs):
+// the browser's full screen and keeping the settings. A full-screen request
+// takes a moment, so while one is on its way the answer is what it asked
+// for; a refused one (a browser allows it only just after a click or key)
+// leaves the window as it was, and the game then unticks its setting.
+let fullscreenWanted = null;
+window.ppPlatform = {
+  getFullscreen() {
+    return fullscreenWanted !== null ? fullscreenWanted : !!document.fullscreenElement;
+  },
+  setFullscreen(on) {
+    if (on === this.getFullscreen()) return;
+    fullscreenWanted = on;
+    const done = () => { fullscreenWanted = null; };
+    const request = on ? document.documentElement.requestFullscreen() : document.exitFullscreen();
+    request.then(done, (e) => { console.warn('Full screen not changed:', e && e.message); done(); });
+  },
+  saveSettings(values) {
+    Object.assign(settings, values);
+    saveSettings(settings);
+  },
+};
 
 // Development switch: open the page as ?nosw to remove the service worker
 // and everything it stored. Loading again without it starts them afresh.
@@ -250,7 +276,7 @@ async function main() {
   const songs = {};
   for (const [name, path] of Object.entries(files.songs || {})) songs[name] = path;
   window.ppAudio = new SoundPlayer(context, songs);
-  if (settings.fullscreen) document.documentElement.requestFullscreen().catch(() => {});
+  if (settings.fullscreen) window.ppPlatform.setFullscreen(true);
   document.getElementById('start').hidden = true;
   status.textContent = 'Starting...';
 
@@ -262,6 +288,12 @@ async function main() {
     musicVolume: settings.musicVolume,
     soundVolume: settings.soundVolume,
     stretch: settings.stretch,
+    // The game's own settings (play.Settings' names).
+    settings: {
+      fullscreen: settings.fullscreen, nudity: settings.nudity, easyMode: settings.easyMode,
+      dateFormatIndex: settings.dateFormatIndex, musicVolume: settings.musicVolume,
+      soundVolume: settings.soundVolume,
+    },
     effects: null,      // the effects pack, filled in when it arrives
   };
   try {

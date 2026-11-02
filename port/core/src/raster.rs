@@ -86,16 +86,30 @@ impl Screen {
     }
 
     pub fn draw(&mut self, q: &Quad, pictures: &[Picture]) {
-        if (q.color >> 24) as f64 / 255.0 < ALPHA_THRESH {
-            return;
-        }
-        let pic = &pictures[q.image];
         let colour = [
             ((q.color >> 16) & 255) as f64 / 255.0,
             ((q.color >> 8) & 255) as f64 / 255.0,
             (q.color & 255) as f64 / 255.0,
             (q.color >> 24) as f64 / 255.0,
         ];
+        self.draw_coloured(q, pictures, colour);
+    }
+
+    /// The fade cover between screens (`ScreenFlash`'s black fill over the
+    /// whole screen): its alpha is a float in the game, not a byte, so it
+    /// is passed as one.
+    pub fn cover(&mut self, alpha: f32, pictures: &[Picture]) {
+        let q = Quad { image: 0, x0: 0.0, y0: 0.0, x1: WIDTH as f64, y1: HEIGHT as f64, src: [0, 0, 1, 1], color: 0 };
+        self.draw_coloured(&q, pictures, [0.0, 0.0, 0.0, alpha as f64]);
+    }
+
+    /// `draw` with the quad's colour as red, green, blue, alpha from 0 to 1
+    /// (`q.color` is not read).
+    fn draw_coloured(&mut self, q: &Quad, pictures: &[Picture], colour: [f64; 4]) {
+        if colour[3] < ALPHA_THRESH {
+            return;
+        }
+        let pic = &pictures[q.image];
         let [sx, sy, sw, sh] = q.src;
         let (iw, ih) = (pic.width as f64, pic.height as f64);
         let (u0, u1) = (sx as f64 / iw, (sx + sw) as f64 / iw);

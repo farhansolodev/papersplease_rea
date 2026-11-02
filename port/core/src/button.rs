@@ -118,6 +118,14 @@ impl Button {
         &self.looks[self.current]
     }
 
+    /// `set_modeName`: shows the look of that name (an unknown name changes
+    /// nothing).
+    pub fn set_look(&mut self, name: &str) {
+        if let Some(i) = self.looks.iter().position(|l| l.name == name) {
+            self.current = i;
+        }
+    }
+
     /// The background picture's size (every button the port makes so far
     /// has one).
     pub fn size(&self) -> (i32, i32) {

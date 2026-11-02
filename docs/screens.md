@@ -1510,8 +1510,13 @@ for other callers of `Settings.save` found only the settings' own
 call-by-name table; the files decompiled so far are not the whole
 program.
 
-This fits what was seen with the real save folder (`save-format.md`): the
-`settings` file appeared when the user changed a volume, not at start-up.
+`Game`'s own copy of the counter starts at 0 and the settings' at 1, so the
+first frame of the run also applies the settings and saves them: with no
+`settings` entry yet, the defaults are written at start-up (read on
+2026-11-03, milestone 3b). Until then this paragraph said the real save
+folder showed the file was written when the user changed a volume, not at
+start-up; that was an over-reading, corrected 2026-11-03: the file's time
+shows only its last write (`save-format.md`).
 
 ## Who reads `platover`: nobody found
 
@@ -1666,7 +1671,9 @@ buttons on desktop are 5 apart; part 2, "The menu helper", 2026-10-18.) The desk
 - What the nudity setting changes: its readers were not looked up. (Easy
   mode's effect is known: the night adds the event `EASY_MODE` when the
   setting is on, `night.md`.)
-- The height of the icons, so the exact height of the language row and of
+- (The tick box, plus and minus icons were looked up on 2026-11-03,
+  milestone 3b, `milestone-3.md`: every one of those buttons is 15 x 15.)
+  The height of the language button's icon, so the exact height of the language row and of
   the settings list.
 - Where the documents folder for screenshots is. (What keys 0 to 4 and 6
   to 9 do was listed here; answered the same day, "Every key the game

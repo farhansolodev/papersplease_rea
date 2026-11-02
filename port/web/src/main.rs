@@ -4,12 +4,14 @@
 //!
 //! What it shows depends on the address (docs/milestone-1.md,
 //! docs/milestone-2.md, docs/milestone-3.md): `?page=title` (default) is the
-//! title screen, alive since milestone 3a (it rises with `Theme`, its buttons
-//! press and click, the game draws its own cursor); `?page=fonts` is the
-//! font test pages (arrow keys change the page, `&p=N` starts on page N,
-//! counting from 0); `?page=sounds` is the sound test page (milestone 2);
-//! `?page=testcard` is milestone 0's test card.
+//! game from its title screen, alive since milestone 3a (it rises with
+//! `Theme`, its buttons press and click, the game draws its own cursor),
+//! with the settings screen and the fades between screens since milestone
+//! 3b; `?page=fonts` is the font test pages (arrow keys change the page,
+//! `&p=N` starts on page N, counting from 0); `?page=sounds` is the sound
+//! test page (milestone 2); `?page=testcard` is milestone 0's test card.
 
+mod platform;
 mod sound;
 
 use bevy::asset::RenderAssetUsages;
@@ -21,17 +23,19 @@ use bevy::prelude::*;
 use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
 use bevy::window::{CursorOptions, PrimaryWindow};
 use pp_core::adpcm;
-use pp_core::aud::{Music, SoundDefs, Speaker};
-use pp_core::input::{self, HostInput, Input, Key, KEY_COUNT};
+use pp_core::aud::SoundDefs;
+use pp_core::game::Game;
+use pp_core::input::{HostInput, Key, KEY_COUNT};
 use pp_core::pack::Pack;
 use pp_core::pages::Gallery;
 use pp_core::raster::Screen;
 use pp_core::screen::{self, HEIGHT, WIDTH};
+use pp_core::settings::{Saved, Settings};
 use pp_core::sound::{category_volume, setting, Category};
 use pp_core::soundtest::{self, Entry};
 use pp_core::stepper::Stepper;
 use pp_core::testcard;
-use pp_core::title::{self, TitleScreen};
+use platform::PagePlatform;
 use sound::Player;
 
 /// The core's fixed step, 1/60 s (docs/DESIGN.md, decision 1).
@@ -54,14 +58,11 @@ const KEYS: [(Key, Option<KeyCode>); KEY_COUNT] = [
     (Key::Screenshot, Some(KeyCode::KeyO)),
 ];
 
-/// The title screen and what runs it: the game's input, speaker and music.
-struct TitleRun {
+/// The game and what it draws with.
+struct GameRun {
     gallery: Gallery,
     screen: Screen,
-    title: TitleScreen,
-    input: Input,
-    speaker: Speaker,
-    music: Music,
+    game: Game,
     /// The arrow's and the hand's pictures (index, width, height).
     arrow: (usize, u32, u32),
     hand: (usize, u32, u32),
@@ -78,6 +79,8 @@ struct Config {
     music_volume: f64,
     sound_volume: f64,
     stretch: bool,
+    /// The game's settings as the page keeps them, if it has any.
+    saved: Option<Saved>,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -94,6 +97,15 @@ fn read_config() -> Config {
         .dyn_into::<Array>()
         .map(|a| a.iter().filter_map(|s| s.as_string()).collect())
         .unwrap_or_default();
+    let saved = get(&cfg, "settings");
+    let saved = (saved.is_object()).then(|| Saved {
+        fullscreen: get(&saved, "fullscreen").as_bool().unwrap_or(false),
+        nudity: get(&saved, "nudity").as_bool().unwrap_or(true),
+        easy_mode: get(&saved, "easyMode").as_bool().unwrap_or(false),
+        date_format_index: get(&saved, "dateFormatIndex").as_f64().unwrap_or(0.0) as i32,
+        music_volume: setting(get(&saved, "musicVolume").as_f64().unwrap_or(1.0)),
+        sound_volume: setting(get(&saved, "soundVolume").as_f64().unwrap_or(1.0)),
+    });
     Config {
         page: get(&cfg, "page").as_string().unwrap_or_else(|| "title".into()),
         index: get(&cfg, "p").as_f64().map_or(0, |n| n.max(0.0) as usize),
@@ -102,6 +114,7 @@ fn read_config() -> Config {
         music_volume: setting(get(&cfg, "musicVolume").as_f64().unwrap_or(1.0)),
         sound_volume: setting(get(&cfg, "soundVolume").as_f64().unwrap_or(1.0)),
         stretch: get(&cfg, "stretch").as_bool().unwrap_or(false),
+        saved,
     }
 }
 
@@ -115,6 +128,7 @@ fn read_config() -> Config {
         music_volume: 1.0,
         sound_volume: 1.0,
         stretch: false,
+        saved: None,
     }
 }
 
@@ -130,8 +144,8 @@ struct Play {
 enum Mode {
     /// Milestone 0's test card.
     TestCard,
-    /// The title screen.
-    Title(Box<TitleRun>),
+    /// The game, from its title screen.
+    Title(Box<GameRun>),
     /// The font test pages.
     Pages { gallery: Gallery, count: usize, index: usize, screen: Screen, dirty: bool },
     /// The sound test page.
@@ -190,7 +204,7 @@ fn main() {
         .run();
 }
 
-fn start_mode(config: &mut Config) -> Mode {
+fn start_mode(config: &mut Config, player: &mut Player) -> Mode {
     if config.page == "testcard" {
         return Mode::TestCard;
     }
@@ -208,7 +222,7 @@ fn start_mode(config: &mut Config) -> Mode {
     };
     info!("start pack loaded: {} fonts, {} pictures", gallery.fonts.len(), gallery.pictures.len());
     match config.page.as_str() {
-        "title" => match title_run(gallery, &pack) {
+        "title" => match game_run(gallery, &pack, config.saved.as_ref(), player) {
             Ok(run) => Mode::Title(Box::new(run)),
             Err(e) => {
                 error!("title screen: {e}");
@@ -230,8 +244,10 @@ fn start_mode(config: &mut Config) -> Mode {
     }
 }
 
-/// The first title screen of the run, with the speaker reading `Sounds.xml`.
-fn title_run(gallery: Gallery, pack: &Pack) -> Result<TitleRun, String> {
+/// The game from its first title screen, with the speaker reading
+/// `Sounds.xml` and the settings the page kept (a desktop game starts with
+/// nudity on).
+fn game_run(gallery: Gallery, pack: &Pack, saved: Option<&Saved>, player: &mut Player) -> Result<GameRun, String> {
     let xml = pack.get("data/Sounds.xml").ok_or("data/Sounds.xml is missing from the pack")?;
     let defs = SoundDefs::parse(std::str::from_utf8(xml).map_err(|_| "Sounds.xml is not UTF-8")?)?;
     let cursor = |file: &str| -> Result<(usize, u32, u32), String> {
@@ -239,13 +255,10 @@ fn title_run(gallery: Gallery, pack: &Pack) -> Result<TitleRun, String> {
         Ok((i, gallery.pictures[i].width, gallery.pictures[i].height))
     };
     let (arrow, hand) = (cursor("CursorArrow.png")?, cursor("CursorHand.png")?);
-    Ok(TitleRun {
-        title: TitleScreen::new(&gallery, true)?,
+    Ok(GameRun {
+        game: Game::new(&gallery, defs, Settings::new(true, saved), player)?,
         gallery,
         screen: Screen::new(),
-        input: Input::new(),
-        speaker: Speaker::new(defs),
-        music: Music::new(),
         arrow,
         hand,
     })
@@ -286,15 +299,13 @@ fn setup(
     let picture = images.add(image);
 
     let mut config = read_config();
-    let mut mode = start_mode(&mut config);
     let mut player = Player::new();
-    // As `Game.applySettings`: each category gets its setting squared.
+    // As `Game.applySettings`: each category gets its setting squared (the
+    // game applies its settings again on its first frame).
     player.set_category_volume(Category::Music, category_volume(config.music_volume));
     player.set_category_volume(Category::Effect, category_volume(config.sound_volume));
-    if let Mode::Title(run) = &mut mode {
-        // The screen change asks for the new screen's song
-        // (`Game.applyScreenChange`, docs/audio-layer.md).
-        run.music.play(Some(title::SONG), &mut run.speaker, &mut player);
+    let mode = start_mode(&mut config, &mut player);
+    if let Mode::Title(_) = &mode {
         // The game draws its own cursor; the system's is hidden over it.
         cursor.visible = false;
     }
@@ -354,27 +365,15 @@ fn held_keys(keys: &ButtonInput<KeyCode>) -> [bool; KEY_COUNT] {
     out
 }
 
-/// One 1/60 s step of the title screen, in the original's frame order
-/// (docs/input-handling.md, "One frame"): input, the screen's update, the
-/// music, the screen's input (buttons topmost first, then the screen's own;
-/// the drawn cursor last), the speaker.
-fn step_title(run: &mut TitleRun, input: &HostInput, player: &mut Player) {
-    run.input.update(input, STEP);
-    run.title.update(&run.music, &run.speaker);
-    run.music.update(&mut run.speaker, player);
-    if let Some(id) = run.title.react(&mut run.input, &mut run.speaker, player) {
-        // Where each button leads comes with later milestones.
-        info!("title: {id} clicked");
+/// One 1/60 s step of the game (`Game.update`'s frame order, pp_core's
+/// `game.rs`).
+fn step_game(run: &mut GameRun, input: &HostInput, player: &mut Player) {
+    if let Err(e) = run.game.step(input, STEP, &mut run.gallery, player, &mut PagePlatform) {
+        error!("game: {e}");
     }
-    run.speaker.update(STEP, player);
-}
-
-fn draw_title(run: &mut TitleRun) {
-    let mut quads = run.title.quads(&run.gallery);
-    quads.extend(input::cursor_quad(&run.input, run.arrow, run.hand));
-    run.screen.clear();
-    for q in &quads {
-        run.screen.draw(q, &run.gallery.pictures);
+    for line in run.game.log.drain(..) {
+        // Where these buttons lead comes with later milestones.
+        info!("{line}");
     }
 }
 
@@ -427,7 +426,7 @@ fn step_and_draw(
         Mode::Title(run) => {
             let mut input = host_input;
             for _ in 0..due {
-                step_title(run, &input, &mut host.player);
+                step_game(run, &input, &mut host.player);
                 // Seen once: from the next step on, only what is held.
                 (input.keys, input.left_down) = (held_keys(&keys), buttons.pressed(MouseButton::Left));
             }
@@ -436,7 +435,7 @@ fn step_and_draw(
                 host.pending_left = false;
             }
             if due > 0 {
-                draw_title(run);
+                run.game.draw(&run.gallery, &mut run.screen, run.arrow, run.hand);
                 data.copy_from_slice(&run.screen.pixels);
             }
         }

@@ -1,4 +1,4 @@
-// Milestone 0, 1a, 1b, 2 and 3a check: drives a real browser (headless Edge or
+// Milestone 0, 1a, 1b, 2, 3a and 3b check: drives a real browser (headless Edge or
 // Chrome, with a throwaway profile in build/) against the local server and
 // reports (every page opens on the start screen; the check clicks its button
 // with a real mouse click, as a player would):
@@ -24,6 +24,13 @@
 //      gets all 108 effects, three of them compared sample for sample with
 //      extracted/audio (skipped without it); a looping effect plays and
 //      stops; a volume key gives the setting squared as the gain;
+//   4d. screen changes (milestone 3b): the title's settings button fades to
+//      black and opens the settings screen, compared with the Python
+//      reference (extracted/previews/m3b, made by
+//      scripts/reference/settingsscreen.py; skipped without it), Theme
+//      playing on; Music minus kept in the page's storage and heard; the
+//      Fullscreen box following the window; Escape back to the title; the
+//      volume kept after a reload;
 //   5. whether the page still starts with the network switched off, showing
 //      the same font page, and the title's Theme plays from the cache.
 //
@@ -42,6 +49,7 @@ const URL = `http://localhost:${PORT}/`;
 const DEBUG_PORT = 9333;
 const REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1');
 const TITLE_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1b', 'title.rgba');
+const SETTINGS_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3b', 'settings_a.rgba');
 const AUDIO = path.join(ROOT, 'extracted', 'audio');
 const PROFILE = path.join(ROOT, 'build', '_browser_profile');
 const BROWSERS = [
@@ -281,6 +289,91 @@ async function titleAlive() {
   if (down < 0 || up < down) throw new Error('button-down then button-up were not played');
 }
 
+// Milestone 3b (docs/milestone-3.md): from the title at rest, the settings
+// button fades to black and opens the settings screen (identical to the
+// Python reference but for the cursor) with Theme playing on; Music minus
+// sets the setting to 0.9 (kept in the page's storage, music gain 0.81); the
+// Fullscreen box follows what the browser allows; Escape presses DONE and
+// fades back to a title that does not rise; after a reload the volume is
+// still 0.9. The mouse is moved with real mouse events.
+async function settingsScreen() {
+  const wantSettings = readFileSync(SETTINGS_REFERENCE);
+  const wantTitle = readFileSync(TITLE_REFERENCE);
+  const THEME_ID = `(() => { for (const [id, s] of window.ppAudio.playing) if (s.filename === 'Theme.ogg') return id; return null; })()`;
+  const themeBefore = await evaluate(THEME_ID);
+  const click = async (x, y) => {
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+    await sleep(100);
+    for (const type of ['mousePressed', 'mouseReleased']) {
+      await send('Input.dispatchMouseEvent', { type, x, y, button: 'left', clickCount: 1 });
+      await sleep(100);
+    }
+  };
+  // The arrow's picture (19 x 26) sits at (-1, -1) from the mouse.
+  const arrowAt = (x, y) => [x - 1, y - 1, 19, 26];
+  // A hidden headless page is drawn about once a second and each drawing
+  // runs at most 0.1 s of game time, so the game's 1.2 s screen change can
+  // take 15 s or more here: the waits are long.
+  const settleOn = async (want, cursor, what, ms = 40000) => {
+    const t0 = Date.now();
+    for (;;) {
+      const d = await differences(want);
+      if (d.n === 0 || within(d.box, cursor)) return { d, s: (Date.now() - t0) / 1000 };
+      if (Date.now() - t0 > ms) throw new Error(`${what} (last: ${d.n} bytes differ in ${JSON.stringify(d.box)})`);
+      await sleep(100);
+    }
+  };
+
+  // The settings button, bottom left: 29 x 29 at (10, 281).
+  await click(24, 295);
+  const t0 = Date.now();
+  for (;;) {
+    const r = await evaluate(READ, 40000);
+    const got = Buffer.from(r.data, 'base64');
+    let lit = 0;
+    for (let j = 0; j < 270 * 570 * 4; j += 4) if (got[j] || got[j + 1] || got[j + 2]) lit++;
+    if (lit === 0) break;
+    if (Date.now() - t0 > 15000) throw new Error('no black screen within 15 s of the click');
+  }
+  console.log(`   the settings button: the screen is black ${((Date.now() - t0) / 1000).toFixed(2)} s after the click`);
+  const opened = await settleOn(wantSettings, arrowAt(24, 295), 'the settings screen did not appear');
+  console.log(`   the settings screen: identical to the reference but for the cursor, ${opened.s.toFixed(1)} s after the black screen`);
+  const themeAfter = await evaluate(THEME_ID);
+  console.log(`   Theme plays on: play id ${themeBefore} before, ${themeAfter} after, at ${(await evaluate(THEME_AT)).toFixed(2)} s`);
+  if (themeAfter !== themeBefore) throw new Error('Theme was started again');
+
+  // Music minus: 15 x 15 at (358, 198).
+  await click(365, 205);
+  await waitFor(`JSON.parse(localStorage.getItem('pp.settings') || '{}').musicVolume === 0.9`, 'music 0.9 kept by the page', 5000);
+  await waitFor('Math.abs(window.ppAudio.groupVolume[1] - 0.81) < 1e-6', 'the music gain 0.81', 5000);
+  console.log('   Music minus: kept as', JSON.stringify(JSON.parse(await evaluate(`localStorage.getItem('pp.settings')`))),
+    '; music gain', await evaluate('window.ppAudio.groupVolume[1]'));
+
+  // The Fullscreen box at (358, 122): whatever the browser does, the box and
+  // the kept setting end up agreeing with the window.
+  for (const turn of ['on', 'off']) {
+    await click(365, 129);
+    await sleep(4000);
+    const fs = await evaluate(`({ window: !!document.fullscreenElement, kept: JSON.parse(localStorage.getItem('pp.settings')).fullscreen })`);
+    console.log(`   the Fullscreen box clicked (${turn}): window full screen ${fs.window}, kept ${fs.kept}`);
+    if (fs.window !== fs.kept) throw new Error('the Fullscreen setting does not follow the window');
+    if (!fs.window) break;
+  }
+
+  // Escape presses DONE: back to a title at rest (no rise) within seconds.
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 500, y: 200 });
+  await key('Escape', 27, 'Escape');
+  const back = await settleOn(wantTitle, arrowAt(500, 200), 'no title at rest after Escape');
+  console.log(`   Escape: the title at rest, ${back.s.toFixed(1)} s later (a second title does not rise)`);
+
+  // Kept after a reload.
+  await send('Page.reload');
+  await start('the title after a reload');
+  await waitFor('Math.abs(window.ppAudio.groupVolume[1] - 0.81) < 1e-6', 'the music gain 0.81 after a reload', 10000);
+  console.log('   after a reload: music setting', await evaluate('window.ppConfig.settings.musicVolume'), ', music gain', await evaluate('window.ppAudio.groupVolume[1]'));
+  await evaluate(`localStorage.removeItem('pp.settings'), 1`);
+}
+
 async function waitFor(expression, what, ms = 60000) {
   const t0 = Date.now();
   while (Date.now() - t0 < ms) {
@@ -396,6 +489,14 @@ try {
   const groups = await evaluate('window.ppAudio.groupVolume');
   console.log('   category volumes (settings 1.0):', JSON.stringify(groups));
   if (groups[0] !== 1 || groups[1] !== 1) throw new Error('category volumes are not 1');
+
+  if (existsSync(TITLE_REFERENCE) && existsSync(SETTINGS_REFERENCE)) {
+    console.log('1f. screen changes and the settings screen (milestone 3b)');
+    await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
+    await settingsScreen();
+  } else {
+    console.log('1f. SKIPPED: no reference title or settings screen in extracted/previews');
+  }
 
   console.log('1e. the sound test page');
   await send('Emulation.setDeviceMetricsOverride', { width: 1400, height: 900, deviceScaleFactor: 1, mobile: false });

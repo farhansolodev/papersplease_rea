@@ -11,6 +11,7 @@
 //! The sound player itself is the host's ([`AudioHost`]): in the browser the
 //! page's `audio.js`, as `UnityPlatformAudio` in the original.
 
+use crate::num::lerp_scale;
 use crate::rand::{Rand, ShuffledSequence};
 use crate::sound::Category;
 use crate::xmlscan;
@@ -24,6 +25,9 @@ pub trait AudioHost {
     /// have it (stopped, finished, or never started).
     fn position(&mut self, id: u32) -> f64;
     fn set_category_pause(&mut self, category: Category, paused: bool);
+    /// A category's mixer volume, 0 to 1 (`Game.applySettings` gives each
+    /// its setting squared; docs/audio.md, "The mixer").
+    fn set_category_volume(&mut self, category: Category, volume: f32);
 }
 
 /// MusicBeat.kBeatsPerBar.
@@ -60,12 +64,6 @@ const MEASURES: [(i32, f64); 16] = [
     (48, 90.0),
     (49, 0.0),
 ];
-
-/// `app.Num.lerpScale`: `x` held to `in0..in1`, mapped onto `out0..out1`.
-fn lerp_scale(x: f64, in0: f64, in1: f64, out0: f64, out1: f64) -> f64 {
-    let x = x.min(in1).max(in0);
-    (x - in0) / (in1 - in0) * (out1 - out0) + out0
-}
 
 /// A double handed to the host as a 4-byte float.
 fn f32_of(x: f64) -> f32 {
@@ -508,6 +506,9 @@ pub(crate) mod sim {
                     s.paused = paused;
                 }
             }
+        }
+        fn set_category_volume(&mut self, category: Category, volume: f32) {
+            self.log.push(format!("setCategoryVolume {category:?} {volume}"));
         }
     }
 }

@@ -14,6 +14,24 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-03 Record that the user tried milestone 3b
+
+**Changed:** `docs/PROGRESS.md` (header, stage 5, step 14), `docs/milestone-3.md` (the parts table, "3b: Not tested").
+**Why:** the user tried 3b and said "lgtm".
+**Tested how:** doc change only; not tested.
+**Result:** 3b marked tried (which browser, and which items, full screen among them, were looked at, not recorded). The first try ran the old 3a build (the settings button did nothing): the new service worker takes over only once the old tab is closed. After a new tab the user said everything is fine. Noted in `milestone-3.md` ("How to try it", "Dead ends").
+**Docs corrected:** the two above. Searched `docs/` for "not yet tried by the user" and "By the user".
+**Still broken / not tested:** as in the 3b entry, except that a person has now tried it.
+
+## 2026-11-03 Milestone 3b: screen changes and the settings screen (step 14)
+
+**Changed:** before it, at the user's request, `git push` of the 5 local commits to `origin/master` (checked first: no game files, no pasted decompiler output). New: `port/core/src/{fade,settings,settings_screen,game}.rs`, `port/core/tests/{settings_screen,game}.rs`, `port/web/src/platform.rs`, `scripts/reference/settingsscreen.py`. Edited: `port/core/src/{lib,aud,num,button,picture,pages,raster}.rs` (category volume in `AudioHost`, `lerp_scale` moved, `set_look`, `fill_rect`/`paste_blend`, `made_picture`, `Screen::cover`), `port/web/src/{main,sound}.rs` (the host runs a `Game`), `port/www/index.html` (`pp.settings` keeps nudity, easy mode, date format; `ppConfig.settings`; `window.ppPlatform`), `scripts/build_assets/build_pack.py` (header, icons, ten texts), `scripts/checks/web_offline_check.mjs` (step 1f), `scripts/checks/README.md`, docs below. No download.
+**Why:** milestone 3b; the user gave the go-ahead for the plan (pause screen moved to 3c, agreed).
+**Tested how:** `python -I scripts/reference/settingsscreen.py extracted/art/assets extracted/previews/m3b`; `cargo test -p pp_core` (`--nocapture` for the comparisons); `python -I scripts/build_web.py`; `node scripts/checks/web_offline_check.mjs 8080` in headless Edge, 2 runs. The app's browser pane was hidden, so no look in a visible window.
+**Result:** 88 unit tests pass; the settings screen identical to the reference in both cases, the title still identical; `tests/game.rs` passes (change on frame 70, Theme started once, volume buttons and bar, save, full screen both ways, Escape back to a title that does not rise). Browser run 1 FAILED ("the settings screen did not appear": the check waited 8 s, the hidden page runs about 0.1 s of game time a second); waits lengthened; run 2 passed everything, step 1f included (black, then the screen identical but for the cursor; Theme's play id unchanged; music 0.9 kept, gain 0.81; full screen refused by headless Edge and the box back off; Escape to the title; 0.81 after a reload). WebAssembly 26,470,695 bytes, start pack 2,046,977.
+**Docs corrected:** `save-format.md` (the `off` and `off-instant` rows: the change on the 70th frame, the instant fade-in; the settings file is written on the first frame when there is none: the "file appeared when a volume changed" reading was wrong, corrected), `screens.md` part 4 (the same correction; the icons' sizes), `DESIGN.md` (full screen decided; milestone 3 row; the host row), `milestone-3.md` (3b sections; the parts table; 3a's "nothing happens after a click"; the second title), `PROGRESS.md` (header, stage 5, docs table, two "fullscreen still open" lines, step 14). Searched `docs/` for "appeared when", "after 1 second", "fullscreen in", "still open", "in 3b", "height of the icons".
+**Still broken / not tested:** not tried by the user; real full screen and the Escape that leaves it; a visible window; Firefox; nothing against the running game. Not committed.
+
 ## 2026-11-03 A frame counter, `?fps`
 
 **Changed:** `port/www/index.html` (a box top left, shown with `?fps`, the browser's frames per second counted once a second), `scripts/checks/web_offline_check.mjs` (step 1a opens the title with `?fps` and checks the counter shows a number), `scripts/checks/README.md`, `docs/milestone-3.md` ("After 3a: the frame counter"), `docs/PROGRESS.md` (step 13).
