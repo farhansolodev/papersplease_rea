@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-03 A frame counter, `?fps`
+
+**Changed:** `port/www/index.html` (a box top left, shown with `?fps`, the browser's frames per second counted once a second), `scripts/checks/web_offline_check.mjs` (step 1a opens the title with `?fps` and checks the counter shows a number), `scripts/checks/README.md`, `docs/milestone-3.md` ("After 3a: the frame counter"), `docs/PROGRESS.md` (step 13).
+**Why:** the user asked for an FPS counter top left, the simplest way that keeps the pixel comparisons.
+**Tested how:** `python -I scripts/build_web.py`; `node scripts/checks/web_offline_check.mjs 8080` in headless Edge, 1 run; a look in the app's browser pane.
+**Result:** the check passed everything: the counter showed "0 fps" right after the start, the title was still identical to the reference 1.1 s after the skip, cursor, button, sounds, font pages, effects, offline. In the pane the counter showed top left, reading 2 to 4 fps: the pane is hidden while I work, and a hidden page is drawn only a few times a second.
+**Docs corrected:** none needed; searched `docs/` for "fps" and "frame counter" (the test card's frame counter is milestone 0's, a different thing).
+**Still broken / not tested:** game steps per second are not shown. The user tried it in a visible window and said it looks right (the number shown not recorded).
+
 ## 2026-11-03 Record that the user tried milestone 3a
 
 **Changed:** `docs/PROGRESS.md` (header, stage 5, step 13), `docs/milestone-3.md` (the parts table, "Not tested").

@@ -14,7 +14,8 @@
 //      Python reference's still while rising; after a key skips the rise the
 //      whole canvas is byte for byte the reference's; the mouse over STORY
 //      draws the hand cursor, a press shows STORY pressed and plays
-//      button-down, the release plays button-up (needs extracted/previews/m1b,
+//      button-down, the release plays button-up; all with the frame counter
+//      (?fps) shown over the page (needs extracted/previews/m1b,
 //      made by scripts/reference/titlescreen.py; skipped without it);
 //   4b. that F5, F12, Ctrl+R and the right-click menu are not blocked
 //      (defaultPrevented stays false on events sent to the canvas);
@@ -355,8 +356,12 @@ try {
   if (existsSync(TITLE_REFERENCE)) {
     console.log('1a. the title screen alive (milestone 3a), against the Python reference at rest');
     await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
-    await send('Page.navigate', { url: URL });
+    // With the frame counter on: it sits over the page, so the canvas must
+    // still equal the reference.
+    await send('Page.navigate', { url: URL + '?fps' });
     await start('the title screen to start');
+    await waitFor(`/^\\d+ fps$/.test(document.getElementById('fps').textContent)`, 'the frame counter', 10000);
+    console.log(`   the frame counter (?fps) shows "${await evaluate(`document.getElementById('fps').textContent`)}"`);
     await titleAlive();
   } else {
     console.log('1a. SKIPPED: no reference title in extracted/previews/m1b');

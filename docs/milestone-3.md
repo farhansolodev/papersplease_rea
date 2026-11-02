@@ -202,6 +202,33 @@ and `language-pack.md` lists no change to it).
   Fixed by remembering a press until a step has seen it (the decision
   above); the next two runs passed. Solved.
 
+## After 3a: the frame counter (`?fps`)
+
+Asked for by the user on 2026-11-03. Opening any page with `?fps` in the
+address (for example `http://localhost:8080/?fps`) shows the browser's
+frames per second in the window's top left corner, counted by the page
+with the browser's frame timer and updated once a second. It is a
+development aid, off by default.
+
+- It is a box of the page (`port/www/index.html`) laid over the canvas,
+  not part of the game's picture: the game's 570 x 320 picture is
+  unchanged, and clicks pass through the box to the game. In a window
+  where the picture reaches the corner (an exact multiple of 570 x 320,
+  or "Fill the window") it covers a corner of what you see, not of the
+  game's pixels.
+- It counts what the browser draws, not the game's steps; those stay
+  1/60 s each (`DESIGN.md`, decision 1). A count of the steps would need
+  the Rust host; left out to keep the change to one file (my choice, the
+  user asked for the simplest).
+- Checked: the browser check's title step now runs with `?fps`. The
+  counter shows a number, and the canvas is still byte for byte the
+  reference after the skip; every other step passed (1 run). In the
+  hidden headless browser and in the app's pane (hidden while I work)
+  it read 0 to 4 fps: a hidden page is drawn only a few times a second,
+  so those numbers say nothing about a visible window. The user tried it
+  in a visible window the same day and said it looks right (the number
+  shown was not recorded).
+
 ## Next: 3b
 
 The plan for 3b, to be read before it is built: `save-format.md` part 2

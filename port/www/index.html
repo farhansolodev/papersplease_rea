@@ -12,6 +12,10 @@
   #game { width: 100%; height: 100%; display: block; outline: none; }
   #status { position: fixed; left: 12px; bottom: 12px; color: #888;
             font: 14px monospace; pointer-events: none; }
+  /* The frame counter (?fps): over the page, never part of the game's picture. */
+  #fps { position: fixed; left: 8px; top: 8px; z-index: 1; padding: 2px 6px; color: #c8c8b0;
+         background: rgba(0, 0, 0, 0.6); font: 13px monospace; pointer-events: none; }
+  #fps[hidden] { display: none; }
 
   /* The start screen (docs/milestone-2.md): our own page, not a game screen. */
   #start { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -40,6 +44,7 @@
 <body>
 <div id="stage"><canvas id="game"></canvas></div>
 <div id="status"></div>
+<div id="fps" hidden></div>
 <div id="start">
   <form class="box" id="options" onsubmit="return false">
     <h1>PAPERS, PLEASE</h1>
@@ -72,6 +77,25 @@ const loadtext = document.getElementById('loadtext');
 const bar = document.querySelector('#progress div');
 const go = document.getElementById('go');
 const params = new URLSearchParams(location.search);
+
+// Development switch: ?fps shows the browser's frames per second, counted
+// once a second, in the window's top left corner. The game's own steps stay
+// 1/60 s whatever this shows.
+if (params.has('fps')) {
+  const box = document.getElementById('fps');
+  box.hidden = false;
+  let frames = 0, since = performance.now();
+  const count = (now) => {
+    frames++;
+    if (now - since >= 1000) {
+      box.textContent = `${Math.round(frames * 1000 / (now - since))} fps`;
+      frames = 0;
+      since = now;
+    }
+    requestAnimationFrame(count);
+  };
+  requestAnimationFrame(count);
+}
 
 // The player's settings, kept in the browser's local storage under the same
 // names as the game's own settings file (docs/save-format.md, "Settings"):

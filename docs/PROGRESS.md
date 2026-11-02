@@ -774,8 +774,11 @@ the night screen's family pictures; part 11, the last screens.)
    (reversible, `DESIGN.md`): the speaker on the fixed step; presses kept
    until a step sees them. The user tried it the same day and said
    everything works quite well (which browser not recorded). **Not
-   tested**: against the game, Firefox. Next: the plan for **3b,
-   screens** (its reading list is at the end of `milestone-3.md`).
+   tested**: against the game, Firefox. After it, at the user's request,
+   a frame counter: `?fps` shows the browser's frames per second top left,
+   a box of the page that leaves the game's picture alone
+   (`milestone-3.md`, "After 3a: the frame counter"). Next: the plan for
+   **3b, screens** (its reading list is at the end of `milestone-3.md`).
 
 Small jobs that fit anywhere:
 
