@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-03 New standing rule: push after every commit
+
+**Changed:** `CLAUDE.md` (hard rule 2: after every commit, push to GitHub, after checking the commits hold no game files and no pasted decompiler output).
+**Why:** the user's new standing rule ("always push to github after every commit"); wording proposed and accepted.
+**Tested how:** doc change only; not tested.
+**Result:** rule added. The two 3b commits were pushed the same day, after the check.
+**Docs corrected:** none needed; searched `CLAUDE.md` and `docs/` for "push".
+**Still broken / not tested:** nothing.
+
 ## 2026-11-03 Record that the user tried full screen in 3b
 
 **Changed:** `docs/milestone-3.md` ("3b: Not tested"), `docs/DESIGN.md` (the fullscreen row), `docs/PROGRESS.md` (header, step 14), `docs/screens.md` part 4 ("For the port": the Escape that leaves full screen, "not tested" before).

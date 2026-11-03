@@ -18,7 +18,10 @@ Port my own copy of Papers, Please to run in the browser:
    tooling and notes get committed, and nothing from the game goes on a public
    host.
 2. **Do not run `git commit` unless I asked.** Stage nothing beyond what the
-   current task requires.
+   current task requires. After every commit, push it to GitHub
+   (`git push origin master`). Before pushing, check that the commits hold
+   no game files and no pasted decompiler output: the repository is public
+   (rule 1).
 3. **Do not touch anything outside this project folder** unless I explicitly
    name the path. The game install is read-only: copy files into this project
    before working on them.
