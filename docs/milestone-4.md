@@ -10,7 +10,7 @@ step 16):
 
 | Part | What you can try | State |
 |---|---|---|
-| **4a** | The booth at the start of day 1 (`?page=day`): the opening card typing the date and falling away, the booth as its constructor builds it, the border's background and blinking booth button, the ambient sounds | **Built 2026-11-05** (below) |
+| **4a** | The booth at the start of day 1 (`?page=day`): the opening card typing the date and falling away, the booth as its constructor builds it, the border's background and blinking booth button, the ambient sounds | **Built 2026-11-05** (below), tried by the user the same day |
 | 4b | The rulebook (docked, dragged, opened, its pages), the shutter switch, the pause screen | Not started |
 | 4c | The clock running, the stamp bar, stamping | Not started |
 | 5a, 5b | Travelers (milestone 5) | Not started |
@@ -144,7 +144,9 @@ Written up in `booth-screen.md`; the ones that show on screen:
 
 ## 4a: Not tested
 
-- By the user.
+- **By the user, in detail.** The user tried 4a on 2026-11-05 and said
+  "all good" (which browser, and whether the sounds were listened to, not
+  recorded).
 - Against the running game: everything is code reading.
 - Firefox; Chrome by hand; a window in front at a real 60 frames a second.
 - The ambient sounds by ear (their volumes are only the code's rules).

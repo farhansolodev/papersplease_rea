@@ -14,6 +14,24 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-05 Record that the user tried milestone 4a
+
+**Changed:** `docs/PROGRESS.md` (update, stage 5, step 16), `docs/milestone-4.md` (the parts table, "4a: Not tested").
+**Why:** the user tried 4a and said "all good".
+**Tested how:** doc change only; not tested.
+**Result:** 4a marked tried (which browser, and whether the sounds were listened to, not recorded).
+**Docs corrected:** the two above. Searched `docs/` for "not yet tried by the user" and "By the user".
+**Still broken / not tested:** as in the 4a entry, except that a person has now tried it.
+
+## 2026-11-05 The day-1 newspaper stays in milestone 6
+
+**Changed:** `docs/DESIGN.md` (the intro's stand-in row).
+**Why:** the user asked whether I knew of the newspaper after the intro: it is not an intro page but the `news` screen the intro fades to (`screens.md` part 5), replaced by a fade to the title since 3c. Offered as a step before 4b; the user chose to keep it in milestone 6.
+**Tested how:** doc change only; not tested.
+**Result:** decision recorded.
+**Docs corrected:** none needed; searched `docs/` for "newspaper" and "stand-in".
+**Still broken / not tested:** nothing new. Not committed.
+
 ## 2026-11-05 New standing rule: close what I start
 
 **Changed:** `CLAUDE.md` ("How to work": close every server, browser tab or pane, headless browser and background task started for the work before ending a turn, check it stopped, say what was closed).
