@@ -14,6 +14,15 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-05 New standing rule: close what I start
+
+**Changed:** `CLAUDE.md` ("How to work": close every server, browser tab or pane, headless browser and background task started for the work before ending a turn, check it stopped, say what was closed).
+**Why:** the user still heard the game playing after 4a: I had left `?page=day` open in the app's hidden browser pane (it kept running from the service worker's copy after the server was stopped). The tab was closed; no headless Edge was left from the browser check (checked). Wording proposed and accepted.
+**Tested how:** doc change only; not tested.
+**Result:** rule added.
+**Docs corrected:** none needed; searched `CLAUDE.md` and `docs/` for "server", "close", "running".
+**Still broken / not tested:** nothing.
+
 ## 2026-11-05 Milestone 4a: the booth at the start of day 1 (step 16)
 
 **Changed:** new `port/core/src/{stater,gdate,day}.rs`, `port/core/tests/day.rs`, `port/core/tests/common/mod.rs` (the JSON reader moved out of `tests/intro.rs`), `docs/milestone-4.md`. Edited: `port/core/src/{lib,game,picture,reveal_text}.rs` (`GameScreen::Day`, `Game::new_day`, a screen's song optional; `Affine` and `draw_affine`; a `visible` switch), `port/core/tests/{intro,game}.rs`, `port/web/src/main.rs` and `port/www/index.html` (`?page=day`), `scripts/build_assets/build_pack.py` (13 pictures, 45 texts), `scripts/checks/web_offline_check.mjs` (step 1h), `scripts/checks/README.md`, docs below. No download, no Ghidra run (beyond part 1's), no game launch.

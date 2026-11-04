@@ -160,6 +160,13 @@ Port my own copy of Papers, Please to run in the browser:
   so and explain, then wait for me.
 - **Verify with evidence.** For the original game you cannot see the screen, so
   rely on logs, numbers and dumped data. For the browser build, run it and look.
+- **Close what I start.** Before ending a turn, stop every server, browser tab
+  or pane, headless browser and background task I started for the work (the
+  local web server, the app's browser pane with the game open, Ghidra runs),
+  unless you asked to keep it running. Check that it stopped (the port is
+  free, no tab is left) and say in the closing message what was closed. When
+  you need it running to try a build, give you the command to start it
+  instead.
 - **Tell me how to test it.** After every change, give the exact command to run
   and what I should see. "Done" without a test procedure is not done.
 - **Explain in plain language.** I am not the programmer here. Explain a term
