@@ -9,7 +9,9 @@
 //! with the settings screen and the fades between screens since milestone
 //! 3b; `?page=intro` is the game started on the intro pages (milestone 3c;
 //! the original reaches them from the load screen, which comes later), and
-//! after them the title; `?page=fonts` is the font test pages (arrow keys change the page,
+//! after them the title; `?page=day` is the game started on day 1's
+//! screen (milestone 4a: the booth at the start of the day, the opening
+//! card falling away; nothing takes clicks yet); `?page=fonts` is the font test pages (arrow keys change the page,
 //! `&p=N` starts on page N, counting from 0); `?page=sounds` is the sound
 //! test page (milestone 2); `?page=testcard` is milestone 0's test card.
 
@@ -146,7 +148,8 @@ struct Play {
 enum Mode {
     /// Milestone 0's test card.
     TestCard,
-    /// The game, from its title screen or (`?page=intro`) the intro.
+    /// The game, from its title screen, the intro (`?page=intro`) or day 1
+    /// (`?page=day`).
     Title(Box<GameRun>),
     /// The font test pages.
     Pages { gallery: Gallery, count: usize, index: usize, screen: Screen, dirty: bool },
@@ -224,7 +227,7 @@ fn start_mode(config: &mut Config, player: &mut Player) -> Mode {
     };
     info!("start pack loaded: {} fonts, {} pictures", gallery.fonts.len(), gallery.pictures.len());
     match config.page.as_str() {
-        page @ ("title" | "intro") => match game_run(gallery, &pack, config.saved.as_ref(), page == "intro", player) {
+        page @ ("title" | "intro" | "day") => match game_run(gallery, &pack, config.saved.as_ref(), page, player) {
             Ok(run) => Mode::Title(Box::new(run)),
             Err(e) => {
                 error!("{page} screen: {e}");
@@ -246,10 +249,11 @@ fn start_mode(config: &mut Config, player: &mut Player) -> Mode {
     }
 }
 
-/// The game from its first title screen (or, with `intro`, from the intro
-/// pages), with the speaker reading `Sounds.xml` and the settings the page
-/// kept (a desktop game starts with nudity on).
-fn game_run(gallery: Gallery, pack: &Pack, saved: Option<&Saved>, intro: bool, player: &mut Player) -> Result<GameRun, String> {
+/// The game from its first title screen (or, with `page` "intro" or "day",
+/// from the intro pages or day 1's screen), with the speaker reading
+/// `Sounds.xml` and the settings the page kept (a desktop game starts with
+/// nudity on).
+fn game_run(gallery: Gallery, pack: &Pack, saved: Option<&Saved>, page: &str, player: &mut Player) -> Result<GameRun, String> {
     let xml = pack.get("data/Sounds.xml").ok_or("data/Sounds.xml is missing from the pack")?;
     let defs = SoundDefs::parse(std::str::from_utf8(xml).map_err(|_| "Sounds.xml is not UTF-8")?)?;
     let cursor = |file: &str| -> Result<(usize, u32, u32), String> {
@@ -258,10 +262,10 @@ fn game_run(gallery: Gallery, pack: &Pack, saved: Option<&Saved>, intro: bool, p
     };
     let (arrow, hand) = (cursor("CursorArrow.png")?, cursor("CursorHand.png")?);
     Ok(GameRun {
-        game: if intro {
-            Game::new_intro(defs, Settings::new(true, saved))
-        } else {
-            Game::new(&gallery, defs, Settings::new(true, saved), player)?
+        game: match page {
+            "intro" => Game::new_intro(defs, Settings::new(true, saved)),
+            "day" => Game::new_day(defs, Settings::new(true, saved)),
+            _ => Game::new(&gallery, defs, Settings::new(true, saved), player)?,
         },
         gallery,
         screen: Screen::new(),

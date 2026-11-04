@@ -18,6 +18,7 @@
 //! the first screen built that can be paused, and the pause comes in 3d.
 
 use crate::aud::{AudioHost, Music, SoundDefs, Speaker};
+use crate::day::{self, DayScreen};
 use crate::fade::{Event, Fader, State};
 use crate::input::{self, HostInput, Input};
 use crate::intro::{self, IntroScreen};
@@ -43,6 +44,8 @@ pub enum GameScreen {
     Title(TitleScreen),
     Settings(SettingsScreen),
     Intro(Box<IntroScreen>),
+    /// The day screen at the start of day 1 (milestone 4a).
+    Day(Box<DayScreen>),
 }
 
 pub struct Game {
@@ -80,8 +83,19 @@ impl Game {
     /// 6): an instant change to the intro is queued, so the first frame
     /// builds it as a screen change does, with that frame's time.
     pub fn new_intro(defs: SoundDefs, settings: Settings) -> Game {
+        Game::new_on("intro", defs, settings)
+    }
+
+    /// A start on day 1's screen, for the test address `?page=day` (the
+    /// original reaches it from the day-1 newspaper, which comes in
+    /// milestone 6), built as `new_intro` builds the intro.
+    pub fn new_day(defs: SoundDefs, settings: Settings) -> Game {
+        Game::new_on("day", defs, settings)
+    }
+
+    fn new_on(screen: &'static str, defs: SoundDefs, settings: Settings) -> Game {
         let mut game = Game::blank(defs, settings);
-        game.pending = Some("intro");
+        game.pending = Some(screen);
         for event in game.fader.go(State::OffInstant, true) {
             if event == Event::FreezeScreen {
                 game.frozen = true;
@@ -135,6 +149,7 @@ impl Game {
                 GameScreen::Title(t) => t.update(&self.music, &self.speaker),
                 GameScreen::Settings(s) => s.update(gallery, &self.settings, self.time),
                 GameScreen::Intro(i) => i.update(gallery, dt, &mut self.speaker, audio)?,
+                GameScreen::Day(d) => d.update(dt, self.time, &mut self.speaker, audio),
             }
         }
         self.music.update(&mut self.speaker, audio);
@@ -148,6 +163,8 @@ impl Game {
                 GameScreen::Intro(i) => {
                     i.react(gallery, &mut self.input, dt, &mut self.speaker, audio)?.then(|| ("intro", "done".to_string()))
                 }
+                // Nothing on the day screen takes input yet (4b).
+                GameScreen::Day(_) => None,
             };
             match clicked {
                 Some(("title", id)) if id == "settings" => self.queue_screen_change("settings", gallery, audio)?,
@@ -201,14 +218,15 @@ impl Game {
         self.speaker.stop_all(true, true, audio);
         self.speaker.ignore_non_looping_plays_this_frame();
         let (screen, song) = match name {
-            "title" => (GameScreen::Title(TitleScreen::new(gallery, false)?), title::SONG),
-            "settings" => (GameScreen::Settings(SettingsScreen::new(gallery, &self.settings)?), settings_screen::SONG),
-            "intro" => (GameScreen::Intro(Box::new(IntroScreen::new(gallery, self.dt, &mut self.speaker, audio)?)), intro::SONG),
+            "title" => (GameScreen::Title(TitleScreen::new(gallery, false)?), Some(title::SONG)),
+            "settings" => (GameScreen::Settings(SettingsScreen::new(gallery, &self.settings)?), Some(settings_screen::SONG)),
+            "intro" => (GameScreen::Intro(Box::new(IntroScreen::new(gallery, self.dt, &mut self.speaker, audio)?)), Some(intro::SONG)),
+            "day" => (GameScreen::Day(Box::new(DayScreen::new(gallery, self.dt, &mut self.speaker, audio)?)), day::SONG),
             other => return Err(format!("Screen not found: {other}")),
         };
         self.screen = screen;
         self.frozen = false;
-        self.music.play(Some(song), &mut self.speaker, audio);
+        self.music.play(song, &mut self.speaker, audio);
         Ok(())
     }
 
@@ -234,6 +252,7 @@ impl Game {
             GameScreen::Title(t) => t.quads(gallery),
             GameScreen::Settings(s) => s.quads(gallery),
             GameScreen::Intro(i) => i.quads(gallery),
+            GameScreen::Day(d) => d.quads(gallery),
         };
         out.clear();
         for q in &quads {

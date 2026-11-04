@@ -87,8 +87,10 @@ constructor) and by the border scene (two). What it says is in `speech.md`.
   wider (sin(π x b)): opening, width over 0.25..0.375 and the bounce
   over 0.375..0.5 of the reveal; closing, width over 0.25..0.75 and the
   bounce over 0.75..1. A bubble without the dotted line starts its
-  reveal a quarter in. (The reveal is taken as linear in time: the
-  state's default curve was not read.)
+  reveal a quarter in. (The reveal is taken as linear in time. A target
+  given without a curve does move in a straight line, read on 2026-11-05,
+  `booth-screen.md`, part 2; this said the default curve was not read.
+  Whether the bubble's target is given without one was not checked.)
 - The box is never narrower than its borders; the text is cut to the
   box less 4 pixels on each side while it opens.
 - `originOffsetY` = −(line height + 22); `totalHeight` = text height + 8.

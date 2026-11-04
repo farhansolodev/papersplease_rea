@@ -428,8 +428,8 @@ citation being printed.
 - The engine side of giving, confiscating and the drawer
   (`player-actions.md` has the rules; the booth's state machine that
   calls `hideTransientPapers` was not named state by state).
-- The curves `BOUNCEBACK` and `INVPOW` (`app.Interp`), also open in
-  `buttons.md`.
+- (The curves `BOUNCEBACK` and `INVPOW` were listed here: read on
+  2026-11-05, `booth-screen.md`, part 2, "The curves".)
 - The carousel's floating papers (`coordinateReavelFloating`; phone
   only).
 

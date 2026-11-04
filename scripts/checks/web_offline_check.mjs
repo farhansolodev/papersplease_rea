@@ -37,6 +37,11 @@
 //      skipped without it); NEXT starts each next page and a press hurries
 //      it, each page at rest identical to the reference but for the cursor;
 //      the last NEXT fades to the title at rest, Theme playing on;
+//   4f. the start of day 1 (milestone 4a, ?page=day): the opening card with
+//      the whole date, identical to the Python reference
+//      (extracted/previews/m4a, made by scripts/reference/boothscreen.py;
+//      skipped without it); then the booth uncovered, identical to the
+//      reference but for the blinking booth button; booth-intro started;
 //   5. whether the page still starts with the network switched off, showing
 //      the same font page, and the title's Theme plays from the cache.
 //
@@ -57,6 +62,7 @@ const REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1');
 const TITLE_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1b', 'title.rgba');
 const SETTINGS_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3b', 'settings_a.rgba');
 const INTRO_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3c');
+const DAY_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm4a');
 const AUDIO = path.join(ROOT, 'extracted', 'audio');
 const PROFILE = path.join(ROOT, 'build', '_browser_profile');
 const BROWSERS = [
@@ -446,6 +452,36 @@ async function introPages() {
   if (after !== theme) throw new Error('Theme was started again');
 }
 
+// Milestone 4a on ?page=day (docs/milestone-4.md): the card with the date
+// typed whole, then, once the card has fallen, the booth. The booth button
+// blinks every 0.375 s, faster than the canvas can be read reliably, so the
+// booth is compared outside the button's 56 x 38 at (146, 65). No mouse
+// moves, so no cursor is drawn.
+async function dayStart() {
+  const wait = async (name, allow, ms = 60000) => {
+    const want = readFileSync(path.join(DAY_REFERENCE, name + '.rgba'));
+    const t0 = Date.now();
+    for (;;) {
+      let d;
+      try { d = await differences(want); } catch (e) { d = { n: -1, box: e.message }; }   // the canvas still resizing
+      if (d.n === 0 || (d.n > 0 && allow && within(d.box, allow))) return { d, s: (Date.now() - t0) / 1000 };
+      if (Date.now() - t0 > ms) throw new Error(`${name}: not reached (last: ${d.n} bytes differ in ${JSON.stringify(d.box)})`);
+      await sleep(200);
+    }
+  };
+  await send('Page.navigate', { url: URL + '?page=day' });
+  await start('day 1 to start');
+  await evaluate(`(() => { window.ppStarts = []; const p = window.ppAudio, s = p.start.bind(p);
+    p.start = (...a) => { window.ppStarts.push(a[2]); return s(...a); }; return 1; })()`);
+  const card = await wait('card_full', null);
+  console.log(`   the opening card with the whole date: identical to the reference (${card.s.toFixed(1)} s)`);
+  const booth = await wait('booth_normal', [146, 65, 56, 38]);
+  console.log(`   the booth uncovered: identical to the reference outside the booth button (${booth.d.n} bytes differ there; ${booth.s.toFixed(1)} s later)`);
+  const starts = await evaluate('window.ppStarts');
+  console.log('   sounds started after the start:', JSON.stringify([...new Set(starts.map((f) => f.replace(/[0-9]*\.(wav|ogg)$/, '')))]));
+  if (!starts.some((f) => f.startsWith('booth-intro'))) throw new Error('booth-intro did not play');
+}
+
 async function waitFor(expression, what, ms = 60000) {
   const t0 = Date.now();
   while (Date.now() - t0 < ms) {
@@ -576,6 +612,14 @@ try {
     await introPages();
   } else {
     console.log('1g. SKIPPED: no reference intro pages in extracted/previews/m3c or title in m1b');
+  }
+
+  if (existsSync(path.join(DAY_REFERENCE, 'card_full.rgba'))) {
+    console.log('1h. the start of day 1 (milestone 4a)');
+    await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
+    await dayStart();
+  } else {
+    console.log('1h. SKIPPED: no reference day start in extracted/previews/m4a');
   }
 
   console.log('1e. the sound test page');

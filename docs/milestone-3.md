@@ -12,8 +12,8 @@ in two, my suggestion in the plan, which the user accepted):
 |---|---|---|
 | **3a** | The title alive: the game's own cursor, the title rising with `Theme`, a click or key skipping the rise, the logo bobbing, the buttons pressing and clicking with their sounds | **Built 2026-11-03** (below), tried by the user the same day |
 | **3b** | Screens: the fade between screens, the settings screen with working settings (kept in the browser), Escape and the browser's full screen | **Built 2026-11-03** (below), tried by the user the same day |
-| **3c** | The intro pages (the page player), reached by the test address `?page=intro` | **Built 2026-11-04** (below) |
-| 3d | The pause screen on Escape | Not started |
+| **3c** | The intro pages (the page player), reached by the test address `?page=intro` | **Built 2026-11-04** (below), tried by the user the same day |
+| 3d | The pause screen on Escape | Folded into milestone 4 on 2026-11-04 (the user's decision; suggested as part of 4b, `PROGRESS.md` step 16) |
 
 The pause screen was in 3b at first. It moved to 3c on 2026-11-03 (my
 suggestion, the user agreed): only the day, night, news and intro screens
@@ -578,7 +578,8 @@ From the code, read for this step (the functions are listed in
 
 ## 3c: Not tested
 
-- **By the user**.
+- **By the user, in detail.** The user tried 3c on 2026-11-04 and said
+  "lgtm" (which browser, and which pages, not recorded).
 - Against the running game: everything is code reading (`screens.md` part
   5, "Things to watch in the game").
 - A page's sound after 2 s: the intro has none; it is built for the
@@ -590,9 +591,10 @@ From the code, read for this step (the functions are listed in
 None in the build. In the app's pane NEXT first looked broken; it was my
 click missing it (above).
 
-## Next: 3d
+## Next: 3d (now part of milestone 4)
 
-The pause screen. To read before it is built: `screens.md` part 4 (the
+The pause screen, built with milestone 4 since 2026-11-04 (the reading
+list below still holds). To read before it is built: `screens.md` part 4 (the
 pause screen, `enablePause`, Escape and its key mask) and part 3
 (`Confirm`), `save-format.md` part 2 (the `paused` state: effects paused,
 the song plays on, the clock paused, `button-drop` and `hover-up`). Two

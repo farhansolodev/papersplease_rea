@@ -88,6 +88,7 @@ impl Rig {
             GameScreen::Title(_) => "title",
             GameScreen::Settings(_) => "settings",
             GameScreen::Intro(_) => "intro",
+            GameScreen::Day(_) => "day",
             GameScreen::Empty => "empty",
         }
     }

@@ -26,7 +26,11 @@ header and button icons and its texts. Milestone 3c adds data/Intro.xml, the
 five pictures it names as pictures/intro/<file name>, and the NEXT text. The
 English pack can replace Intro.xml's captions, but none of its 23 changes is
 in that file (checked 2026-11-04 with scripts/reference/locpack.py), so the
-file goes in as it is. The English language pack is NOT
+file goes in as it is. Milestone 4a adds the day screen's pictures (the
+booth's and the border scene's background and booth button) and the texts
+of the desk hint and the long date (`date_verbose`, `month_1` to 12,
+`day_1` to 31; none is changed by the English pack, docs/language-pack.md).
+The English language pack is NOT
 applied here: of the 23 texts it changes none is in Text.xml, so Text.xml
 strings are the same with or without it (docs/milestone-1.md). Files it does
 change (Travelers.txt, Facts.xml, Endlesses.xml) need it applied
@@ -46,10 +50,14 @@ DEFAULT_OUT = os.path.join(ROOT, "build", "assets", "start.pack")
 PICTURES = ["Title.png", "PushButton.png", "SettingsButton.png", "CursorArrow.png", "CursorHand.png",
             "ScreenHeader.png", "SettingButtonOn.png", "SettingButtonOff.png", "SettingButtonPlus.png",
             "SettingButtonMinus.png",
-            "intro/Intro0.png", "intro/Intro1.png", "intro/Intro2.png", "intro/Intro3.png", "intro/Arstotzka.png"]
+            "intro/Intro0.png", "intro/Intro1.png", "intro/Intro2.png", "intro/Intro3.png", "intro/Arstotzka.png",
+            "Shutter.png", "Counter.png", "ConsoleUnder.png", "Console.png", "ClockPin.png",
+            "ShutterSwitchDown.png", "ShutterSwitchUp.png", "Desk.png", "StampBarTop.png", "StampBarMid.png",
+            "StampBarBot.png", "CheckpointBack.png", "OuterBooth.png"]
 STRINGS = ["wrap_hyphen", "menu_story", "menu_endless", "created_by",
            "menu_settings", "menu_done", "menu_fullscreen", "menu_nudity", "menu_easy", "menu_easytip",
-           "menu_dateformat", "menu_music", "menu_sound", "menu_next"]
+           "menu_dateformat", "menu_music", "menu_sound", "menu_next",
+           "booth_dragdocs", "date_verbose"] + ["month_%d" % n for n in range(1, 13)] + ["day_%d" % n for n in range(1, 32)]
 DATA = ["Sounds.xml", "Intro.xml"]
 
 

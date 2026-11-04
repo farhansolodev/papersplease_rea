@@ -1300,9 +1300,11 @@ search covered every call of the six key functions of `app.ent.Input`
 (by name, and through the slot-number helpers), every write of a
 button's `shortcutKey`, and every place Unity's own key input is read.
 What it found is complete for the code Ghidra decompiled; the two
-functions it could not (the `Booth` and `Layout` constructors) were
+functions it could not then (the `Booth` and `Layout` constructors) were
 checked in their instruction listings for button shortcut calls, and
-have none.
+have none. (The `Booth` constructor decompiles with a longer time limit
+since 2026-11-04, `ghidra-workflow.md`; its decompile, searched the same
+day, has no write of `shortcutKey`, which agrees.)
 
 **Keys tested by number** (the only places in the game):
 

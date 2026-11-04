@@ -6,6 +6,11 @@
 //     -noanalysis -readOnly -scriptPath scripts\ghidra
 //     -postScript DecompileFunctions.java <output file> <prefix or 0xADDRESS>...
 //
+// The time limit per function is 120 s; the environment variable
+// PP_DECOMPILE_TIMEOUT (seconds) raises it, and with it the decompiler's
+// output limit, for the few functions too big for the default (the Booth
+// constructor, 2026-11-04).
+//
 // A selector of the form @<file> reads selectors from that file, one per line
 // (blank lines and lines starting with # are skipped). Use it for long lists
 // of addresses: see game_function_lists.py.
@@ -19,13 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ghidra.app.decompiler.DecompInterface;
+import ghidra.app.decompiler.DecompileOptions;
 import ghidra.app.decompiler.DecompileResults;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Function;
 
 public class DecompileFunctions extends GhidraScript {
 
-	private static final int TIMEOUT_SECONDS = 120;
+	private static final int DEFAULT_TIMEOUT_SECONDS = 120;
 
 	@Override
 	protected void run() throws Exception {
@@ -69,14 +75,23 @@ public class DecompileFunctions extends GhidraScript {
 			}
 		}
 
+		int timeout = DEFAULT_TIMEOUT_SECONDS;
+		String env = System.getenv("PP_DECOMPILE_TIMEOUT");
 		DecompInterface decompiler = new DecompInterface();
+		if (env != null && !env.isEmpty()) {
+			timeout = Integer.parseInt(env);
+			DecompileOptions options = new DecompileOptions();
+			options.setMaxPayloadMBytes(512);
+			options.setMaxInstructions(200000);
+			decompiler.setOptions(options);
+		}
 		decompiler.openProgram(currentProgram);
 		int written = 0, failed = 0;
 		try (PrintWriter out = new PrintWriter(args[0], StandardCharsets.UTF_8)) {
 			for (Function function : selected) {
 				monitor.checkCancelled();
 				DecompileResults results =
-					decompiler.decompileFunction(function, TIMEOUT_SECONDS, monitor);
+					decompiler.decompileFunction(function, timeout, monitor);
 				out.println("// ===== " + function.getName() + " @ " + function.getEntryPoint());
 				if (results.decompileCompleted()) {
 					out.println(results.getDecompiledFunction().getC());

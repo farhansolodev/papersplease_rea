@@ -9,14 +9,17 @@
 //! buttons, the drawn cursor and the title screen alive. Milestone 3b: the
 //! game's screen changes with their fade, the settings and the settings
 //! screen. Milestone 3c: the typing caption, the page player and the intro
-//! screen.
+//! screen. Milestone 4a: the general state machine, the game's date type and
+//! the day screen at the start of day 1.
 
 pub mod adpcm;
 pub mod aud;
 pub mod button;
+pub mod day;
 pub mod fade;
 pub mod font;
 pub mod game;
+pub mod gdate;
 pub mod input;
 pub mod intro;
 pub mod num;
@@ -31,6 +34,7 @@ pub mod settings;
 pub mod settings_screen;
 pub mod sound;
 pub mod soundtest;
+pub mod stater;
 pub mod stepper;
 pub mod testcard;
 pub mod text;

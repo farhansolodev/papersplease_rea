@@ -97,9 +97,13 @@ analyzeHeadless.bat ... -postScript DecompileFunctions.java decompiled\all\play_
 Several `-postScript` pairs can go in one run. The two first lists (454
 functions) took 67 seconds; the other 13 lists, in one run, 1,051 seconds
 (17.5 minutes). Result: 6,856 of 6,858 decompiled. The two that time out
-are the ones known to be too big, the `Booth` and `Layout` constructors;
-their instruction listings are `decompiled/booth_ctor_asm.txt` and
-`layout_ctor_asm.txt`. Each `.c` file has a cleaned `.clean.c` copy
+at the script's default limit are the ones known to be too big, the
+`Booth` and `Layout` constructors; their instruction listings are
+`decompiled/booth_ctor_asm.txt` and `layout_ctor_asm.txt`. With a longer
+limit the `Booth` constructor does decompile (2026-11-04: about 5
+minutes, into `decompiled/booth_ctor.c` with `.clean.c` and `.short.c`
+copies; below, "A function can be too big"); the `Layout` constructor
+was not retried. Each `.c` file has a cleaned `.clean.c` copy
 (`clean_decompile.py`); `play_ui`, `app_ent` and `play_screen` also have
 a condensed `.short.c`. A function whose address is shared with an
 earlier list is written only there, so search the whole folder, not one
@@ -180,6 +184,21 @@ Habits that paid off:
   `dump.cs` (`[R13 + 0x90]` and so on). The record is in `border-view.md`.
   Since 2026-10-16 the whole constructor is run in the emulator instead
   (`EmulateLayout.java`, below), which gives every field at once.
+  **A longer limit can be enough** (2026-11-04): with the environment
+  variable `PP_DECOMPILE_TIMEOUT` set (seconds), `DecompileFunctions.java`
+  uses that limit and raises the decompiler's output limits (512 MB,
+  200,000 instructions). The `Booth` constructor (`0x1801b9100`, about
+  5,800 instructions), which had always timed out, finished in about 5
+  minutes with `PP_DECOMPILE_TIMEOUT=2400`:
+
+  ```powershell
+  $env:PP_DECOMPILE_TIMEOUT = '2400'
+  C:\tools\ghidra_12.1.4_PUBLIC\support\analyzeHeadless.bat decompiled\ghidra PapersPlease `
+    -process GameAssembly.dll -noanalysis -readOnly -scriptPath scripts\ghidra `
+    -postScript DecompileFunctions.java decompiled\booth_ctor.c 0x1801b9100
+  ```
+
+  Which of the two limits was the one that mattered was not tested.
 
 ## Running the game's code in the emulator
 

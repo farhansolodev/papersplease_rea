@@ -22,6 +22,9 @@ use pp_core::raster::Screen;
 use pp_core::settings::{Saved, Settings};
 use pp_core::sound::Category;
 
+mod common;
+use common::Json;
+
 const DT: f64 = 1.0 / 60.0;
 /// Inside NEXT (129 x 19 at (220, 290)).
 const NEXT: (f64, f64) = (285.0, 299.0);
@@ -56,129 +59,6 @@ impl Platform for Page {
 
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
-}
-
-/// A small reader for the reference's timeline.json, which holds only
-/// numbers, strings, true/false/null, lists and objects.
-#[derive(Debug, Clone, PartialEq)]
-enum Json {
-    Null,
-    Bool(bool),
-    Num(f64),
-    Str(String),
-    List(Vec<Json>),
-    Obj(Vec<(String, Json)>),
-}
-
-impl Json {
-    fn parse(s: &str) -> Json {
-        let mut chars = s.chars().peekable();
-        Json::value(&mut chars)
-    }
-
-    fn value(c: &mut std::iter::Peekable<std::str::Chars>) -> Json {
-        while c.peek().is_some_and(|x| x.is_whitespace()) {
-            c.next();
-        }
-        match c.peek().copied() {
-            Some('{') => {
-                c.next();
-                let mut out = Vec::new();
-                loop {
-                    match Json::value(c) {
-                        Json::Str(k) => {
-                            while c.next() != Some(':') {}
-                            out.push((k, Json::value(c)));
-                        }
-                        _ => return Json::Obj(out),
-                    }
-                    while let Some(x) = c.next() {
-                        if x == ',' {
-                            break;
-                        }
-                        if x == '}' {
-                            return Json::Obj(out);
-                        }
-                    }
-                }
-            }
-            Some('[') => {
-                c.next();
-                let mut out = Vec::new();
-                loop {
-                    while c.peek().is_some_and(|x| x.is_whitespace()) {
-                        c.next();
-                    }
-                    if c.peek() == Some(&']') {
-                        c.next();
-                        return Json::List(out);
-                    }
-                    out.push(Json::value(c));
-                    while let Some(x) = c.next() {
-                        if x == ',' {
-                            break;
-                        }
-                        if x == ']' {
-                            return Json::List(out);
-                        }
-                    }
-                }
-            }
-            Some('"') => {
-                c.next();
-                let mut s = String::new();
-                while let Some(x) = c.next() {
-                    match x {
-                        '"' => break,
-                        '\\' => s.push(c.next().unwrap()),
-                        x => s.push(x),
-                    }
-                }
-                Json::Str(s)
-            }
-            Some('}') | Some(']') | None => Json::Null,
-            Some(_) => {
-                let mut word = String::new();
-                while c.peek().is_some_and(|x| !",]} \n\r\t".contains(*x)) {
-                    word.push(c.next().unwrap());
-                }
-                match word.as_str() {
-                    "null" => Json::Null,
-                    "true" => Json::Bool(true),
-                    "false" => Json::Bool(false),
-                    n => Json::Num(n.parse().unwrap()),
-                }
-            }
-        }
-    }
-
-    fn get(&self, key: &str) -> &Json {
-        match self {
-            Json::Obj(items) => &items.iter().find(|(k, _)| k == key).unwrap_or_else(|| panic!("no {key}")).1,
-            _ => panic!("not an object"),
-        }
-    }
-
-    fn list(&self) -> &[Json] {
-        match self {
-            Json::List(l) => l,
-            _ => panic!("not a list"),
-        }
-    }
-
-    fn num(&self) -> Option<i64> {
-        match self {
-            Json::Num(n) => Some(*n as i64),
-            _ => None,
-        }
-    }
-
-    fn str(&self) -> &str {
-        match self {
-            Json::Str(s) => s,
-            _ => panic!("not a string"),
-        }
-    }
 }
 
 /// One frame of the run as the game shows it: (page, state, cut, letters

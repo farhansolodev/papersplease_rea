@@ -1,7 +1,8 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-11-04, after
-step 15, milestone 3c, the intro pages (`milestone-3.md`); before it
+**Read this first in a new session.** Last updated 2026-11-05, after
+step 16's first build, milestone 4a, the booth at the start of day 1
+(`milestone-4.md`); before it the reading for it (`booth-screen.md`); before it step 15, milestone 3c, the intro pages (`milestone-3.md`); before it
 step 14, milestone 3b, screen changes and the settings screen
 (`milestone-3.md`); before it step 13, milestone 3a, the title screen
 alive (`milestone-3.md`); before
@@ -105,11 +106,43 @@ from the right over 1 s, its caption types on, then NEXT; from page 2 on a
 press shows the page whole. Checked: a new reference `introscreen.py`, and
 `tests/intro.rs`, which plays its run with real mouse presses: all 617
 frames, the 35 typing-sound frames and seven pictures agree; the browser
-check's new step 1g (1 run, passed); a look in the app's pane. Not yet
-tried by the user; nothing compared with the game. Findings: the first
+check's new step 1g (1 run, passed); a look in the app's pane. Tried by
+the user the same day ("lgtm"); nothing compared with the game. Findings: the first
 page appears at once (an empty holder is 0 wide; was inferred);
 `revealAll` never plays its sound (corrects `screens.md` part 5). Details
 in step 15 below.
+
+**Update 2026-11-04 (step 16, under way): milestone 4, reading the
+booth.** The user asked to pick up the pace: the pause screen (3d) is
+folded into milestone 4, and milestones 4 and 5 are planned once, as
+"day 1 playable", with a stop for the user to try each build (both in
+`DESIGN.md`, "Decided by the user"). Done so far, no port code yet: the
+`Booth` constructor, which earlier steps recorded as too big for the
+decompiler, **decompiles with a longer time limit** (a new option of
+`DecompileFunctions.java`, `ghidra-workflow.md`); it is read, with
+`Booth.update`, the shutter, the console and part of its clock
+(`booth-screen.md`). Findings (by the code, nothing seen in the game): a
+day opens on a black card over the booth with the date typing, which
+falls away when the border scene starts the booth's intro; the console
+is two pictures with the papers between them; the clock runs from 6:00
+to 18:00 over the day; the wall picture `BoothWall.png` is made but
+never drawn; a day starts in the state `off` (answers `audio-layer.md`'s
+open item). Next: the plan for 4a in step 16 below, then building it.
+
+**Update 2026-11-05 (step 16): milestone 4a, the booth at the start of day
+1, is built** (`milestone-4.md`, "4a"), with the user's go-ahead for the
+4a–5b plan; the user tried 3c the day before ("lgtm"). `?page=day` opens
+on the black card typing "November 23rd, 1982"; after about 6 s it falls
+away and the booth shows (closed shutter, counter, console with date,
+"00" and the clock at 6:00, the desk and its hint, the stamp bar's edge),
+with the border's booth button blinking. The port now has the game's
+general state machine and curves (`stater.rs`). Checked against a new
+reference (`boothscreen.py`): 520 frames and six pictures identical; the
+browser check passed. Not yet tried by the user; nothing compared with the
+game. Findings: a new clock's first frame gives no time; the date card is
+two lines high (the empty title); the console's "---" weight is never
+seen; the bounce curve falls back short of its target (corrects a guess in
+`buttons.md`). Details in step 16 below.
 
 Before it the same day,
 step 7, the sorting of the open questions: 151 items into five kinds
@@ -448,7 +481,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out. The browser formats of the sounds: done in milestone 2 (2026-10-29, `milestone-2.md`: songs as Ogg Vorbis from ffmpeg, effects as the game's ADPCM) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files"). Step 6b, the game-side audio layer (`audio-layer.md`) |
-| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). **Milestone 3b built** (2026-11-03): screen changes with their fade, the settings and the settings screen, full screen; tried by the user (2026-11-03). **Milestone 3c built** (2026-11-04): the intro pages (the typing caption, the page player), by `?page=intro`; not yet tried by the user. The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3d and 4 to 10 not started |
+| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). **Milestone 3b built** (2026-11-03): screen changes with their fade, the settings and the settings screen, full screen; tried by the user (2026-11-03). **Milestone 3c built** (2026-11-04): the intro pages (the typing caption, the page player), by `?page=intro`; tried by the user (2026-11-04). The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. The pause screen (3d) is folded into milestone 4 (the user's decision, 2026-11-04). **Milestone 4a built** (`milestone-4.md`, 2026-11-05): day 1's booth at the start of the day, by `?page=day`, the general state machine; not yet tried by the user. 4b, 4c and milestones 5 to 10 not started |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
@@ -512,6 +545,8 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `screen-output.md` | **The Unity side of drawing** (the last part): the drawing order (layers lowest first, then the order visuals were added), the host's frame, the 570 x 320 screen picture and how it is fitted to the window (window size, full screen, the command-line words), how quads are batched, texture coordinates, pictures on the graphics card and the change counter, where a fractional position lands (the graphics card's rule, assumed), the quad shader (colour multiplied in, ordinary alpha blending, gamma colour space), the phantom cursor (behind the picture, so hidden over it), and the Unity files (step 5b: the scene, materials, shaders, Pixel Perfect Camera and project settings, read with UnityPy) |
 | `vis-basics.md` | **Drawing, part 6**: the rest of `app.vis`: pictures in memory (0xAARRGGBB, byte order, change counter, `white1x1`), colours, `Fill`, the nine-slice `Frame`, the atlas of chips and its y order, `Point.parse` and `Rect.parse` with the data check, the geometry helpers the game uses, and the helpers it never calls |
 | `inspect-mode.md` | **Drawing, part 5b**: the inspect mode (`InspectUi`): opening and closing (button, Space, double click), its states and timings, the reveal of the hint and buttons, the overlay, the surround lines and the initial scan; what can be marked (papers topmost first, marks to fact paths, the paper itself, the booth's four things); the two selection slots; the pair's text; the diagram's timeline and label side; the interrogate button; when the mode is disabled |
+| `milestone-4.md` | Milestone 4, split into 4a, 4b, 4c (and 5a, 5b for milestone 5); 4a, the booth at the start of day 1: how to try it (`?page=day`), what was built (`stater.rs`, `gdate.rs`, `day.rs`, the affine picture drawing), the decisions (the test address, the walk-in kept as a distance, the sub-clocks), the checks (520 frames and six pictures against `boothscreen.py`, browser step 1h), measurements, findings (6 s before the intro, the two-line date, the weight never shown, the bounce), what is not tested, the failures on the way, the reading list for 4b |
+| `booth-screen.md` | **The booth, part 1**: how its constructor was decompiled (a longer time limit), what it builds on desktop and in which order (the wall picture made but never drawn, the counter, the console's two pictures with the papers between, the shutter switch, the desk and its hint text, the stamp bar, the drawer, the day's opening card), the state machine's states and the day's start (`off`, `intro`, `intro-instant`, `empty`), `Booth.update` (the clock from 6:00 to 18:00, the ambient by state), the shutter, the console and its clock; **part 2** (2026-11-05): the state machine's rules in full, the curves, the clocks' first frame, the start of a day frame by frame (the walk-in, the booth button's blink), the card's two-line date, the weight never shown, the stamp bar, the other parts at the start; what is not read yet |
 | `booth-layout.md` | **Every desktop value of `Layout`**, from the game's constructor run in Ghidra's emulator: the booth's rectangles (window, counter, console, desk, clips, clamps, give area, slot, counter edge, floor line), the dock points of the rulebook, bulletin and transcript, the inspect rectangles, and all other fields; how the run was made and checked (35 values read by hand earlier all match) |
 | `paths-xml-format.md` | `Paths.xml`: paths and animations of the figures in the top view |
 | `borderanim-xml-format.md` | `BorderAnim.xml`: the picture atlas and how an animation finds its frames |
@@ -860,7 +895,7 @@ the night screen's family pictures; part 11, the last screens.)
    reference's run, the 35 `text-reveal` frames, seven pictures byte for
    byte, the fade to the title; a deliberate fault in a letter delay made
    it fail, as it should); the browser check's step 1g, 1 run, passed; a
-   look in the app's pane. **Not tested**: by the user, against the game,
+   look in the app's pane. Tried by the user the same day ("lgtm"). **Not tested**: against the game,
    a page's sound (the intro has none), Firefox. Corrected:
    `screens.md` part 5 (`revealAll` plays no sound; the first page and the
    clip's positions now read, not inferred), `buttons.md` (`Sprite.width`
@@ -868,7 +903,62 @@ the night screen's family pictures; part 11, the last screens.)
    1.0000000000000013, not 1.0 exactly). Next: the user tries 3c (two
    commands in `milestone-3.md`, "3c: How to try it"), then the plan for
    **3d, the pause screen** (its reading list and two decisions are at the
-   end of `milestone-3.md`).
+   end of `milestone-3.md`; since step 16 the pause screen is part of
+   milestone 4, below).
+
+16. **Milestones 4 and 5, "day 1 playable": under way** (2026-11-04).
+   The user asked for a faster pace and chose two ways: fold the pause
+   screen into milestone 4, and plan milestones 4 and 5 once, with a stop
+   to try each build. Not chosen: lighter checking (a new Python reference
+   per screen stays) and shorter write-ups. Done: the reading in
+   `booth-screen.md` (the `Booth` constructor decompiled, `ghidra-workflow.md`).
+   **The plan, suggested, waiting for the user's go-ahead** (each build is
+   one step with its doc section in a new `milestone-4.md` or
+   `milestone-5.md`, its `MODLOG.md` entry and, when asked, its commit):
+   - **4a, the booth at the start of day 1** (`?page=day`): the day
+     screen with the border scene's background picture (no figures yet),
+     the booth as its constructor builds it (counter, the console with
+     date, 6:00 on the clock, "00" and "---", the closed shutter and its
+     switch, the desk and its hint, the closed stamp bar), the opening
+     card typing the date and falling away, the ambient loops. To read
+     first: the stamp bar, the border scene's pictures and who calls
+     `startIntro`, `app.Interp`'s curves, the clock's instructions. Check:
+     a new reference `boothscreen.py`, frame by frame as `tests/intro.rs`
+     does, and a step in the browser check.
+   - **4b, the rulebook and pausing**: the rulebook docked, dragged
+     closed and open, its pages and links (the day's rule texts need
+     `BoothEnv`'s text lookup, to read), the return to its dock, their
+     sounds; the shutter switch; Escape and the pause screen (3d's
+     reading list and two decisions, end of `milestone-3.md`). Check:
+     `deskmove.py` and `pages.py` (existing) plus a pause reference.
+   - **4c, the booth's clock and tools**: the clock running, the stamp
+     bar sliding out, stamping a paper, the drawer if day 1 has it.
+   - **5a, travelers arrive**: the traveler pipeline in Rust (the Python
+     reference already matches the game for days 1 to 4), the person in
+     the window, speech, papers from the slot, giving them back. Check:
+     the same travelers as `booth.py` for a fixed seed.
+   - **5b, judging day 1**: stamping and judging by the booth's rules,
+     citations, the day's end by the clock. After 5b, day 1 can be
+     played through (no night yet: that is milestone 6).
+   **The user gave the go-ahead for this plan on 2026-11-04.**
+   **4a, the booth at the start of day 1: built** (2026-11-05,
+   `milestone-4.md`, "4a"). The second reading (the state machine in
+   full, the curves, the clocks' first frame, the stamp bar, the border's
+   start and the booth button's blink, the shutter's strips and the clock
+   in the instructions) is in `booth-screen.md`, part 2. New: in
+   `pp_core` `stater.rs`, `gdate.rs`, `day.rs`, `Picture::draw_affine`;
+   `Game::new_day` and `?page=day`; the reference
+   `scripts/reference/boothscreen.py`; `tests/day.rs`; the browser check's
+   step 1h. Checked: 95 unit tests; 520 frames, the sound frames and six
+   pictures identical to the reference (a deliberate fault made it fail);
+   the browser check, 1 run after a fix to its new step, passed; a look in
+   the app's pane. **Not tested**: by the user, against the game, Firefox,
+   the sounds by ear. Corrected: `buttons.md` (the bounce curve was
+   guessed "an overshoot", which was wrong: it falls back short of the
+   target), `desk-movement.md`, `ui-parts.md`, `inspect-mode.md` (the
+   curves, the default curve). Next: the user tries 4a (two commands in
+   `milestone-4.md`, "4a: How to try it"), then **4b** (its reading list
+   is at the end of `milestone-4.md`).
 
 Small jobs that fit anywhere:
 
@@ -914,13 +1004,15 @@ were closed and the docs that still said "open" were fixed.)
 Read these in the order of the port's build. The first two matter most.
 
 - **The booth's own state machine** (`empty`, `entering`, `intro`,
-  `busy-with-border`, `detaining`...) is known only where `Border` touches it.
-  The decompiler times out on the `Booth` constructor, where the states are
-  set up; its instructions are in `decompiled/booth_ctor_asm.txt` and list the
-  state names and callbacks in order. It also decides which ambient loop is
-  heard at a day's start and which six states select the street noise
-  (`audio-layer.md`). *Settle first when the booth is built.* Assume nothing;
-  read it.
+  `busy-with-border`, `detaining`...): **read in part on 2026-11-04**
+  (`booth-screen.md`). The `Booth` constructor, where the states are set
+  up, decompiles with a longer time limit (this said the decompiler times
+  out on it; that holds only at the default limit, corrected the same
+  day, `ghidra-workflow.md`). Read: the states made, their order, and the
+  day's start (`off`, `intro`, `intro-instant`, `empty`); a day starts in
+  `off`, which answers the open item of `audio-layer.md` about the first
+  ambient loop. Still to read: the functions of the states from
+  `entering` on. *Settle each when the part that needs it is built.*
 - **Who sends the scene to `waiting-to-fade-to-night` on a day that ends by
   the clock** (`border-scene.md`). *Settle when the day's end is built.*
 - **What `canDetain`, `forceDeny`, `slow` and `special` do in play** beyond
@@ -1152,6 +1244,9 @@ All gitignored. Nothing below is in git.
 | `extracted/saverun/` | small | A real save folder: the user's hand-played game of 2026-10-14 (four saves with one branch, settings, statistics, name position) | Play again with `savedir` pointing at an empty folder (`save-format.md`); the same game cannot be recreated |
 | `extracted/stashrun/`, `extracted/stash_sample/` | small | The stash test of 2026-10-14: the test's save folder as it ended (no stash, it was deleted by the click on "Story"), and a copy taken after the first launch that still has `stash.sav` | Play again as described in `save-format.md` ("The stash test in the running game"); the same stash cannot be recreated |
 | `decompiled/booth_ctor_asm.txt` | about 0.5 MB | Read for part 2 of `save-format.md`: the instructions of the `Booth` constructor and of `HostUnity.CreateGame`. (The stash, `GameTransition` and `play.screen` functions read for that part are in `decompiled/all/`) | Step 4 of `ghidra-workflow.md`: `DumpAssembly.java 0x1801b9100` and `0x1809e7b00` |
+| `decompiled/booth_ctor.c`, `.clean.c`, `.short.c` | about 0.3 MB | The `Booth` constructor decompiled (`booth-screen.md`) | `ghidra-workflow.md`, "A function can be too big": `PP_DECOMPILE_TIMEOUT=2400`, then `clean_decompile.py` and `condense_decompile.py` |
+| `decompiled/booth4a_run1.txt` | small | For `booth-screen.md` part 2: the instructions of `Shutter.set_openT` and `ConsoleClock.set_hour` | `DumpAssembly.java 0x18071a720` and `0x18093f3e0` |
+| `extracted/previews/m4a/` | about 4.5 MB | The reference run of milestone 4a (`timeline.json`, six pictures) | `python -I scripts/reference/boothscreen.py extracted/art/assets extracted/previews/m4a` |
 | `decompiled/titlescreen_update_asm.txt`, `loadscreen_strings.txt` | small | For `screens.md`, parts 2 and 3: the instructions of `TitleScreen.update`, and the strings of three load-screen functions in machine-code order | `DumpAssembly.java 0x180676bc0`; `ListStringUses.java` with `0x1806f4810`, `0x1806ee2e0` and `0x18093d4f0` |
 | `decompiled/all/` | about 44 MB | **The whole game decompiled once** (2026-10-14): every function of the game's own classes (6,856 of 6,858; not the social service and Steam), one file per part with a cleaned copy, the address lists in `lists/`, two Ghidra logs, and `booth_react.short.c`. Search here first for "who else does this?" | `ghidra-workflow.md`, "The whole game, decompiled once": `game_function_lists.py`, then `DecompileFunctions.java` with `@` list files (about 19 minutes), then `clean_decompile.py` on each file |
 | `decompiled/drawing5_run1.txt` to `drawing5_run3.txt` | under 1 MB each | For `desk-movement.md` (and part 5b): the instructions of the `Filer` and `InspectUi` constructors, `InspectUi.updateOverlay`, `Paper.set_mountPos` and `get_mountPos`, `DeskItem.animateReveal`, `startCustomDrag` and `FUN_180131040`; the strings of `updateOverlay`, the `InspectUi` constructor, `InspectUiDiagram.set` and its constructor | `DumpAssembly.java 0x180873270 0x18061c9e0 0x1804bedb0 0x1804b58b0` with `ListStringUses.java 0x1804bedb0 0x1804b58b0 0x1808ea280 0x1808e8910`; then `DumpAssembly.java 0x180454d60 0x18061b880 0x180131040`; then `DumpAssembly.java 0x18045cbc0` |

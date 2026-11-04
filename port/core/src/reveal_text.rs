@@ -29,6 +29,9 @@ pub struct RevealText {
     reveal_countdown: f64,
     /// Each built letter's alpha, as its tile's colour holds it (a float).
     alpha: Vec<f32>,
+    /// The entity's `visible` (the booth's opening card hides its text when
+    /// its intro ends); the owner checks it before drawing.
+    pub visible: bool,
 }
 
 impl RevealText {
@@ -43,6 +46,7 @@ impl RevealText {
             reveal_index: 0,
             reveal_countdown: 0.0,
             alpha: Vec::new(),
+            visible: true,
         }
     }
 

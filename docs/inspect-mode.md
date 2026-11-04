@@ -211,8 +211,10 @@ entering `on`: the interrogate button is enabled only if the pair
 `inspect-diagramon`. At 60 % of the blend (1.2 s), if enabled, the sound
 `inspect-interrogateon`.
 
-Over the 2 seconds (the visible amount taken as linear in time;
-`app.Interp`'s default curve was not read):
+Over the 2 seconds (the visible amount taken as linear in time; a target
+given without a curve moves in a straight line, read on 2026-11-05,
+`booth-screen.md`, part 2, where this said the default curve was not
+read; whether this target is given without one was not checked):
 
 | Time | What shows |
 |---|---|

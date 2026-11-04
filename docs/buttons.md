@@ -324,8 +324,12 @@ state machine (`app.Stater`, `border-scene.md`) with two states:
   So **it blinks: 0.25 s normal, 0.25 s flash**, for as long as it is
   down.
 
-Both blends use the curve `BOUNCEBACK(0.1, 1)` (`app.InterpType`); its
-shape was not read (it looks like an overshoot and settle). For a given
+Both blends use the curve `BOUNCEBACK(0.1, 1)` (`app.InterpType`): it
+reaches the target at a third of the time, comes back 10% of the way at
+two thirds and lands at the end (read on 2026-11-05, `booth-screen.md`,
+part 2, "The curves"; this said its shape was not read and guessed "an
+overshoot and settle", which was wrong: it never goes past the target,
+it falls back short of it). For a given
 `dropT`: the button is shown and takes input only while `dropT` is above
 0; its top is at `topY - height + height x dropT`; and the part above
 `topY` is cut off. `dropped` reads as "the state is `on`"; setting it
@@ -422,7 +426,8 @@ a ring.
   which the game code does not round; the Unity side does not round
   them either, read on 2026-10-17, `screen-output.md`: the graphics
   card's pixel rule decides, by the usual rule the nearest pixel.)
-- The shape of the `BOUNCEBACK` curve (`app.Interp.get`, case 6).
+- (The shape of the `BOUNCEBACK` curve was listed here: read on
+  2026-11-05, `booth-screen.md`, part 2.)
 - When the stamp bar drops its button and what the click does
   (`StampBar`, `DropRemote`); the criminal-poster pin's behaviour beyond
   its looks (phone only, by the inference above).

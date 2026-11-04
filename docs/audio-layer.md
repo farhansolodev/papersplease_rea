@@ -131,7 +131,8 @@ fade, and sets both to volume 0 **at once**.
 Every frame, `Booth.update` looks at the booth's own state. In the
 states `off`, `intro`, `empty`, `busy-with-border`, `waiting-to-detain`
 and `detaining` (by their names: no traveler being dealt with in the
-booth; the booth's state machine is not fully read, `border-scene.md`)
+booth; the booth's state machine is read only as far as a day's start,
+`booth-screen.md`)
 it asks for `border-ambient` at 1, `booth-ambient` at 0, and sets **no
 room**; in any other state (with no state at all too) the opposite, and
 the room `booth`.
@@ -149,11 +150,12 @@ the room `booth`.
   to nearly 0 in the first frame and then rises). The loop whose first
   target is 0 is already "at" 0 as far as the game knows, so the host is
   never told, and **it keeps playing at its full level until its target
-  first becomes 1**; from then on it behaves. Inferred from the state
-  names (the first state of a day was not read): at the start of a day
-  the booth is in `off`, `intro` or `empty`, so `booth-ambient` would be
-  heard at full level together with `border-ambient` until the first
-  traveler comes in.
+  first becomes 1**; from then on it behaves. A day starts in `off`
+  (read on 2026-11-04 in the decompiled constructor, `booth-screen.md`;
+  this was inferred from the state names before), then `intro` and
+  `empty`, so **`booth-ambient` is heard at full level together with
+  `border-ambient` until the first traveler comes in** (by the code; not
+  heard in the game).
 - **Room**: the only sound with a room is `car-driveby` (`border`). So
   **car sounds are dropped while a traveler is in the booth** (room
   `booth`) and play when the room is not set. The room is never set
@@ -277,10 +279,12 @@ dropped.
 
 ## Not studied
 
-- Which booth state a day starts in, so which ambient is the one heard
-  at full level at first (inferred `booth-ambient`, above).
-- The booth's state machine as a whole (`border-scene.md`): the six
-  "border" states are known only by name.
+- (Which booth state a day starts in was listed here: `off`, read on
+  2026-11-04, `booth-screen.md`; so the ambient heard at full level at
+  first is `booth-ambient`, above.)
+- The booth's state machine as a whole: its states and the day's start
+  are read since 2026-11-04 (`booth-screen.md`); the functions of the
+  states from `entering` on, among them the "border" states, are not.
 - Whether anything calls `SetPauseForAppLostFocus` (`audio.md`).
 - Whether the game ever has 32 sounds at once (`audio.md`).
 
