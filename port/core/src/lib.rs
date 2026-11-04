@@ -8,6 +8,7 @@
 //! Milestone 3a: the random generator, the audio layer (`app.aud`), input,
 //! buttons, the drawn cursor and the title screen alive. Milestone 3b: the
 //! game's screen changes with their fade, the settings and the settings
+//! screen. Milestone 3c: the typing caption, the page player and the intro
 //! screen.
 
 pub mod adpcm;
@@ -17,12 +18,14 @@ pub mod fade;
 pub mod font;
 pub mod game;
 pub mod input;
+pub mod intro;
 pub mod num;
 pub mod pack;
 pub mod pages;
 pub mod picture;
 pub mod rand;
 pub mod raster;
+pub mod reveal_text;
 pub mod screen;
 pub mod settings;
 pub mod settings_screen;

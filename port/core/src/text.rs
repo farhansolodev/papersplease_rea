@@ -58,9 +58,21 @@ pub struct Text {
 
 pub struct Built {
     pub tiles: Vec<Tile>,
+    /// The built letters (`getBuiltLetters`): every character of the laid-out
+    /// lines that the font has, spaces included, with the index of its tile
+    /// in `tiles` (none for the space). A character the font lacks has a box
+    /// tile but no built letter.
+    pub letters: Vec<(char, Option<usize>)>,
     pub width: i32,
     pub height: i32,
     pub hyphenated: bool,
+}
+
+impl Built {
+    /// What an empty text lays out to.
+    pub fn empty() -> Built {
+        Built { tiles: Vec::new(), letters: Vec::new(), width: 0, height: 0, hyphenated: false }
+    }
 }
 
 impl Text {
@@ -81,11 +93,12 @@ impl Text {
 
     pub fn build(&self, font: &Font) -> Built {
         if self.text.is_empty() {
-            return Built { tiles: Vec::new(), width: 0, height: 0, hyphenated: false };
+            return Built::empty();
         }
         let split = font.split(&self.text, self.fixed_width, self.multi_line);
         let r = i32::from(self.rounded);
         let mut tiles = Vec::new();
+        let mut letters = Vec::new();
         let mut y = self.padding_y;
         for line in &split.lines {
             let mut x = self.padding_x;
@@ -110,6 +123,7 @@ impl Text {
                         x += font.space_width;
                     }
                     Some(letter) => {
+                        letters.push((c, (c != SPACE).then_some(tiles.len())));
                         if c != SPACE {
                             tiles.push(Tile {
                                 kind: TileKind::Letter,
@@ -146,10 +160,16 @@ impl Text {
                 front.push(back([0, 1, r, height - 2]));
                 front.push(back([width, 1, r, height - 2]));
             }
+            let shift = front.len();
             front.append(&mut tiles); // the background tiles come first
             tiles = front;
+            for (_, tile) in &mut letters {
+                if let Some(i) = tile {
+                    *i += shift;
+                }
+            }
         }
-        Built { tiles, width: width + r, height, hyphenated: split.hyphenated }
+        Built { tiles, letters, width: width + r, height, hyphenated: split.hyphenated }
     }
 }
 
@@ -243,6 +263,16 @@ mod tests {
         assert_eq!(b.tiles[2].dst, [4, 1, 1, 4]);
         assert_eq!(b.tiles[3].dst[0], 1); // the letter is shifted right by 1
         assert_eq!(b.width, 5);
+    }
+
+    #[test]
+    fn built_letters_list_spaces_but_not_missing_letters() {
+        let mut t = text("A ?B");
+        t.background = 0xFF112233;
+        let b = t.build(&font());
+        // Tiles: the background, A, the box for "?", B.
+        assert_eq!(b.letters, [('A', Some(1)), (' ', None), ('B', Some(3))]);
+        assert_eq!(b.tiles[2].kind, TileKind::Box);
     }
 
     #[test]

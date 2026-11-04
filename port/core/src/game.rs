@@ -14,12 +14,13 @@
 //!    has moved; otherwise the window's full screen is copied into them if
 //!    it differs.
 //!
-//! The pause key is not looked at yet: none of the screens built so far can
-//! be paused (only the day, night, news and intro screens can).
+//! The pause key is not looked at yet: the intro screen (milestone 3c) is
+//! the first screen built that can be paused, and the pause comes in 3d.
 
 use crate::aud::{AudioHost, Music, SoundDefs, Speaker};
 use crate::fade::{Event, Fader, State};
 use crate::input::{self, HostInput, Input};
+use crate::intro::{self, IntroScreen};
 use crate::pages::Gallery;
 use crate::raster::Screen;
 use crate::settings::{Saved, Settings};
@@ -36,8 +37,12 @@ pub trait Platform {
 }
 
 pub enum GameScreen {
+    /// Before the first screen of a run that starts elsewhere than the
+    /// title (the test address `?page=intro`): black.
+    Empty,
     Title(TitleScreen),
     Settings(SettingsScreen),
+    Intro(Box<IntroScreen>),
 }
 
 pub struct Game {
@@ -53,8 +58,9 @@ pub struct Game {
     /// The screen's switches 4 and 16 cleared: no input, no update.
     frozen: bool,
     pending: Option<&'static str>,
-    /// The game's clock (`app.Clock.time`).
+    /// The game's clock (`app.Clock.time`) and this frame's time.
     time: f64,
+    dt: f64,
     /// Lines for the host's log (clicks that lead nowhere yet).
     pub log: Vec<String>,
 }
@@ -63,21 +69,42 @@ impl Game {
     /// The start: the first title screen of the run (the one that rises)
     /// and its song.
     pub fn new(gallery: &Gallery, defs: SoundDefs, settings: Settings, audio: &mut dyn AudioHost) -> Result<Game, String> {
-        let mut game = Game {
+        let mut game = Game::blank(defs, settings);
+        game.screen = GameScreen::Title(TitleScreen::new(gallery, true)?);
+        game.music.play(Some(title::SONG), &mut game.speaker, audio);
+        Ok(game)
+    }
+
+    /// A start on the intro, for the test address `?page=intro` (the
+    /// original reaches it from the load screen, which comes in milestone
+    /// 6): an instant change to the intro is queued, so the first frame
+    /// builds it as a screen change does, with that frame's time.
+    pub fn new_intro(defs: SoundDefs, settings: Settings) -> Game {
+        let mut game = Game::blank(defs, settings);
+        game.pending = Some("intro");
+        for event in game.fader.go(State::OffInstant, true) {
+            if event == Event::FreezeScreen {
+                game.frozen = true;
+            }
+        }
+        game
+    }
+
+    fn blank(defs: SoundDefs, settings: Settings) -> Game {
+        Game {
             input: Input::new(),
             speaker: Speaker::new(defs),
             music: Music::new(),
             settings,
             settings_generation: 0,
             fader: Fader::new(),
-            screen: GameScreen::Title(TitleScreen::new(gallery, true)?),
+            screen: GameScreen::Empty,
             frozen: false,
             pending: None,
             time: 0.0,
+            dt: 0.0,
             log: Vec::new(),
-        };
-        game.music.play(Some(title::SONG), &mut game.speaker, audio);
-        Ok(game)
+        }
     }
 
     pub fn screen(&self) -> &GameScreen {
@@ -98,26 +125,39 @@ impl Game {
     pub fn step(&mut self, host: &HostInput, dt: f64, gallery: &mut Gallery, audio: &mut dyn AudioHost, platform: &mut dyn Platform) -> Result<(), String> {
         self.input.update(host, dt);
         self.time += dt;
+        self.dt = dt;
         for event in self.fader.step(dt) {
             self.handle(event, gallery, audio)?;
         }
         if !self.frozen {
             match &mut self.screen {
+                GameScreen::Empty => {}
                 GameScreen::Title(t) => t.update(&self.music, &self.speaker),
                 GameScreen::Settings(s) => s.update(gallery, &self.settings, self.time),
+                GameScreen::Intro(i) => i.update(gallery, dt, &mut self.speaker, audio)?,
             }
         }
         self.music.update(&mut self.speaker, audio);
         if !self.frozen {
             let clicked = match &mut self.screen {
+                GameScreen::Empty => None,
                 GameScreen::Title(t) => t.react(&mut self.input, &mut self.speaker, audio).map(|id| ("title", id)),
                 GameScreen::Settings(s) => s
                     .react(&mut self.input, &mut self.speaker, audio, &mut self.settings, self.time)
                     .map(|id| ("settings", id)),
+                GameScreen::Intro(i) => {
+                    i.react(gallery, &mut self.input, dt, &mut self.speaker, audio)?.then(|| ("intro", "done".to_string()))
+                }
             };
             match clicked {
                 Some(("title", id)) if id == "settings" => self.queue_screen_change("settings", gallery, audio)?,
                 Some(("settings", id)) if id == "back" => self.queue_screen_change("title", gallery, audio)?,
+                // `IntroScreen.intro_onDone` fades to the day-1 newspaper,
+                // which comes in milestone 6; for now, to the title.
+                Some(("intro", _)) => {
+                    self.log.push("intro: done (the newspaper comes in milestone 6; to the title for now)".into());
+                    self.queue_screen_change("title", gallery, audio)?;
+                }
                 Some((screen, id)) => self.log.push(format!("{screen}: {id} clicked")),
                 None => {}
             }
@@ -163,6 +203,7 @@ impl Game {
         let (screen, song) = match name {
             "title" => (GameScreen::Title(TitleScreen::new(gallery, false)?), title::SONG),
             "settings" => (GameScreen::Settings(SettingsScreen::new(gallery, &self.settings)?), settings_screen::SONG),
+            "intro" => (GameScreen::Intro(Box::new(IntroScreen::new(gallery, self.dt, &mut self.speaker, audio)?)), intro::SONG),
             other => return Err(format!("Screen not found: {other}")),
         };
         self.screen = screen;
@@ -189,8 +230,10 @@ impl Game {
     /// the cursor pictures (index, width, height).
     pub fn draw(&self, gallery: &Gallery, out: &mut Screen, arrow: (usize, u32, u32), hand: (usize, u32, u32)) {
         let quads = match &self.screen {
+            GameScreen::Empty => Vec::new(),
             GameScreen::Title(t) => t.quads(gallery),
             GameScreen::Settings(s) => s.quads(gallery),
+            GameScreen::Intro(i) => i.quads(gallery),
         };
         out.clear();
         for q in &quads {

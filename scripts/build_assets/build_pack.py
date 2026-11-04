@@ -22,7 +22,11 @@ pictures as pictures/<file name> (PICTURES) and its three texts to
 strings.json (STRINGS). Milestone 3a adds the two cursor pictures and
 data/Sounds.xml (DATA), which the game's speaker reads (Sounds.xml is not
 changed by the English pack). Milestone 3b adds the settings screen's
-header and button icons and its texts. The English language pack is NOT
+header and button icons and its texts. Milestone 3c adds data/Intro.xml, the
+five pictures it names as pictures/intro/<file name>, and the NEXT text. The
+English pack can replace Intro.xml's captions, but none of its 23 changes is
+in that file (checked 2026-11-04 with scripts/reference/locpack.py), so the
+file goes in as it is. The English language pack is NOT
 applied here: of the 23 texts it changes none is in Text.xml, so Text.xml
 strings are the same with or without it (docs/milestone-1.md). Files it does
 change (Travelers.txt, Facts.xml, Endlesses.xml) need it applied
@@ -41,11 +45,12 @@ ASSETS = os.path.join(ROOT, "extracted", "art", "assets")
 DEFAULT_OUT = os.path.join(ROOT, "build", "assets", "start.pack")
 PICTURES = ["Title.png", "PushButton.png", "SettingsButton.png", "CursorArrow.png", "CursorHand.png",
             "ScreenHeader.png", "SettingButtonOn.png", "SettingButtonOff.png", "SettingButtonPlus.png",
-            "SettingButtonMinus.png"]
+            "SettingButtonMinus.png",
+            "intro/Intro0.png", "intro/Intro1.png", "intro/Intro2.png", "intro/Intro3.png", "intro/Arstotzka.png"]
 STRINGS = ["wrap_hyphen", "menu_story", "menu_endless", "created_by",
            "menu_settings", "menu_done", "menu_fullscreen", "menu_nudity", "menu_easy", "menu_easytip",
-           "menu_dateformat", "menu_music", "menu_sound"]
-DATA = ["Sounds.xml"]
+           "menu_dateformat", "menu_music", "menu_sound", "menu_next"]
+DATA = ["Sounds.xml", "Intro.xml"]
 
 
 def text_item(text_xml, item_id):

@@ -413,7 +413,10 @@ a ring.
 - (`app.vis.Text`'s width and height were listed here; read on
   2026-10-16, `text-drawing.md`: one line's height is the font's line
   height, its width the text's width.)
-- What a scaled picture answers for its width (`Sprite.width`). (Whether
+- (What a scaled picture answers for its width was listed here: read on
+  2026-11-04 for milestone 3c, `Sprite.width` is its drawing rectangle's
+  width, which `Sprite.rebuild` sets to the picture's (or piece's) width
+  times `scaleX`, 0 without a picture; `screens.md` part 5.) (Whether
   `Image.paste` rounds half-pixel positions was listed here: it cuts them
   toward zero, `text-drawing.md`. A button on screen is drawn as quads,
   which the game code does not round; the Unity side does not round

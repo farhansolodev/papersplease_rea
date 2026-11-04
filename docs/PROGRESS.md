@@ -1,6 +1,7 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-11-03, after
+**Read this first in a new session.** Last updated 2026-11-04, after
+step 15, milestone 3c, the intro pages (`milestone-3.md`); before it
 step 14, milestone 3b, screen changes and the settings screen
 (`milestone-3.md`); before it step 13, milestone 3a, the title screen
 alive (`milestone-3.md`); before
@@ -63,7 +64,7 @@ of 4 ("Currently stuck"). Details in step 12 below.
 built** (`milestone-3.md`); the user tried milestone 2 the same day and
 said to plan and go ahead without waiting. Milestone 3 is split into 3a
 (this), 3b (screen changes, settings) and 3c (the intro pages and, since
-step 14, the pause screen).
+step 14, the pause screen; in step 15 the pause screen became 3d).
 The title now rises with `Theme`'s beat, a click or key skips the rise,
 the logo bobs, the game draws its own cursor, and the buttons press and
 click with their sounds; the core has the game's random generator, the
@@ -94,6 +95,21 @@ screen change takes 70 frames (the second's wait starts once the screen is
 black); the settings are saved on the first frame when there are none,
 which corrects `save-format.md` and `screens.md`. Details in step 14
 below.
+
+**Update 2026-11-04 (step 15): milestone 3c, the intro pages, is built**
+(`milestone-3.md`, "3c"), with the user's go-ahead for the plan: 3c split
+from the pause screen (now 3d), the intro reached by the test address
+`?page=intro`, and the title after its last page (the stand-in for the
+day-1 newspaper; both in `DESIGN.md`). Each page's picture is uncovered
+from the right over 1 s, its caption types on, then NEXT; from page 2 on a
+press shows the page whole. Checked: a new reference `introscreen.py`, and
+`tests/intro.rs`, which plays its run with real mouse presses: all 617
+frames, the 35 typing-sound frames and seven pictures agree; the browser
+check's new step 1g (1 run, passed); a look in the app's pane. Not yet
+tried by the user; nothing compared with the game. Findings: the first
+page appears at once (an empty holder is 0 wide; was inferred);
+`revealAll` never plays its sound (corrects `screens.md` part 5). Details
+in step 15 below.
 
 Before it the same day,
 step 7, the sorting of the open questions: 151 items into five kinds
@@ -432,7 +448,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out. The browser formats of the sounds: done in milestone 2 (2026-10-29, `milestone-2.md`: songs as Ogg Vorbis from ffmpeg, effects as the game's ADPCM) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files"). Step 6b, the game-side audio layer (`audio-layer.md`) |
-| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). **Milestone 3b built** (2026-11-03): screen changes with their fade, the settings and the settings screen, full screen; tried by the user (2026-11-03). The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3c and 4 to 10 not started |
+| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). **Milestone 3b built** (2026-11-03): screen changes with their fade, the settings and the settings screen, full screen; tried by the user (2026-11-03). **Milestone 3c built** (2026-11-04): the intro pages (the typing caption, the page player), by `?page=intro`; not yet tried by the user. The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. Milestones 3d and 4 to 10 not started |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
@@ -447,7 +463,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `milestone-0.md` | Milestone 0, an empty page: how to try it, what was built, what was measured (WebAssembly 26 MB, `target/` 2.3 GB), what was checked, what is not tested, dead ends |
 | `milestone-1.md` | Milestone 1a, the font test pages, and 1b, the title screen as a still (with where everything on it sits and the 5-pixel menu gap); the fix for blocked browser keys: how to try each, what was built, the decisions, measurements, checks, findings (half-pixel positions, a line-breaker edge), what is not tested |
 | `milestone-2.md` | Milestone 2, sound: how to try it (the start screen, `Theme`, the sound test page, watching the song streamed and kept), what was built (the sound files, the ADPCM decoder, the sound player `audio.js`, the service worker's song handling, effects in the background), the decisions (the songs' format, the player in the page), measurements, checks, findings (Chrome and mixed song parts, the worker restarted, no service workers in the app's pane), dead ends (the check's unexplained failures), what is not tested |
-| `milestone-3.md` | Milestone 3, split into 3a, 3b, 3c; 3a, the title screen alive: how to try it, what was built (the generator, `app.aud`, input, buttons, the live title), the decisions (the speaker on the fixed step, presses kept until a step sees them), the checks, findings (buttons do not block), what is not tested, the failure on the way; 3b, screen changes and the settings screen: how to try it, what was built (the fade states, the settings, the settings screen, `Game`, the page's `ppPlatform`), the decisions (pause moved to 3c, full screen in a browser), the checks, findings (a change takes 70 frames; the settings saved on the first frame; the layout), what is not tested, the reading list for 3c |
+| `milestone-3.md` | Milestone 3, split into 3a, 3b, 3c, 3d; 3c, the intro pages: how to try it (`?page=intro`), what was built (`reveal_text.rs`, `intro.rs`), the decisions (the test address, the title after the pages), the checks (617 frames and seven pictures against `introscreen.py`, browser step 1g), findings (the first page at once, a silent `revealAll`), what is not tested, the reading list for 3d; 3a, the title screen alive: how to try it, what was built (the generator, `app.aud`, input, buttons, the live title), the decisions (the speaker on the fixed step, presses kept until a step sees them), the checks, findings (buttons do not block), what is not tested, the failure on the way; 3b, screen changes and the settings screen: how to try it, what was built (the fade states, the settings, the settings screen, `Game`, the page's `ppPlatform`), the decisions (pause moved to 3c, full screen in a browser), the checks, findings (a change takes 70 frames; the settings saved on the first frame; the layout), what is not tested, the reading list for 3c |
 | `DESIGN.md` | The port's decisions: decided by the user, suggested defaults, the three needed before the first Rust code, the five answered before milestone 0 (hosting, browsers, start screen, Bevy as a thin host, downloads); the architecture (core, host, page, asset preparation; one frame; exactness checks; loading and caching) and the 11 milestones (step 8) |
 | **Base** | |
 | `rand.md` | The random generator, checked against the machine code |
@@ -826,7 +842,33 @@ the night screen's family pictures; part 11, the last screens.)
    Corrected: `save-format.md` and `screens.md` (the settings file is
    written on the first frame when there is none; the change's timing).
    Next: the plan for **3c, the intro pages and the pause screen** (its
-   reading list is at the end of `milestone-3.md`).
+   reading list is at the end of `milestone-3.md`; built since as 3c and
+   3d, step 15).
+
+15. **Milestone 3c, the intro pages: built** (2026-11-04,
+   `milestone-3.md`, "3c"; the user gave the go-ahead for the plan with my
+   three recommendations: 3c split, the pause screen now 3d; the test
+   address `?page=intro`; the title after the last page). New in
+   `pp_core`: `reveal_text.rs` (`RevealTextEnt`), `intro.rs` (the page
+   player `Intro` and `IntroScreen`); built letters in `text.rs`; data
+   files, per-tile colours and clipped pictures in `pages.rs`;
+   `Game::new_intro`. The start pack gains `Intro.xml`, its five pictures
+   and `menu_next` (none of the English pack's changes is in `Intro.xml`,
+   checked with `locpack.py`). New reference
+   `scripts/reference/introscreen.py`, written from the code first.
+   Checked: 91 unit tests; `tests/intro.rs` (all 617 frames of the
+   reference's run, the 35 `text-reveal` frames, seven pictures byte for
+   byte, the fade to the title; a deliberate fault in a letter delay made
+   it fail, as it should); the browser check's step 1g, 1 run, passed; a
+   look in the app's pane. **Not tested**: by the user, against the game,
+   a page's sound (the intro has none), Firefox. Corrected:
+   `screens.md` part 5 (`revealAll` plays no sound; the first page and the
+   clip's positions now read, not inferred), `buttons.md` (`Sprite.width`
+   answered), `milestone-3.md` 3b (60 frames of 1/60 s give
+   1.0000000000000013, not 1.0 exactly). Next: the user tries 3c (two
+   commands in `milestone-3.md`, "3c: How to try it"), then the plan for
+   **3d, the pause screen** (its reading list and two decisions are at the
+   end of `milestone-3.md`).
 
 Small jobs that fit anywhere:
 

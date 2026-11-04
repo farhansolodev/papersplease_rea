@@ -1,4 +1,4 @@
-// Milestone 0, 1a, 1b, 2, 3a and 3b check: drives a real browser (headless Edge or
+// Milestone 0, 1a, 1b, 2, 3a, 3b and 3c check: drives a real browser (headless Edge or
 // Chrome, with a throwaway profile in build/) against the local server and
 // reports (every page opens on the start screen; the check clicks its button
 // with a real mouse click, as a player would):
@@ -31,6 +31,12 @@
 //      playing on; Music minus kept in the page's storage and heard; the
 //      Fullscreen box following the window; Escape back to the title; the
 //      volume kept after a reload;
+//   4e. the intro pages (milestone 3c, ?page=intro): page 1 types on and
+//      comes to rest, identical to the Python reference
+//      (extracted/previews/m3c, made by scripts/reference/introscreen.py;
+//      skipped without it); NEXT starts each next page and a press hurries
+//      it, each page at rest identical to the reference but for the cursor;
+//      the last NEXT fades to the title at rest, Theme playing on;
 //   5. whether the page still starts with the network switched off, showing
 //      the same font page, and the title's Theme plays from the cache.
 //
@@ -50,6 +56,7 @@ const DEBUG_PORT = 9333;
 const REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1');
 const TITLE_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1b', 'title.rgba');
 const SETTINGS_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3b', 'settings_a.rgba');
+const INTRO_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3c');
 const AUDIO = path.join(ROOT, 'extracted', 'audio');
 const PROFILE = path.join(ROOT, 'build', '_browser_profile');
 const BROWSERS = [
@@ -374,6 +381,71 @@ async function settingsScreen() {
   await evaluate(`localStorage.removeItem('pp.settings'), 1`);
 }
 
+// Milestone 3c (docs/milestone-3.md): ?page=intro. Page 1 comes to rest by
+// itself (no mouse yet, so no cursor: the whole canvas must equal the
+// reference); then for each page NEXT is clicked, the new page starts (the
+// canvas changes), a press on NEXT's spot hurries it, and the page at rest
+// equals the reference but for the cursor. The last NEXT fades to the
+// title at rest; Theme plays on (the same play id) throughout.
+async function introPages() {
+  const THEME_ID = `(() => { for (const [id, s] of window.ppAudio.playing) if (s.filename === 'Theme.ogg') return id; return null; })()`;
+  const [nx, ny] = [285, 299];                       // inside NEXT, 129 x 19 at (220, 290)
+  const cursor = [nx - 7, ny - 3, 21, 28];           // the arrow (-1, -1) or the hand (-6, -2), 19 x 26
+  const press = async (type) => { await send('Input.dispatchMouseEvent', { type, x: nx, y: ny, button: 'left', clickCount: 1 }); await sleep(300); };
+  const click = async () => { await press('mousePressed'); await press('mouseReleased'); };
+  const rest = async (name, ms = 60000) => {
+    const want = readFileSync(path.join(INTRO_REFERENCE, name + '.rgba'));
+    const t0 = Date.now();
+    for (;;) {
+      const d = await differences(want);
+      if (d.n === 0 || within(d.box, cursor)) return { d, s: (Date.now() - t0) / 1000 };
+      if (Date.now() - t0 > ms) throw new Error(`${name}: not reached (last: ${d.n} bytes differ in ${JSON.stringify(d.box)})`);
+      await sleep(200);
+    }
+  };
+  const changed = async (name, ms = 30000) => {
+    const want = readFileSync(path.join(INTRO_REFERENCE, name + '.rgba'));
+    const t0 = Date.now();
+    for (;;) {
+      const d = await differences(want);
+      if (d.n > 0 && !within(d.box, cursor)) return;
+      if (Date.now() - t0 > ms) throw new Error(`NEXT on ${name} did not start the next page`);
+      await sleep(200);
+    }
+  };
+
+  await send('Page.navigate', { url: URL + '?page=intro' });
+  await start('the intro to start');
+  await waitFor(`(${THEME_AT}) > 0`, 'Theme to start', 30000);
+  const theme = await evaluate(THEME_ID);
+  const first = await rest('page1_rest');
+  if (first.d.n !== 0) throw new Error('page 1 differs from the reference with no cursor shown');
+  console.log(`   page 1 typed on and came to rest: identical to the reference (${first.s.toFixed(1)} s)`);
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: nx, y: ny });
+  const pages = ['page1_rest', 'page2_rest', 'page3_hurried', 'page4_rest', 'page5_rest'];
+  for (let i = 1; i < pages.length; i++) {
+    await click();
+    await changed(pages[i - 1]);
+    await press('mousePressed');                      // hurries the page; NEXT, shown at once, must not click
+    await press('mouseReleased');
+    const r = await rest(pages[i]);
+    console.log(`   NEXT, then a press: page ${i + 1} at rest, identical to the reference but for the cursor (${r.s.toFixed(1)} s)`);
+  }
+  await click();
+  const title = readFileSync(TITLE_REFERENCE);
+  const t0 = Date.now();
+  for (;;) {
+    const d = await differences(title);
+    if (d.n === 0 || within(d.box, cursor)) break;
+    if (Date.now() - t0 > 60000) throw new Error(`no title at rest after the last NEXT (last: ${d.n} bytes differ in ${JSON.stringify(d.box)})`);
+    await sleep(200);
+  }
+  console.log(`   the last NEXT: the title at rest ${((Date.now() - t0) / 1000).toFixed(1)} s later (it does not rise)`);
+  const after = await evaluate(THEME_ID);
+  console.log(`   Theme plays on: play id ${theme} on the intro, ${after} on the title`);
+  if (after !== theme) throw new Error('Theme was started again');
+}
+
 async function waitFor(expression, what, ms = 60000) {
   const t0 = Date.now();
   while (Date.now() - t0 < ms) {
@@ -496,6 +568,14 @@ try {
     await settingsScreen();
   } else {
     console.log('1f. SKIPPED: no reference title or settings screen in extracted/previews');
+  }
+
+  if (existsSync(path.join(INTRO_REFERENCE, 'page1_rest.rgba')) && existsSync(TITLE_REFERENCE)) {
+    console.log('1g. the intro pages (milestone 3c)');
+    await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
+    await introPages();
+  } else {
+    console.log('1g. SKIPPED: no reference intro pages in extracted/previews/m3c or title in m1b');
   }
 
   console.log('1e. the sound test page');

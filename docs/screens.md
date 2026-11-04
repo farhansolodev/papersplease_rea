@@ -1798,10 +1798,11 @@ The player starts in `flipping` on page 1.
 current picture from its right edge to its left edge, at a steady speed,
 in 1 second. Left of the line the old picture shows; right of it, the
 new one. So the new page is uncovered from the right, sweeping left.
-(The line's place is rounded to whole pixels each frame. That the cut
-is in screen positions, not in the picture's own, is inferred: in the
-picture's own positions the numbers would not line up with the
-picture.)
+(The line's place is rounded to whole pixels each frame. The cut is in
+screen positions: `Quad.make` cuts a quad to its clip rectangle in the
+coordinates of the picture's own place, before the parent's position is
+added, and the page player's parent sits at (0, 0). Read on 2026-11-04
+for milestone 3c; this was inferred before.)
 
 **The caption** starts typing only after the wipe, at the speed of every
 typing text (part 1, "Timed changes"): 0.05 s before the first letter,
@@ -1819,14 +1820,21 @@ on**. Pressing the mouse anywhere on the screen while a page is in
 whole caption appears, and NEXT appears. In `idle` such a press does
 nothing. (The NEXT button is asked before the page player, but it is
 hidden while `flipping`, so the press reaches the player.) `revealAll`
-plays `text-reveal` once if the typing had not finished, by the name of
-the field it tests; that field (`revealCount`) was not followed.
+plays no sound. It plays `text-reveal` only when `revealIndex <
+revealCount`, and nothing in the game sets `revealCount`: its name appears
+only in `RevealTextEnt`'s own by-name field helpers, so it stays 0. (Read on
+2026-11-04 for milestone 3c. This said, from the field's name, that
+`revealAll` plays the sound once if the typing had not finished: wrong,
+corrected. `scripts/reference/introscreen.py` and the port follow the
+correction.)
 
-**The first page:** the current holder has no picture yet. If an empty
-holder counts as 0 wide, the wipe line stays at the left edge and the
-first picture appears at once. `Sprite.width` gives the width of the
-holder's drawing rectangle, and what that is for an empty holder was not
-followed, so this is **inferred**. The caption still waits the 1 second.
+**The first page:** the current holder has no picture yet, and so it is
+0 wide: `Sprite.width` is the width of its drawing rectangle, which
+`Sprite.rebuild` sets to the picture's width times the scale, and to 0
+without a picture (the constructor rebuilds the empty holders). Its x is
+0, so the wipe line stays at x 0 and **the first picture appears at
+once**. The caption still waits the 1 second. (Read on 2026-11-04 for
+milestone 3c; this was inferred before. Not seen in the game.)
 
 **An extra click (by the code; does not happen with the present data):**
 if every page after the one on screen is passed over by its condition,
@@ -1971,14 +1979,15 @@ starts a fade, and a fade stops the screen's input (part 1).
 
 ## Not studied
 
-- What `Sprite.width` answers for an empty holder, so whether the first
-  page wipes or appears at once.
+- (What `Sprite.width` answers for an empty holder was listed here: 0,
+  so the first page appears at once; read on 2026-11-04, "The first
+  page" above.)
 - (`app.vis.Text`'s width for a fixed-width text was listed here; read
   on 2026-10-16, `text-drawing.md`: the widest wrapped line. The caption's
   left edge therefore depends on its text.)
-- In which positions a clip rectangle is applied (`app.vis`), taken to be
-  screen positions.
-- `RevealTextEnt.revealCount`.
+- (In which positions a clip rectangle is applied, and
+  `RevealTextEnt.revealCount`, were listed here; both read on 2026-11-04
+  for milestone 3c, "The wipe" and "Hurrying a page" above.)
 - Draw order between the page player and the ending's black rectangle.
 - `AlltimeStats.or` after the read-back, and how the all-time record is
   saved.

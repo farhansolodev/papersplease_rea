@@ -87,6 +87,8 @@ impl Rig {
         match self.game.screen() {
             GameScreen::Title(_) => "title",
             GameScreen::Settings(_) => "settings",
+            GameScreen::Intro(_) => "intro",
+            GameScreen::Empty => "empty",
         }
     }
 }

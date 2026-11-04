@@ -5,19 +5,21 @@ with their pressed look and sounds, the title rising with the music, the
 settings and pause screens with working volumes, the intro pages, and the
 fades between screens. That is too much to try in one go, so it is split
 into three, like milestone 1 (decided by me on 2026-11-03; the user said to
-plan and go ahead without waiting):
+plan and go ahead without waiting), and on 2026-11-04 into four (3c split
+in two, my suggestion in the plan, which the user accepted):
 
 | Part | What you can try | State |
 |---|---|---|
 | **3a** | The title alive: the game's own cursor, the title rising with `Theme`, a click or key skipping the rise, the logo bobbing, the buttons pressing and clicking with their sounds | **Built 2026-11-03** (below), tried by the user the same day |
 | **3b** | Screens: the fade between screens, the settings screen with working settings (kept in the browser), Escape and the browser's full screen | **Built 2026-11-03** (below), tried by the user the same day |
-| 3c | The intro pages (the page player) and the pause screen on Escape | Not started |
+| **3c** | The intro pages (the page player), reached by the test address `?page=intro` | **Built 2026-11-04** (below) |
+| 3d | The pause screen on Escape | Not started |
 
 The pause screen was in 3b at first. It moved to 3c on 2026-11-03 (my
 suggestion, the user agreed): only the day, night, news and intro screens
 can be paused (`screens.md` part 4), and the intro, in 3c, is the first of
 them the port has, so in 3b the pause screen could only have been reached
-from a test page.
+from a test page. On 2026-11-04 it moved again, to 3d, when 3c was split.
 
 ## 3a: How to try it
 
@@ -370,7 +372,9 @@ From the code, read for this step; nothing compared with the running game.
   not run while it blends, so its second starts only once the screen is
   black. Frame by frame after the click: the cover's alpha 0, 2/15, 4/15 ...
   14/15, black on the 9th frame; the 1 s wait (60 frames of 1/60 s add up to
-  1.0 exactly); the new screen built on the 70th frame under the black cover,
+  1.0000000000000013, just over 1.0, and 59 to less; this said "1.0
+  exactly", corrected 2026-11-04 in 3c: the frame count is unchanged); the
+  new screen built on the 70th frame under the black cover,
   and it gets its update and input that same frame; the cover gone 9 frames
   later. `save-format.md` part 2 is corrected.
 - **After an instant change, the next fade-in is instant too**:
@@ -401,7 +405,9 @@ From the code, read for this step; nothing compared with the running game.
   "lgtm"; which browser, and which items under "How to try it" were looked
   at (full screen among them), was not recorded.
 - **Real full screen**: headless Edge refused it, so I saw only the
-  refusal. The user tried the Fullscreen row in a visible browser on
+  refusal. (In 3c's run of the same check, on 2026-11-04, headless Edge
+  granted it and the box followed it on and off; why the two runs differ
+  was not looked into.) The user tried the Fullscreen row in a visible browser on
   2026-11-03 and said "it all works well" (which browser, and which ways of
   leaving full screen were used, not recorded). The user also checked
   Escape in full screen: **the first press only leaves full screen** (the
@@ -432,13 +438,166 @@ From the code, read for this step; nothing compared with the running game.
   "How to try it" did not say so; it applies to every build: close the old
   tab, or open `?nosw` once.
 
-## Next: 3c
+## 3c: How to try it
 
-The intro pages and the pause screen. To read before it is built:
-`screens.md` part 5 (the page player, the intro screen) and part 4 (the
-pause screen, `enablePause`, Escape and its key mask), `save-format.md` part
-2 (the `paused` state: effects paused, the song plays on, `button-drop` and
-`hover-up`), `ends-xml-format.md` (`Intro.xml`). STORY leads to the load
-screen first (`screens.md` part 3), so 3c needs a way in: the load screen
-itself, or a test page; to settle in its plan. Still open from milestone 2:
+Built 2026-11-04, with the user's go-ahead for the plan (3c split from the
+pause screen; the intro reached by a test address; the pages followed by
+the title). From the project folder:
+
+```
+python -I scripts/build_web.py
+python -I scripts/serve.py 8080
+```
+
+Close any tab still showing an older build first. Open
+`http://localhost:8080/?page=intro` and click "Click to start". You should
+see:
+
+1. **Page 1**: the envelope picture at once (no wipe on the first page),
+   `Theme` playing; after about a second "Congratulations." types on, letter
+   by letter, with a soft typing sound every third letter; then NEXT appears
+   at the bottom. A click before NEXT does nothing on this page.
+2. **NEXT**: the next picture is uncovered from the right edge, sweeping
+   left over a second; then its caption types on; then NEXT again.
+3. **From page 2 on, a click anywhere** while the picture sweeps or the
+   caption types shows the page whole at once, with NEXT (a click on NEXT's
+   spot does not also press NEXT).
+4. Five pages in all ("Congratulations." to "Glory to Arstotzka."). After
+   the fifth NEXT the screen fades to black and back to the title, already
+   in place (it does not rise), `Theme` playing on. In the original the
+   fifth NEXT leads to the day-1 newspaper, which comes in milestone 6.
+5. Escape does nothing yet on the intro: the pause comes in 3d.
+
+The title's STORY still does nothing: in the original it opens the load
+screen, which needs saves (milestone 6).
+
+## 3c: What was built
+
+In the core (`port/core/src/`), tested with `cargo test`:
+
+- `reveal_text.rs`: `play.ui.RevealTextEnt`, the typing text (the countdown,
+  the delays after `.`, `,` and other letters, the sound every third letter,
+  `revealAll`).
+- `intro.rs`: the page player `play.screen.Intro` (its two states, the wipe,
+  the typing, NEXT, hurrying, a page's sound after 2 s) and `IntroScreen`;
+  `read_pages` for `Intro.xml` (and later `Ends.xml`).
+- `text.rs`: a text's built letters (`getBuiltLetters`).
+- `pages.rs`: the pack's data files in the gallery; drawing a laid-out text
+  with a colour per tile; a picture cut to a clip rectangle as `Quad.make`
+  cuts it.
+- `game.rs`: the intro screen; `Game::new_intro` for the test address (an
+  instant change to the intro is queued, so the first frame builds it as a
+  screen change would); after the pages, a fade to the title.
+
+In the host (`port/web/src/main.rs`) and the page (`port/www/index.html`):
+`?page=intro`. In the start pack: `data/Intro.xml`, its five pictures as
+`pictures/intro/<file>`, the text `menu_next`. The English pack can replace
+`Intro.xml`'s captions, but none of its 23 changes is in that file (checked
+with `locpack.py`), so it goes in as it is.
+
+New reference: `scripts/reference/introscreen.py`, written from the code
+before the Rust. It plays one fixed run frame by frame (NEXT clicked 20
+frames after each page comes to rest; page 3 hurried 10 frames after it
+starts, page 4 after 70) and writes the run's timeline and seven pictures
+to `extracted/previews/m3c`.
+
+## 3c: Decisions
+
+- **The way in is a test address**, `?page=intro` (the user chose it from
+  the plan): STORY keeps doing nothing until the load screen exists, since
+  in the original STORY never leads straight to the intro.
+- **After the pages, the title** (the user chose it): the stand-in for the
+  day-1 newspaper, so the intro can be tried again.
+- **A page with `when`, or a `$fact` value, is not supported yet**: the
+  intro has neither, and they need the story's facts. A `when` page stops
+  with an error instead of guessing; a `$fact` caption is empty and a
+  `$fact` picture leaves the holder as it was (what the game does when the
+  fact is not set).
+
+## 3c: Checks
+
+- `cargo test -p pp_core`: 91 unit tests (3 new: the pages and their
+  colours, built letters) and the test files. New: `tests/intro.rs` plays
+  the reference's run through the game with real mouse presses (NEXT
+  pressed and let go, presses that hurry): **all 617 frames** agree with
+  the reference (page, state, the wipe's cut, letters shown, NEXT shown),
+  `text-reveal` plays on the same 35 frames, **seven pictures are identical
+  byte for byte** (page 1 at rest, page 2 mid-wipe, mid-typing and at rest,
+  page 3 just hurried, pages 4 and 5 at rest), and the last NEXT gives the
+  title 70 frames later, not rising, with `Theme` started only once.
+- Two deliberate faults, to see that the test can fail: a letter delay of
+  0.05 s instead of 0.04 s failed it (page 1 at rest: 525 bytes differ);
+  starting the typing at a clock of exactly 1 s instead of after it did
+  not, because the clock never lands on exactly 1.0 (60 frames give
+  1.0000000000000013), so the two rules give the same frames.
+- `node scripts/checks/web_offline_check.mjs 8080` in headless Edge, new step
+  1g (**1 run, passed**, with all the earlier steps): page 1 came to rest by
+  itself, identical to the reference (15 s; the hidden headless page is
+  slow); for pages 2 to 5, NEXT then a press: each page at rest identical
+  to the reference but for the cursor; the last NEXT gave the title at rest
+  17.5 s later; `Theme` kept its play id.
+- A look in the app's browser pane (hidden, so slow): page 1 with its
+  caption and NEXT; NEXT started page 2's wipe from the right, then its
+  caption typing. My first two clicks missed NEXT by a few pixels: the
+  pane is 1024 x 768 at 1.75 device pixels per CSS pixel, which my
+  screenshot coordinates did not allow for (not a fault of the port).
+
+## 3c: Measurements
+
+- WebAssembly 26,488,181 bytes (26,470,695 after 3b).
+- Start pack 2,064,388 bytes, 43 files (2,046,977).
+- From the reference run, at 60 frames a second: page 1's first letter on
+  frame 62 and the page at rest on frame 99 (1.65 s); page 2 at rest 232
+  frames (3.9 s) after its NEXT.
+
+## 3c: Findings
+
+From the code, read for this step (the functions are listed in
+`introscreen.py`); nothing compared with the running game.
+
+- **The first page appears at once, with no wipe**: an empty picture
+  holder is 0 x 0 (`Sprite.rebuild`) at x 0, so the wipe's line stays at
+  x 0. `screens.md` part 5 had this as inferred; now read.
+- **`revealAll` never plays `text-reveal`**: its test `revealIndex <
+  revealCount` is never true, since nothing sets `revealCount`. Hurrying a
+  page is silent. `screens.md` part 5 said, from the field's name, that it
+  plays once if the typing had not finished: wrong, corrected.
+- The wipe's cut is in screen positions: `Quad.make` cuts a quad to its
+  clip in the coordinates of its own place, before the parent's position
+  is added, and the player's parent is at (0, 0) (was inferred).
+- Showing a page steps the caption once, with that frame's time: the
+  countdown before the first letter is 0.05 s less one frame, and every
+  letter is hidden from that moment.
+- A caption's letters get their alpha only from the typing: the caption's
+  colour is `0xffffff`, alpha 0, so a letter the font lacked (none in
+  English) would never show.
+- A press that hurries a page also takes the mouse until it is let go, so
+  the NEXT button, shown at once, does not see that press.
+- The caption's built letters include spaces (so a space takes 0.04 s like
+  a letter) but not letters the font lacks.
+
+## 3c: Not tested
+
+- **By the user**.
+- Against the running game: everything is code reading (`screens.md` part
+  5, "Things to watch in the game").
+- A page's sound after 2 s: the intro has none; it is built for the
+  endings and run by no test.
+- Firefox, Chrome by hand; a visible window at a real 60 frames a second.
+
+## 3c: Dead ends and failures
+
+None in the build. In the app's pane NEXT first looked broken; it was my
+click missing it (above).
+
+## Next: 3d
+
+The pause screen. To read before it is built: `screens.md` part 4 (the
+pause screen, `enablePause`, Escape and its key mask) and part 3
+(`Confirm`), `save-format.md` part 2 (the `paused` state: effects paused,
+the song plays on, the clock paused, `button-drop` and `hover-up`). Two
+decisions for its plan: QUIT is left out (the user's decision), which
+changes the button column; and in full screen the browser keeps the first
+Escape for itself (Chrome and Edge can pass it to the page with the
+Keyboard Lock interface; Firefox cannot). Still open from milestone 2:
 splitting the title's and menus' effects into the start pack.

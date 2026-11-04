@@ -14,7 +14,7 @@ use crate::pack::Pack;
 use crate::picture::Picture;
 use crate::raster::{Quad, Screen};
 use crate::screen::{HEIGHT, WIDTH};
-use crate::text::{Align, Text};
+use crate::text::{Align, Built, Text, Tile};
 
 /// Fonts, pictures and texts, loaded once. Picture 0 is the 1 x 1 white one.
 pub struct Gallery {
@@ -23,6 +23,9 @@ pub struct Gallery {
     pub pictures: Vec<Picture>,
     /// The pack's `strings.json`: texts of `Text.xml` by id.
     pub strings: HashMap<String, String>,
+    /// The pack's data files other than `Fonts.xml`, by file name
+    /// (`Intro.xml`).
+    pub data: HashMap<String, String>,
     /// Picture index by name: a font sheet by its file name, any other
     /// picture as `pictures/<file name>`.
     names: HashMap<String, usize>,
@@ -86,6 +89,7 @@ impl Gallery {
             fonts: Vec::new(),
             pictures: vec![Picture::white()],
             strings,
+            data: HashMap::new(),
             names: HashMap::new(),
             sheet_files: Vec::new(),
         };
@@ -100,6 +104,9 @@ impl Gallery {
                 }
             }
             gallery.fonts.push((entry.id, font));
+        }
+        for name in pack.names().into_iter().filter(|n| n.starts_with("data/") && *n != "data/Fonts.xml") {
+            gallery.data.insert(name["data/".len()..].to_string(), text(name)?);
         }
         for name in pack.names().into_iter().filter(|n| n.starts_with("pictures/")) {
             let picture = Picture::from_png(get(name)?).map_err(|e| format!("{name}: {e}"))?;
@@ -287,7 +294,14 @@ impl Builder<'_> {
         t.color = 0xFFFFFFFF;
         set(&mut t);
         let built = t.build(font);
-        for tile in &built.tiles {
+        self.tiles(font, &built, x, y, |_, tile| tile.color);
+        built.height
+    }
+
+    /// Draws a laid-out text at (x, y), each tile in the colour `color`
+    /// gives it (by its index in `built.tiles`).
+    pub(crate) fn tiles(&mut self, font: &Font, built: &Built, x: f64, y: f64, color: impl Fn(usize, &Tile) -> u32) {
+        for (i, tile) in built.tiles.iter().enumerate() {
             let (w, h) = (tile.dst[2] as f64, tile.dst[3] as f64);
             let x0 = x + tile.dst[0] as f64;
             let y0 = y + tile.dst[1] as f64;
@@ -295,9 +309,43 @@ impl Builder<'_> {
                 None => 0,
                 Some(p) => self.gallery.names[&font.page_files[p]],
             };
-            self.quads.push(Quad { image, x0, y0, x1: x0 + w, y1: y0 + h, src: tile.src, color: tile.color });
+            self.quads.push(Quad { image, x0, y0, x1: x0 + w, y1: y0 + h, src: tile.src, color: color(i, tile) });
         }
-        built.height
+    }
+
+    /// [`Builder::part`] cut to a clip rectangle (x, y, width, height) as
+    /// `Quad.make` cuts it: nothing when the two do not overlap, otherwise
+    /// the edges moved in and the picture piece cut by the same amount. The
+    /// port's quads read whole picture pixels, so this takes whole numbers
+    /// only (all the intro's are: its cut is rounded, its places floored).
+    pub(crate) fn part_clipped(&mut self, image: usize, x: i32, y: i32, src: [i32; 4], clip: Option<[i32; 4]>) {
+        let (mut px, mut py) = (x, y);
+        let (mut pr, mut pb) = (x + src[2], y + src[3]);
+        let [mut ux, mut uy] = [src[0], src[1]];
+        let (mut ur, mut ub) = (src[0] + src[2], src[1] + src[3]);
+        if let Some([cx, cy, cw, ch]) = clip {
+            if cx + cw <= px || pr <= cx || cy + ch <= py || pb <= cy {
+                return;
+            }
+            if px < cx {
+                ux += cx - px;
+                px = cx;
+            }
+            if cx + cw < pr {
+                ur -= pr - (cx + cw);
+                pr = cx + cw;
+            }
+            if py < cy {
+                uy += cy - py;
+                py = cy;
+            }
+            if cy + ch < pb {
+                ub -= pb - (cy + ch);
+                pb = cy + ch;
+            }
+        }
+        let src = [ux, uy, ur - ux, ub - uy];
+        self.quads.push(Quad { image, x0: px as f64, y0: py as f64, x1: pr as f64, y1: pb as f64, src, color: 0xFFFFFFFF });
     }
 
     /// A sprite of the piece `src` (x, y, width, height) of picture `image`,
