@@ -39,9 +39,10 @@
 //      the last NEXT fades to the title at rest, Theme playing on;
 //   4f. the start of day 1 (milestone 4a, ?page=day): the opening card with
 //      the whole date, identical to the Python reference
-//      (extracted/previews/m4b, made by scripts/reference/boothscreen.py;
-//      skipped without it); then the booth uncovered, identical to the
-//      reference but for the blinking booth button; booth-intro started;
+//      (extracted/previews/m4c since milestone 4c, made by
+//      scripts/reference/boothscreen.py; skipped without it); then the booth
+//      uncovered, identical to the reference but for the blinking booth
+//      button; booth-intro started;
 //   4g. the shutter and the pause (milestone 4b, on the same day page):
 //      Escape shows the pause screen, identical to the Python reference
 //      (pause_a, made by scripts/reference/pausescreen.py) and plays
@@ -50,6 +51,13 @@
 //      (the booth again, hover-up); a click on the shutter switch opens the
 //      shutter (shutter_open, but for the cursor and the blinking button),
 //      with shutter-rise;
+//   4h. the rulebook (milestone 4c, on the same day page): the switch closes
+//      the shutter (booth_normal); the rulebook pressed at its dock and
+//      dragged onto the desk opens there, and once let go it lies still
+//      (rulebook_open, but for the cursor and the blinking button); pressed
+//      on its page and dragged back over the counter it closes, and once
+//      let go it goes back to its dock (booth_normal again);
+//      paper-dragstart and paper-dragstop started;
 //   5. whether the page still starts with the network switched off, showing
 //      the same font page, and the title's Theme plays from the cache.
 //
@@ -70,7 +78,8 @@ const REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1');
 const TITLE_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1b', 'title.rgba');
 const SETTINGS_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3b', 'settings_a.rgba');
 const INTRO_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3c');
-const DAY_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm4b');
+const DAY_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm4c');
+const PAUSE_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm4b');
 const AUDIO = path.join(ROOT, 'extracted', 'audio');
 const PROFILE = path.join(ROOT, 'build', '_browser_profile');
 const BROWSERS = [
@@ -495,7 +504,7 @@ async function dayStart() {
 async function shutterAndPause() {
   const BUTTON = [146, 65, 56, 38];          // the border's blinking booth button
   const wait = async (name, allow, ms = 60000) => {
-    const want = readFileSync(path.join(DAY_REFERENCE, name + '.rgba'));
+    const want = readFileSync(path.join(name.startsWith('pause_') ? PAUSE_REFERENCE : DAY_REFERENCE, name + '.rgba'));
     const t0 = Date.now();
     for (;;) {
       let d;
@@ -544,6 +553,65 @@ async function shutterAndPause() {
   console.log(`   the shutter switch: the shutter open (${open.d.n} bytes differ, in the blinking button or around the switch and cursor)`);
   console.log('   sounds started:', JSON.stringify(await started()));
   if (!(await started()).includes('shutter-rise')) throw new Error('shutter-rise did not play');
+}
+
+// Milestone 4c on the day page that shutterAndPause left (the shutter
+// open; docs/milestone-4.md, 4c). A hidden headless page draws about once
+// a second, so every move is held for 1.5 s: the game then runs its frames
+// with the mouse still, the drag's speed dies away, and the page lies
+// exactly where the cursor put it.
+async function rulebook() {
+  const BUTTON = [146, 65, 56, 38];
+  const wait = async (name, allow, ms = 60000) => {
+    const want = readFileSync(path.join(DAY_REFERENCE, name + '.rgba'));
+    const t0 = Date.now();
+    for (;;) {
+      let d;
+      try { d = await differences(want); } catch (e) { d = { n: -1, box: e.message }; }
+      if (d.n === 0 || (d.n > 0 && allow && allow.some((r) => within(d.box, r)))) return { d, s: (Date.now() - t0) / 1000 };
+      if (Date.now() - t0 > ms) throw new Error(`${name}: not reached (last: ${d.n} bytes differ in ${JSON.stringify(d.box)})`);
+      await sleep(200);
+    }
+  };
+  const at = async (x, y) => evaluate(`(() => { const r = document.querySelector('canvas').getBoundingClientRect();
+    return [r.x + (${x} + 0.5) * r.width / 570, r.y + (${y} + 0.5) * r.height / 320]; })()`);
+  const mouse = async (type, x, y) => {
+    const [px, py] = await at(x, y);
+    const extra = type === 'mouseMoved' ? {} : { button: 'left', clickCount: 1 };
+    await send('Input.dispatchMouseEvent', { type, x: px, y: py, ...extra });
+    await sleep(1500);
+  };
+  const started = async () => [...new Set((await evaluate('window.ppStarts')).map((f) => f.replace(/[0-9]*\.(wav|ogg)$/, '')))];
+  const cursorAt = (x, y) => [x - 10, y - 4, 32, 34];
+  // Close the shutter first (the reference's rulebook moves are made with
+  // it closed).
+  await mouse('mouseMoved', 164, 118);
+  await mouse('mousePressed', 164, 118);
+  await mouse('mouseReleased', 164, 118);
+  const closed = await wait('booth_normal', [BUTTON, [140, 100, 60, 60]]);
+  console.log(`   the switch: the shutter closed (${closed.d.n} bytes differ, in the blinking button or around the switch and cursor)`);
+  await evaluate('(window.ppStarts = [], 1)');
+  // The rulebook from its dock onto the desk.
+  await mouse('mouseMoved', 126, 294);
+  await mouse('mousePressed', 126, 294);
+  await mouse('mouseMoved', 300, 250);
+  await mouse('mouseMoved', 400, 200);
+  await mouse('mouseReleased', 400, 200);
+  const open = await wait('rulebook_open', [BUTTON, cursorAt(400, 200)]);
+  console.log(`   dragged onto the desk: the rulebook open on its contents page (${open.d.n} bytes differ, in the blinking button or around the cursor; ${open.s.toFixed(1)} s)`);
+  // Back over the counter: it closes and goes home.
+  await mouse('mouseMoved', 300, 240);
+  await mouse('mousePressed', 300, 240);
+  await mouse('mouseMoved', 200, 220);
+  await mouse('mouseMoved', 90, 200);
+  await mouse('mouseReleased', 90, 200);
+  const home = await wait('booth_normal', [BUTTON, cursorAt(90, 200)]);
+  console.log(`   dragged back over the counter: closed and back at its dock (${home.d.n} bytes differ, in the blinking button or around the cursor; ${home.s.toFixed(1)} s)`);
+  const sounds = await started();
+  console.log('   sounds started:', JSON.stringify(sounds));
+  for (const id of ['paper-dragstart', 'paper-dragstop']) {
+    if (!sounds.includes(id)) throw new Error(id + ' did not play');
+  }
 }
 
 async function waitFor(expression, what, ms = 60000) {
@@ -682,14 +750,20 @@ try {
     console.log('1h. the start of day 1 (milestone 4a)');
     await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
     await dayStart();
-    if (existsSync(path.join(DAY_REFERENCE, 'pause_a.rgba'))) {
+    if (existsSync(path.join(PAUSE_REFERENCE, 'pause_a.rgba'))) {
       console.log('1i. the shutter and the pause (milestone 4b)');
       await shutterAndPause();
+      if (existsSync(path.join(DAY_REFERENCE, 'rulebook_open.rgba'))) {
+        console.log('1j. the rulebook (milestone 4c)');
+        await rulebook();
+      } else {
+        console.log('1j. SKIPPED: no reference rulebook in extracted/previews/m4c');
+      }
     } else {
       console.log('1i. SKIPPED: no reference pause screen in extracted/previews/m4b');
     }
   } else {
-    console.log('1h. SKIPPED: no reference day start in extracted/previews/m4b');
+    console.log('1h. SKIPPED: no reference day start in extracted/previews/m4c');
   }
 
   console.log('1e. the sound test page');

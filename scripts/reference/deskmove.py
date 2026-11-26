@@ -102,7 +102,9 @@ class TouchDrag:
         if not self.has_vel():
             self.vel = [0.0, 0.0]
             return
-        k = 1.0 if dt == 0 else self.decay ** (60.0 * dt)
+        # get_decayPowFactor is 60 x dt, or 1 when dt is 0 (corrected
+        # 2026-11-26: this said no decay for dt 0)
+        k = self.decay if dt == 0 else self.decay ** (60.0 * dt)
         self.vel = [self.vel[0] * k, self.vel[1] * k]
         pos[0] = math_round(pos[0] + self.vel[0] * dt)
         pos[1] = math_round(pos[1] + self.vel[1] * dt)

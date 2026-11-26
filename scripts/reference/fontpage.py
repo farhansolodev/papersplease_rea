@@ -39,10 +39,15 @@ WHITE = "white"          # the 1 x 1 white picture (Image.white1x1)
 
 
 class Quad:
-    def __init__(self, image, x, y, w, h, src, color):
+    def __init__(self, image, x, y, w, h, src, color, clip=None):
         self.image, self.src, self.color = image, src, color
         self.x0, self.y0 = x, y
         self.x1, self.y1 = x + w, y + h
+        # A clip rectangle (x, y, w, h) on the screen: Quad.make cuts the
+        # quad and its picture piece by the same proportion, which leaves
+        # each pixel's texel as it was; so only the pixels whose centre is
+        # inside it are drawn (milestone 4c).
+        self.clip = clip
 
 
 class Page:
@@ -164,6 +169,11 @@ def draw(quads, sheets):
         u0, u1, v0, v1 = sx / iw, (sx + sw) / iw, sy / ih, (sy + sh) / ih
         xs = [x for x in host.covered_pixels(q.x0, q.x1) if 0 <= x < W]
         ys = [y for y in host.covered_pixels(q.y0, q.y1) if 0 <= y < H]
+        if q.clip is not None:
+            cx, cy, cw, ch = q.clip
+            in_x, in_y = set(host.covered_pixels(cx, cx + cw)), set(host.covered_pixels(cy, cy + ch))
+            xs = [x for x in xs if x in in_x]
+            ys = [y for y in ys if y in in_y]
         for y in ys:
             ty = host.texel_at(y, q.y0, q.y1, v0, v1, ih)
             for x in xs:

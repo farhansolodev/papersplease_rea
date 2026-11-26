@@ -288,8 +288,12 @@ documents, the Arstotzka token before and after the painting over.
   2026-10-16, `fact-pictures.md`. `EmblemLib.getEmblemImage`, the seal
   mark's picture, was also listed, but it had been read in full on
   2026-10-13: `emblems-and-bodies.md`.)
-- What the day's rule table maps (`Rule0` ...) and where the page masks
-  are set.
+- What the day's rule table maps (`Rule0` ...): for milestone 4d. Where
+  the page masks are set is known: the `BoothEnv` constructor sets
+  `Rules/PageMask` (`traveler-creation.md`, from `Facts.xml`'s
+  `<rulebook>`) and `addBulletinForDay` sets `Bulletin/PageMask`
+  (`papers-on-desk.md`); the port builds the rulebook's since milestone 4c
+  (`port/core/src/paper.rs`; updated 2026-11-26).
 - (Inspection was listed here: read on 2026-10-16, `inspect-mode.md`.
   The desk side, `DeskItem.setInnerImage` and `addInnerVisual`, and
   `compareProximity` in detail were also listed: read on 2026-10-16,

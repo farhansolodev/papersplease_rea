@@ -12,8 +12,10 @@ step 16):
 |---|---|---|
 | **4a** | The booth at the start of day 1 (`?page=day`): the opening card typing the date and falling away, the booth as its constructor builds it, the border's background and blinking booth button, the ambient sounds | **Built 2026-11-05** (below), tried by the user the same day |
 | **4b** | The shutter switch and the pause screen (Escape, RESUME, the settings rows, MAIN MENU and its confirm box) | **Built 2026-11-26** (below), not yet tried by the user |
-| 4c | The rulebook (docked, dragged, opened, its pages and links, back to its dock, its sounds) | Not started |
-| 4d | The clock running, the stamp bar, stamping | Not started |
+| **4c** | The rulebook moves: docked, dragged closed and open, thrown, back to its dock, opened on its contents page, its sounds | **Built 2026-11-26** (below), not yet tried by the user |
+| 4d | The rulebook's pages: links, page turns, every page of day 1 | Not started |
+| 4e | The day's other papers at the start: the bulletin open on the desk, the transcript | Not started |
+| 4f | The clock running, the stamp bar, stamping | Not started |
 | 5a, 5b | Travelers (milestone 5) | Not started |
 
 ## 4a: How to try it
@@ -432,10 +434,288 @@ menu helper on y 270; Escape in full screen. Also:
   second copy of the pack, whose made pictures would have had other
   numbers; it now uses the game's own gallery.
 
-## Next: 4c
+## 4c: The plan (2026-11-26, written before building)
 
-The rulebook on the desk: docked on the console, dragged closed and open,
-its pages and links, its return to its dock, its sounds
-(`desk-pictures.md`, `desk-movement.md`, `page-layout.md`). To read first:
-`BoothEnv`'s text lookup for the day's rule texts and the rulebook's page
-player on the desk. Then 4d: the clock running, the stamp bar, stamping.
+**Another split.** The old 4c (the rulebook: docked, dragged, opened,
+its pages and links, back to its dock, its sounds) is too large for one
+build: the port has no desk item and no page layout yet, and the
+rulebook's later pages need the day's rule texts and the fact pictures
+(passports, seals, issuing cities). And a day opens with two more papers
+than the rulebook: the bulletin, open on the desk (`reveal="ondesk:120,2"`,
+day 1's tutorial pages), and the transcript. So, my decision (recorded in
+`DESIGN.md`):
+
+- **4c = the rulebook moves**: a desk item, closed at its dock, dragged
+  closed and open, thrown, back to its dock, opened on its contents page;
+- **4d = the rulebook's pages**: its links, page turns and every page of
+  day 1 (the rule texts, the map, the region pages, the booth page);
+- **4e = the day's other papers at the start**: the bulletin and the
+  transcript;
+- **4f = the clock running, the stamp bar, stamping** (the old 4d).
+
+**What 4c builds** (read on 2026-11-26 in `decompiled/all/`:
+`Booth.engine_onPapersAdded` whole, the `Paper` constructor whole,
+`DeskItem.react` and `update` whole, `updateCustomDrag`'s use of the
+pointer and of `TouchDrag`, `getInnerVisualAt`, `TouchDrag` whole,
+`app.Clock` whole; the rest of `DeskItem`, `DockPoint` and
+`PaperInnerVisuals` as `desk-movement.md`, `desk-pictures.md` and
+`page-layout.md` describe them):
+
+1. **The rulebook is made with the booth.** `BoothEngine.start` adds the
+   day's papers; each becomes a `Paper` under the papers' root entity
+   (after the desk and its hint, before the console's top picture). The
+   rulebook's reveal is `DOCKED` (it has `dock="true"` and no `reveal`):
+   it starts at its dock home, (113, 174) in the booth, closed, and
+   becomes `NORMAL` on its first update. Its closed picture is
+   `RulesOuter.png` as it is (26 x 34; a docking paper is not turned or
+   halved). It shows page 0 (`home`, the contents) when opened: the day
+   has no `OpenToPage`. It takes no input while the booth is `off` (the
+   booth's input switch), so from the intro on.
+2. **Pressing it**: `startCustomDrag` lifts a closed docked paper to its
+   home less 6 pixels and plays `toTop` (`paper-totop`) when it is already
+   on top of the papers, which it always is in 4c (alone; 4e adds the
+   bulletin over it, and then the first press is silent).
+3. **Dragging it** (one frame late, as the game: `react` records the
+   pointer, the next `update` moves the paper): over the counter column
+   it stays closed, held by its dock point's drag clamp; over the desk
+   (x 178 and right) it opens, centred on the cursor if the drag started
+   closed, held by the desk clamp, with the drag shadow (the page in
+   black at half opacity, 4 right and 4 down) once it has moved;
+   `paper-dragstart` the first time the cursor is more than 1 pixel from
+   where the press was. `TouchDrag` keeps the drag's speed with its own
+   clock.
+4. **Letting it go**: `paper-dragstop` if it moved. Closed, it goes home
+   along its dock's return path (rise to just above the home, slide
+   across, drop with gravity; `paper-dragstop` twice on landing, as the
+   sound set `paper` names it for both `drop` and `dragStop`). Open on
+   the desk, it slides on with the drag's speed, shrinking to 0.75 each
+   1/60 s, until under 1 pixel a second. A press that moved under 4
+   pixels is a click on the mark under the cursor: **following a link is
+   4d**; in 4c a click does nothing more.
+5. **Its pictures and clips**: the closed picture cut to the counter
+   column (`boothOuter`, 0..178); the open page and its marks cut to
+   `boothInnerClip` (x 180 and right), the page's rectangle in common.
+   The contents page is laid out by `PaperInnerVisuals`' rules: the page
+   picture with its marker pixels painted over, the five dots and five
+   button texts placed on the marker pixels (rounded boxes in the text
+   colour, letters in the page's back colour), the `home` corner and the
+   `next` corner; the four tabs left out (no `RULEBOOK_TABS` upgrade); a
+   mark whose link names a page the day has not is left out. The day's
+   page mask comes from `Facts.xml`'s `<rulebook>` and day 1's rules
+   (`RuleNeedPassport;RuleArstotzkaOnly;`): no `docs` and no
+   `confiscation` page, so the Documents and Confiscation entries are
+   not drawn.
+6. **The cursor**: the hand over the closed rulebook and over a mark with
+   a link on the open page (unless the drag has moved 4 pixels), the
+   arrow elsewhere on it.
+7. Left out on purpose: the bulletin and the transcript (4e), page turns
+   (4d), the rulebook's tilt draw from the booth's generator (made by the
+   `Paper` constructor even for a paper drawn untilted; nothing else
+   draws from that generator before milestone 5, so it changes nothing
+   yet), the inspect mode (not on day 1), the drawer (not on day 1).
+
+**Checks planned:** unit tests (the page mask, the marker pixels, the
+clamps, the dock path, `TouchDrag`); `boothscreen.py` extended with the
+rulebook (`deskmove.py` and `pages.py` underneath) and an input script
+given per frame (the mouse's place, its button, Escape), compared frame
+by frame in `tests/day.rs` (the rulebook's place, placement, state,
+shadow and the cursor every frame, the sounds, new pictures byte for
+byte); the browser check's new step 1j (drag the rulebook onto the desk,
+then back to its dock); a look in the app's pane.
+
+## 4c: How to try it
+
+From the project folder:
+
+```
+python -I scripts/build_web.py
+python -I scripts/serve.py 8080
+```
+
+Then open `http://localhost:8080/?page=day` and click "Click to start".
+Wait for the black card to fall away (about 6 seconds). Then:
+
+1. **The rulebook lies at its dock**: the small closed book in the slot
+   on the console, at the bottom of the counter, right of the console's
+   middle. The mouse over it shows the hand.
+2. **Press it and hold**: it lifts out of its slot (a quiet paper sound),
+   and as soon as you move it pops up above the console. Drag it around
+   the counter: it stays closed and cannot go lower than the top of the
+   console. Let go: it rises, slides back across and drops into its slot
+   with a paper sound.
+3. **Drag it onto the desk** (the dark area on the right): it opens on
+   its contents page ("CONTENTS", with Basic Rules, Regional Map and Booth
+   Info as dark buttons, a dog-ear at the bottom right), centred on the
+   mouse, with a soft dark shadow while you drag. Let go: it stays. The
+   mouse over a button shows the hand; **clicking a button does nothing
+   yet** (turning pages is 4d). The Documents and Confiscation entries
+   are missing on purpose: day 1 has no such pages.
+4. **Throw it**: press on the page and fling it sideways, letting go
+   while moving: it slides on a little and stops. It cannot leave the
+   desk: at least 70 x 30 pixels of it always stay on the desk, and the
+   part over the counter is hidden.
+5. **Drag it back over the counter**: it closes as soon as the mouse
+   crosses the desk's left edge; let go and it goes back to its slot.
+
+The bulletin and the transcript, which day 1 also has, are not on the
+desk yet (4e). A reload starts the day again.
+
+## 4c: What was built
+
+- `port/core/src/paper.rs` (new): `Papers.xml` read tag by tag (papers,
+  pages, marks with the paper's and page's inherited attributes, the
+  sound sets); the rulebook's page mask from `Facts.xml`'s `<rulebook>`;
+  `PaperNav`; the marker pixels (positions and the painting over);
+  `PaperInnerVisuals` for texts (link buttons rounded, colours swapped)
+  and literal pictures.
+- `port/core/src/desk.rs` (new): a docking desk item: closed or open, the
+  `DOCKED` reveal, the press (lifted 6, `toTop`), the drag one frame late
+  (the dock's drag clamp, the desk clamp, centring when the placement
+  changes, rounding, `dragStart`, the shadow), the release (`dragStop`),
+  the way home, the throw (`TouchDrag` with its own frame-counted clock),
+  `worldRect`, picking the mark under the cursor (`compareProximity`),
+  the cursor, the quads with their clip rectangles.
+- `port/core/src/day.rs`: the rulebook made with the booth (contents page
+  laid out, the page picture copied, the shadow picture made), updated
+  after the shutter, reacting before the switch, drawn between the desk's
+  hint and the console's top picture; a frame counter that runs under the
+  pause too (for the papers' own clocks).
+- `port/core/src/raster.rs`: a quad may carry an alpha factor (`fade`,
+  for the shadow's exact 0.5) and a clip rectangle (`clip`: only the
+  pixels whose centre is inside are drawn, which are the pixels the
+  game's proportional cut of the quad and its picture piece leaves; the
+  texel each pixel reads does not change).
+- `port/core/src/pages.rs`: `Gallery::sheet_index`; a tinted clipped piece.
+- The start pack: `data/Papers.xml`, `data/Facts.xml` and five pictures
+  (`papers/RulesOuter.png`, `RulesInnerHome.png`, `RulesTocDot.png`,
+  `RulesGoHomeBase.png`, `RulesGoNext.png`).
+- `scripts/reference/rulebook.py` (new, on `deskmove.py`, `pages.py`,
+  `deskpics.py`); `boothscreen.py` with the rulebook and an input given
+  frame by frame (written to `timeline.json` as `input`), 1,250 frames;
+  `fontpage.py` quads with a clip rectangle; `deskmove.py` corrected
+  (below).
+- `port/core/tests/day.rs`: plays the reference's input frame by frame;
+  compares the rulebook and the cursor every frame and the paper sounds.
+- The browser check's step 1j; `DAY_REFERENCE` is now
+  `extracted/previews/m4c` (the pause pictures stay in `m4b`).
+
+## 4c: Decisions (mine, reversible)
+
+In `DESIGN.md`, "Decided by me": the new split (4c to 4f), day 1's rules
+as a constant, the tilt draw left for milestone 5, the quad's float alpha.
+Also:
+
+- **A clip rectangle limits a quad's pixels** instead of cutting its
+  picture piece: the game cuts both by the same proportion, which leaves
+  every pixel's texel as it was, so the pixels drawn are the same; a
+  fractional cut (a closed paper sliding home across x 178) would need
+  fractional picture pieces otherwise. Both the reference and the port
+  do it this way; the only difference from the game's own arithmetic
+  could be a float rounding at a texel boundary (not seen; assumed).
+- **The papers' clocks count frames** (`TouchDrag`'s `app.Clock`: frames
+  since its last update times the step, at most 0.1 s), as the booth's
+  own clocks already do (4b).
+
+## 4c: Checks
+
+- `cargo test -p pp_core` (with `CARGO_HOME` set to `.cargo-home`): **108
+  unit tests** (new: `Papers.xml` with inheritance, the page mask, the
+  marker pixels, `PaperNav`, the desk clamp, the dock clamp, the way home,
+  the throw's slowing down, `compareProximity`), and every earlier
+  comparison still identical (title, settings, intro, pause).
+- `tests/day.rs` against `boothscreen.py` (`extracted/previews/m4c`):
+  **1,250 frames**, the input given per frame (4b's clicks, then the
+  rulebook: hovered, pressed and dragged closed over the counter, let go
+  and home; dragged onto the desk, held still, let go; the hand over
+  "Basic Rules"; thrown; dragged back over the counter, home; a click at
+  its dock): every frame's 4a and 4b values and **the rulebook's x, y
+  (floats compared exactly), placement, state, dragging, shadow, and the
+  cursor**; **36 sound starts**; **17 pictures** byte for byte (eight new:
+  lifted, dragged closed, going home, opening with its shadow, open,
+  thrown, closing, home). A deliberate fault (the throw's decay 0.75 made
+  0.76) made it fail on `rulebook_thrown` (10,668 bytes); with the first,
+  gentler throw it had **not** failed (below), so the throw was made
+  faster.
+- The browser check (`node scripts/checks/web_offline_check.mjs 8080`,
+  headless Edge): **passed in full on the second run** (5 min 43 s). The
+  first stopped in step 1g, before the new step, on the song (below).
+  Step 1j: the switch closed the shutter (`booth_normal`, but for the
+  blinking button and around the switch and cursor); the rulebook pressed
+  at its dock and moved to (400, 200) with real mouse events lay open
+  there, identical to `rulebook_open` but for the cursor and the button;
+  pressed on its page and moved to (90, 200), it closed and went home,
+  identical to `booth_normal` but for the cursor and the button;
+  `paper-dragstart` and `paper-dragstop` started. Steps 1h and 1i passed
+  against the new references (the rulebook now at its dock in them).
+- A look in the app's browser pane (`?page=day`): after the card fell
+  the rulebook showed at its dock on the console. **The drag could not
+  be tried there** (below). The tab was closed afterwards.
+
+## 4c: Measurements
+
+- WebAssembly 26,566,216 bytes (38,718 more than 4b); start pack
+  2,168,250 bytes (65 files).
+
+## 4c: Findings (by the code; nothing compared with the game)
+
+- **A docked rulebook pops up when grabbed**: its dock's drag clamp
+  holds a closed paper's bottom at y 178 (the clamp's bottom), above the
+  home (y 174 to 208), so on the first drag frame after the press the
+  rulebook jumps from y 168 (lifted 6) to y 144. Even a plain click on it
+  makes it jump up and fall back into its slot with the drop sounds
+  (`desk-movement.md`).
+- **On day 1 the contents page shows three entries**: Basic Rules,
+  Regional Map, Booth Info; Documents and Confiscation are left out by
+  the page mask (no `RuleNeedIdCard`, no confiscation).
+- **The `toTop` sound plays on every press** while the rulebook is the
+  only paper; with the bulletin over it (4e) the first press is silent.
+- **The cursor over a dragged page** is the hand only while the drag has
+  moved under 4 pixels and the cursor is on a link.
+
+## 4c: Not tested
+
+- **By the user.** Nothing of 4c was tried by the user yet.
+- Against the running game: everything is code reading, in particular
+  the pop-up when grabbed, the page's look and its place.
+- **Dragging by hand in the app's pane** (below); the headless check's
+  real mouse events did it instead.
+- Firefox; Chrome by hand; the sounds by ear.
+- A pause in the middle of a drag or a throw (built by the rules, not in
+  the script).
+- A closed rulebook let go across the desk's edge (a fractional clip
+  while it slides home): built, not in the script.
+
+## 4c: Dead ends and failures
+
+- **The first throw in the reference's script was too gentle to test the
+  decay**: with the page thrown at 10 pixels a frame, a deliberate fault
+  in the decay (0.76 for 0.75) still gave the same rounded positions and
+  the test passed. The throw is now 20 pixels a frame (the page slides 58
+  pixels and the fault shows).
+- **The first comparison failed on `rulebook_returning`** (411 bytes):
+  the port drew at whole pixels while the rulebook slid home at
+  fractions of a pixel. Positions are no longer rounded for drawing, and
+  clipping became a pixel limit (above) so that fractional cuts work.
+- `Facts.xml` is not well-formed XML (a bare `&&`), so the reference cuts
+  out its `<rulebook>` element before parsing; the port's tag reader is
+  lenient anyway.
+- **Browser check, run 1, failed in step 1g** (the intro, before 4c's
+  step): "Theme.ogg NotSupportedError: Failed to load because no
+  supported source was found", then "timed out waiting for Theme to
+  start". This is the song problem under "Currently stuck" in
+  `PROGRESS.md` (`milestone-2.md`, "Dead ends"); run 2 passed it.
+- **The look in the app's pane could not drag**: the pane was hidden, so
+  the page ran as a background page at about a frame a second; the
+  pane's drag action pressed and let go between two game frames, so the
+  game saw no press; mouse events made by a script in the page were not
+  taken by the game either. Two attempts, then left to the headless
+  check, whose real mouse events work.
+
+## Next: 4d
+
+The rulebook's pages: links and page turns (`Paper.onClick`,
+`followLink`, `turnPage`), the page stack (`#back`), every page day 1
+has (the rule texts through the day's rule table, the map, the region
+pages with their fact pictures, the booth page). Then 4e (the bulletin
+and the transcript at the day's start) and 4f (the clock running, the
+stamp bar, stamping).

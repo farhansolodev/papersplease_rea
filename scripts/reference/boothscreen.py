@@ -1,4 +1,4 @@
-"""The day screen at the start of day 1, milestones 4a and 4b (docs/milestone-4.md):
+"""The day screen at the start of day 1, milestones 4a, 4b and 4c (docs/milestone-4.md):
 the booth as its constructor builds it on desktop, the day's opening card
 typing the date and falling away, and the border scene's background and
 booth button, frame by frame at 1/60 s a frame. Written from the code
@@ -7,15 +7,17 @@ the same quad rules as fontpage.py.
 
     python -I scripts/reference/boothscreen.py <assets dir> <out dir>
 
-for example `extracted/art/assets` and `extracted/previews/m4a` (gitignored).
+for example `extracted/art/assets` and `extracted/previews/m4c` (gitignored).
 It plays the first FRAMES frames and writes:
 
 - timeline.json: for every frame, the booth's and the border's states, the
   opening card's y and whether it is shown, how many letters of the date
   are shown, the booth button's look, the shutter's state and openT, the
-  switch's look, whether the game is paused, the game clock; the frames on
-  which each sound starts; the frame of `start-intro`; the input script
-  (SCRIPT below, as frames), which the Rust test plays as real presses;
+  switch's look, whether the game is paused, the game clock, the
+  rulebook's place, placement, state, drag and shadow, the cursor the
+  parts chose; the frames on which each sound starts; the frame of
+  `start-intro`; the input, frame by frame (`input`: the mouse's x and y,
+  its button, Escape), which the Rust test plays as real presses;
 - <name>.rgba for the frames in SNAPSHOTS (570 x 320 x 4 bytes, alpha 255),
   each also as a PNG and, enlarged 3 times, as _x3.png to look at.
 
@@ -25,12 +27,17 @@ compares both, byte for byte and frame for frame.
 Since milestone 4b the run has input (SCRIPT): after the intro has begun,
 the shutter switch is clicked (the shutter opens), Escape pauses the game
 in the middle of the opening, Escape again presses RESUME, and later the
-switch closes the shutter.
+switch closes the shutter. Since milestone 4c the mouse also moves
+(RULEBOOK_SCRIPT): the rulebook is hovered, pressed and dragged closed
+over the counter and let go (home again), dragged onto the desk and let go,
+hovered over a button, thrown, dragged back over the counter (home again),
+and clicked at its dock (rulebook.py).
 
 What is left out on purpose (docs/milestone-4.md, "4a"): the border
 scene's figures (milestone 6; only the walk-in figure's distance is kept,
-for the moment it starts the booth's intro), the day's papers (the
-rulebook comes in 4c), the booth's engine, every click but the switch's.
+for the moment it starts the booth's intro), the day's other papers (the
+bulletin and the transcript, 4e), the booth's engine, every click but the
+switch's and the rulebook's.
 
 The rules, as read (docs/booth-screen.md):
 
@@ -76,6 +83,8 @@ import faces  # noqa: E402
 import fontpage  # noqa: E402
 import fonts  # noqa: E402
 import gdate  # noqa: E402
+import inputs  # noqa: E402
+import rulebook as rulebookmod  # noqa: E402
 import text as textmod  # noqa: E402
 import titlescreen  # noqa: E402
 from introscreen import built_letters, lerp_scale  # noqa: E402
@@ -83,7 +92,7 @@ from PIL import Image  # noqa: E402
 
 W, H = fontpage.W, fontpage.H
 DT = 1.0 / 60.0
-FRAMES = 720
+FRAMES = 1250
 
 # Desktop layout values (booth-layout.md, scripts/reference/layout.py).
 BOOTH_Y = 103
@@ -110,13 +119,66 @@ DAY1 = 2445296.5                 # 23 November 1982 (value-helpers.md)
 WALK_LENGTH, WALK_SPEED = 60.0, 10.0   # Paths.xml `enter-right`, default speed
 
 SNAPSHOTS = ["card_typing", "card_full", "card_falling", "card_bounce", "booth_highlight", "booth_normal",
-             "shutter_opening", "shutter_open", "shutter_closing"]
+             "shutter_opening", "shutter_open", "shutter_closing",
+             "rulebook_lifted", "rulebook_closed_drag", "rulebook_returning", "rulebook_opening", "rulebook_open",
+             "rulebook_thrown", "rulebook_closing", "rulebook_home"]
 MAX_DT = 0.1                     # app.Clock.maxDeltaTime
 
 # The input (milestone 4b), in frames after start-intro: what is pressed on
 # which frame and let go 3 frames later.
 SCRIPT = [(150, "switch"), (170, "escape"), (230, "escape"), (310, "switch")]
 HOLD = 3
+SWITCH_AT = (164, 118)            # the middle of the shutter switch (28 x 23 at 150, 107)
+SWITCH_RECT = (150, 107, 28, 23)
+
+# The rulebook's script (milestone 4c), in frames after start-intro: the
+# mouse's place and whether its button is held, frame by frame. Before it
+# the mouse rests on the shutter switch (where 4b's clicks are).
+DOCK_AT = (126, 294)              # the middle of the rulebook at its dock (113, 174 + 103)
+DAY1_RULES = "RuleNeedPassport;RuleArstotzkaOnly;"
+
+
+def rulebook_script():
+    out = {}
+
+    def hold(a, b, at, down):
+        for o in range(a, b):
+            out[o] = (at[0], at[1], down)
+
+    def move(a, b, p, q, down):
+        for o in range(a, b):
+            t = (o - a + 1) / float(b - a)
+            out[o] = (int(math.floor(p[0] + (q[0] - p[0]) * t)), int(math.floor(p[1] + (q[1] - p[1]) * t)), down)
+    hold(360, 370, DOCK_AT, False)                    # over the closed rulebook: the hand
+    hold(370, 375, DOCK_AT, True)                     # pressed: lifted 6 pixels, paper-totop
+    move(375, 390, DOCK_AT, (60, 200), True)          # dragged closed over the counter
+    hold(390, 400, (60, 200), True)
+    hold(400, 460, (60, 200), False)                  # let go: back to the dock
+    hold(460, 462, DOCK_AT, False)
+    hold(462, 466, DOCK_AT, True)                     # pressed again
+    move(466, 496, DOCK_AT, (400, 200), True)         # onto the desk: open, with the shadow
+    hold(496, 530, (400, 200), True)                  # held still: the speed dies away
+    hold(530, 570, (400, 200), False)                 # let go: it stays
+    hold(570, 590, (440, 166), False)                 # over "Basic Rules": the hand
+    hold(590, 592, (337, 240), False)
+    hold(592, 594, (337, 240), True)                  # pressed on the page
+    move(594, 600, (337, 240), (217, 240), True)      # thrown to the left, fast
+    hold(600, 640, (217, 240), False)                 # it slides on and stops
+    hold(640, 642, (300, 240), False)
+    hold(642, 644, (300, 240), True)                  # pressed on the page
+    move(644, 664, (300, 240), (90, 200), True)       # back over the counter: closed
+    hold(664, 670, (90, 200), True)
+    hold(670, 760, (90, 200), False)                  # let go: back to the dock
+    hold(760, 762, DOCK_AT, False)
+    hold(762, 764, DOCK_AT, True)                     # a click on it at its dock
+    hold(764, 820, DOCK_AT, False)
+    return out
+
+
+RULEBOOK_SCRIPT = rulebook_script()
+RULEBOOK_SNAPS = {372: "rulebook_lifted", 395: "rulebook_closed_drag", 405: "rulebook_returning",
+                  500: "rulebook_opening", 565: "rulebook_open", 603: "rulebook_thrown", 667: "rulebook_closing",
+                  815: "rulebook_home"}
 
 
 # --- app.Interp ---------------------------------------------------------
@@ -450,6 +512,9 @@ class Day:
         empty = self.booth.add("empty")
         empty.targets = [(self.card, {"active": False})]
         self.booth.go("off", True)
+        # BoothEngine.start: the day's papers (here only the rulebook; 4e
+        # adds the bulletin and the transcript).
+        self.rulebook = rulebookmod.Rulebook(assets, lib, pictures, DAY1_RULES, DT, self.sounds)
         self.weight_text = "---"
         self.weight = None
         self.clock = clock_picture(assets, 6.0)
@@ -511,8 +576,11 @@ class Day:
         if weight != self.weight:
             self.weight = weight
             self.weight_text = weight.replace("kg", "")
-        # The booth's children: the shutter, with the game's clock.
+        # The booth's children: the shutter, with the game's clock; then
+        # the papers.
         self.shutter.step(DT)
+        self.rulebook.frame = self.frame
+        self.rulebook.update(DT, self.frame)
         # Border.update: its clock, its states, then the figures.
         self.border_clock.update()
         self.border.step(self.border_clock.dt)
@@ -547,6 +615,8 @@ class Day:
         hx = int(math.floor(math.floor(DESK_W * 0.5 + DESK_X) - hw * 0.5))
         hy = (DESK_H + 0.0 - 5.0) - hh
         page.text(ui, hint, hx, by + hy, color=HINT_COLOR, background=HINT_BACK, padding_x=6, padding_y=2)
+        # The papers.
+        self.rulebook.draw(page)
         # The console, moved to the end of the booth's children then.
         cy = by + CONSOLE_Y
         page.picture("Console.png", 0, cy)
@@ -584,17 +654,30 @@ PICTURES = ["Shutter.png", "Counter.png", "ConsoleUnder.png", "Console.png", "Sh
 
 def run(assets, lib, pictures, strings):
     day = Day(assets, lib, pictures, strings)
-    frames, snaps = [], {}
+    frames, snaps, host_input = [], {}, []
     start = None
     paused = False
     script = []                      # (frame pressed, what), set once start-intro is known
     switch_pressing = False
     resume_pressing = False
     opened_at = closed_at = None
+    inp = inputs.Input()
+    rulebook_ent = object()          # the rulebook's input identity
     for frame in range(1, FRAMES + 1):
         day.frame = frame
         held = {what for at, what in script if at <= frame < at + HOLD}
         released = {what for at, what in script if frame == at + HOLD}
+        # The host's input this frame: the mouse rests on the shutter switch
+        # (pressed for its clicks), then follows the rulebook's script.
+        mx, my, down = SWITCH_AT[0], SWITCH_AT[1], "switch" in held
+        if start is not None and (frame - start) in RULEBOOK_SCRIPT:
+            mx, my, down = RULEBOOK_SCRIPT[frame - start]
+        elif start is not None and frame - start > max(RULEBOOK_SCRIPT):
+            mx, my, down = RULEBOOK_SCRIPT[max(RULEBOOK_SCRIPT)]
+        escape = "escape" in held
+        host_input.append([mx, my, down, escape])
+        inp.update([False] * 11, [(down, (float(mx), float(my)), False), (False, (0.0, 0.0), True),
+                                  (False, (0.0, 0.0), True)], frame * DT)
         # Game.update: the pause key first (Escape just down, the game on,
         # the day screen can pause); Escape is then masked until let go.
         escape_masked = getattr(day, "escape_masked", False)
@@ -615,7 +698,8 @@ def run(assets, lib, pictures, strings):
             start = day.events["start-intro"]
             script = [(start + after, what) for after, what in SCRIPT]
         # The input: the pause screen's RESUME (Escape, the back button),
-        # then the day's shutter switch (mouse) when not paused.
+        # then the day's parts when not paused: the rulebook (a later child
+        # of the booth, so first), then the shutter switch.
         if paused and not escape_masked:
             if "escape" in held and not resume_pressing:
                 resume_pressing = True
@@ -626,6 +710,11 @@ def run(assets, lib, pictures, strings):
                 paused = False
                 day.sounds.append((frame, "hover-up"))
         if not paused and day.booth_flags.input:
+            day.rulebook.frame = frame
+            day.rulebook.react(inp, rulebook_ent)
+            p = inp.pointers[0]
+            if p.capturing is None and inputs.inside(SWITCH_RECT, p.world[0], p.world[1]):
+                p.set_cursor("HAND")
             if "switch" in held and not switch_pressing:
                 switch_pressing = True
                 day.sounds.append((frame, "button-down"))
@@ -637,12 +726,16 @@ def run(assets, lib, pictures, strings):
                     opened_at = frame
                 else:
                     closed_at = frame
+        rb = day.rulebook.state()
         frames.append({
             "frame": frame, "booth": day.booth.cur.name, "border": day.border.cur.name,
             "card": day.card.active, "card_y": day.card.y, "shown": day.reveal.shown(),
             "button": day.button_look, "shutter": day.shutter.cur.name, "open_t": day.shutter_obj.open_t,
             "switch": day.switch_look, "paused": paused, "time": day.time,
             "booth_time": day.booth_time,
+            "rb_x": rb["x"], "rb_y": rb["y"], "rb_placement": rb["placement"], "rb_state": rb["state"],
+            "rb_dragging": rb["dragging"], "rb_shadow": rb["shadow"],
+            "cursor": None if paused else inp.pointers[0].cursor,
         })
         name = None
         if frame == 40:
@@ -666,6 +759,8 @@ def run(assets, lib, pictures, strings):
             name = "shutter_open"
         elif closed_at is not None and frame == closed_at + 9:
             name = "shutter_closing"
+        elif start is not None and (frame - start) in RULEBOOK_SNAPS:
+            name = RULEBOOK_SNAPS[frame - start]
         if name:
             snaps[frame] = (name, day.draw())
     timeline = {
@@ -673,10 +768,13 @@ def run(assets, lib, pictures, strings):
         "sounds": [{"frame": f, "id": s} for f, s in day.sounds],
         "start_intro": start,
         "script": [{"frame": at, "what": what, "hold": HOLD} for at, what in script],
+        "input": host_input,
         "snapshots": {name: f for f, (name, _) in snaps.items()},
         "date": day.date_text,
         "card_text": day.reveal.text,
         "card_xy": [day.reveal.x, day.reveal.y],
+        "rulebook_mask": day.rulebook.mask,
+        "rulebook_marks": [[v.name, v.kind, v.x, v.y, v.size[0], v.size[1]] for v in day.rulebook.placed],
     }
     return timeline, {name: quads for f, (name, quads) in snaps.items()}
 

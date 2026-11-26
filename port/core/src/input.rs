@@ -309,7 +309,7 @@ pub fn cursor_quad(input: &Input, arrow: (usize, u32, u32), hand: (usize, u32, u
         _ => (arrow, (-1.0, -1.0)),
     };
     let (x, y) = (p.unclamped.0 + dx, p.unclamped.1 + dy);
-    Some(Quad { image, x0: x, y0: y, x1: x + w as f64, y1: y + h as f64, src: [0, 0, w as i32, h as i32], color: 0xFFFF_FFFF })
+    Some(Quad { image, x0: x, y0: y, x1: x + w as f64, y1: y + h as f64, src: [0, 0, w as i32, h as i32], color: 0xFFFF_FFFF, fade: 1.0, clip: None })
 }
 
 #[cfg(test)]

@@ -321,7 +321,12 @@ While dragging, each frame: velocity = half the old velocity + half
 each frame: if the speed is below 1 pixel a second it is set to 0;
 otherwise it is multiplied by 0.75^(60 x dt) (0.75 per 1/60 s) and the
 position moves by velocity x dt, rounded. Its clock is its own
-`app.Clock`.
+`app.Clock`, started at the press (so its first update, in the first drag
+frame, gives 0) and updated only by the drag frames and the slide; when it
+gives 0 the decay power is 1, not 0, so the speed still shrinks by 0.75
+(read on 2026-11-26 for milestone 4c; `deskmove.py` had no decay for a
+zero step, corrected the same day; the slide never meets a zero step in
+the game, since the drag frames update the clock first).
 
 ### Going back to the dock
 
@@ -341,6 +346,13 @@ height / 2); on the next frame `NORMAL`, and then the return path.
   t = how far off the column's middle, from 0 (in its middle half) to 1;
   elsewhere it is held with its bottom at 178. Then the middle is clamped
   so the whole paper is inside x 0..570, y 0..178.
+  The clamp's bottom (178) is above the homes' bottoms (208, 208, 217),
+  so a docked paper held closed can never be lower than that: pressed at
+  its home it is lifted 6 pixels, and on the first drag frame it pops up
+  until its bottom is at 178 (the rulebook from y 168 to 144), even for a
+  plain click, after which it falls back into its home (seen in the
+  reference and the port for milestone 4c, 2026-11-26; not compared with
+  the game).
 - *When let go* (`returnHome`, each frame): if below the home's top, it
   rises 500 pixels a second to one pixel above it; else, if not at the
   home's x, it moves sideways 500 pixels a second to it; else, if above

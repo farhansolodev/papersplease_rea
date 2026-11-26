@@ -140,6 +140,11 @@ impl Gallery {
         Ok(self.pictures.len() - 1)
     }
 
+    /// The picture index of a font sheet, by its file name.
+    pub fn sheet_index(&self, file: &str) -> usize {
+        self.names[file]
+    }
+
     fn sheet(&self, index: usize) -> (&str, &Picture) {
         let name = &self.sheet_files[index];
         (name, &self.pictures[self.names[name]])
@@ -241,6 +246,8 @@ Pneumonoultramicroscopicsilicovolcanoconiosis is a very long word that gets cut 
                     y1: -oy as f64 + pic.height as f64,
                     src: [0, 0, pic.width as i32, pic.height as i32],
                     color: 0xFFFFFFFF,
+                    fade: 1.0,
+                    clip: None,
                 });
                 b.text(
                     regular,
@@ -284,7 +291,7 @@ pub(crate) struct Builder<'a> {
 
 impl Builder<'_> {
     pub(crate) fn fill(&mut self, x: f64, y: f64, w: f64, h: f64, color: u32) {
-        self.quads.push(Quad { image: 0, x0: x, y0: y, x1: x + w, y1: y + h, src: [0, 0, 1, 1], color });
+        self.quads.push(Quad { image: 0, x0: x, y0: y, x1: x + w, y1: y + h, src: [0, 0, 1, 1], color, fade: 1.0, clip: None });
     }
 
     /// Draws a text at (x, y) and returns its height. `set` changes the
@@ -309,7 +316,7 @@ impl Builder<'_> {
                 None => 0,
                 Some(p) => self.gallery.names[&font.page_files[p]],
             };
-            self.quads.push(Quad { image, x0, y0, x1: x0 + w, y1: y0 + h, src: tile.src, color: color(i, tile) });
+            self.quads.push(Quad { image, x0, y0, x1: x0 + w, y1: y0 + h, src: tile.src, color: color(i, tile), fade: 1.0, clip: None });
         }
     }
 
@@ -319,12 +326,17 @@ impl Builder<'_> {
     /// port's quads read whole picture pixels, so this takes whole numbers
     /// only (all the intro's are: its cut is rounded, its places floored).
     pub(crate) fn part_clipped(&mut self, image: usize, x: i32, y: i32, src: [i32; 4], clip: Option<[i32; 4]>) {
+        self.part_clipped_tinted(image, x, y, src, clip, 0xFFFFFFFF);
+    }
+
+    /// [`Builder::part_clipped`] in a colour (a font sheet's letter).
+    pub(crate) fn part_clipped_tinted(&mut self, image: usize, x: i32, y: i32, src: [i32; 4], clip: Option<[i32; 4]>, color: u32) {
         let (mut px, mut py) = (x, y);
         let (mut pr, mut pb) = (x + src[2], y + src[3]);
         let [mut ux, mut uy] = [src[0], src[1]];
         let (mut ur, mut ub) = (src[0] + src[2], src[1] + src[3]);
         if let Some([cx, cy, cw, ch]) = clip {
-            if cx + cw <= px || pr <= cx || cy + ch <= py || pb <= cy {
+            if cx + cw <= px || pr <= cx || cy + ch <= py || pb <= cy || cw <= 0 || ch <= 0 {
                 return;
             }
             if px < cx {
@@ -345,20 +357,20 @@ impl Builder<'_> {
             }
         }
         let src = [ux, uy, ur - ux, ub - uy];
-        self.quads.push(Quad { image, x0: px as f64, y0: py as f64, x1: pr as f64, y1: pb as f64, src, color: 0xFFFFFFFF });
+        self.quads.push(Quad { image, x0: px as f64, y0: py as f64, x1: pr as f64, y1: pb as f64, src, color, fade: 1.0, clip: None });
     }
 
     /// The piece `src` of picture `image` drawn stretched to `w` x `h` at
     /// (x, y) (a nine-slice frame's tile, `app.vis.Frame`).
     pub(crate) fn stretched(&mut self, image: usize, x: f64, y: f64, w: f64, h: f64, src: [i32; 4]) {
-        self.quads.push(Quad { image, x0: x, y0: y, x1: x + w, y1: y + h, src, color: 0xFFFFFFFF });
+        self.quads.push(Quad { image, x0: x, y0: y, x1: x + w, y1: y + h, src, color: 0xFFFFFFFF, fade: 1.0, clip: None });
     }
 
     /// A sprite of the piece `src` (x, y, width, height) of picture `image`,
     /// drawn at (x, y) at its own size.
     pub(crate) fn part(&mut self, image: usize, x: f64, y: f64, src: [i32; 4]) {
         let (x1, y1) = (x + src[2] as f64, y + src[3] as f64);
-        self.quads.push(Quad { image, x0: x, y0: y, x1, y1, src, color: 0xFFFFFFFF });
+        self.quads.push(Quad { image, x0: x, y0: y, x1, y1, src, color: 0xFFFFFFFF, fade: 1.0, clip: None });
     }
 }
 

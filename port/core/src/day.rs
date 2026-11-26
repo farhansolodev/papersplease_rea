@@ -15,17 +15,23 @@
 //! shutter (4b). The screen can be paused (`enablePause`); while paused it
 //! is not updated, and its own clocks catch up by at most 0.1 s after.
 //!
-//! Not here yet: the border's figures (milestone 6), the rulebook (4c), the
-//! clock running and the stamp bar (4d), the booth's rules and travelers
-//! (milestone 5).
+//! Since milestone 4c the rulebook lies at its dock on the counter: it can
+//! be dragged closed, opened on the desk on its contents page, thrown, and
+//! sent back to its dock (`desk.rs`).
+//!
+//! Not here yet: the border's figures (milestone 6), the rulebook's other
+//! pages (4d), the bulletin and the transcript (4e), the clock running and
+//! the stamp bar (4f), the booth's rules and travelers (milestone 5).
 
 use std::f64::consts::PI;
 
 use crate::aud::{AudioHost, Speaker};
 use crate::button::{Background, Button, Look};
+use crate::desk::{DeskPaper, DeskPics, RULES_DOCK};
 use crate::gdate;
 use crate::input::Input;
 use crate::pages::{Builder, Gallery};
+use crate::paper::{layout, mark_positions, read_papers, rulebook_page_mask, Nav};
 use crate::picture::{Affine, Picture};
 use crate::raster::Quad;
 use crate::reveal_text::RevealText;
@@ -51,6 +57,13 @@ const CONSOLE_DATE: (f64, f64) = (4.0, 48.0);
 const CONSOLE_COUNT: (f64, f64) = (86.0, 42.0);
 const OUTER_BOOTH_BUTTON: (f64, f64) = (146.0, 65.0);
 const BORDER_H: i32 = 103;
+
+/// Day 1's rules (`Day/Rules`; a constant until milestone 5 reads
+/// `Days.csv`, docs/DESIGN.md) and its confiscation (none).
+const DAY1_RULES: &str = "RuleNeedPassport;RuleArstotzkaOnly;";
+const DAY1_CONFISCATION: &str = "";
+/// The rulebook's input identity (the switch is 3, the border's button 4).
+const RULEBOOK_ENT: u32 = 5;
 
 /// `ConsoleEnt`'s static colours, the desk hint's, the shutter's shadow.
 const DATE_COLOR: u32 = 0xFF42_2A1C;
@@ -291,7 +304,45 @@ pub struct DayScreen {
     pics: Pics,
     /// The frame count since the screen was made, for the tests.
     frames: u32,
+    /// Every frame of the screen, shown or hidden (the papers' own clocks).
+    ticks: u64,
     start_intro: Option<u32>,
+    rulebook: DeskPaper,
+}
+
+/// The rulebook as the booth makes it (`Booth.engine_onPapersAdded`, the
+/// `Paper` constructor): its contents page laid out (the day has no page
+/// to open it to), its closed picture, at its dock.
+fn make_rulebook(gallery: &mut Gallery) -> Result<DeskPaper, String> {
+    let papers_xml = gallery.data.get("Papers.xml").ok_or("Papers.xml is missing from the pack")?;
+    let facts_xml = gallery.data.get("Facts.xml").ok_or("Facts.xml is missing from the pack")?;
+    let (papers, sound_sets) = read_papers(papers_xml);
+    let paper = papers.iter().find(|p| p.id == "Rules").ok_or("no Rules paper in Papers.xml")?;
+    let nav = Nav { paper, mask: rulebook_page_mask(facts_xml, DAY1_RULES, DAY1_CONFISCATION) };
+    // Paper.setPage(0): the first page the paper has.
+    let index = (0..paper.pages.len()).find(|&i| nav.has_page(i)).ok_or("the rulebook has no page")?;
+    let file = format!("papers/{}", paper.pages[index].image);
+    let mut picture = gallery.pictures[gallery.picture(&file).ok_or_else(|| format!("{file} is missing from the pack"))?].clone();
+    let positions = mark_positions(&paper.pages[index], &mut picture, &mut || 0.0);
+    let g: &Gallery = gallery;
+    let size = |name: &str| g.picture(&format!("papers/{name}")).map(|i| (g.pictures[i].width as i32, g.pictures[i].height as i32));
+    let placed = layout(paper, index, &positions, &nav, g, &|_| String::new(), &size, false)?;
+    let outer_file = format!("papers/{}", paper.outer.as_deref().unwrap_or(""));
+    let outer = g.picture(&outer_file).ok_or_else(|| format!("{outer_file} is missing from the pack"))?;
+    let outer_size = (g.pictures[outer].width as f64, g.pictures[outer].height as f64);
+    let inner_size = (picture.width as f64, picture.height as f64);
+    let sounds = sound_sets.get(&paper.sounds).cloned().unwrap_or_default();
+    // The drag shadow: the page in black wherever it is not transparent.
+    let mut shadow = picture.clone();
+    for px in shadow.rgba.chunks_exact_mut(4) {
+        if px[3] != 0 {
+            px.copy_from_slice(&[0, 0, 0, 255]);
+        }
+    }
+    let page = gallery.made_picture("rules-page", |_| Ok(picture))?;
+    let shadow = gallery.made_picture("rules-shadow", |_| Ok(shadow))?;
+    let pics = DeskPics { outer, page, shadow };
+    Ok(DeskPaper::docked(RULEBOOK_ENT, outer_size, inner_size, RULES_DOCK, pics, placed, sounds))
 }
 
 impl DayScreen {
@@ -387,6 +438,9 @@ impl DayScreen {
         // its states; the walk-in figure sets off.
         let band = BORDER_H - OUTER_BOOTH_BUTTON.1 as i32;
         let piece = |row: i32| Background::Piece { image: outer, src: [0, row, 56, band] };
+        // BoothEngine.start: the day's papers (only the rulebook yet).
+        let rulebook = make_rulebook(gallery)?;
+
         let mut outer_booth = Button::new("outer-booth", 4, "", Look::new("normal", piece(0), piece(0)));
         outer_booth.looks.push(Look::new("highlight", piece(band), piece(band)));
         outer_booth.x = OUTER_BOOTH_BUTTON.0;
@@ -418,7 +472,9 @@ impl DayScreen {
             booth_ambient,
             pics,
             frames: 0,
+            ticks: 0,
             start_intro: None,
+            rulebook,
         })
     }
 
@@ -462,6 +518,11 @@ impl DayScreen {
     }
 
     /// The frame (counted from the screen's first) of `start-intro`.
+    /// The rulebook, for the tests.
+    pub fn rulebook(&self) -> &DeskPaper {
+        &self.rulebook
+    }
+
     pub fn start_intro(&self) -> Option<u32> {
         self.start_intro
     }
@@ -471,6 +532,7 @@ impl DayScreen {
     /// walk-in figure). `time` is the game clock's time.
     pub fn update(&mut self, dt: f64, time: f64, speaker: &mut Speaker, audio: &mut dyn AudioHost) {
         self.frames += 1;
+        self.ticks += 1;
         self.booth_clock.update(dt);
         self.booth_time += self.booth_clock.dt;
         self.booth.step(self.booth_clock.dt, &mut BoothCtx { parts: &mut self.parts, dt, speaker, audio });
@@ -487,6 +549,8 @@ impl DayScreen {
         speaker.set_room(None);
         // The booth's children: the shutter moves with the game's clock.
         self.shutter.step(dt, &mut ShutterCtx { open_t: &mut self.open_t, switch: Some(&mut self.shutter_switch), speaker, audio });
+        // Then the papers.
+        self.rulebook.update(dt, self.ticks, speaker, audio);
 
         self.border_clock.update(dt);
         self.border.step(self.border_clock.dt, &mut BorderCtx { button: &mut self.outer_booth, time });
@@ -507,17 +571,19 @@ impl DayScreen {
     /// A frame the screen is not updated (hidden under the pause): its own
     /// clocks will give that time too on their next update.
     pub fn skip(&mut self, dt: f64) {
+        self.ticks += 1;
         self.booth_clock.skip(dt);
         self.border_clock.skip(dt);
     }
 
     /// The screen's input: the booth's parts, if they take input (not in
-    /// `off`); of them only the shutter switch does anything yet
-    /// (`Booth.shutterSwitch_onClick`).
+    /// `off`), the later ones first: the rulebook (a child of the papers'
+    /// root), then the shutter switch (`Booth.shutterSwitch_onClick`).
     pub fn react(&mut self, input: &mut Input, speaker: &mut Speaker, audio: &mut dyn AudioHost) {
         if !self.parts.parts_input {
             return;
         }
+        self.rulebook.react(input, speaker, audio);
         if self.shutter_switch.react((0.0, BOOTH_Y), input, speaker, audio) && self.booth.current() != "busy-with-border" {
             // With the shutter open, BoothEngine.closeShutter first: it acts
             // only on a traveler, and there is none yet.
@@ -561,6 +627,8 @@ impl DayScreen {
             t.padding_x = 6;
             t.padding_y = 2;
         });
+        // The papers.
+        self.rulebook.draw(&mut b, gallery);
         // The console, moved to the end of the booth's children then.
         let cy = by + CONSOLE_Y;
         whole(&mut b, self.pics.console, 0.0, cy);

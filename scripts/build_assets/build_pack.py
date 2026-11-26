@@ -32,6 +32,11 @@ of the desk hint and the long date (`date_verbose`, `month_1` to 12,
 `day_1` to 31; none is changed by the English pack, docs/language-pack.md).
 Milestone 4b adds the pause screen's red button and confirm box pictures and
 its four texts (PAUSED, RESUME, MAIN MENU, CANCEL).
+Milestone 4c adds data/Papers.xml and data/Facts.xml (the rulebook's
+definition and its page mask; the English pack changes no text of the
+rulebook's contents page, and none of Facts.xml's <rulebook>) and the
+rulebook's closed picture, contents page, dot and two corner pictures as
+pictures/papers/<file name>.
 The English language pack is NOT
 applied here: of the 23 texts it changes none is in Text.xml, so Text.xml
 strings are the same with or without it (docs/milestone-1.md). Files it does
@@ -56,13 +61,15 @@ PICTURES = ["Title.png", "PushButton.png", "SettingsButton.png", "CursorArrow.pn
             "Shutter.png", "Counter.png", "ConsoleUnder.png", "Console.png", "ClockPin.png",
             "ShutterSwitchDown.png", "ShutterSwitchUp.png", "Desk.png", "StampBarTop.png", "StampBarMid.png",
             "StampBarBot.png", "CheckpointBack.png", "OuterBooth.png",
-            "PushButtonRed.png", "ConfirmBox.png"]
+            "PushButtonRed.png", "ConfirmBox.png",
+            "papers/RulesOuter.png", "papers/RulesInnerHome.png", "papers/RulesTocDot.png",
+            "papers/RulesGoHomeBase.png", "papers/RulesGoNext.png"]
 STRINGS = ["wrap_hyphen", "menu_story", "menu_endless", "created_by",
            "menu_settings", "menu_done", "menu_fullscreen", "menu_nudity", "menu_easy", "menu_easytip",
            "menu_dateformat", "menu_music", "menu_sound", "menu_next",
            "booth_dragdocs", "date_verbose",
            "menu_paused", "menu_resume", "menu_mainmenu", "confirm_cancel"] + ["month_%d" % n for n in range(1, 13)] + ["day_%d" % n for n in range(1, 32)]
-DATA = ["Sounds.xml", "Intro.xml"]
+DATA = ["Sounds.xml", "Intro.xml", "Papers.xml", "Facts.xml"]
 
 
 def text_item(text_xml, item_id):

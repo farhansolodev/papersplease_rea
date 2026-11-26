@@ -36,6 +36,15 @@ pub struct Quad {
     pub src: [i32; 4],
     /// 0xAARRGGBB.
     pub color: u32,
+    /// A factor on the colour's alpha: the game's colours are floats, and
+    /// a sprite at alpha 0.5 (the drag shadow) is exactly half, which no
+    /// byte gives. 1 for everything else.
+    pub fade: f64,
+    /// A clip rectangle (x, y, width, height) on the screen. `Quad.make`
+    /// cuts the quad and its picture piece by the same proportion, which
+    /// leaves each pixel's texel as it was; so the quad keeps its place
+    /// and piece and only the pixels whose centre lies inside are drawn.
+    pub clip: Option<[f64; 4]>,
 }
 
 /// The screen picture: `WIDTH x HEIGHT` pixels of red, green, blue, alpha
@@ -90,7 +99,7 @@ impl Screen {
             ((q.color >> 16) & 255) as f64 / 255.0,
             ((q.color >> 8) & 255) as f64 / 255.0,
             (q.color & 255) as f64 / 255.0,
-            (q.color >> 24) as f64 / 255.0,
+            (q.color >> 24) as f64 / 255.0 * q.fade,
         ];
         self.draw_coloured(q, pictures, colour);
     }
@@ -99,7 +108,7 @@ impl Screen {
     /// whole screen): its alpha is a float in the game, not a byte, so it
     /// is passed as one.
     pub fn cover(&mut self, alpha: f32, pictures: &[Picture]) {
-        let q = Quad { image: 0, x0: 0.0, y0: 0.0, x1: WIDTH as f64, y1: HEIGHT as f64, src: [0, 0, 1, 1], color: 0 };
+        let q = Quad { image: 0, x0: 0.0, y0: 0.0, x1: WIDTH as f64, y1: HEIGHT as f64, src: [0, 0, 1, 1], color: 0, fade: 1.0, clip: None };
         self.draw_coloured(&q, pictures, [0.0, 0.0, 0.0, alpha as f64]);
     }
 
@@ -114,8 +123,13 @@ impl Screen {
         let (iw, ih) = (pic.width as f64, pic.height as f64);
         let (u0, u1) = (sx as f64 / iw, (sx + sw) as f64 / iw);
         let (v0, v1) = (sy as f64 / ih, (sy + sh) as f64 / ih);
-        let xs = covered(q.x0, q.x1, WIDTH);
-        for y in covered(q.y0, q.y1, HEIGHT) {
+        let (mut xs, mut ys) = (covered(q.x0, q.x1, WIDTH), covered(q.y0, q.y1, HEIGHT));
+        if let Some([cx, cy, cw, ch]) = q.clip {
+            let (cxs, cys) = (covered(cx, cx + cw, WIDTH), covered(cy, cy + ch, HEIGHT));
+            xs = xs.start.max(cxs.start)..xs.end.min(cxs.end).max(xs.start.max(cxs.start));
+            ys = ys.start.max(cys.start)..ys.end.min(cys.end).max(ys.start.max(cys.start));
+        }
+        for y in ys {
             let ty = texel_at(y, q.y0, q.y1, v0, v1, pic.height);
             for x in xs.clone() {
                 let tx = texel_at(x, q.x0, q.x1, u0, u1, pic.width);
@@ -141,7 +155,7 @@ mod tests {
     }
 
     fn quad(x0: f64, y0: f64, x1: f64, y1: f64, color: u32) -> Quad {
-        Quad { image: 0, x0, y0, x1, y1, src: [0, 0, 1, 1], color }
+        Quad { image: 0, x0, y0, x1, y1, src: [0, 0, 1, 1], color, fade: 1.0, clip: None }
     }
 
     fn px(s: &Screen, x: u32, y: u32) -> [u8; 4] {
@@ -210,7 +224,7 @@ mod tests {
             rgba: vec![255, 0, 0, 255, 0, 0, 255, 255],
         };
         let mut s = Screen::new();
-        let q = Quad { image: 0, x0: 10.0, y0: 0.0, x1: 14.0, y1: 1.0, src: [0, 0, 2, 1], color: 0xFFFFFFFF };
+        let q = Quad { image: 0, x0: 10.0, y0: 0.0, x1: 14.0, y1: 1.0, src: [0, 0, 2, 1], color: 0xFFFFFFFF, fade: 1.0, clip: None };
         s.draw(&q, &[pic]);
         assert_eq!(&px(&s, 10, 0)[..3], [255, 0, 0]);
         assert_eq!(&px(&s, 11, 0)[..3], [255, 0, 0]);
@@ -226,7 +240,7 @@ mod tests {
             rgba: vec![255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 9, 9, 9, 255],
         };
         let mut s = Screen::new();
-        let q = Quad { image: 0, x0: 0.0, y0: 0.0, x1: 2.0, y1: 1.0, src: [1, 0, 2, 1], color: 0xFFFFFFFF };
+        let q = Quad { image: 0, x0: 0.0, y0: 0.0, x1: 2.0, y1: 1.0, src: [1, 0, 2, 1], color: 0xFFFFFFFF, fade: 1.0, clip: None };
         s.draw(&q, &[pic]);
         assert_eq!(&px(&s, 0, 0)[..3], [0, 255, 0]);
         assert_eq!(&px(&s, 1, 0)[..3], [0, 0, 255]);
