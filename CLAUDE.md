@@ -17,8 +17,10 @@ Port my own copy of Papers, Please to run in the browser:
    (`game/`, `extracted/`, `dumps/`, `decompiled/`). Only my own Rust code,
    tooling and notes get committed, and nothing from the game goes on a public
    host.
-2. **Do not run `git commit` unless I asked.** Stage nothing beyond what the
-   current task requires. After every commit, push it to GitHub
+2. **Commit each step when it is done and tested** (my standing go-ahead
+   since 2026-11-26; before that, commits waited for me). One commit per
+   step. Stage nothing beyond what the step requires. After every commit,
+   push it to GitHub
    (`git push origin master`). Before pushing, check that the commits hold
    no game files and no pasted decompiler output: the repository is public
    (rule 1).
@@ -49,12 +51,11 @@ Port my own copy of Papers, Please to run in the browser:
    steps, what is stuck, the open questions and the list of docs. Then
    `docs/ghidra-workflow.md` for the commands and how to read decompiled
    output.
-2. Before any work, tell me which model the step needs, so I can switch while
-   the session is still short (you cannot switch it yourself). Opus for
-   decompilation and reverse-engineering reasoning, or a step that mixes that
-   with routine work. Sonnet for doc updates, routine helper scripts and
-   checks. If unsure, say Opus.
-3. Give me the plan for the step and wait (see "Plan first" below).
+2. Take the next step in `docs/PROGRESS.md` and do it without waiting for
+   me (see "Work on your own" below). Opus suits decompilation and
+   reverse-engineering reasoning, Sonnet doc updates, routine helper
+   scripts and checks; a session that starts other sessions picks the model
+   for them.
 
 ## Tooling state
 
@@ -117,11 +118,20 @@ Port my own copy of Papers, Please to run in the browser:
 
 ## How to work
 
-- **Plan first.** Before doing a task, tell me what you are going to do, which
-  files will change and how I can check the result, then wait for my go-ahead.
-  Reading files to work out the plan is fine without asking. Editing or
-  creating files, running scripts or Ghidra, and any git command wait for the
-  go-ahead. A plain question gets a direct answer, with no plan step.
+- **Work on your own** (my standing rule since 2026-11-26; before that, every
+  step waited for my go-ahead on its plan). Go through the steps in
+  `docs/PROGRESS.md` in order without asking: write the step's plan into its
+  doc, build it, test it yourself as far as you possibly can (unit tests,
+  the Python references, the headless browser check, a look in the app's
+  browser pane), write it up, commit and push it, then go on to the next.
+  Make the reversible decisions yourself and record them, with the reason,
+  in `docs/DESIGN.md`. Stop and ask me only for: a launch of the original
+  game, a download, something that touches online play or DRM (rule 4), a
+  change that would undo a decision I made, or something that truly cannot
+  be tested without me (then finish what can be done and list what is left
+  for me in `docs/PROGRESS.md`). Keep token use low: one step per session,
+  with the docs as the hand-over, and subagents for wide searches. A plain
+  question from me gets a direct answer.
 - **Recover IL2CPP names first.** Raw `GameAssembly.dll` without the names from
   `global-metadata.dat` is not worth analysing.
 - **Search the whole decompile first.** All of the game's own code is
@@ -167,8 +177,9 @@ Port my own copy of Papers, Please to run in the browser:
   free, no tab is left) and say in the closing message what was closed. When
   you need it running to try a build, give you the command to start it
   instead.
-- **Tell me how to test it.** After every change, give the exact command to run
-  and what I should see. "Done" without a test procedure is not done.
+- **Write down how to test it.** Every build's doc gives the exact commands
+  to run and what I should see, so I can try it whenever I come back.
+  "Done" without a test procedure is not done.
 - **Explain in plain language.** I am not the programmer here. Explain a term
   the first time you use it.
 

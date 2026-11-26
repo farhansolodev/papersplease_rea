@@ -14,6 +14,14 @@ below this header. "Tested" means it was actually run; otherwise write
 **Still broken / not tested:** be honest
 ```
 
+## 2026-11-26 Rules for working on my own
+
+**Changed:** `CLAUDE.md` (hard rule 2, "Start here in a new session", "Work on your own" replacing "Plan first", how to test). "Ask before large refactors" is unchanged: a change to it was refused by the permission check, so it still waits for the user.
+**Why:** the user asked for the rest of the project to be done without waiting for them, one session per step, testing everything that can be tested here. Asked about the two rules involved, they chose: commit and push each step (after the check for game files); still ask before each launch of the original game and before each download.
+**Tested how:** doc change only; not tested.
+**Result:** steps now go plan, build, test, write-up, commit, push, next, with no wait.
+**Still broken / not tested:** nothing to test.
+
 ## 2026-11-05 Record that the user tried milestone 4a
 
 **Changed:** `docs/PROGRESS.md` (update, stage 5, step 16), `docs/milestone-4.md` (the parts table, "4a: Not tested").
