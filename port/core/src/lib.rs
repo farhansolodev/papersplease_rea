@@ -23,6 +23,7 @@ pub mod gdate;
 pub mod input;
 pub mod intro;
 pub mod num;
+pub mod pause;
 pub mod pack;
 pub mod pages;
 pub mod picture;

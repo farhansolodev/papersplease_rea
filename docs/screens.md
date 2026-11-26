@@ -1001,7 +1001,20 @@ Used here and by other screens. `show(callback, message, options)`:
   button), `backButton` and `freezeAfterClick`.
 - One standard button per option, stacked 10 apart (button height 19),
   centred in a frame that is centred on the screen; the message above
-  them.
+  them. **With an empty message the gap is doubled to 20** and the frame
+  is the buttons and twice the padding high (read in full on 2026-11-26
+  for milestone 4b, `Confirm.show`; this said "10 apart" for every box,
+  which was wrong for an empty message). The details: the frame is
+  `ConfirmBox.png` (244 x 192) drawn as a nine-slice frame with borders
+  of 10, as wide as the picture, centred left to right by the
+  constructor; `show` makes it (buttons x 19 + (buttons - 1) x gap) +
+  padding high, the padding being the layout's `confirmBoxPadding`
+  (15, 20 on desktop) used twice with no message, or the message's height
+  plus three times it with one; centred up and down; the first button's
+  top is the frame's bottom less the buttons' height less the padding.
+  Under the frame, a fill of the whole screen, black at alpha 0.5 (the
+  box's `backFill`). The box's own size is the whole screen, which is
+  what it masks (`Confirm.react`).
 - An option with the id `back` or `cancel`, or with `backButton`, becomes
   the back button.
 - A click: the box hides, or, with `freezeAfterClick`, stays on screen but

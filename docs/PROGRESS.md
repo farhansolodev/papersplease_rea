@@ -1,8 +1,9 @@
 # Where the project stands
 
-**Read this first in a new session.** Last updated 2026-11-05, after
-step 16's first build, milestone 4a, the booth at the start of day 1
-(`milestone-4.md`); before it the reading for it (`booth-screen.md`); before it step 15, milestone 3c, the intro pages (`milestone-3.md`); before it
+**Read this first in a new session.** Last updated 2026-11-26, after
+step 17, milestone 4b, the shutter switch and the pause screen
+(`milestone-4.md`, "4b"); before it step 16's first build, milestone 4a,
+the booth at the start of day 1 (`milestone-4.md`); before it the reading for it (`booth-screen.md`); before it step 15, milestone 3c, the intro pages (`milestone-3.md`); before it
 step 14, milestone 3b, screen changes and the settings screen
 (`milestone-3.md`); before it step 13, milestone 3a, the title screen
 alive (`milestone-3.md`); before
@@ -143,6 +144,27 @@ game. Findings: a new clock's first frame gives no time; the date card is
 two lines high (the empty title); the console's "---" weight is never
 seen; the bounce curve falls back short of its target (corrects a guess in
 `buttons.md`). Details in step 16 below.
+
+**Update 2026-11-26 (step 17): milestone 4b, the shutter switch and the
+pause screen, is built** (`milestone-4.md`, "4b"), on my own under the
+user's new rule (`CLAUDE.md`, "Work on your own"). I cut the old 4b in two
+(`DESIGN.md`, "Decided by me"): 4b is the shutter and the pause, **4c is
+the rulebook**, 4d the clock, the stamp bar and stamping. On `?page=day`
+the shutter switch opens and closes the shutter (SMOOTHERSTEP up in 1 s,
+a bounce down in 0.35 s, their sounds); Escape pauses the day (or the
+intro) on a pause screen with Fullscreen, Nudity, Music, Sound, RESUME
+and MAIN MENU (no QUIT, the user's decision), MAIN MENU asks in a confirm
+box and fades to the title. Escape in full screen: Keyboard Lock in
+Chrome and Edge, a handed-over Escape elsewhere (my decision). Checked:
+99 unit tests; 720 frames, 20 sound starts and nine pictures identical to
+`boothscreen.py` with its input script played as real presses; the pause
+screen and the confirm box identical to a new `pausescreen.py`, reached
+by real presses; the browser check passed in full on its fourth run (headless Edge, 5 minutes; three earlier runs failed on faults in the check itself, not in the build); **Not tried by the user**; nothing
+compared with the game. Findings: an empty confirm box doubles its button
+gap (corrects `screens.md` part 3); the booth's own clocks jump up to
+0.1 s after a pause while the shutter does not; an open shutter with
+nobody there shows black. A correction to milestone 2: the page's sound
+player paused sounds started during a pause. Details in step 17 below.
 
 Before it the same day,
 step 7, the sorting of the open questions: 151 items into five kinds
@@ -481,7 +503,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | 2. Getting assets out | 5% | Mostly done: images, fonts, data; the English language pack compared with the archive (`language-pack.md`; other packs not needed); the audio, as WAV (`audio.md`, 2026-10-17). Not done: a scripted `Art.dat` cut-out. The browser formats of the sounds: done in milestone 2 (2026-10-29, `milestone-2.md`: songs as Ogg Vorbis from ffmpeg, effects as the game's ADPCM) |
 | 3. Understanding the data files | 12% | Done: all 31 files in the data folder are written up (`data-files.md`). The 3 that the game does not read are noted as such |
 | 4. Understanding the game logic | 30% | Roughly 80%. Done: the traveler pipeline (with a Python reference that matches the game), speech, booth events, player actions, judging, faces, news selection, the night's rules, the newspaper picture, endless-mode rules, the whole border scene in four parts (figures and the waiting line, `Border` itself, shooting, the view with the cameras and the endless scoreboard), saves in two parts (the store, the save tree, one save's content, settings and statistics files; screen changes and the stash). The screens, parts 1 to 7: the base of a screen, the night screen, the title screen, the menu helper, the load screen, the confirm box, the pause screen, the settings screen, the intro and ending screens with their page player, the credits screen, the endless code box and the endless screen (`screens.md`); the frame rate (`border-view.md`); part 8, how a language pack is loaded and what the English one changes (`language-pack.md`); part 9, buttons (`buttons.md`); part 10, the night screen's family pictures (`night-pictures.md`); part 11, the day screen, the wait screen, the screen shake, the screen flash and the news magnifier (`screens.md`). Left out by the user's decision: the language chooser and the age rating. Step 5, drawing, part 1: how a text is laid out and drawn (`text-drawing.md`); part 2: how a document page is laid out (`page-layout.md`); the newspaper's headlines run through the text layout (`newspaper-picture.md`); part 3: the fact pictures of a page and the picture operations they use (`fact-pictures.md`); part 4: a paper's pictures on the desk, clipping, drawing order, clicking, picking a mark, stamp ink, `Image.render` (`desk-pictures.md`). Every desktop layout value, from the `Layout` constructor run in the emulator (`booth-layout.md`). Part 5a: how a paper moves (reveals, hides, dragging, the clamps, the give area, the dock points, the drawer; `desk-movement.md`). Part 5b: the inspect mode (`inspect-mode.md`). Part 6: the rest of `app.vis` (`vis-basics.md`). Part 7: the rest of `play.ui` (`ui-parts.md`). Input handling (`input-handling.md`). The Unity side of drawing (`screen-output.md`), which ends the drawing step; step 5b, the Unity scene and shader files, read with UnityPy (`screen-output.md`, "The Unity files"). Step 6b, the game-side audio layer (`audio-layer.md`) |
-| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). **Milestone 3b built** (2026-11-03): screen changes with their fade, the settings and the settings screen, full screen; tried by the user (2026-11-03). **Milestone 3c built** (2026-11-04): the intro pages (the typing caption, the page player), by `?page=intro`; tried by the user (2026-11-04). The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. The pause screen (3d) is folded into milestone 4 (the user's decision, 2026-11-04). **Milestone 4a built** (`milestone-4.md`, 2026-11-05): day 1's booth at the start of the day, by `?page=day`, the general state machine; tried by the user (2026-11-05). 4b, 4c and milestones 5 to 10 not started |
+| 5. Building the browser game in Rust | 40% | Started: **milestone 0 built and tried by the user** (`milestone-0.md`, 2026-10-17): a Bevy window in the browser showing a test card at a whole-number zoom, the fixed step, the service worker, the build and server scripts. **Milestone 1a built** (`milestone-1.md`, 2026-10-18): the start pack, fonts, text layout, software drawing of quads, 35 font test pages identical to the Python reference. **Milestone 1b built** (2026-10-18): the title screen as a still, identical to its Python reference; tried by the user. **Milestone 2 built** (`milestone-2.md`, 2026-10-29): the start screen, the sound player, the effects decoded by the port, `Theme` streamed and kept, the sound test page; tried by the user (2026-11-03). **Milestone 3a built** (`milestone-3.md`, 2026-11-03): the title alive (rise, bob, cursor, buttons and their sounds), the audio layer, input; tried by the user (2026-11-03). **Milestone 3b built** (2026-11-03): screen changes with their fade, the settings and the settings screen, full screen; tried by the user (2026-11-03). **Milestone 3c built** (2026-11-04): the intro pages (the typing caption, the page player), by `?page=intro`; tried by the user (2026-11-04). The architecture and milestones are in `DESIGN.md` (step 8). Bevy 0.20.0 and `wasm-bindgen-cli` 0.2.129 are in `.cargo-home/`; `trunk` and `wasm-pack` are not used. The pause screen (3d) is folded into milestone 4 (the user's decision, 2026-11-04). **Milestone 4a built** (`milestone-4.md`, 2026-11-05): day 1's booth at the start of the day, by `?page=day`, the general state machine; tried by the user (2026-11-05). **Milestone 4b built** (2026-11-26): the shutter switch, the pause screen with its confirm box, Escape in full screen; not yet tried by the user. 4c, 4d and milestones 5 to 10 not started |
 | 6. Comparing with the original | 10% | Started and working: a repeatable method exists and days 1 to 4 of one seed match; a real save folder gives a second method (see "Verification") |
 
 ## What is documented
@@ -545,7 +567,7 @@ Rough estimate: **about 40% of the work**, low confidence. Estimated total:
 | `screen-output.md` | **The Unity side of drawing** (the last part): the drawing order (layers lowest first, then the order visuals were added), the host's frame, the 570 x 320 screen picture and how it is fitted to the window (window size, full screen, the command-line words), how quads are batched, texture coordinates, pictures on the graphics card and the change counter, where a fractional position lands (the graphics card's rule, assumed), the quad shader (colour multiplied in, ordinary alpha blending, gamma colour space), the phantom cursor (behind the picture, so hidden over it), and the Unity files (step 5b: the scene, materials, shaders, Pixel Perfect Camera and project settings, read with UnityPy) |
 | `vis-basics.md` | **Drawing, part 6**: the rest of `app.vis`: pictures in memory (0xAARRGGBB, byte order, change counter, `white1x1`), colours, `Fill`, the nine-slice `Frame`, the atlas of chips and its y order, `Point.parse` and `Rect.parse` with the data check, the geometry helpers the game uses, and the helpers it never calls |
 | `inspect-mode.md` | **Drawing, part 5b**: the inspect mode (`InspectUi`): opening and closing (button, Space, double click), its states and timings, the reveal of the hint and buttons, the overlay, the surround lines and the initial scan; what can be marked (papers topmost first, marks to fact paths, the paper itself, the booth's four things); the two selection slots; the pair's text; the diagram's timeline and label side; the interrogate button; when the mode is disabled |
-| `milestone-4.md` | Milestone 4, split into 4a, 4b, 4c (and 5a, 5b for milestone 5); 4a, the booth at the start of day 1: how to try it (`?page=day`), what was built (`stater.rs`, `gdate.rs`, `day.rs`, the affine picture drawing), the decisions (the test address, the walk-in kept as a distance, the sub-clocks), the checks (520 frames and six pictures against `boothscreen.py`, browser step 1h), measurements, findings (6 s before the intro, the two-line date, the weight never shown, the bounce), what is not tested, the failures on the way, the reading list for 4b |
+| `milestone-4.md` | Milestone 4, split into 4a to 4d (and 5a, 5b for milestone 5); 4b, the shutter switch and the pause screen: its plan, how to try it, what was built (`pause.rs`, the shutter in `day.rs`, the `paused` state, the settings list shared), decisions, checks (720 frames and nine pictures against `boothscreen.py` with an input script, the pause screen against `pausescreen.py`, browser step 1i), findings, what is not tested, the reading list for 4c; 4a, the booth at the start of day 1: how to try it (`?page=day`), what was built (`stater.rs`, `gdate.rs`, `day.rs`, the affine picture drawing), the decisions (the test address, the walk-in kept as a distance, the sub-clocks), the checks (520 frames and six pictures against `boothscreen.py`, browser step 1h), measurements, findings (6 s before the intro, the two-line date, the weight never shown, the bounce), what is not tested, the failures on the way, the reading list for 4b |
 | `booth-screen.md` | **The booth, part 1**: how its constructor was decompiled (a longer time limit), what it builds on desktop and in which order (the wall picture made but never drawn, the counter, the console's two pictures with the papers between, the shutter switch, the desk and its hint text, the stamp bar, the drawer, the day's opening card), the state machine's states and the day's start (`off`, `intro`, `intro-instant`, `empty`), `Booth.update` (the clock from 6:00 to 18:00, the ambient by state), the shutter, the console and its clock; **part 2** (2026-11-05): the state machine's rules in full, the curves, the clocks' first frame, the start of a day frame by frame (the walk-in, the booth button's blink), the card's two-line date, the weight never shown, the stamp bar, the other parts at the start; what is not read yet |
 | `booth-layout.md` | **Every desktop value of `Layout`**, from the game's constructor run in Ghidra's emulator: the booth's rectangles (window, counter, console, desk, clips, clamps, give area, slot, counter edge, floor line), the dock points of the rulebook, bulletin and transcript, the inspect rectangles, and all other fields; how the run was made and checked (35 values read by hand earlier all match) |
 | `paths-xml-format.md` | `Paths.xml`: paths and animations of the figures in the top view |
@@ -956,8 +978,35 @@ the night screen's family pictures; part 11, the last screens.)
    tested**: against the game, Firefox, the sounds by ear. Corrected: `buttons.md` (the bounce curve was
    guessed "an overshoot", which was wrong: it falls back short of the
    target), `desk-movement.md`, `ui-parts.md`, `inspect-mode.md` (the
-   curves, the default curve). Next: **4b** (its reading list
-   is at the end of `milestone-4.md`).
+   curves, the default curve). Next: 4b.
+
+17. **Milestone 4b, the shutter switch and the pause screen: built**
+   (2026-11-26, `milestone-4.md`, "4b"), on my own (the user's rule of the
+   same day). The old 4b was cut in two (`DESIGN.md`, "Decided by me"):
+   **4b** the shutter and the pause, **4c** the rulebook, **4d** the clock
+   running, the stamp bar, stamping. Read in `decompiled/all/`: `Shutter`
+   whole, `Booth.shutterSwitch_onClick`, `BoothEngine.closeShutter`,
+   `app.Num.smootherstep` (constants from the DLL), `Game.update`'s pause
+   test, the `paused` state's functions, `app.Clock`'s
+   `pauseForOneFrame` and `update`, `PauseScreen` and `Confirm` whole,
+   `Frame.buildTiles`. New: `pause.rs`, the `paused` state in `fade.rs`,
+   the shutter in `day.rs`, the settings list shared by both screens,
+   Escape in full screen in the page, the references `pausescreen.py`
+   and an input script in `boothscreen.py`, `tests/pause.rs`, the
+   browser check's step 1i. Checked: 99 unit tests; `tests/day.rs` 720
+   frames (shutter, openT, paused, both clocks), 20 sound starts, nine
+   pictures identical (a deliberate fault made it fail); `tests/pause.rs`
+   (both pictures identical; Escape, MAIN MENU, CANCEL, MAIN MENU to the
+   title 70 frames after the click); the browser check passed in full on its fourth run (headless Edge, 5 minutes; three earlier runs failed on faults in the check itself, not in the build); **Not tested**: by
+   the user; against the game; Keyboard Lock and the Firefox hand-over
+   (no real full-screen window here); Firefox; pausing the intro.
+   Corrected: `screens.md` part 3 (an empty confirm box's gap is 20),
+   `booth-screen.md` (the open window; the switch and the shutter's
+   clock), `milestone-2.md` (the page paused new sounds during a pause;
+   fixed in `audio.js`), `DESIGN.md` (the fullscreen row, the milestones
+   row). **Next: 4c, the rulebook** (its reading list is at the end of
+   `milestone-4.md`): read first, write its plan into `milestone-4.md`,
+   build, test, write up, commit and push, as this step did.
 
 Small jobs that fit anywhere:
 

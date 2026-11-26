@@ -3,26 +3,27 @@
 //! 4). One [`Game::step`] is one frame of `Game.update`, in its order:
 //!
 //! 1. the input (the host's frame, before `Game.update`);
-//! 2. the clock, then the screen-change states ([`Fader`]), which may build
-//!    the next screen;
-//! 3. the screen's update, unless it is frozen by a change;
-//! 4. the music;
-//! 5. the screen's input, unless frozen (a click may ask for another
-//!    screen);
-//! 6. the speaker;
-//! 7. the settings: applied and saved on the frame their change counter
+//! 2. the pause key: Escape on a screen that can be paused, while the game
+//!    runs, pauses it (milestone 4b);
+//! 3. the clock, then the game's states ([`Fader`]), which may build the
+//!    next screen, or (paused) hold the clock for the frame;
+//! 4. the screen's update, unless it is frozen by a change or hidden under
+//!    the pause; then the pause screen's;
+//! 5. the music;
+//! 6. the input: the pause screen first, then the screen, unless frozen or
+//!    hidden (a click may ask for another screen);
+//! 7. the speaker;
+//! 8. the settings: applied and saved on the frame their change counter
 //!    has moved; otherwise the window's full screen is copied into them if
 //!    it differs.
-//!
-//! The pause key is not looked at yet: the intro screen (milestone 3c) is
-//! the first screen built that can be paused, and the pause comes in 3d.
 
 use crate::aud::{AudioHost, Music, SoundDefs, Speaker};
 use crate::day::{self, DayScreen};
 use crate::fade::{Event, Fader, State};
-use crate::input::{self, HostInput, Input};
+use crate::input::{self, HostInput, Input, Key};
 use crate::intro::{self, IntroScreen};
 use crate::pages::Gallery;
+use crate::pause::{PauseAction, PauseScreen};
 use crate::raster::Screen;
 use crate::settings::{Saved, Settings};
 use crate::settings_screen::{self, SettingsScreen};
@@ -60,6 +61,14 @@ pub struct Game {
     screen: GameScreen,
     /// The screen's switches 4 and 16 cleared: no input, no update.
     frozen: bool,
+    /// The screen's switch 1 cleared under the pause: not updated, not
+    /// drawn, no input.
+    hidden: bool,
+    /// The pause screen, while the game is `paused`.
+    pause: Option<Box<PauseScreen>>,
+    /// The game clock's time at the start of this frame (the pause's
+    /// `pauseForOneFrame` takes the frame's time back).
+    time_before: f64,
     pending: Option<&'static str>,
     /// The game's clock (`app.Clock.time`) and this frame's time.
     time: f64,
@@ -114,6 +123,9 @@ impl Game {
             fader: Fader::new(),
             screen: GameScreen::Empty,
             frozen: false,
+            hidden: false,
+            pause: None,
+            time_before: 0.0,
             pending: None,
             time: 0.0,
             dt: 0.0,
@@ -135,25 +147,69 @@ impl Game {
         self.fader.state()
     }
 
+    /// The pause screen, while paused.
+    pub fn pause_screen(&self) -> Option<&PauseScreen> {
+        self.pause.as_deref()
+    }
+
+    /// The game clock's time.
+    pub fn time(&self) -> f64 {
+        self.time
+    }
+
+    /// `GameScreen.canPause`: the screens that call `enablePause` (of those
+    /// built: the intro and the day).
+    fn can_pause(&self) -> bool {
+        matches!(self.screen, GameScreen::Intro(_) | GameScreen::Day(_))
+    }
+
     /// One frame of `dt` seconds.
     pub fn step(&mut self, host: &HostInput, dt: f64, gallery: &mut Gallery, audio: &mut dyn AudioHost, platform: &mut dyn Platform) -> Result<(), String> {
         self.input.update(host, dt);
+        if self.can_pause() && self.input.key_just_down(Key::Escape) && self.fader.state() == State::On {
+            self.input.mask_key_until_release(Key::Escape);
+            for event in self.fader.go(State::Paused, false) {
+                self.handle(event, gallery, audio)?;
+            }
+        }
+        self.time_before = self.time;
         self.time += dt;
         self.dt = dt;
         for event in self.fader.step(dt) {
             self.handle(event, gallery, audio)?;
         }
-        if !self.frozen {
+        if self.hidden {
+            if let GameScreen::Day(d) = &mut self.screen {
+                d.skip(dt);
+            }
+        }
+        if !self.frozen && !self.hidden {
             match &mut self.screen {
                 GameScreen::Empty => {}
                 GameScreen::Title(t) => t.update(&self.music, &self.speaker),
                 GameScreen::Settings(s) => s.update(gallery, &self.settings, self.time),
                 GameScreen::Intro(i) => i.update(gallery, dt, &mut self.speaker, audio)?,
-                GameScreen::Day(d) => d.update(dt, self.time, &mut self.speaker, audio),
+                GameScreen::Day(d) => d.update(self.dt, self.time, &mut self.speaker, audio),
             }
         }
+        if let Some(p) = &mut self.pause {
+            p.update(gallery, &self.settings, self.time);
+        }
         self.music.update(&mut self.speaker, audio);
-        if !self.frozen {
+        let action = match &mut self.pause {
+            Some(p) => p.react(gallery, &mut self.input, &mut self.speaker, audio, &mut self.settings, self.time)?,
+            None => None,
+        };
+        match action {
+            Some(PauseAction::Resume) => {
+                for event in self.fader.go(State::On, false) {
+                    self.handle(event, gallery, audio)?;
+                }
+            }
+            Some(PauseAction::MainMenu) => self.queue_screen_change("title", gallery, audio)?,
+            None => {}
+        }
+        if !self.frozen && !self.hidden {
             let clicked = match &mut self.screen {
                 GameScreen::Empty => None,
                 GameScreen::Title(t) => t.react(&mut self.input, &mut self.speaker, audio).map(|id| ("title", id)),
@@ -163,8 +219,10 @@ impl Game {
                 GameScreen::Intro(i) => {
                     i.react(gallery, &mut self.input, dt, &mut self.speaker, audio)?.then(|| ("intro", "done".to_string()))
                 }
-                // Nothing on the day screen takes input yet (4b).
-                GameScreen::Day(_) => None,
+                GameScreen::Day(d) => {
+                    d.react(&mut self.input, &mut self.speaker, audio);
+                    None
+                }
             };
             match clicked {
                 Some(("title", id)) if id == "settings" => self.queue_screen_change("settings", gallery, audio)?,
@@ -205,6 +263,24 @@ impl Game {
         match event {
             Event::FreezeScreen => self.frozen = true,
             Event::ApplyScreenChange => self.apply_screen_change(gallery, audio)?,
+            Event::EnterPaused => {
+                self.speaker.pause_all(audio);
+                if self.pause.is_none() {
+                    self.pause = Some(Box::new(PauseScreen::new(gallery, &self.settings)?));
+                }
+                self.hidden = true;
+                self.speaker.play("button-drop", audio);
+            }
+            Event::PauseClock => {
+                self.time = self.time_before;
+                self.dt = 0.0;
+            }
+            Event::ExitPaused => {
+                self.speaker.resume_all(audio);
+                self.pause = None;
+                self.hidden = false;
+                self.speaker.play("hover-up", audio);
+            }
         }
         Ok(())
     }
@@ -248,6 +324,7 @@ impl Game {
     /// the cursor pictures (index, width, height).
     pub fn draw(&self, gallery: &Gallery, out: &mut Screen, arrow: (usize, u32, u32), hand: (usize, u32, u32)) {
         let quads = match &self.screen {
+            _ if self.hidden => Vec::new(),
             GameScreen::Empty => Vec::new(),
             GameScreen::Title(t) => t.quads(gallery),
             GameScreen::Settings(s) => s.quads(gallery),
@@ -257,6 +334,9 @@ impl Game {
         out.clear();
         for q in &quads {
             out.draw(q, &gallery.pictures);
+        }
+        if let Some(p) = &self.pause {
+            p.draw(gallery, out);
         }
         if self.fader.fade() != 0.0 {
             out.cover(self.fader.fade(), &gallery.pictures);

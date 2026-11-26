@@ -30,6 +30,8 @@ file goes in as it is. Milestone 4a adds the day screen's pictures (the
 booth's and the border scene's background and booth button) and the texts
 of the desk hint and the long date (`date_verbose`, `month_1` to 12,
 `day_1` to 31; none is changed by the English pack, docs/language-pack.md).
+Milestone 4b adds the pause screen's red button and confirm box pictures and
+its four texts (PAUSED, RESUME, MAIN MENU, CANCEL).
 The English language pack is NOT
 applied here: of the 23 texts it changes none is in Text.xml, so Text.xml
 strings are the same with or without it (docs/milestone-1.md). Files it does
@@ -53,11 +55,13 @@ PICTURES = ["Title.png", "PushButton.png", "SettingsButton.png", "CursorArrow.pn
             "intro/Intro0.png", "intro/Intro1.png", "intro/Intro2.png", "intro/Intro3.png", "intro/Arstotzka.png",
             "Shutter.png", "Counter.png", "ConsoleUnder.png", "Console.png", "ClockPin.png",
             "ShutterSwitchDown.png", "ShutterSwitchUp.png", "Desk.png", "StampBarTop.png", "StampBarMid.png",
-            "StampBarBot.png", "CheckpointBack.png", "OuterBooth.png"]
+            "StampBarBot.png", "CheckpointBack.png", "OuterBooth.png",
+            "PushButtonRed.png", "ConfirmBox.png"]
 STRINGS = ["wrap_hyphen", "menu_story", "menu_endless", "created_by",
            "menu_settings", "menu_done", "menu_fullscreen", "menu_nudity", "menu_easy", "menu_easytip",
            "menu_dateformat", "menu_music", "menu_sound", "menu_next",
-           "booth_dragdocs", "date_verbose"] + ["month_%d" % n for n in range(1, 13)] + ["day_%d" % n for n in range(1, 32)]
+           "booth_dragdocs", "date_verbose",
+           "menu_paused", "menu_resume", "menu_mainmenu", "confirm_cancel"] + ["month_%d" % n for n in range(1, 13)] + ["day_%d" % n for n in range(1, 32)]
 DATA = ["Sounds.xml", "Intro.xml"]
 
 

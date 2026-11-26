@@ -1,19 +1,23 @@
-//! Plays the start of day 1 (milestone 4a) frame by frame through the game
-//! and compares it with the Python reference's run: every frame's booth and
-//! border states, whether the opening card shows and its exact y, how many
-//! letters of the date are out, the booth button's look; the frames on
-//! which the sounds start; six pictures byte for byte. Needs two
-//! gitignored, game-derived inputs; with either missing the test says so
-//! and passes without checking:
+//! Plays the start of day 1 (milestones 4a and 4b) frame by frame through
+//! the game and compares it with the Python reference's run: every frame's
+//! booth and border states, whether the opening card shows and its exact y,
+//! how many letters of the date are out, the booth button's look, the
+//! shutter's state and openT, the switch's look, whether the game is paused,
+//! the game clock; the frames on which the sounds start; nine pictures byte
+//! for byte. The reference's input script (the shutter switch clicked,
+//! Escape to pause, Escape to resume, the switch again) is played as real
+//! mouse and key presses. Needs two gitignored, game-derived inputs; with
+//! either missing the test says so and passes without checking:
 //!
 //!     python -I scripts/build_assets/build_pack.py          -> build/assets/start.pack
-//!     python -I scripts/reference/boothscreen.py extracted/art/assets extracted/previews/m4a
+//!     python -I scripts/reference/boothscreen.py extracted/art/assets extracted/previews/m4b
 
 use std::path::{Path, PathBuf};
 
 use pp_core::aud::{AudioHost, SoundDefs};
 use pp_core::game::{Game, GameScreen, Platform};
-use pp_core::input::HostInput;
+use pp_core::fade::State;
+use pp_core::input::{HostInput, Key};
 use pp_core::pack::Pack;
 use pp_core::pages::Gallery;
 use pp_core::raster::Screen;
@@ -58,13 +62,30 @@ fn root() -> PathBuf {
 }
 
 /// One frame as the game shows it: booth state, border state, card shown,
-/// card y, letters shown, button look.
-type Frame = (String, String, bool, f64, usize, String);
+/// card y, letters shown, button look; shutter state, openT, switch look,
+/// paused, the game clock, the booth's own clock.
+type Frame = (String, String, bool, f64, usize, String, String, f64, String, bool, f64, f64);
+
+/// The middle of the shutter switch (150, 4 in the booth at y 103; 28 x 23).
+const SWITCH: (f64, f64) = (164.0, 118.0);
+
+const SOUNDS: [&str; 10] = [
+    "text-reveal",
+    "booth-intro",
+    "border-ambient",
+    "booth-ambient",
+    "shutter-rise",
+    "shutter-drop",
+    "button-down",
+    "button-up",
+    "button-drop",
+    "hover-up",
+];
 
 #[test]
 fn the_start_of_day_one_plays_as_the_reference_does() {
     let pack_path = root().join("build/assets/start.pack");
-    let out = root().join("extracted/previews/m4a");
+    let out = root().join("extracted/previews/m4b");
     let Ok(bytes) = std::fs::read(&pack_path) else {
         eprintln!("SKIPPED: {} not found", pack_path.display());
         return;
@@ -84,15 +105,25 @@ fn the_start_of_day_one_plays_as_the_reference_does() {
         _ => panic!(),
     };
     let want_frames = timeline.get("frames").list();
+    let script: Vec<(i64, String, i64)> = timeline
+        .get("script")
+        .list()
+        .iter()
+        .map(|e| (e.get("frame").num().unwrap(), e.get("what").str().to_string(), e.get("hold").num().unwrap()))
+        .collect();
+    assert_eq!(script.len(), 4, "the reference's input script");
+    let held = |frame: i64, what: &str| script.iter().any(|(at, w, hold)| w == what && *at <= frame && frame < at + hold);
 
     let mut frames: Vec<Frame> = Vec::new();
     let mut sounds: Vec<(i64, String)> = Vec::new();
     let mut checked = 0;
     for frame in 1..=want_frames.len() as i64 {
         let before = audio.started.len();
-        game.step(&HostInput::default(), DT, &mut gallery, &mut audio, &mut page).unwrap();
+        let mut input = HostInput { mouse_valid: true, mouse: SWITCH, left_down: held(frame, "switch"), ..HostInput::default() };
+        input.keys[Key::Escape as usize] = held(frame, "escape");
+        game.step(&input, DT, &mut gallery, &mut audio, &mut page).unwrap();
         for file in &audio.started[before..] {
-            for id in ["text-reveal", "booth-intro", "border-ambient", "booth-ambient"] {
+            for id in SOUNDS {
                 if file.starts_with(id) && sounds.last() != Some(&(frame, id.to_string())) {
                     sounds.push((frame, id.to_string()));
                 }
@@ -100,6 +131,7 @@ fn the_start_of_day_one_plays_as_the_reference_does() {
         }
         let GameScreen::Day(day) = game.screen() else { panic!("frame {frame}: not on the day screen") };
         let (shown, y) = day.card();
+        let (shutter, open_t) = day.shutter();
         frames.push((
             day.booth_state().into(),
             day.border_state().into(),
@@ -107,6 +139,12 @@ fn the_start_of_day_one_plays_as_the_reference_does() {
             y,
             day.shown(),
             day.button_look().into(),
+            shutter.into(),
+            open_t,
+            day.switch_look().into(),
+            game.change_state() == State::Paused,
+            game.time(),
+            day.booth_time(),
         ));
         for (name, at) in &snapshots {
             if *at == frame {
@@ -132,6 +170,12 @@ fn the_start_of_day_one_plays_as_the_reference_does() {
             f.get("card_y").float(),
             f.get("shown").num().unwrap() as usize,
             f.get("button").str().into(),
+            f.get("shutter").str().into(),
+            f.get("open_t").float(),
+            f.get("switch").str().into(),
+            f.get("paused") == &Json::Bool(true),
+            f.get("time").float(),
+            f.get("booth_time").float(),
         );
         assert_eq!(got, &want, "frame {}", i + 1);
     }

@@ -348,6 +348,12 @@ impl Builder<'_> {
         self.quads.push(Quad { image, x0: px as f64, y0: py as f64, x1: pr as f64, y1: pb as f64, src, color: 0xFFFFFFFF });
     }
 
+    /// The piece `src` of picture `image` drawn stretched to `w` x `h` at
+    /// (x, y) (a nine-slice frame's tile, `app.vis.Frame`).
+    pub(crate) fn stretched(&mut self, image: usize, x: f64, y: f64, w: f64, h: f64, src: [i32; 4]) {
+        self.quads.push(Quad { image, x0: x, y0: y, x1: x + w, y1: y + h, src, color: 0xFFFFFFFF });
+    }
+
     /// A sprite of the piece `src` (x, y, width, height) of picture `image`,
     /// drawn at (x, y) at its own size.
     pub(crate) fn part(&mut self, image: usize, x: f64, y: f64, src: [i32; 4]) {

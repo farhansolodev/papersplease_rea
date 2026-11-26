@@ -1,6 +1,7 @@
 //! The day screen (`play.screen.DayScreen`) as milestone 4a builds it: the
 //! booth at the start of a day and the border scene's background and
-//! booth button (docs/booth-screen.md, docs/milestone-4.md, "4a").
+//! booth button (docs/booth-screen.md, docs/milestone-4.md, "4a"), and
+//! since milestone 4b the shutter switch and the pause.
 //! scripts/reference/boothscreen.py runs the same frames; tests/day.rs
 //! compares the two.
 //!
@@ -10,14 +11,20 @@
 //! the card falls away over a second with a small bounce, and the border's
 //! booth button starts blinking.
 //!
-//! Not here yet: the border's figures (milestone 6), the day's papers and
-//! every click (4b), the booth's rules and travelers (milestone 5).
+//! Once the intro has begun, the shutter switch opens and closes the
+//! shutter (4b). The screen can be paused (`enablePause`); while paused it
+//! is not updated, and its own clocks catch up by at most 0.1 s after.
+//!
+//! Not here yet: the border's figures (milestone 6), the rulebook (4c), the
+//! clock running and the stamp bar (4d), the booth's rules and travelers
+//! (milestone 5).
 
 use std::f64::consts::PI;
 
 use crate::aud::{AudioHost, Speaker};
 use crate::button::{Background, Button, Look};
 use crate::gdate;
+use crate::input::Input;
 use crate::pages::{Builder, Gallery};
 use crate::picture::{Affine, Picture};
 use crate::raster::Quad;
@@ -58,17 +65,31 @@ const CARD_TEXT: u32 = 0xFF_FFFF;
 const WALK_LENGTH: f64 = 60.0;
 const WALK_SPEED: f64 = 10.0;
 
-/// An `app.Clock` with the fixed step: its first update gives no time.
+/// `app.Clock`'s `maxDeltaTime`: a clock never moves more in one update.
+const MAX_DT: f64 = 0.1;
+
+/// An `app.Clock` with the fixed step: its first update gives no time; a
+/// later one the time since the one before (the frame's step, plus the
+/// steps of frames it was not updated in, as under the pause), at most
+/// 0.1 s.
 #[derive(Debug, Clone, Copy, Default)]
 struct SubClock {
     started: bool,
     dt: f64,
+    /// The time of frames since the last update that did not update it.
+    missed: f64,
 }
 
 impl SubClock {
     fn update(&mut self, frame_dt: f64) {
-        self.dt = if self.started { frame_dt } else { 0.0 };
+        let since = self.missed + frame_dt;
+        self.dt = if !self.started { 0.0 } else if MAX_DT < since { MAX_DT } else { since };
+        self.missed = 0.0;
         self.started = true;
+    }
+
+    fn skip(&mut self, frame_dt: f64) {
+        self.missed += frame_dt;
     }
 }
 
@@ -133,6 +154,47 @@ impl Host<BoothProp, BoothFunc> for BoothCtx<'_> {
                 self.speaker.play("booth-intro", self.audio);
             }
             BoothFunc::HideCardText => self.parts.reveal.visible = false,
+        }
+    }
+}
+
+/// The shutter's one moving value (`Shutter.set_openT`).
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct OpenT;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum ShutterFunc {
+    /// `closed`'s enter function (Shutter constructor line 33).
+    Drop,
+    /// `open`'s (line 42).
+    Rise,
+}
+
+struct ShutterCtx<'a> {
+    open_t: &'a mut f64,
+    /// The switch, once given to the shutter (not yet when it is made).
+    switch: Option<&'a mut Button>,
+    speaker: &'a mut Speaker,
+    audio: &'a mut dyn AudioHost,
+}
+
+impl Host<OpenT, ShutterFunc> for ShutterCtx<'_> {
+    fn get(&self, _: OpenT) -> Value {
+        Value::Num(*self.open_t)
+    }
+    fn set(&mut self, _: OpenT, value: Value) {
+        if let Value::Num(t) = value {
+            *self.open_t = t;
+        }
+    }
+    fn run(&mut self, func: ShutterFunc) {
+        let (sound, look) = match func {
+            ShutterFunc::Drop => ("shutter-drop", "down"),
+            ShutterFunc::Rise => ("shutter-rise", "up"),
+        };
+        self.speaker.play(sound, self.audio);
+        if let Some(b) = self.switch.as_deref_mut() {
+            b.set_look(look);
         }
     }
 }
@@ -208,10 +270,14 @@ pub struct DayScreen {
     booth: Stater<BoothProp, BoothFunc>,
     parts: BoothParts,
     booth_clock: SubClock,
+    /// The booth clock's time (the sum of its steps), for the tests.
+    booth_time: f64,
     border: Stater<(), BorderFunc>,
     border_clock: SubClock,
     outer_booth: Button,
     shutter_switch: Button,
+    shutter: Stater<OpenT, ShutterFunc>,
+    open_t: f64,
     /// The walk-in figure's distance along its path.
     walk: f64,
     walk_done: bool,
@@ -260,14 +326,25 @@ impl DayScreen {
 
         // The shutter starts closed at once: its enter function plays
         // `shutter-drop`, which the screen change's frame ignores, and its
-        // switch is not set yet.
-        speaker.play("shutter-drop", audio);
+        // switch is not given to it yet.
+        let mut shutter = Stater::new();
+        shutter
+            .add("closed")
+            .interp(0.35)
+            .func(When::Enter, ShutterFunc::Drop)
+            .target(OpenT, Value::Num(0.0), Curve::Bounceback(0.1, 1));
+        shutter
+            .add("open")
+            .interp(1.0)
+            .func(When::Enter, ShutterFunc::Rise)
+            .target(OpenT, Value::Num(1.0), Curve::Smootherstep(0.0, 1.0));
+        let mut open_t = 0.0;
+        shutter.go("closed", true, &mut ShutterCtx { open_t: &mut open_t, switch: None, speaker, audio });
         let whole = |i: usize| Background::Piece { image: i, src: [0, 0, gallery.pictures[i].width as i32, gallery.pictures[i].height as i32] };
         let mut shutter_switch = Button::new("shutter-switch", 3, "", Look::new("down", whole(pics.switch_down), whole(pics.switch_down)));
         shutter_switch.looks.push(Look::new("up", whole(switch_up), whole(switch_up)));
         shutter_switch.x = SHUTTER_SWITCH.0;
         shutter_switch.y = SHUTTER_SWITCH.1;
-        shutter_switch.enabled = false;
 
         // The opening card: the long date and a line break (a story day's
         // title is the empty text, not missing).
@@ -324,10 +401,13 @@ impl DayScreen {
             booth,
             parts,
             booth_clock: SubClock::default(),
+            booth_time: 0.0,
             border,
             border_clock: SubClock::default(),
             outer_booth,
             shutter_switch,
+            shutter,
+            open_t,
             walk: 0.0,
             walk_done: false,
             weight: None,
@@ -361,6 +441,21 @@ impl DayScreen {
         self.parts.reveal.shown()
     }
 
+    /// The shutter's state (`closed`, `open`) and how far open it is.
+    pub fn shutter(&self) -> (&'static str, f64) {
+        (self.shutter.current(), self.open_t)
+    }
+
+    /// The booth's own clock's time.
+    pub fn booth_time(&self) -> f64 {
+        self.booth_time
+    }
+
+    /// The shutter switch's look (`down`, `up`).
+    pub fn switch_look(&self) -> &str {
+        &self.shutter_switch.looks[self.shutter_switch.current].name
+    }
+
     /// The border's booth button's look.
     pub fn button_look(&self) -> &str {
         &self.outer_booth.looks[self.outer_booth.current].name
@@ -377,6 +472,7 @@ impl DayScreen {
     pub fn update(&mut self, dt: f64, time: f64, speaker: &mut Speaker, audio: &mut dyn AudioHost) {
         self.frames += 1;
         self.booth_clock.update(dt);
+        self.booth_time += self.booth_clock.dt;
         self.booth.step(self.booth_clock.dt, &mut BoothCtx { parts: &mut self.parts, dt, speaker, audio });
         // No traveler stands at his place: the weight is empty (which
         // clears the constructor's "---" on the first update).
@@ -389,6 +485,8 @@ impl DayScreen {
         speaker.set_volume(self.border_ambient, 1.0, true);
         speaker.set_volume(self.booth_ambient, 0.0, true);
         speaker.set_room(None);
+        // The booth's children: the shutter moves with the game's clock.
+        self.shutter.step(dt, &mut ShutterCtx { open_t: &mut self.open_t, switch: Some(&mut self.shutter_switch), speaker, audio });
 
         self.border_clock.update(dt);
         self.border.step(self.border_clock.dt, &mut BorderCtx { button: &mut self.outer_booth, time });
@@ -406,15 +504,39 @@ impl DayScreen {
         }
     }
 
+    /// A frame the screen is not updated (hidden under the pause): its own
+    /// clocks will give that time too on their next update.
+    pub fn skip(&mut self, dt: f64) {
+        self.booth_clock.skip(dt);
+        self.border_clock.skip(dt);
+    }
+
+    /// The screen's input: the booth's parts, if they take input (not in
+    /// `off`); of them only the shutter switch does anything yet
+    /// (`Booth.shutterSwitch_onClick`).
+    pub fn react(&mut self, input: &mut Input, speaker: &mut Speaker, audio: &mut dyn AudioHost) {
+        if !self.parts.parts_input {
+            return;
+        }
+        if self.shutter_switch.react((0.0, BOOTH_Y), input, speaker, audio) && self.booth.current() != "busy-with-border" {
+            // With the shutter open, BoothEngine.closeShutter first: it acts
+            // only on a traveler, and there is none yet.
+            let to = if self.shutter.current() == "open" { "closed" } else { "open" };
+            let mut ctx = ShutterCtx { open_t: &mut self.open_t, switch: Some(&mut self.shutter_switch), speaker, audio };
+            self.shutter.go(to, false, &mut ctx);
+        }
+    }
+
     /// The frame's quads: the shutter's shadow (layer -1), then the booth's
     /// parts in their order, then the border scene.
     pub fn quads(&self, gallery: &Gallery) -> Vec<Quad> {
         let mut b = Builder { gallery, quads: Vec::new() };
         let by = BOOTH_Y;
-        // The shutter, at x -1, closed: openT 0.
-        b.fill(-1.0, by, 180.0, WALL_H, SHADOW_COLOR);
+        // The shutter, at x -1 (Shutter.set_openT).
         let strip_h = 20.0;
-        let top = (-40.0 - WALL_H) * 0.0 + WALL_H;
+        let top = (-40.0 - WALL_H) * self.open_t + WALL_H;
+        let shadow_y = f64::min(0.0, top - WALL_H + 40.0).floor() as i32;
+        b.fill(-1.0, by + shadow_y as f64, 180.0, WALL_H, SHADOW_COLOR);
         for i in 0..6 {
             let y = (f64::min(i as f64 * (WALL_H / 6.0), top - (6 - i) as f64 * strip_h * 0.5 - strip_h * 0.5)).floor() as i32;
             b.part(self.pics.shutter, -1.0, by + y as f64, [0, 20 * i, 180, 20]);

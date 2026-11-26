@@ -75,7 +75,10 @@ export class SoundPlayer {
       element.play().catch((e) => console.warn('song did not start:', filename, e));
     }
     this.playing.set(playId, sound);
-    if (this.groupPaused[sound.category === MUSIC ? MUSIC : EFFECT]) this.pause(sound);
+    // A sound started while its category is paused plays: the original
+    // pauses only the sources playing at the pause (milestone 4b; before
+    // it this paused new sounds too, which would have silenced the pause
+    // screen's own sounds).
     return true;
   }
 

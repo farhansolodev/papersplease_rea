@@ -26,7 +26,7 @@
 
 use std::f64::consts::PI;
 
-use crate::num::lerp_scale;
+use crate::num::{lerp_scale, smootherstep};
 
 /// A target's value: the game boxes numbers and true/false alike.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -46,7 +46,12 @@ pub enum Curve {
     /// `BOUNCEBACK(perc, count)`: reaches the target, bounces back `count`
     /// times, each bounce smaller, and lands on it at the end.
     Bounceback(f64, i32),
+    /// `SMOOTHERSTEP(e0, e1)`: `app.Num.smootherstep(e0, e1, t)`, the
+    /// polynomial 6t^5 - 15t^4 + 10t^3 of t scaled to the edges and held
+    /// to 0..1 (milestone 4b; its constants read from the DLL).
+    Smootherstep(f64, f64),
 }
+
 
 /// `app.Interp.lerp`: numbers in a straight line; anything else jumps from
 /// a to b at t = 0.5.
@@ -81,6 +86,7 @@ impl Curve {
                 let c = (half * PI * t).cos();
                 lerp(a, b, 1.0 - c.abs() * amp)
             }
+            Curve::Smootherstep(e0, e1) => lerp(a, b, smootherstep(e0, e1, t)),
         }
     }
 }
@@ -336,6 +342,20 @@ mod tests {
         fn run(&mut self, f: &'static str) {
             self.ran.push(f);
         }
+    }
+
+    #[test]
+    fn smootherstep_is_flat_at_both_ends_and_half_way_in_the_middle() {
+        let at = |t| match Curve::Smootherstep(0.0, 1.0).get(Value::Num(0.0), Value::Num(100.0), t) {
+            Value::Num(v) => v,
+            _ => unreachable!(),
+        };
+        assert_eq!(at(0.0), 0.0);
+        assert_eq!(at(0.5), 50.0);
+        assert_eq!(at(1.0), 100.0);
+        // 10 x 0.1^3 - 15 x 0.1^4 + 6 x 0.1^5 = 0.00856
+        assert!((at(0.1) - 0.856).abs() < 1e-12);
+        assert!(at(0.9) > 99.0);
     }
 
     #[test]

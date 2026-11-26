@@ -23,6 +23,14 @@ pub fn lerp_scale(x: f64, in0: f64, in1: f64, out0: f64, out1: f64) -> f64 {
     (x - in0) / (in1 - in0) * (out1 - out0) + out0
 }
 
+/// `app.Num.smootherstep`: 6t^5 - 15t^4 + 10t^3 with t held to 0..1, in the
+/// game's order of operations (constants 1, 6, 15, 10 read from the DLL,
+/// milestone 4b).
+pub fn smootherstep(edge0: f64, edge1: f64, x: f64) -> f64 {
+    let t = f64::max(0.0, f64::min(1.0, (x - edge0) / (edge1 - edge0)));
+    ((t * 6.0 - 15.0) * t + 10.0) * t * t * t
+}
+
 /// `app.Num.smoothstep`: 0 below `edge0`, 1 above `edge1`, an S-curve between.
 pub fn smoothstep(edge0: f64, edge1: f64, x: f64) -> f64 {
     let t = f64::max(0.0, f64::min(1.0, (x - edge0) / (edge1 - edge0)));

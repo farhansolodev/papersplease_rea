@@ -349,6 +349,9 @@ fn read_input(host: &mut Host, window: &Window, keys: &ButtonInput<KeyCode>, but
     for (key, code) in KEYS {
         let Some(c) = code else { continue };
         host.pending_keys[key as usize] |= keys.just_pressed(c);
+        if key == Key::Escape && platform::take_lost_escape() {
+            host.pending_keys[key as usize] = true;
+        }
         out.keys[key as usize] = keys.pressed(c) || host.pending_keys[key as usize];
     }
     if let Some(at) = window.physical_cursor_position() {

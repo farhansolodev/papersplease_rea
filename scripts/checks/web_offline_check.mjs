@@ -1,4 +1,4 @@
-// Milestone 0, 1a, 1b, 2, 3a, 3b and 3c check: drives a real browser (headless Edge or
+// Milestone 0, 1a, 1b, 2, 3a, 3b, 3c, 4a and 4b check: drives a real browser (headless Edge or
 // Chrome, with a throwaway profile in build/) against the local server and
 // reports (every page opens on the start screen; the check clicks its button
 // with a real mouse click, as a player would):
@@ -39,9 +39,17 @@
 //      the last NEXT fades to the title at rest, Theme playing on;
 //   4f. the start of day 1 (milestone 4a, ?page=day): the opening card with
 //      the whole date, identical to the Python reference
-//      (extracted/previews/m4a, made by scripts/reference/boothscreen.py;
+//      (extracted/previews/m4b, made by scripts/reference/boothscreen.py;
 //      skipped without it); then the booth uncovered, identical to the
 //      reference but for the blinking booth button; booth-intro started;
+//   4g. the shutter and the pause (milestone 4b, on the same day page):
+//      Escape shows the pause screen, identical to the Python reference
+//      (pause_a, made by scripts/reference/pausescreen.py) and plays
+//      button-drop; MAIN MENU opens the confirm box (pause_b, but for the
+//      cursor); Escape presses CANCEL (pause_a again); Escape presses RESUME
+//      (the booth again, hover-up); a click on the shutter switch opens the
+//      shutter (shutter_open, but for the cursor and the blinking button),
+//      with shutter-rise;
 //   5. whether the page still starts with the network switched off, showing
 //      the same font page, and the title's Theme plays from the cache.
 //
@@ -62,7 +70,7 @@ const REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1');
 const TITLE_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm1b', 'title.rgba');
 const SETTINGS_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3b', 'settings_a.rgba');
 const INTRO_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm3c');
-const DAY_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm4a');
+const DAY_REFERENCE = path.join(ROOT, 'extracted', 'previews', 'm4b');
 const AUDIO = path.join(ROOT, 'extracted', 'audio');
 const PROFILE = path.join(ROOT, 'build', '_browser_profile');
 const BROWSERS = [
@@ -72,8 +80,9 @@ const BROWSERS = [
 const exe = BROWSERS.find(existsSync);
 if (!exe) { console.error('no Edge or Chrome found'); process.exit(1); }
 
-// Stop the whole check if something hangs.
-setTimeout(() => { console.log('   RESULT: FAILED - hung for 5 minutes'); stopProfileBrowsers(); process.exit(2); }, 300000).unref?.();
+// Stop the whole check if something hangs (10 minutes since 4b: the whole
+// run took about 5 with step 1i, which the earlier 5-minute limit cut off).
+setTimeout(() => { console.log('   RESULT: FAILED - hung for 10 minutes'); stopProfileBrowsers(); process.exit(2); }, 600000).unref?.();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Stops every browser process that uses the throwaway profile (the
@@ -482,6 +491,61 @@ async function dayStart() {
   if (!starts.some((f) => f.startsWith('booth-intro'))) throw new Error('booth-intro did not play');
 }
 
+// Milestone 4b on the day page that dayStart left (docs/milestone-4.md, 4b).
+async function shutterAndPause() {
+  const BUTTON = [146, 65, 56, 38];          // the border's blinking booth button
+  const wait = async (name, allow, ms = 60000) => {
+    const want = readFileSync(path.join(DAY_REFERENCE, name + '.rgba'));
+    const t0 = Date.now();
+    for (;;) {
+      let d;
+      try { d = await differences(want); } catch (e) { d = { n: -1, box: e.message }; }
+      if (d.n === 0 || (d.n > 0 && allow && allow.some((r) => within(d.box, r)))) return { d, s: (Date.now() - t0) / 1000 };
+      if (Date.now() - t0 > ms) throw new Error(`${name}: not reached (last: ${d.n} bytes differ in ${JSON.stringify(d.box)})`);
+      await sleep(200);
+    }
+  };
+  // Where a game pixel is on the page (the canvas fills the 570 x 320 view).
+  const at = async (x, y) => evaluate(`(() => { const r = document.querySelector('canvas').getBoundingClientRect();
+    return [r.x + (${x} + 0.5) * r.width / 570, r.y + (${y} + 0.5) * r.height / 320]; })()`);
+  const click = async (x, y) => {
+    const [px, py] = await at(x, y);
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: px, y: py });
+    await sleep(300);
+    for (const type of ['mousePressed', 'mouseReleased']) {
+      await send('Input.dispatchMouseEvent', { type, x: px, y: py, button: 'left', clickCount: 1 });
+      await sleep(1500);   // a hidden headless page draws about once a second
+    }
+  };
+  const started = async () => [...new Set((await evaluate('window.ppStarts')).map((f) => f.replace(/[0-9]*\.(wav|ogg)$/, '')))];
+  // The arrow (19 x 26) sits at (-1, -1) from the mouse; the hand further left.
+  const cursorAt = (x, y) => [x - 10, y - 4, 32, 34];
+  await evaluate('(window.ppStarts = [], 1)');
+  // The mouse away from everything, then Escape.
+  const [ax, ay] = await at(560, 10);
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: ax, y: ay });
+  await key('Escape', 27);
+  const paused = await wait('pause_a', [cursorAt(560, 10)]);
+  console.log(`   Escape: the pause screen, identical to the reference (${paused.d.n} bytes differ, around the cursor; ${paused.s.toFixed(1)} s)`);
+  if (!(await started()).includes('button-drop')) throw new Error('button-drop did not play');
+  await click(284, 279);
+  const confirm = await wait('pause_b', [cursorAt(284, 279)]);
+  console.log(`   MAIN MENU: the confirm box, identical to the reference but for the cursor (${confirm.d.n} bytes differ there)`);
+  await key('Escape', 27);
+  const cancelled = await wait('pause_a', [cursorAt(284, 279)]);
+  console.log(`   Escape: CANCEL, the pause screen again (${cancelled.d.n} bytes differ, around the cursor)`);
+  await evaluate('(window.ppStarts = [], 1)');
+  await key('Escape', 27);
+  const resumed = await wait('booth_normal', [BUTTON, cursorAt(284, 279)]);
+  console.log(`   Escape: RESUME, the booth again (${resumed.d.n} bytes differ, in the blinking button or around the cursor; ${resumed.s.toFixed(1)} s)`);
+  if (!(await started()).includes('hover-up')) throw new Error('hover-up did not play');
+  await click(164, 118);
+  const open = await wait('shutter_open', [BUTTON, [140, 100, 60, 60]]);
+  console.log(`   the shutter switch: the shutter open (${open.d.n} bytes differ, in the blinking button or around the switch and cursor)`);
+  console.log('   sounds started:', JSON.stringify(await started()));
+  if (!(await started()).includes('shutter-rise')) throw new Error('shutter-rise did not play');
+}
+
 async function waitFor(expression, what, ms = 60000) {
   const t0 = Date.now();
   while (Date.now() - t0 < ms) {
@@ -618,8 +682,14 @@ try {
     console.log('1h. the start of day 1 (milestone 4a)');
     await send('Emulation.setDeviceMetricsOverride', { width: 570, height: 320, deviceScaleFactor: 1, mobile: false });
     await dayStart();
+    if (existsSync(path.join(DAY_REFERENCE, 'pause_a.rgba'))) {
+      console.log('1i. the shutter and the pause (milestone 4b)');
+      await shutterAndPause();
+    } else {
+      console.log('1i. SKIPPED: no reference pause screen in extracted/previews/m4b');
+    }
   } else {
-    console.log('1h. SKIPPED: no reference day start in extracted/previews/m4a');
+    console.log('1h. SKIPPED: no reference day start in extracted/previews/m4b');
   }
 
   console.log('1e. the sound test page');

@@ -1,4 +1,4 @@
-"""The day screen at the start of day 1, milestone 4a (docs/milestone-4.md):
+"""The day screen at the start of day 1, milestones 4a and 4b (docs/milestone-4.md):
 the booth as its constructor builds it on desktop, the day's opening card
 typing the date and falling away, and the border scene's background and
 booth button, frame by frame at 1/60 s a frame. Written from the code
@@ -8,22 +8,29 @@ the same quad rules as fontpage.py.
     python -I scripts/reference/boothscreen.py <assets dir> <out dir>
 
 for example `extracted/art/assets` and `extracted/previews/m4a` (gitignored).
-It plays the first FRAMES frames with no input and writes:
+It plays the first FRAMES frames and writes:
 
 - timeline.json: for every frame, the booth's and the border's states, the
   opening card's y and whether it is shown, how many letters of the date
-  are shown, the booth button's look; the frames on which each sound
-  starts; the frame of `start-intro`;
+  are shown, the booth button's look, the shutter's state and openT, the
+  switch's look, whether the game is paused, the game clock; the frames on
+  which each sound starts; the frame of `start-intro`; the input script
+  (SCRIPT below, as frames), which the Rust test plays as real presses;
 - <name>.rgba for the frames in SNAPSHOTS (570 x 320 x 4 bytes, alpha 255),
   each also as a PNG and, enlarged 3 times, as _x3.png to look at.
 
 port/core/tests/day.rs runs the port's game through the same frames and
 compares both, byte for byte and frame for frame.
 
+Since milestone 4b the run has input (SCRIPT): after the intro has begun,
+the shutter switch is clicked (the shutter opens), Escape pauses the game
+in the middle of the opening, Escape again presses RESUME, and later the
+switch closes the shutter.
+
 What is left out on purpose (docs/milestone-4.md, "4a"): the border
 scene's figures (milestone 6; only the walk-in figure's distance is kept,
 for the moment it starts the booth's intro), the day's papers (the
-rulebook comes in 4b), the booth's engine, everything a click does.
+rulebook comes in 4c), the booth's engine, every click but the switch's.
 
 The rules, as read (docs/booth-screen.md):
 
@@ -31,7 +38,8 @@ The rules, as read (docs/booth-screen.md):
   updated in the same frame (docs/milestone-3.md, 3b). The tree updates
   the booth (Booth.update, then its children), then the border.
 - Clocks (app.Clock.update): a clock's first update gives dt 0, every
-  later one the frame's time. The booth and the border have their own
+  later one the time since the one before, at most 0.1 s (maxDeltaTime):
+  the frame's time, or after the pause the paused frames' time too. The booth and the border have their own
   clocks, made with the screen; the typing (stepReveal) and the booth
   button's blink use the game's clock, which here starts with the run
   (time = frames x 1/60, added up).
@@ -42,6 +50,16 @@ The rules, as read (docs/booth-screen.md):
   and a line break (a story day's title is the empty text, not missing);
   x = floor(285 - w / 2), y = floor(108.5 - h / 2 - 20). One stepReveal
   when it is made, then one every frame in `off`.
+- The shutter (Shutter, docs/booth-screen.md): `closed` (0.35 s to openT 0
+  along BOUNCEBACK(0.1, 1), `shutter-drop`, the switch `down`) and `open`
+  (1.0 s to openT 1 along SMOOTHERSTEP(0, 1), `shutter-rise`, the switch
+  `up`); it steps with the game's clock, after Booth.update. A click on
+  the switch (button-down on the press, button-up on the release) toggles
+  it once the booth's parts take input (from the intro on).
+- The pause (Game.update, the `paused` state, docs/milestone-4.md 4b):
+  Escape pauses (`button-drop`); while paused the screen is not updated
+  and no game time passes; Escape pressed and let go presses RESUME
+  (button-down, then button-up and `hover-up`).
 - The walk-in: the free leaving figure follows `enter-right` (60 units,
   speed 10) from its start; each border frame adds dt x 10 (dt from the
   border's clock); when the distance reaches 60, `start-intro`: the
@@ -65,7 +83,7 @@ from PIL import Image  # noqa: E402
 
 W, H = fontpage.W, fontpage.H
 DT = 1.0 / 60.0
-FRAMES = 520
+FRAMES = 720
 
 # Desktop layout values (booth-layout.md, scripts/reference/layout.py).
 BOOTH_Y = 103
@@ -91,7 +109,14 @@ DAY1 = 2445296.5                 # 23 November 1982 (value-helpers.md)
 
 WALK_LENGTH, WALK_SPEED = 60.0, 10.0   # Paths.xml `enter-right`, default speed
 
-SNAPSHOTS = ["card_typing", "card_full", "card_falling", "card_bounce", "booth_highlight", "booth_normal"]
+SNAPSHOTS = ["card_typing", "card_full", "card_falling", "card_bounce", "booth_highlight", "booth_normal",
+             "shutter_opening", "shutter_open", "shutter_closing"]
+MAX_DT = 0.1                     # app.Clock.maxDeltaTime
+
+# The input (milestone 4b), in frames after start-intro: what is pressed on
+# which frame and let go 3 frames later.
+SCRIPT = [(150, "switch"), (170, "escape"), (230, "escape"), (310, "switch")]
+HOLD = 3
 
 
 # --- app.Interp ---------------------------------------------------------
@@ -108,6 +133,10 @@ class Interp:
             return a if t < self.params[0] else self.b
         if self.kind == "LINEAR":
             return lerp(a, self.b, t)
+        if self.kind == "SMOOTHERSTEP":
+            e0, e1 = self.params
+            d = max(0.0, min(1.0, (t - e0) / (e1 - e0)))
+            return lerp(a, self.b, ((d * 6.0 - 15.0) * d + 10.0) * d * d * d)
         if self.kind == "BOUNCEBACK":
             perc, count = self.params
             n1 = float(count + 1)
@@ -242,15 +271,22 @@ class Stater:
 
 
 class Clock:
-    """app.Clock with a fixed frame: dt 0 on the first update."""
+    """app.Clock with a fixed frame: dt 0 on the first update, then the time
+    since the last update (the frame, and any frames it missed), capped."""
 
     def __init__(self):
         self.started = False
         self.dt = 0.0
+        self.missed = 0.0
 
     def update(self):
-        self.dt = DT if self.started else 0.0
+        since = self.missed + DT
+        self.dt = 0.0 if not self.started else (MAX_DT if MAX_DT < since else since)
+        self.missed = 0.0
         self.started = True
+
+    def skip(self):
+        self.missed = self.missed + DT
 
 
 # --- the parts ----------------------------------------------------------
@@ -330,6 +366,13 @@ class Group:
         self.y = 0.0
 
 
+class Shutter:
+    """What the shutter's states move."""
+
+    def __init__(self):
+        self.open_t = 0.0
+
+
 class Flags:
     """An entity's switch 8 or 4, as the states set them (not drawn)."""
 
@@ -373,6 +416,7 @@ class Day:
         self.sounds = []
         self.events = {}
         self.booth_clock, self.border_clock = Clock(), Clock()
+        self.booth_time = 0.0
 
         # The booth (constructor order; docs/booth-screen.md).
         self.card = Group()
@@ -411,6 +455,24 @@ class Day:
         self.clock = clock_picture(assets, 6.0)
         pictures["made/clock"] = self.clock
 
+        # The shutter: closed at once; its `shutter-drop` falls in the
+        # screen change's frame, which drops one-shot sounds, and its switch
+        # is not given to it yet.
+        self.shutter_obj = Shutter()
+        self.switch_look = "down"
+        self.switch_given = False
+        self.shutter = Stater()
+        closed = self.shutter.add("closed")
+        closed.interp_duration = 0.35
+        closed.funcs = [["ENTER", lambda: self.shutter_sound("shutter-drop", "down"), False]]
+        closed.targets = [(self.shutter_obj, {"open_t": Interp("BOUNCEBACK", 0.0, 0.1, 1)})]
+        opened = self.shutter.add("open")
+        opened.interp_duration = 1.0
+        opened.funcs = [["ENTER", lambda: self.shutter_sound("shutter-rise", "up"), False]]
+        opened.targets = [(self.shutter_obj, {"open_t": Interp("SMOOTHERSTEP", 1.0, 0.0, 1.0)})]
+        self.shutter.go("closed", True)
+        self.switch_given = True
+
         # The border scene.
         self.walk = 0.0
         self.walk_done = False
@@ -421,6 +483,21 @@ class Day:
         ready.funcs = [["STEP", self.blink, False]]
         self.border.go("off", True)
 
+    def shutter_sound(self, sound, look):
+        if self.switch_given:
+            self.sounds.append((self.frame, sound))
+            self.switch_look = look
+
+    def switch_click(self):
+        """Booth.shutterSwitch_onClick (the booth is never busy-with-border
+        here, and closeShutter does nothing without a traveler)."""
+        self.shutter.go("closed" if self.shutter.cur.name == "open" else "open")
+
+    def skip(self):
+        """A frame the screen is hidden under the pause."""
+        self.booth_clock.skip()
+        self.border_clock.skip()
+
     def blink(self):
         self.button_look = "normal" if 0.375 < math.fmod(self.time, 0.75) else "highlight"
 
@@ -428,11 +505,14 @@ class Day:
         self.time = DT + self.time
         # Booth.update, then its children (nothing in them moves yet).
         self.booth_clock.update()
+        self.booth_time = self.booth_clock.dt + self.booth_time
         self.booth.step(self.booth_clock.dt)
         weight = ""                              # no traveler at his place
         if weight != self.weight:
             self.weight = weight
             self.weight_text = weight.replace("kg", "")
+        # The booth's children: the shutter, with the game's clock.
+        self.shutter.step(DT)
         # Border.update: its clock, its states, then the figures.
         self.border_clock.update()
         self.border.step(self.border_clock.dt)
@@ -449,16 +529,17 @@ class Day:
         page = titlescreen.Title(lib, pictures)
         by = BOOTH_Y
         # Layer -1: the shutter's shadow (the shutter at x -1).
-        page.fill(-1, by + 0, 180, WALL_H, SHADOW_COLOR)
-        # Layer 0, the booth's children in order.
         strip_h = 20
-        top = (-40.0 - WALL_H) * 0.0 + WALL_H
+        top = (-40.0 - WALL_H) * self.shutter_obj.open_t + WALL_H
+        page.fill(-1, by + int(math.floor(min(0.0, top - WALL_H + 40.0))), 180, WALL_H, SHADOW_COLOR)
+        # Layer 0, the booth's children in order.
         for i in range(6):
             y = int(math.floor(min(i * (WALL_H / 6.0), top - (6 - i) * strip_h * 0.5 - strip_h * 0.5)))
             page.part("Shutter.png", -1, by + y, (0, 20 * i, 180, 20))
         page.picture("Counter.png", 0, by + COUNTER_Y)
         page.picture("ConsoleUnder.png", 0, by + CONSOLE_Y)
-        page.picture("ShutterSwitchDown.png", SHUTTER_SWITCH[0], by + SHUTTER_SWITCH[1])
+        switch = "ShutterSwitchDown.png" if self.switch_look == "down" else "ShutterSwitchUp.png"
+        page.picture(switch, SHUTTER_SWITCH[0], by + SHUTTER_SWITCH[1])
         page.picture("Desk.png", DESK_X, by + 0)
         ui = lib.get("ui_regular")
         hint = self.strings["booth_dragdocs"]
@@ -496,7 +577,8 @@ class Day:
         return page.quads
 
 
-PICTURES = ["Shutter.png", "Counter.png", "ConsoleUnder.png", "Console.png", "ShutterSwitchDown.png", "Desk.png",
+PICTURES = ["Shutter.png", "Counter.png", "ConsoleUnder.png", "Console.png", "ShutterSwitchDown.png",
+            "ShutterSwitchUp.png", "Desk.png",
             "StampBarTop.png", "StampBarMid.png", "StampBarBot.png", "CheckpointBack.png", "OuterBooth.png"]
 
 
@@ -504,15 +586,63 @@ def run(assets, lib, pictures, strings):
     day = Day(assets, lib, pictures, strings)
     frames, snaps = [], {}
     start = None
+    paused = False
+    script = []                      # (frame pressed, what), set once start-intro is known
+    switch_pressing = False
+    resume_pressing = False
+    opened_at = closed_at = None
     for frame in range(1, FRAMES + 1):
         day.frame = frame
-        day.update()
+        held = {what for at, what in script if at <= frame < at + HOLD}
+        released = {what for at, what in script if frame == at + HOLD}
+        # Game.update: the pause key first (Escape just down, the game on,
+        # the day screen can pause); Escape is then masked until let go.
+        escape_masked = getattr(day, "escape_masked", False)
+        if "escape" in released:
+            day.escape_masked = False
+        just_down = {what for at, what in script if frame == at}
+        if "escape" in just_down and not paused:
+            paused = True
+            day.escape_masked = True
+            escape_masked = True
+            day.sounds.append((frame, "button-drop"))
+        # The tree's update: the day, unless hidden under the pause.
+        if paused:
+            day.skip()
+        else:
+            day.update()
         if start is None and "start-intro" in day.events:
             start = day.events["start-intro"]
+            script = [(start + after, what) for after, what in SCRIPT]
+        # The input: the pause screen's RESUME (Escape, the back button),
+        # then the day's shutter switch (mouse) when not paused.
+        if paused and not escape_masked:
+            if "escape" in held and not resume_pressing:
+                resume_pressing = True
+                day.sounds.append((frame, "button-down"))
+            elif "escape" in released and resume_pressing:
+                resume_pressing = False
+                day.sounds.append((frame, "button-up"))
+                paused = False
+                day.sounds.append((frame, "hover-up"))
+        if not paused and day.booth_flags.input:
+            if "switch" in held and not switch_pressing:
+                switch_pressing = True
+                day.sounds.append((frame, "button-down"))
+            elif "switch" in released and switch_pressing:
+                switch_pressing = False
+                day.sounds.append((frame, "button-up"))
+                day.switch_click()
+                if day.shutter.cur.name == "open":
+                    opened_at = frame
+                else:
+                    closed_at = frame
         frames.append({
             "frame": frame, "booth": day.booth.cur.name, "border": day.border.cur.name,
             "card": day.card.active, "card_y": day.card.y, "shown": day.reveal.shown(),
-            "button": day.button_look,
+            "button": day.button_look, "shutter": day.shutter.cur.name, "open_t": day.shutter_obj.open_t,
+            "switch": day.switch_look, "paused": paused, "time": day.time,
+            "booth_time": day.booth_time,
         })
         name = None
         if frame == 40:
@@ -529,12 +659,20 @@ def run(assets, lib, pictures, strings):
         elif start is not None and frame > start + 70 and day.button_look == "normal" \
                 and all(n != "booth_normal" for n, _ in snaps.values()):
             name = "booth_normal"
+        elif opened_at is not None and frame == opened_at + 12:
+            name = "shutter_opening"
+        elif opened_at is not None and closed_at is None and not paused and day.shutter_obj.open_t == 1.0 \
+                and all(n != "shutter_open" for n, _ in snaps.values()):
+            name = "shutter_open"
+        elif closed_at is not None and frame == closed_at + 9:
+            name = "shutter_closing"
         if name:
             snaps[frame] = (name, day.draw())
     timeline = {
         "frames": frames,
         "sounds": [{"frame": f, "id": s} for f, s in day.sounds],
         "start_intro": start,
+        "script": [{"frame": at, "what": what, "hold": HOLD} for at, what in script],
         "snapshots": {name: f for f, (name, _) in snaps.items()},
         "date": day.date_text,
         "card_text": day.reveal.text,

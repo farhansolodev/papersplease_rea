@@ -161,7 +161,32 @@ window.ppPlatform = {
     Object.assign(settings, values);
     saveSettings(settings);
   },
+  // One Escape the browser took for itself, for the game (below).
+  takeLostEscape() {
+    const lost = lostEscape;
+    lostEscape = false;
+    return lost;
+  },
 };
+
+// Escape in full screen (milestone 4b, docs/DESIGN.md "Decided by me"). The
+// original pauses on Escape and stays in full screen. Chrome and Edge can
+// give Escape to the page while in full screen (the Keyboard Lock
+// interface); holding Escape still leaves full screen there. Browsers
+// without it (Firefox) leave full screen on the first Escape and the page
+// never sees the key, so the game is handed one Escape press instead.
+let lostEscape = false;
+let wasFullscreen = false;
+document.addEventListener('fullscreenchange', () => {
+  const now = !!document.fullscreenElement;
+  const lock = navigator.keyboard && navigator.keyboard.lock;
+  if (now && lock) {
+    navigator.keyboard.lock(['Escape']).catch((e) => console.warn('Escape not kept:', e && e.message));
+  } else if (!now && wasFullscreen && !lock && fullscreenWanted === null) {
+    lostEscape = true;
+  }
+  wasFullscreen = now;
+});
 
 // Development switch: open the page as ?nosw to remove the service worker
 // and everything it stored. Loading again without it starts them afresh.

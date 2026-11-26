@@ -149,10 +149,16 @@ def draw(quads, sheets):
     pictures[WHITE] = white
     pixels = {name: im.load() for name, im in pictures.items()}
     for q in quads:
-        if (q.color >> 24) / 255 < host.ALPHA_THRESH:
+        if isinstance(q.color, tuple):
+            # A colour given as four floats (red, green, blue, alpha), as
+            # the game's ColorData holds it (milestone 4b: the confirm
+            # box's half-black cover).
+            colour = list(q.color)
+        else:
+            colour = [((q.color >> 16) & 255) / 255.0, ((q.color >> 8) & 255) / 255.0,
+                      (q.color & 255) / 255.0, (q.color >> 24) / 255.0]
+        if colour[3] < host.ALPHA_THRESH:
             continue
-        colour = [((q.color >> 16) & 255) / 255.0, ((q.color >> 8) & 255) / 255.0,
-                  (q.color & 255) / 255.0, (q.color >> 24) / 255.0]
         iw, ih = pictures[q.image].size
         sx, sy, sw, sh = q.src
         u0, u1, v0, v1 = sx / iw, (sx + sw) / iw, sy / ih, (sy + sh) / ih

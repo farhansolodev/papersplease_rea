@@ -1,9 +1,9 @@
 //! The game's own states for changing screens (`Game.createStater`, run by
 //! `app.Stater` and `app.State`; docs/save-format.md part 2, "Queueing a
 //! screen") and the fade cover they move (`ScreenFlash.fadeT`, docs/screens.md
-//! part 11). Only the three states a screen change uses are here: `on`,
-//! `off` and `off-instant` (`paused` and `flashing-to-title` come with the
-//! screens that need them).
+//! part 11). The three states a screen change uses, `on`, `off` and
+//! `off-instant`, and since milestone 4b `paused` (`flashing-to-title` comes
+//! with the screen that needs it).
 //!
 //! How `app.Stater` runs a state, as read for this step:
 //!
@@ -32,6 +32,8 @@ pub enum State {
     On,
     Off,
     OffInstant,
+    /// No target, no blend, no duration: the fade cover stays as it is.
+    Paused,
 }
 
 /// What a state change asks of the game, in order.
@@ -42,6 +44,15 @@ pub enum Event {
     FreezeScreen,
     /// `off`'s exit function: `applyScreenChange` with the pending change.
     ApplyScreenChange,
+    /// `paused`'s enter function (createStater line 242): effects paused,
+    /// the pause screen made, the screen hidden (switch 1), `button-drop`.
+    EnterPaused,
+    /// `paused`'s step function (line 252), every settled frame:
+    /// `Clock.pauseForOneFrame`, no game time passes this frame.
+    PauseClock,
+    /// `paused`'s exit function (line 256): effects resumed, the pause
+    /// screen removed, the screen shown, `hover-up`.
+    ExitPaused,
 }
 
 pub struct Fader {
@@ -82,21 +93,22 @@ impl Fader {
         match s {
             State::On => self.on_interp,
             State::Off => FADE_TIME,
-            State::OffInstant => 0.0,
+            State::OffInstant | State::Paused => 0.0,
         }
     }
 
-    fn target(s: State) -> f64 {
+    fn target(s: State) -> Option<f64> {
         match s {
-            State::On => 0.0,
-            State::Off | State::OffInstant => 1.0,
+            State::On => Some(0.0),
+            State::Off | State::OffInstant => Some(1.0),
+            State::Paused => None,
         }
     }
 
     /// (duration, next state) of the states that have them.
     fn duration(s: State) -> Option<(f64, State)> {
         match s {
-            State::On => None,
+            State::On | State::Paused => None,
             State::Off => Some((OFF_TIME, State::On)),
             State::OffInstant => Some((0.0, State::On)),
         }
@@ -105,7 +117,7 @@ impl Fader {
     /// `State.apply` with a blend position `t`; `None` is "no start kept",
     /// which puts the target straight in.
     fn apply(&mut self, from: Option<f64>, t: f64) {
-        let target = Self::target(self.state);
+        let Some(target) = Self::target(self.state) else { return };
         let from = from.unwrap_or(target);
         self.fade = ((target - from) * t + from) as f32;
     }
@@ -123,12 +135,15 @@ impl Fader {
                 self.on_interp = 0.0;
                 events.push(Event::ApplyScreenChange);
             }
+            State::Paused => events.push(Event::ExitPaused),
             State::On => {}
         }
         let snapshot = self.fade as f64;
         self.state = to;
-        if to != State::On {
-            events.push(Event::FreezeScreen);
+        match to {
+            State::On => {}
+            State::Paused => events.push(Event::EnterPaused),
+            State::Off | State::OffInstant => events.push(Event::FreezeScreen),
         }
         self.step_time = 0.0;
         if instant {
@@ -158,6 +173,9 @@ impl Fader {
                 }
             }
             self.step_time += dt;
+            if self.state == State::Paused {
+                return vec![Event::PauseClock];
+            }
         } else {
             let t = 1.0 - self.interp_countdown / self.interp(self.state);
             self.apply(Some(self.snapshot), f64::min(1.0, t));
@@ -214,6 +232,22 @@ mod tests {
         assert_eq!(fades[change - 1 + 9], 0.0);
         assert!(fades[change - 1 + 8] > 0.0);
         assert!(fades[change..].windows(2).all(|p| p[1] <= p[0]));
+    }
+
+    #[test]
+    fn pausing_keeps_the_cover_and_pauses_the_clock_every_frame() {
+        let mut f = Fader::new();
+        assert_eq!(f.go(State::Paused, false), [Event::EnterPaused]);
+        assert_eq!(f.fade(), 0.0);
+        for _ in 0..3 {
+            assert_eq!(f.step(DT), [Event::PauseClock], "from the first frame on");
+        }
+        assert_eq!(f.go(State::On, false), [Event::ExitPaused]);
+        assert_eq!(f.step(DT), []);
+        assert_eq!(f.fade(), 0.0);
+        // MAIN MENU from the pause: leaving it first, then the fade out.
+        f.go(State::Paused, false);
+        assert_eq!(f.go(State::Off, false), [Event::ExitPaused, Event::FreezeScreen]);
     }
 
     #[test]

@@ -88,6 +88,11 @@ plays a sound"), with the browser's Web Audio:
 - **`stop`, `setVolume`, `position`** (seconds, -1 for an unknown id),
   **`setCategoryPause`** (resuming a category resumes only what that
   category's pause paused), **`update`** (frees finished one-shots).
+  (Corrected 2026-11-26, milestone 4b: the page's player also paused a
+  sound started while its category was paused, which the original does
+  not do, since it pauses only the sources playing at the pause; that
+  would have silenced the pause screen's `button-drop` and its button
+  sounds. Nothing had paused before 4b, so nothing heard was affected.)
 - Not copied: the pause when the window loses focus (no caller found in
   the game, `audio.md`).
 

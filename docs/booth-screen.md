@@ -65,7 +65,12 @@ order, except where noted):
    by the code the picture is made and never shown. In the window
    instead: the shutter (closed, it covers the window wholly: strips from
    y 0 to 107, x −1 to 179) over its shadow; with the shutter open, the
-   traveler and what lies behind (not read for an open shutter yet).
+   traveler (none at a day's start). With nobody there an open shutter
+   shows nothing behind it: the shutter, its shadow and the traveler entity
+   are all that draw in the window, so it shows the black under everything
+   (by the code, read for milestone 4b on 2026-11-26; this said "not read
+   for an open shutter yet". Not compared with the game: the first thing
+   to look at in a comparison run).
 4. The traveler entity (`TravelerEnt`, the person in the window) at
    x = wall x (0), given the wall's width (178). Read only in part.
 5. **The shutter** (below), started open if the day's first traveler is
@@ -222,6 +227,21 @@ The curves `STEP` and `BOUNCEBACK` (`app.Interp`) were read on
   (t = 0): y 0, 17, 35, 53, 71 and 87. The shadow's y = floor(min(0,
   top − h + 40)); the traveler entity is told `t`.
 - `isFullyRaised`: open and more than 0.01 s in that state.
+- **The switch** (`Booth.shutterSwitch_onClick`, read 2026-11-26 for
+  milestone 4b): nothing while the booth is `busy-with-border`; with the
+  shutter open, `BoothEngine.closeShutter` first (with a traveler who has
+  not yet seen it closed, it marks him and applies his `ShutterClose`
+  responses; with no traveler nothing); then the shutter goes to the
+  other state (`set_open`, which does nothing if it is already there).
+  The switch is a booth child, so it takes clicks only while the booth's
+  switch 8 is set: not in `off`, from the intro on. Its sounds are a
+  button's defaults, `button-down` and `button-up`, then the state's own.
+  `SMOOTHERSTEP(0, 1)` is `app.Num.smootherstep`: t held to 0..1, then
+  ((6t − 15)t + 10)t³, the constants 1, 6, 15 and 10 read from the DLL.
+- The shutter steps with the **game's** clock (`Shutter.update` takes the
+  entity tree's clock, not the booth's), so it does not jump after a
+  pause, where the booth's and the border's own clocks give up to 0.1 s
+  at once (`app.Clock`'s `maxDeltaTime`; milestone 4b).
 - Drawing: the shadow, then the traveler's parts that go in front of the
   shadow (`TravelerEnt.drawInFrontOfShutterShadow`: nothing while the
   traveler entity is not visible, which it is not until a traveler is

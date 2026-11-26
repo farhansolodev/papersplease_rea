@@ -27,6 +27,19 @@ mod js {
 
 pub struct PagePlatform;
 
+/// An Escape the browser took to leave full screen, in a browser that
+/// cannot give it to the page (`ppPlatform.takeLostEscape`, milestone 4b):
+/// the host passes it to the game as one press.
+#[cfg(target_arch = "wasm32")]
+pub fn take_lost_escape() -> bool {
+    js::call("takeLostEscape", &[]).as_bool().unwrap_or(false)
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn take_lost_escape() -> bool {
+    false
+}
+
 #[cfg(target_arch = "wasm32")]
 impl Platform for PagePlatform {
     fn fullscreen(&mut self) -> bool {

@@ -49,7 +49,7 @@ pub const SONG: &str = "Theme";
 /// the column is at most the screen less the notch less 40 high, the space
 /// left over is shared out per button (rounded down), and the column is
 /// centred on `center_y`.
-fn menu_column(heights: &[i32], center_y: f64) -> Vec<i32> {
+pub(crate) fn menu_column(heights: &[i32], center_y: f64) -> Vec<i32> {
     let total: i32 = heights.iter().sum();
     let n = heights.len() as i32;
     let height = f64::min(
